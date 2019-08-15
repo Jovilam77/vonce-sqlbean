@@ -1,0 +1,63 @@
+package cn.vonce.sql.annotation;
+
+import cn.vonce.sql.enumerate.JoinType;
+
+import java.lang.annotation.*;
+
+/**
+ * JoinType
+ *
+ * @author Jovi
+ * @version 1.0
+ * @email 766255988@qq.com
+ * @date 2019年6月21日上午12:00:00
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.ANNOTATION_TYPE)
+@Documented
+@Inherited
+public @interface SqlBeanJoin {
+
+    /**
+     * 连接类型
+     *
+     * @return
+     */
+    JoinType type() default JoinType.INNER_JOIN;
+
+    /**
+     * 连接的表名
+     *
+     * @return
+     */
+    String table() default "";
+
+    /**
+     * 连接表的别名
+     *
+     * @return
+     */
+    String tableAlias() default "";
+
+    /**
+     * 连接的表字段
+     *
+     * @return
+     */
+    String tableKeyword() default "";
+
+    /**
+     * 主表的字段
+     *
+     * @return
+     */
+    String mainKeyword() default "";
+
+    /**
+     * 连表查询的字段
+     *
+     * @return
+     */
+    String[] field() default "";
+
+}
