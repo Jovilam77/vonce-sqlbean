@@ -40,7 +40,7 @@ public class SqlHelper {
         if (SqlHelper.sqlBeanConfig == null) {
             isNull(sqlBeanConfig, "参数sqlBeanConfig为null");
             isNull(sqlBeanConfig.getDbType(), "请设置sqlBeanConfig > dbType(数据库类型)");
-            if (sqlBeanConfig.getDbType() == DbType.ORACLE) {
+            if (sqlBeanConfig.getDbType() == DbType.Oracle) {
                 isNull(sqlBeanConfig.getOracleToUpperCase(), "请设置sqlBeanConfig > oracleToUpperCase(sql语句是否转大写)");
             }
             SqlHelper.sqlBeanConfig = sqlBeanConfig;
@@ -85,7 +85,7 @@ public class SqlHelper {
         Integer[] pageParam = null;
         String orderSql = orderBySql(select);
         //SqlServer 分页处理
-        if (sqlBeanConfig.getDbType() == DbType.SQLSERVER2008) {
+        if (sqlBeanConfig.getDbType() == DbType.SQLServer2008) {
             if (SqlBeanUtil.isUsePage(select)) {
                 pageParam = pageParam(select);
                 sqlSb.append(SqlHelperCons.SELECT);
@@ -97,7 +97,7 @@ public class SqlHelper {
         //标准Sql
         sqlSb.append(select.isUseDistinct() ? SqlHelperCons.SELECT_DISTINCT : SqlHelperCons.SELECT);
         //SqlServer 分页处理
-        if (sqlBeanConfig.getDbType() == DbType.SQLSERVER2008) {
+        if (sqlBeanConfig.getDbType() == DbType.SQLServer2008) {
             if (SqlBeanUtil.isUsePage(select)) {
                 sqlSb.append(SqlHelperCons.TOP);
                 sqlSb.append(pageParam[0]);
@@ -120,7 +120,7 @@ public class SqlHelper {
             sqlSb.append(orderSql);
         }
         //SqlServer 分页处理
-        if (sqlBeanConfig.getDbType() == DbType.SQLSERVER2008) {
+        if (sqlBeanConfig.getDbType() == DbType.SQLServer2008) {
             // 主要逻辑 结束
             if (SqlBeanUtil.isUsePage(select)) {
                 sqlSb.append(SqlHelperCons.END_BRACKET);
@@ -137,13 +137,13 @@ public class SqlHelper {
             sqlSb.append(SqlHelperCons.END_BRACKET + SqlHelperCons.AS + SqlHelperCons.T);
         }
         //MySql 分页处理
-        if (sqlBeanConfig.getDbType() == DbType.MYSQL) {
+        if (sqlBeanConfig.getDbType() == DbType.MySQL) {
             if (SqlBeanUtil.isUsePage(select)) {
                 sqlSb.append(limitSql(select));
             }
         }
         //Oracle 分页处理
-        if (sqlBeanConfig.getDbType() == DbType.ORACLE) {
+        if (sqlBeanConfig.getDbType() == DbType.Oracle) {
             oraclePageDispose(select, sqlSb);
         }
         return sqlSb.toString();
@@ -459,7 +459,7 @@ public class SqlHelper {
         StringBuilder fieldAndValuesSql = new StringBuilder();
         List<String> valueSqlList = new ArrayList<>();
         String transferred = SqlBeanUtil.getTransferred();
-        if (sqlBeanConfig.getDbType() == DbType.ORACLE) {
+        if (sqlBeanConfig.getDbType() == DbType.Oracle) {
             if (sqlBeanConfig.getOracleToUpperCase()) {
                 tableName = tableName.toUpperCase();
             }
@@ -509,7 +509,7 @@ public class SqlHelper {
                 fieldSql.append(SqlHelperCons.END_BRACKET);
             }
         }
-        if (sqlBeanConfig.getDbType() == DbType.ORACLE) {
+        if (sqlBeanConfig.getDbType() == DbType.Oracle) {
             for (int k = 0; k < valueSqlList.size(); k++) {
                 if (k > 0) {
                     fieldAndValuesSql.append(SqlHelperCons.INTO);
@@ -522,7 +522,7 @@ public class SqlHelper {
             if (objects != null && objects.length > 1) {
                 fieldAndValuesSql.append(SqlHelperCons.SELECT_DUAL);
             }
-        } else if (sqlBeanConfig.getDbType() == DbType.MYSQL || sqlBeanConfig.getDbType() == DbType.SQLSERVER2008) {
+        } else if (sqlBeanConfig.getDbType() == DbType.MySQL || sqlBeanConfig.getDbType() == DbType.SQLServer2008) {
             for (int k = 0; k < valueSqlList.size(); k++) {
                 if (k == 0) {
                     fieldAndValuesSql.append(tableName);
@@ -776,7 +776,7 @@ public class SqlHelper {
             }
             orderBySql.deleteCharAt(orderBySql.length() - SqlHelperCons.COMMA.length());
         } else {
-            if (sqlBeanConfig.getDbType() == DbType.SQLSERVER2008 && !SqlBeanUtil.isCount(select)) {
+            if (sqlBeanConfig.getDbType() == DbType.SQLServer2008 && !SqlBeanUtil.isCount(select)) {
                 orderBySql.append(SqlHelperCons.ORDER_BY);
                 orderBySql.append(SqlBeanUtil.getFieldFullName(select.getFrom()[0], select.getPage().getIdName()));
             }
@@ -1061,13 +1061,13 @@ public class SqlHelper {
     public static Integer[] pageParam(Select select) {
         Integer[] param;
         //sqlserver
-        if (DbType.SQLSERVER2008 == sqlBeanConfig.getDbType()) {
+        if (DbType.SQLServer2008 == sqlBeanConfig.getDbType()) {
             int top = (select.getPage().getPagenum() + 1) * select.getPage().getPagesize();
             int begin = top - select.getPage().getPagesize();
             param = new Integer[]{top, begin};
         }
         //oracle
-        else if (DbType.ORACLE == sqlBeanConfig.getDbType()) {
+        else if (DbType.Oracle == sqlBeanConfig.getDbType()) {
             //startIndex = (当前页 * 每页显示的数量)，例如：(0 * 10)
             //endIndex = (当前页 * 每页显示的数量) + 每页显示的数量，例如：10 = (0 * 10) + 10
             //那么如果startIndex=0，endIndex=10，就是查询第0到10条数据

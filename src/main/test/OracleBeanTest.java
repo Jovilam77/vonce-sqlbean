@@ -32,7 +32,7 @@ public class OracleBeanTest {
         select.where(SqlLogic.ANDBracket, "sex", 1);
         select.setPage(0, 10);
         System.out.println("---select---");
-        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.ORACLE);
+        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.Oracle);
 //        sqlBeanConfig.setOracleToUpperCase(false);
         select.setSqlBeanConfig(sqlBeanConfig);
         System.out.println(SqlHelper.buildSelectSql(select));
@@ -50,7 +50,7 @@ public class OracleBeanTest {
         list.add(insertColumnInfo2);
         insert.setInsertBean(list);
         System.out.println("---insert---");
-        SqlBeanConfig sqlBeanConfig2 = new SqlBeanConfig(DbType.ORACLE);
+        SqlBeanConfig sqlBeanConfig2 = new SqlBeanConfig(DbType.Oracle);
 //        sqlBeanConfig2.setOracleToUpperCase(false);
         insert.setSqlBeanConfig(sqlBeanConfig2);
         System.out.println(SqlHelper.buildInsertSql(insert));
@@ -68,7 +68,7 @@ public class OracleBeanTest {
 //		update.setWhere("userId = 1111");
         update.where("id", 11);
         System.out.println("---update---");
-        update.setSqlBeanConfig(new SqlBeanConfig(DbType.ORACLE));
+        update.setSqlBeanConfig(new SqlBeanConfig(DbType.Oracle));
         System.out.println(SqlHelper.buildUpdateSql(update));
 
         // delete
@@ -77,7 +77,7 @@ public class OracleBeanTest {
         delete.where("name", "jovi");
         delete.setDeleteBable("user");
         System.out.println("---delete---");
-        delete.setSqlBeanConfig(new SqlBeanConfig(DbType.ORACLE));
+        delete.setSqlBeanConfig(new SqlBeanConfig(DbType.Oracle));
         System.out.println(SqlHelper.buildDeleteSql(delete));
 
 

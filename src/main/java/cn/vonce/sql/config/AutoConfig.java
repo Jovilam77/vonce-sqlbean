@@ -19,18 +19,16 @@ public class AutoConfig {
 
     @Bean
     @ConditionalOnUseMysql
-    public SqlBeanConfig mysqlSqlBeanConfig() {
-        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig();
-        sqlBeanConfig.setDbType(DbType.MYSQL);
+    public SqlBeanConfig mysqlConfig() {
+        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.MySQL);
         SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
     }
 
     @Bean
     @ConditionalOnUseOracle
-    public SqlBeanConfig oracleSqlBeanConfig() {
-        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig();
-        sqlBeanConfig.setDbType(DbType.ORACLE);
+    public SqlBeanConfig oracleConfig() {
+        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.Oracle);
         sqlBeanConfig.setOracleToUpperCase(true);
         SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
@@ -38,9 +36,24 @@ public class AutoConfig {
 
     @Bean
     @ConditionalOnUseSqlServer
-    public SqlBeanConfig sqlServerSqlBeanConfig() {
-        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig();
-        sqlBeanConfig.setDbType(DbType.SQLSERVER2008);
+    public SqlBeanConfig sqlServerConfig() {
+        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.SQLServer2008);
+        SqlHelper.init(sqlBeanConfig);
+        return sqlBeanConfig;
+    }
+
+    @Bean
+    @ConditionalOnUsePostgreSql
+    public SqlBeanConfig postgreSqlConfig() {
+        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.PostgreSQL);
+        SqlHelper.init(sqlBeanConfig);
+        return sqlBeanConfig;
+    }
+
+    @Bean
+    @ConditionalOnUseDB2
+    public SqlBeanConfig db2Config() {
+        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.DB2);
         SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
     }

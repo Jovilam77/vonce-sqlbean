@@ -662,7 +662,7 @@ public class SqlBeanUtil {
     public static String getTransferred() {
         SqlHelper.checkInitStatus();
         String transferred = SqlHelperCons.MYSQL_TRANSFERRED;
-        if (SqlHelper.getSqlBeanConfig().getDbType() == DbType.ORACLE || SqlHelper.getSqlBeanConfig().getDbType() == DbType.SQLSERVER2008) {
+        if (SqlHelper.getSqlBeanConfig().getDbType() == DbType.Oracle || SqlHelper.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
             transferred = SqlHelperCons.ORACLE_TRANSFERRED;
         }
         return transferred;
@@ -675,7 +675,7 @@ public class SqlBeanUtil {
      */
     public static boolean isOracleToUpperCase() {
         SqlHelper.checkInitStatus();
-        if (SqlHelper.getSqlBeanConfig().getDbType() == DbType.ORACLE && SqlHelper.getSqlBeanConfig().getOracleToUpperCase()) {
+        if (SqlHelper.getSqlBeanConfig().getDbType() == DbType.Oracle && SqlHelper.getSqlBeanConfig().getOracleToUpperCase()) {
             return true;
         }
         return false;

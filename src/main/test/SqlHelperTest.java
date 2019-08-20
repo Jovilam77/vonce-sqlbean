@@ -33,7 +33,7 @@ public class SqlHelperTest {
         select.having("sum(price)", 2999, ">");
         select.orderBy("user.id", SqlSort.DESC).orderBy("essay_comment.userId", SqlSort.ASC);
         System.out.println("---select---");
-        select.setSqlBeanConfig(new SqlBeanConfig(DbType.MYSQL));
+        select.setSqlBeanConfig(new SqlBeanConfig(DbType.MySQL));
         System.out.println(SqlHelper.buildSelectSql(select));
 
         // select2
@@ -44,7 +44,7 @@ public class SqlHelperTest {
         select2.where(SqlLogic.OR, "name", "vicky");
         select2.where(SqlLogic.ANDBracket, "sex", 1);
         System.out.println("---select2---");
-        select2.setSqlBeanConfig(new SqlBeanConfig(DbType.MYSQL));
+        select2.setSqlBeanConfig(new SqlBeanConfig(DbType.MySQL));
         System.out.println(SqlHelper.buildSelectSql(select2));
 
         // select3
@@ -59,7 +59,7 @@ public class SqlHelperTest {
         // MysqlBean3.where("name", "vicky");
         select3.where(SqlLogic.AND, "sex", stringList, SqlOperator.IN);
         System.out.println("---select3---");// where id between 1 and 2
-        select3.setSqlBeanConfig(new SqlBeanConfig(DbType.MYSQL));
+        select3.setSqlBeanConfig(new SqlBeanConfig(DbType.MySQL));
         System.out.println(SqlHelper.buildSelectSql(select3));
 
         // select4
@@ -74,7 +74,7 @@ public class SqlHelperTest {
         select4.wANDBracket("name", "vicky", SqlOperator.EQUAL_TO);
         select4.wOR("sex", stringList2, SqlOperator.IN);
         System.out.println("---select4---");// where id between 1 and 2
-        select4.setSqlBeanConfig(new SqlBeanConfig(DbType.MYSQL));
+        select4.setSqlBeanConfig(new SqlBeanConfig(DbType.MySQL));
         System.out.println(SqlHelper.buildSelectSql(select4));
 
         // update
@@ -90,7 +90,7 @@ public class SqlHelperTest {
 //		update.setWhere("userId = 1111");
         update.where("id", 11);
         System.out.println("---update---");
-        update.setSqlBeanConfig(new SqlBeanConfig(DbType.MYSQL));
+        update.setSqlBeanConfig(new SqlBeanConfig(DbType.MySQL));
         System.out.println(SqlHelper.buildUpdateSql(update));
 
         // update 2
@@ -99,7 +99,7 @@ public class SqlHelperTest {
         update2.setUpdateBean(updateColumnInfo);
 //		update2.where("id",11);
         System.out.println("---update 2---");
-        update2.setSqlBeanConfig(new SqlBeanConfig(DbType.MYSQL));
+        update2.setSqlBeanConfig(new SqlBeanConfig(DbType.MySQL));
         System.out.println(SqlHelper.buildUpdateSql(update2));
 
 
@@ -116,7 +116,7 @@ public class SqlHelperTest {
         list.add(insertColumnInfo2);
         insert.setInsertBean(list);
         System.out.println("---insert---");
-        insert.setSqlBeanConfig(new SqlBeanConfig(DbType.MYSQL));
+        insert.setSqlBeanConfig(new SqlBeanConfig(DbType.MySQL));
         System.out.println(SqlHelper.buildInsertSql(insert));
 
         // delete
@@ -125,7 +125,7 @@ public class SqlHelperTest {
         delete.where("name", "jovi");
         delete.setDeleteBable("user");
         System.out.println("---delete---");
-        delete.setSqlBeanConfig(new SqlBeanConfig(DbType.MYSQL));
+        delete.setSqlBeanConfig(new SqlBeanConfig(DbType.MySQL));
         System.out.println(SqlHelper.buildDeleteSql(delete));
 
         float excTime = (float) (System.currentTimeMillis() - startTime) / 1000;

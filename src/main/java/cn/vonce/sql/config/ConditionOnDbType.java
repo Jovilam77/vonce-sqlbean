@@ -47,15 +47,15 @@ public class ConditionOnDbType implements Condition {
                 }
             }
             if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseMysql.class.getName())) {
-                if (DbType.MYSQL == getDbType(driverClassName)) {
+                if (DbType.MySQL == getDbType(driverClassName)) {
                     return true;
                 }
             } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseOracle.class.getName())) {
-                if (DbType.ORACLE == getDbType(driverClassName)) {
+                if (DbType.Oracle == getDbType(driverClassName)) {
                     return true;
                 }
             } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseSqlServer.class.getName())) {
-                if (DbType.SQLSERVER2008 == getDbType(driverClassName)) {
+                if (DbType.SQLServer2008 == getDbType(driverClassName)) {
                     return true;
                 }
             }
@@ -224,13 +224,13 @@ public class ConditionOnDbType implements Condition {
      */
     private DbType getDbType(String driverClassName) {
         if ("com.mysql.jdbc.Driver".equals(driverClassName)) {
-            return DbType.MYSQL;
+            return DbType.MySQL;
         } else if ("oracle.jdbc.driver.OracleDriver".equals(driverClassName)) {
-            return DbType.ORACLE;
+            return DbType.Oracle;
         } else if ("com.microsoft.sqlserver.jdbc.SQLServerDriver".equals(driverClassName)) {
-            return DbType.SQLSERVER2008;
+            return DbType.SQLServer2008;
         } else {
-            return DbType.MYSQL;
+            return DbType.MySQL;
         }
     }
 

@@ -17,7 +17,7 @@ public class SqlHelperTest {
 
     public static void main(String[] args) {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig();
-        sqlBeanConfig.setDbType(DbType.MYSQL);
+        sqlBeanConfig.setDbType(DbType.MySQL);
         sqlBeanConfig.setOracleToUpperCase(false);
         SqlHelper.init(sqlBeanConfig);
 

@@ -505,7 +505,7 @@ public class SqlBeanProvider {
      */
     private void setPaging(Select select, Paging paging, Class<?> clazz) {
         if (paging != null) {
-            if (SqlHelper.getSqlBeanConfig().getDbType() == DbType.SQLSERVER2008) {
+            if (SqlHelper.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
                 try {
                     select.setPage(SqlBeanUtil.getFieldName(SqlBeanUtil.getIdField(clazz)), paging.getPagenum(), paging.getPagesize());
                 } catch (SqlBeanException e) {
