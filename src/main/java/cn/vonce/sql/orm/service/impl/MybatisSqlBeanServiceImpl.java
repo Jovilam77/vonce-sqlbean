@@ -1,7 +1,7 @@
 package cn.vonce.sql.orm.service.impl;
 
 import cn.vonce.sql.bean.*;
-import cn.vonce.sql.config.EnableAutoConfig;
+import cn.vonce.sql.config.UseMybatis;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.orm.dao.MybatisSqlBeanDao;
 import cn.vonce.sql.orm.service.SqlBeanService;
@@ -25,7 +25,7 @@ import java.util.Map;
  * @email 766255988@qq.com
  * @date 2018年5月15日下午3:57:58
  */
-@EnableAutoConfig
+@UseMybatis
 @Transactional(readOnly = true)
 @Service
 public class MybatisSqlBeanServiceImpl<T> implements SqlBeanService<T> {

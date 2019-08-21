@@ -17,9 +17,9 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(AutoConfig.class)
+@Import(MybatisAutoConfig.class)
 @MapperScan("cn.vonce.sql.orm.dao")
-public @interface EnableAutoConfig {
+public @interface UseMybatis {
 
 
 }

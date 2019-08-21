@@ -2,10 +2,7 @@ package cn.vonce.sql.config;
 
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.helper.SqlHelper;
-import cn.vonce.sql.orm.mapper.MybatisSqlBeanMapper;
-import org.apache.ibatis.plugin.Interceptor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 
 /**
  * 自动配置
@@ -56,13 +53,6 @@ public class AutoConfig {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.DB2);
         SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
-    }
-
-    @Bean
-    @Conditional(ConditionalOnUseMybatis.class)
-    public Interceptor interceptor() {
-        MybatisSqlBeanMapper mybatisMapperInterceptor = new MybatisSqlBeanMapper();
-        return mybatisMapperInterceptor;
     }
 
 }

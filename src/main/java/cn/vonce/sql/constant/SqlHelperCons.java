@@ -67,4 +67,6 @@ public class SqlHelperCons {
     public static final String INTO = " INTO ";
     public static final String SELECT_DUAL = " SELECT 1 FROM DUAL ";
 
+    public static final String OFFSET = " OFFSET ";
+
 }

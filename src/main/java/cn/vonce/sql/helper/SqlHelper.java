@@ -84,7 +84,7 @@ public class SqlHelper {
         StringBuilder sqlSb = new StringBuilder();
         Integer[] pageParam = null;
         String orderSql = orderBySql(select);
-        //SqlServer 分页处理
+        //SQLServer2008 分页处理
         if (sqlBeanConfig.getDbType() == DbType.SQLServer2008) {
             if (SqlBeanUtil.isUsePage(select)) {
                 pageParam = pageParam(select);
@@ -119,7 +119,7 @@ public class SqlHelper {
         if (!SqlBeanUtil.isCount(select)) {
             sqlSb.append(orderSql);
         }
-        //SqlServer 分页处理
+        //SQLServer2008 分页处理
         if (sqlBeanConfig.getDbType() == DbType.SQLServer2008) {
             // 主要逻辑 结束
             if (SqlBeanUtil.isUsePage(select)) {
@@ -136,73 +136,24 @@ public class SqlHelper {
             sqlSb.insert(0, SqlHelperCons.SELECT + SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET + SqlHelperCons.FROM + SqlHelperCons.BEGIN_BRACKET);
             sqlSb.append(SqlHelperCons.END_BRACKET + SqlHelperCons.AS + SqlHelperCons.T);
         }
-        //MySql 分页处理
+        //MySQL 分页处理
         if (sqlBeanConfig.getDbType() == DbType.MySQL) {
             if (SqlBeanUtil.isUsePage(select)) {
-                sqlSb.append(limitSql(select));
+                sqlSb.append(mysqlPageSql(select));
+            }
+        }
+        //PostgreSQL 分页处理
+        else if (sqlBeanConfig.getDbType() == DbType.PostgreSQL) {
+            if (SqlBeanUtil.isUsePage(select)) {
+                sqlSb.append(postgreSqlPageSql(select));
             }
         }
         //Oracle 分页处理
-        if (sqlBeanConfig.getDbType() == DbType.Oracle) {
+        else if (sqlBeanConfig.getDbType() == DbType.Oracle) {
             oraclePageDispose(select, sqlSb);
         }
         return sqlSb.toString();
     }
-
-//    /**
-//     * 生成mssql 查询语句<br>
-//     * SELECT * FROM (SELECT TOP 10 ROW_NUMBER() OVER(ORDER BY ID) ROWNUM, *
-//     * FROM BD_Menus ) T WHERE T.ROWNUM >= 6
-//     *
-//     * @param sqlBean
-//     * @return
-//     * @author Jovi
-//     * @date 2018年4月26日下午10:07:46
-//     */
-//    private static String buildMSSelectSql(SqlBean sqlBean) {
-//        StringBuilder sqlSb = new StringBuilder();
-//        if (select.isUsePage()) {
-//            sqlSb.append(SqlHelperCons.SELECT);
-//            sqlSb.append(SqlHelperCons.ALL);
-//            sqlSb.append(SqlHelperCons.FROM);
-//            sqlSb.append(SqlHelperCons.BEGIN_BRACKET);
-//        }
-//        // 主要逻辑 开始
-//        sqlSb.append(select.isUseDistinct() ? SqlHelperCons.SELECT_DISTINCT : SqlHelperCons.SELECT);
-//        if (select.isUsePage()) {
-//            sqlSb.append(SqlHelperCons.TOP);
-////            sqlSb.append(select.getTop());
-//            sqlSb.append(SqlHelperCons.ROW_NUMBER + SqlHelperCons.OVER + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ORDER_BY + SqlHelperCons.ID + SqlHelperCons.END_BRACKET + SqlHelperCons.ROWNUM + SqlHelperCons.COMMA);
-//        }
-//        sqlSb.append(select(sqlBean));
-//        sqlSb.append(SqlHelperCons.FROM);
-//        sqlSb.append(from(sqlBean));
-//        sqlSb.append(innerJoinSql(sqlBean));
-//        sqlSb.append(fullJoinSql(sqlBean));
-//        sqlSb.append(leftJoinSql(sqlBean));
-//        sqlSb.append(rightJoinSql(sqlBean));
-//        sqlSb.append(whereSql(sqlBean, select));
-//        String groupBySql = groupBySql(sqlBean);
-//        sqlSb.append(groupBySql);
-//        sqlSb.append(havingSql(sqlBean));
-//        if (!SqlBeanUtil.isCount(sqlBean)) {
-//            sqlSb.append(orderBySql(sqlBean));
-//        }
-//        // 主要逻辑 结束
-//        if (select.isUsePage()) {
-//            sqlSb.append(SqlHelperCons.END_BRACKET);
-//            sqlSb.append(SqlHelperCons.T);
-//            sqlSb.append(SqlHelperCons.WHERE);
-//            sqlSb.append(SqlHelperCons.T + SqlHelperCons.POINT + SqlHelperCons.ROWNUM);
-//            sqlSb.append(SqlHelperCons.GREAT_THAN_OR_EQUAL_TO);
-////            sqlSb.append(select.getBegin());
-//        }
-//        if (SqlBeanUtil.isCount(sqlBean) && StringUtils.isNotEmpty(groupBySql)) {
-//            sqlSb.insert(0, SqlHelperCons.SELECT + SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET + SqlHelperCons.FROM + SqlHelperCons.BEGIN_BRACKET);
-//            sqlSb.append(SqlHelperCons.END_BRACKET + SqlHelperCons.AS + SqlHelperCons.T);
-//        }
-//        return sqlSb.toString();
-//    }
 
     /**
      * 生成update sql语句(目前仅限数据库字段与实体类bean字段一致使用)
@@ -474,7 +425,7 @@ public class SqlHelper {
         for (int i = 0; i < objects.length; i++) {
             valueSql.delete(0, valueSql.length());
             Field[] fields = objects[i].getClass().getDeclaredFields();
-            int fieldsLength = fields.length;
+//            int fieldsLength = fields.length;
             //只有在循环第一遍的时候才会处理
             if (i == 0) {
                 fieldSql.append(SqlHelperCons.BEGIN_BRACKET);
@@ -482,12 +433,12 @@ public class SqlHelper {
             valueSql.append(SqlHelperCons.BEGIN_BRACKET);
             for (int j = 0; j < fields.length; j++) {
                 if (Modifier.isStatic(fields[j].getModifiers())) {
-                    --fieldsLength;
+//                    --fieldsLength;
                     continue;
                 }
                 String name = SqlBeanUtil.getFieldName(fields[j]);
                 if (SqlBeanUtil.isIgnore(fields[j])) {
-                    --fieldsLength;
+//                    --fieldsLength;
                     continue;
                 }
                 //只有在循环第一遍的时候才会处理
@@ -522,7 +473,7 @@ public class SqlHelper {
             if (objects != null && objects.length > 1) {
                 fieldAndValuesSql.append(SqlHelperCons.SELECT_DUAL);
             }
-        } else if (sqlBeanConfig.getDbType() == DbType.MySQL || sqlBeanConfig.getDbType() == DbType.SQLServer2008) {
+        } else if (sqlBeanConfig.getDbType() == DbType.MySQL || sqlBeanConfig.getDbType() == DbType.SQLServer2008 || sqlBeanConfig.getDbType() == DbType.PostgreSQL) {
             for (int k = 0; k < valueSqlList.size(); k++) {
                 if (k == 0) {
                     fieldAndValuesSql.append(tableName);
@@ -785,26 +736,6 @@ public class SqlHelper {
     }
 
     /**
-     * 返回limit语句
-     *
-     * @param select
-     * @return
-     * @author Jovi
-     * @date 2017年8月17日下午5:23:46
-     */
-    private static String limitSql(Select select) {
-        StringBuilder limit = new StringBuilder();
-        Integer[] param = pageParam(select);
-        limit.append(param[0]);
-        limit.append(SqlHelperCons.COMMA);
-        limit.append(param[1]);
-        if (limit != null && limit.length() != 0) {
-            limit.insert(0, SqlHelperCons.LIMIT);
-        }
-        return limit.toString();
-    }
-
-    /**
      * 条件处理
      *
      * @param conditionType
@@ -1028,6 +959,40 @@ public class SqlHelper {
     }
 
     /**
+     * 返回MySQL 分页语句
+     *
+     * @param select
+     * @return
+     * @author Jovi
+     * @date 2017年8月17日下午5:23:46
+     */
+    private static String mysqlPageSql(Select select) {
+        StringBuilder limit = new StringBuilder();
+        Integer[] param = pageParam(select);
+        limit.append(SqlHelperCons.LIMIT);
+        limit.append(param[0]);
+        limit.append(SqlHelperCons.COMMA);
+        limit.append(param[1]);
+        return limit.toString();
+    }
+
+    /**
+     * 返回PostgreSql 分页语句
+     *
+     * @param select
+     * @return
+     */
+    private static String postgreSqlPageSql(Select select) {
+        StringBuilder limit = new StringBuilder();
+        Integer[] param = pageParam(select);
+        limit.append(SqlHelperCons.LIMIT);
+        limit.append(param[1]);
+        limit.append(SqlHelperCons.OFFSET);
+        limit.append(param[0]);
+        return limit.toString();
+    }
+
+    /**
      * Oracle 分页处理
      *
      * @param select
@@ -1060,13 +1025,13 @@ public class SqlHelper {
      */
     public static Integer[] pageParam(Select select) {
         Integer[] param;
-        //sqlserver
+        //SQLServer2008
         if (DbType.SQLServer2008 == sqlBeanConfig.getDbType()) {
             int top = (select.getPage().getPagenum() + 1) * select.getPage().getPagesize();
             int begin = top - select.getPage().getPagesize();
             param = new Integer[]{top, begin};
         }
-        //oracle
+        //Oracle
         else if (DbType.Oracle == sqlBeanConfig.getDbType()) {
             //startIndex = (当前页 * 每页显示的数量)，例如：(0 * 10)
             //endIndex = (当前页 * 每页显示的数量) + 每页显示的数量，例如：10 = (0 * 10) + 10
@@ -1075,7 +1040,7 @@ public class SqlHelper {
             int endIndex = (select.getPage().getPagenum() * select.getPage().getPagesize()) + select.getPage().getPagesize();
             param = new Integer[]{startIndex, endIndex};
         }
-        //mysql
+        //Mysql、PostgreSQL
         else {
             int limitOffset = select.getPage().getPagenum() * select.getPage().getPagesize();
             int limitAmount = select.getPage().getPagesize();

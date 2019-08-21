@@ -599,11 +599,12 @@ public class SqlBeanUtil {
             case DATE_TYPE:
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 switch (SqlHelper.getSqlBeanConfig().getDbType()) {
-                    case MYSQL:
-                    case SQLSERVER2008:
+                    case MySQL:
+                    case SQLServer2008:
+                    case PostgreSQL:
                         sqlValue = single_quotation_mark + sdf.format(value) + single_quotation_mark;
                         break;
-                    case ORACLE:
+                    case Oracle:
                         sqlValue = "to_timestamp(" + single_quotation_mark + sdf.format(value) + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
                         break;
                 }
@@ -662,7 +663,8 @@ public class SqlBeanUtil {
     public static String getTransferred() {
         SqlHelper.checkInitStatus();
         String transferred = SqlHelperCons.MYSQL_TRANSFERRED;
-        if (SqlHelper.getSqlBeanConfig().getDbType() == DbType.Oracle || SqlHelper.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
+        DbType dbType = SqlHelper.getSqlBeanConfig().getDbType();
+        if (dbType == DbType.Oracle || dbType == DbType.SQLServer2008 || dbType == DbType.PostgreSQL) {
             transferred = SqlHelperCons.ORACLE_TRANSFERRED;
         }
         return transferred;

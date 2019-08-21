@@ -11,6 +11,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.util.ClassUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -56,6 +57,14 @@ public class ConditionOnDbType implements Condition {
                 }
             } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseSqlServer.class.getName())) {
                 if (DbType.SQLServer2008 == getDbType(driverClassName)) {
+                    return true;
+                }
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUsePostgreSql.class.getName())) {
+                if (DbType.PostgreSQL == getDbType(driverClassName)) {
+                    return true;
+                }
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseDB2.class.getName())) {
+                if (DbType.DB2 == getDbType(driverClassName)) {
                     return true;
                 }
             }
@@ -223,14 +232,18 @@ public class ConditionOnDbType implements Condition {
      * @return
      */
     private DbType getDbType(String driverClassName) {
-        if ("com.mysql.jdbc.Driver".equals(driverClassName)) {
+        if ("com.mysql.jdbc.Driver".equals(driverClassName) || "com.mysql.cj.jdbc.Driver".equals(driverClassName)) {
             return DbType.MySQL;
         } else if ("oracle.jdbc.driver.OracleDriver".equals(driverClassName)) {
             return DbType.Oracle;
         } else if ("com.microsoft.sqlserver.jdbc.SQLServerDriver".equals(driverClassName)) {
             return DbType.SQLServer2008;
+        } else if ("org.postgresql.Driver".equals(driverClassName)) {
+            return DbType.PostgreSQL;
+        } else if ("com.ibm.db2.jcc.DB2Driver".equals(driverClassName)) {
+            return DbType.DB2;
         } else {
-            return DbType.MySQL;
+            return null;
         }
     }
 
