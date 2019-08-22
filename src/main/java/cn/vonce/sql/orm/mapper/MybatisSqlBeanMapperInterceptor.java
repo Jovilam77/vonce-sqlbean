@@ -1,7 +1,6 @@
 package cn.vonce.sql.orm.mapper;
 
 import cn.vonce.common.uitls.ReflectUtil;
-import cn.vonce.sql.mapper.SqlBeanMapper;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.resultset.DefaultResultSetHandler;
@@ -28,9 +27,9 @@ import java.util.*;
  */
 @Intercepts(@Signature(method = "handleResultSets", type = ResultSetHandler.class, args = {Statement.class}))
 @Component
-public class MybatisSqlBeanMapper extends SqlBeanMapper implements Interceptor {
+public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements Interceptor {
 
-    private Logger logger = LoggerFactory.getLogger(MybatisSqlBeanMapper.class);
+    private Logger logger = LoggerFactory.getLogger(MybatisSqlBeanMapperInterceptor.class);
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {

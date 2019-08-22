@@ -1,6 +1,6 @@
 package cn.vonce.sql.config;
 
-import cn.vonce.sql.orm.mapper.MybatisSqlBeanMapper;
+import cn.vonce.sql.orm.mapper.MybatisSqlBeanMapperInterceptor;
 import org.apache.ibatis.plugin.Interceptor;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +25,13 @@ public class MybatisAutoConfig extends AutoConfig {
     @Bean
     @Conditional(ConditionalOnUseMybatis.class)
     public Interceptor interceptor() throws Exception {
-        MybatisSqlBeanMapper mybatisMapperInterceptor = new MybatisSqlBeanMapper();
+        MybatisSqlBeanMapperInterceptor mybatisMapperInterceptor = new MybatisSqlBeanMapperInterceptor();
         if (sqlSessionFactoryBean != null) {
             List<Interceptor> interceptorList = sqlSessionFactoryBean.getObject().getConfiguration().getInterceptors();
             if (interceptorList != null) {
                 boolean exist = false;
                 for (Interceptor interceptor : interceptorList) {
-                    if (interceptor instanceof MybatisSqlBeanMapper) {
+                    if (interceptor instanceof MybatisSqlBeanMapperInterceptor) {
                         exist = true;
                         break;
                     }

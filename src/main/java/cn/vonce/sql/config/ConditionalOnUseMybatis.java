@@ -1,6 +1,6 @@
 package cn.vonce.sql.config;
 
-import cn.vonce.sql.orm.mapper.MybatisSqlBeanMapper;
+import cn.vonce.sql.orm.mapper.MybatisSqlBeanMapperInterceptor;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
@@ -18,7 +18,7 @@ public class ConditionalOnUseMybatis implements Condition {
     @Override
     public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
         try {
-            String[] beanName = conditionContext.getBeanFactory().getBeanNamesForType(MybatisSqlBeanMapper.class);
+            String[] beanName = conditionContext.getBeanFactory().getBeanNamesForType(MybatisSqlBeanMapperInterceptor.class);
             if (beanName == null || beanName.length == 0) {
                 Class.forName("org.apache.ibatis.plugin.Interceptor");
                 return true;

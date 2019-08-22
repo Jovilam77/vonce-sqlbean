@@ -1,4 +1,4 @@
-package cn.vonce.sql.mapper;
+package cn.vonce.sql.orm.mapper;
 
 
 import cn.vonce.sql.annotation.SqlBeanField;

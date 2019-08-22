@@ -212,11 +212,6 @@
             <version>${vonce.common.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.jfinal</groupId>
-            <artifactId>jfinal</artifactId>
-            <version>4.3</version>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit}</version>

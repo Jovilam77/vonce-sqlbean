@@ -28,9 +28,6 @@ import java.util.List;
  * @date 2017年6月2日下午5:41:59
  */
 public class SqlHelper {
-    //这一版本实现Oracle、Ms sql兼容，其中Oracle已兼容，需大量测试
-    //下一版本实现代码优化、使用字节码代替反射
-    //下一版本实现乐观锁
 
     private static Logger logger = LoggerFactory.getLogger(SqlHelper.class);
 
@@ -136,8 +133,8 @@ public class SqlHelper {
             sqlSb.insert(0, SqlHelperCons.SELECT + SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET + SqlHelperCons.FROM + SqlHelperCons.BEGIN_BRACKET);
             sqlSb.append(SqlHelperCons.END_BRACKET + SqlHelperCons.AS + SqlHelperCons.T);
         }
-        //MySQL 分页处理
-        if (sqlBeanConfig.getDbType() == DbType.MySQL) {
+        //MySQL,MariaDB 分页处理
+        if (sqlBeanConfig.getDbType() == DbType.MySQL || sqlBeanConfig.getDbType() == DbType.MariaDB) {
             if (SqlBeanUtil.isUsePage(select)) {
                 sqlSb.append(mysqlPageSql(select));
             }
@@ -151,6 +148,10 @@ public class SqlHelper {
         //Oracle 分页处理
         else if (sqlBeanConfig.getDbType() == DbType.Oracle) {
             oraclePageDispose(select, sqlSb);
+        }
+        //DB2 分页处理
+        else if (sqlBeanConfig.getDbType() == DbType.DB2) {
+            db2PageDispose(select, sqlSb);
         }
         return sqlSb.toString();
     }
@@ -425,7 +426,6 @@ public class SqlHelper {
         for (int i = 0; i < objects.length; i++) {
             valueSql.delete(0, valueSql.length());
             Field[] fields = objects[i].getClass().getDeclaredFields();
-//            int fieldsLength = fields.length;
             //只有在循环第一遍的时候才会处理
             if (i == 0) {
                 fieldSql.append(SqlHelperCons.BEGIN_BRACKET);
@@ -433,12 +433,10 @@ public class SqlHelper {
             valueSql.append(SqlHelperCons.BEGIN_BRACKET);
             for (int j = 0; j < fields.length; j++) {
                 if (Modifier.isStatic(fields[j].getModifiers())) {
-//                    --fieldsLength;
                     continue;
                 }
                 String name = SqlBeanUtil.getFieldName(fields[j]);
                 if (SqlBeanUtil.isIgnore(fields[j])) {
-//                    --fieldsLength;
                     continue;
                 }
                 //只有在循环第一遍的时候才会处理
@@ -473,7 +471,7 @@ public class SqlHelper {
             if (objects != null && objects.length > 1) {
                 fieldAndValuesSql.append(SqlHelperCons.SELECT_DUAL);
             }
-        } else if (sqlBeanConfig.getDbType() == DbType.MySQL || sqlBeanConfig.getDbType() == DbType.SQLServer2008 || sqlBeanConfig.getDbType() == DbType.PostgreSQL) {
+        } else {
             for (int k = 0; k < valueSqlList.size(); k++) {
                 if (k == 0) {
                     fieldAndValuesSql.append(tableName);
@@ -539,121 +537,6 @@ public class SqlHelper {
         setSql.deleteCharAt(setSql.length() - SqlHelperCons.COMMA.length());
         return setSql.toString();
     }
-
-//    /**
-//     * 返回where语句
-//     *
-//     * @param sqlBean
-//     * @return
-//     * @throws Exception
-//     * @author Jovi
-//     * @date 2017年8月17日下午4:29:30
-//     */
-//    @SuppressWarnings("unchecked")
-//    private static String whereSql(SqlBean sqlBean, Common common) {
-//        StringBuilder whereSql = new StringBuilder();
-//        String transferred = SqlBeanUtil.getTransferred(sqlBean.getSqlBeanConfig());
-//        // 优先使用where 字符串拼接
-//        if (common.getWhere() != null && !"".equals(common.getWhere())) {
-//            whereSql.append(SqlHelperCons.WHERE);
-//            whereSql.append(SqlHelperCons.BEGIN_BRACKET);
-//            whereSql.append(common.getWhere());
-//            whereSql.append(SqlHelperCons.END_BRACKET);
-//        } else {
-//            if (common.getWhereMap().size() > 0) {
-//                whereSql.append(SqlHelperCons.BEGIN_BRACKET);
-//                int i = 0;
-//                // 遍历所有where条件
-//                for (String key : common.getWhereMap().keySet()) {
-//                    int j = 0;
-//                    List<SqlCondition> sqlConditionSet = common.getWhereMap().get(key);
-//                    for (SqlCondition sqlCondition : sqlConditionSet) {
-//                        Object value;
-//                        // 如果key使用#开头，实际值为传入值，不做任何处理
-//                        if (key.indexOf(SqlHelperCons.WELL_NUMBER) > -1) {
-//                            value = sqlCondition.getValue().toString();
-//                            sqlCondition.setField(sqlCondition.getField().substring(1));
-//                        } else {
-//                            value = sqlCondition.getValue();
-//                            // 如果值不为数组则做处理
-//                            if (!value.getClass().isArray() && !(value instanceof List)) {
-//                                value = SqlBeanUtil.getSqlValue(sqlBean.getSqlBeanConfig().getDbType(), value);
-//                            }
-//                        }
-//                        //where条件key 如果不写全名称默认加上(只支持主表)
-//                        if (select != null) {
-//                            if ((!select.getInnerJoin().isEmpty() || !select.getFullJoin().isEmpty() || !select.getLeftOuterJoin().isEmpty() || !select.getRightOuterJoin().isEmpty()) && sqlCondition.getField().indexOf(SqlHelperCons.POINT) == -1) {
-//                                sqlCondition.setField(transferred + select.getFrom()[0] + transferred + SqlHelperCons.POINT + sqlCondition.getField());
-//                            }
-//                        }
-//                        boolean needEndBracket = isNeedEndBracket(sqlCondition);
-//                        String operator = getOperator(sqlCondition);
-//                        // 遍历sql逻辑处理
-//                        if (((i == 0 && j != 0) || i != 0) && j < sqlConditionSet.size()) {
-//                            whereSql.append(getLogic(sqlCondition));
-//                        }
-//                        String fieldName = sqlCondition.getField();
-//                        if (SqlBeanUtil.isOracleToUpperCase(sqlBean.getSqlBeanConfig())) {
-//                            fieldName = fieldName.toUpperCase();
-//                        }
-//                        // 如果操作符为BETWEEN ，IN、NOT IN 则需额外处理
-//                        if (operator.indexOf(SqlHelperCons.BETWEEN) > -1) {
-//                            Object[] betweenValues;
-//                            if (value.getClass().isArray()) {
-//                                betweenValues = (Object[]) value;
-//                            } else if (value instanceof List) {
-//                                List<Object> list = ((List<Object>) value);
-//                                betweenValues = list.toArray();
-//                            } else {
-//                                try {
-//                                    throw new SqlBeanException("between 条件的值必须为Array或ArrayList");
-//                                } catch (SqlBeanException e) {
-//                                    e.printStackTrace();
-//                                    logger.error(e.getMessage(), e);
-//                                    return null;
-//                                }
-//                            }
-//                            whereSql.append(fieldName + operator + SqlBeanUtil.getSqlValue(sqlBean.getSqlBeanConfig().getDbType(), betweenValues[0]) + SqlHelperCons.AND + SqlBeanUtil.getSqlValue(sqlBean.getSqlBeanConfig().getDbType(), betweenValues[1]));
-//                        } else if (operator.indexOf(SqlHelperCons.IN) > -1) {
-//                            Object[] in_notInValues = {};
-//                            StringBuffer in_notIn = new StringBuffer();
-//                            if (value.getClass().isArray()) {
-//                                in_notInValues = (Object[]) value;
-//                            } else if (value instanceof List) {
-//                                List<Object> list = ((List<Object>) value);
-//                                in_notInValues = list.toArray();
-//                            } else {
-//                                whereSql.append(fieldName + operator + value);
-//                            }
-//                            if (in_notInValues != null && in_notInValues.length > 0) {
-//                                for (int k = 0; k < in_notInValues.length; k++) {
-//                                    in_notIn.append(SqlBeanUtil.getSqlValue(sqlBean.getSqlBeanConfig().getDbType(), in_notInValues[k]));
-//                                    if (k < in_notInValues.length - 1) {
-//                                        in_notIn.append(SqlHelperCons.COMMA);
-//                                    }
-//                                }
-//                                whereSql.append(fieldName + operator + in_notIn.toString());
-//                            }
-//                        } else {
-//                            whereSql.append(fieldName + operator + value);
-//                        }
-//                        // in与not in 额外加结束括号
-//                        if (needEndBracket) {
-//                            whereSql.append(SqlHelperCons.END_BRACKET);
-//                        }
-//                        j++;
-//                    }
-//                    i++;
-//                }
-//                whereSql.append(SqlHelperCons.END_BRACKET);
-//            }
-//            if (common != null && whereSql.length() != 0) {
-//                whereSql.insert(0, SqlHelperCons.WHERE);
-//            }
-//        }
-//        return whereSql.toString();
-//    }
-
 
     /**
      * 返回where语句
@@ -1018,6 +901,32 @@ public class SqlHelper {
     }
 
     /**
+     * DB2 分页处理
+     *
+     * @param select
+     * @param sqlSb
+     * @author Jovi
+     * @date 2019年8月22日下午20:14:10
+     */
+    private static void db2PageDispose(Select select, StringBuilder sqlSb) {
+        //db2 分页语句前缀
+        if (SqlBeanUtil.isUsePage(select)) {
+            Integer[] param = pageParam(select);
+            StringBuilder beginSqlSb = new StringBuilder();
+            beginSqlSb.append(SqlHelperCons.SELECT + SqlHelperCons.ALL + SqlHelperCons.FROM + SqlHelperCons.BEGIN_BRACKET);
+            beginSqlSb.append(SqlHelperCons.SELECT + SqlHelperCons.T + SqlHelperCons.POINT + SqlHelperCons.ALL + SqlHelperCons.COMMA + SqlHelperCons.ROW_NUMBER + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.SPACES + SqlHelperCons.END_BRACKET);
+            beginSqlSb.append(SqlHelperCons.OVER + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.SPACES + SqlHelperCons.END_BRACKET + SqlHelperCons.AS + SqlHelperCons.RN + SqlHelperCons.FROM + SqlHelperCons.BEGIN_BRACKET);
+            sqlSb.insert(0, beginSqlSb);
+            StringBuilder endSb = new StringBuilder();
+            endSb.append(SqlHelperCons.END_BRACKET + SqlHelperCons.T + SqlHelperCons.SPACES + SqlHelperCons.END_BRACKET + SqlHelperCons.TB + SqlHelperCons.WHERE + SqlHelperCons.TB + SqlHelperCons.POINT + SqlHelperCons.RN + SqlHelperCons.BETWEEN);
+            endSb.append(param[1]);
+            endSb.append(SqlHelperCons.AND);
+            endSb.append(param[0]);
+            sqlSb.append(endSb);
+        }
+    }
+
+    /**
      * 各个数据库的分页参数
      *
      * @param select
@@ -1031,8 +940,8 @@ public class SqlHelper {
             int begin = top - select.getPage().getPagesize();
             param = new Integer[]{top, begin};
         }
-        //Oracle
-        else if (DbType.Oracle == sqlBeanConfig.getDbType()) {
+        //Oracle,DB2
+        else if (DbType.Oracle == sqlBeanConfig.getDbType() || DbType.DB2 == sqlBeanConfig.getDbType()) {
             //startIndex = (当前页 * 每页显示的数量)，例如：(0 * 10)
             //endIndex = (当前页 * 每页显示的数量) + 每页显示的数量，例如：10 = (0 * 10) + 10
             //那么如果startIndex=0，endIndex=10，就是查询第0到10条数据
@@ -1040,7 +949,7 @@ public class SqlHelper {
             int endIndex = (select.getPage().getPagenum() * select.getPage().getPagesize()) + select.getPage().getPagesize();
             param = new Integer[]{startIndex, endIndex};
         }
-        //Mysql、PostgreSQL
+        //Mysql,MariaDB,PostgreSQL
         else {
             int limitOffset = select.getPage().getPagenum() * select.getPage().getPagesize();
             int limitAmount = select.getPage().getPagesize();

@@ -1,4 +1,4 @@
-package cn.vonce.sql.provider;
+package cn.vonce.sql.orm.provider;
 
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.constant.SqlHelperCons;

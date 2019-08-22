@@ -4,7 +4,6 @@ import cn.vonce.sql.bean.Delete;
 import cn.vonce.sql.bean.Paging;
 import cn.vonce.sql.bean.Select;
 import cn.vonce.sql.bean.Update;
-import cn.vonce.sql.provider.SqlBeanProvider;
 
 import java.util.Map;
 

@@ -234,6 +234,8 @@ public class ConditionOnDbType implements Condition {
     private DbType getDbType(String driverClassName) {
         if ("com.mysql.jdbc.Driver".equals(driverClassName) || "com.mysql.cj.jdbc.Driver".equals(driverClassName)) {
             return DbType.MySQL;
+        } else if ("org.mariadb.jdbc.Driver".equals(driverClassName)) {
+            return DbType.MariaDB;
         } else if ("oracle.jdbc.driver.OracleDriver".equals(driverClassName)) {
             return DbType.Oracle;
         } else if ("com.microsoft.sqlserver.jdbc.SQLServerDriver".equals(driverClassName)) {

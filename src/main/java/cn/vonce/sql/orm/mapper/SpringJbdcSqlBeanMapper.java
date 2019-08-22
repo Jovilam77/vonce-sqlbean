@@ -1,6 +1,5 @@
 package cn.vonce.sql.orm.mapper;
 
-import cn.vonce.sql.mapper.SqlBeanMapper;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -9,7 +8,9 @@ import java.sql.ResultSet;
 /**
  * Spring jdbc 结果映射
  *
- * @param <T>
+ * @author Jovi
+ * @version 1.0
+ * @email 766255988@qq.com
  */
 public class SpringJbdcSqlBeanMapper<T> extends SqlBeanMapper implements RowMapper<T> {
 

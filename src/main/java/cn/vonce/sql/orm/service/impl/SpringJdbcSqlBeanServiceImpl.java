@@ -4,7 +4,7 @@ import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.UseSpringJdbc;
 import cn.vonce.sql.orm.mapper.SpringJbdcSqlBeanMapper;
 import cn.vonce.sql.orm.service.SqlBeanService;
-import cn.vonce.sql.provider.SqlBeanProvider;
+import cn.vonce.sql.orm.provider.SqlBeanProvider;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

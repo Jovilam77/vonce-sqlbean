@@ -23,6 +23,14 @@ public class AutoConfig {
     }
 
     @Bean
+    @ConditionalOnUseMariaDB
+    public SqlBeanConfig mariaDBConfig() {
+        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.MariaDB);
+        SqlHelper.init(sqlBeanConfig);
+        return sqlBeanConfig;
+    }
+
+    @Bean
     @ConditionalOnUseOracle
     public SqlBeanConfig oracleConfig() {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.Oracle);
