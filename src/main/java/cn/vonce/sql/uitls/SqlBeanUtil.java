@@ -662,10 +662,10 @@ public class SqlBeanUtil {
      */
     public static String getTransferred() {
         SqlHelper.checkInitStatus();
-        String transferred = SqlHelperCons.MYSQL_TRANSFERRED;
+        String transferred = SqlHelperCons.ORACLE_TRANSFERRED;
         DbType dbType = SqlHelper.getSqlBeanConfig().getDbType();
-        if (dbType == DbType.Oracle || dbType == DbType.SQLServer2008 || dbType == DbType.PostgreSQL) {
-            transferred = SqlHelperCons.ORACLE_TRANSFERRED;
+        if (dbType == DbType.MySQL || dbType == DbType.MariaDB) {
+            transferred = SqlHelperCons.MYSQL_TRANSFERRED;
         }
         return transferred;
     }
