@@ -2,14 +2,12 @@ package cn.vonce.sql.orm.service.impl;
 
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.UseMybatis;
-import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.orm.dao.MybatisSqlBeanDao;
 import cn.vonce.sql.orm.service.SqlBeanService;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -34,9 +32,6 @@ public class MybatisSqlBeanServiceImpl<T> implements SqlBeanService<T> {
      *
      */
     private static final long serialVersionUID = 1L;
-
-    @Autowired
-    public SqlBeanConfig sqlBeanConfig;
 
     @Autowired
     public MybatisSqlBeanDao<T> mybatisSqlBeanDao;

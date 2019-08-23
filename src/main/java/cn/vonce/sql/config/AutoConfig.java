@@ -34,7 +34,7 @@ public class AutoConfig {
     @ConditionalOnUseOracle
     public SqlBeanConfig oracleConfig() {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.Oracle);
-        sqlBeanConfig.setOracleToUpperCase(true);
+        sqlBeanConfig.setToUpperCase(true);
         SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
     }
@@ -59,6 +59,7 @@ public class AutoConfig {
     @ConditionalOnUseDB2
     public SqlBeanConfig db2Config() {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.DB2);
+        sqlBeanConfig.setToUpperCase(true);
         SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
     }

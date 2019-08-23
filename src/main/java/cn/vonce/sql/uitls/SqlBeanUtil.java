@@ -304,7 +304,7 @@ public class SqlBeanUtil {
             String tableAlias = join.getTableAlias();
             String tableKeyword = join.getTableKeyword();
             String mainKeyword = join.getMainKeyword();
-            if (isOracleToUpperCase()) {
+            if (isToUpperCase()) {
                 tableName = tableName.toUpperCase();
                 tableAlias = tableAlias.toUpperCase();
                 tableKeyword = tableKeyword.toUpperCase();
@@ -367,7 +367,7 @@ public class SqlBeanUtil {
      */
     public static String getFieldFullName(String tableAlias, String fieldName, String alias) {
         String transferred = getTransferred();
-        if (isOracleToUpperCase()) {
+        if (isToUpperCase()) {
             tableAlias = tableAlias.toUpperCase();
             fieldName = fieldName.toUpperCase();
         }
@@ -599,13 +599,11 @@ public class SqlBeanUtil {
             case DATE_TYPE:
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 switch (SqlHelper.getSqlBeanConfig().getDbType()) {
-                    case MySQL:
-                    case SQLServer2008:
-                    case PostgreSQL:
-                        sqlValue = single_quotation_mark + sdf.format(value) + single_quotation_mark;
-                        break;
                     case Oracle:
                         sqlValue = "to_timestamp(" + single_quotation_mark + sdf.format(value) + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
+                        break;
+                    default:
+                        sqlValue = single_quotation_mark + sdf.format(value) + single_quotation_mark;
                         break;
                 }
                 break;
@@ -662,10 +660,10 @@ public class SqlBeanUtil {
      */
     public static String getTransferred() {
         SqlHelper.checkInitStatus();
-        String transferred = SqlHelperCons.ORACLE_TRANSFERRED;
+        String transferred = SqlHelperCons.DOUBLE_ESCAPE_CHARACTER;
         DbType dbType = SqlHelper.getSqlBeanConfig().getDbType();
         if (dbType == DbType.MySQL || dbType == DbType.MariaDB) {
-            transferred = SqlHelperCons.MYSQL_TRANSFERRED;
+            transferred = SqlHelperCons.SINGLE_ESCAPE_CHARACTER;
         }
         return transferred;
     }
@@ -675,9 +673,9 @@ public class SqlBeanUtil {
      *
      * @return
      */
-    public static boolean isOracleToUpperCase() {
+    public static boolean isToUpperCase() {
         SqlHelper.checkInitStatus();
-        if (SqlHelper.getSqlBeanConfig().getDbType() == DbType.Oracle && SqlHelper.getSqlBeanConfig().getOracleToUpperCase()) {
+        if (SqlHelper.getSqlBeanConfig().getToUpperCase() != null && SqlHelper.getSqlBeanConfig().getToUpperCase()) {
             return true;
         }
         return false;

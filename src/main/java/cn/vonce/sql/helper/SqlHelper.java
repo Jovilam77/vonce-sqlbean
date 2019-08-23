@@ -37,8 +37,8 @@ public class SqlHelper {
         if (SqlHelper.sqlBeanConfig == null) {
             isNull(sqlBeanConfig, "参数sqlBeanConfig为null");
             isNull(sqlBeanConfig.getDbType(), "请设置sqlBeanConfig > dbType(数据库类型)");
-            if (sqlBeanConfig.getDbType() == DbType.Oracle) {
-                isNull(sqlBeanConfig.getOracleToUpperCase(), "请设置sqlBeanConfig > oracleToUpperCase(sql语句是否转大写)");
+            if (sqlBeanConfig.getDbType() == DbType.Oracle || sqlBeanConfig.getDbType() == DbType.DB2) {
+                isNull(sqlBeanConfig.getToUpperCase(), "请设置sqlBeanConfig > toUpperCase(sql语句是否转大写)");
             }
             SqlHelper.sqlBeanConfig = sqlBeanConfig;
         }
@@ -238,7 +238,7 @@ public class SqlHelper {
         checkInitStatus();
         StringBuilder sqlSb = new StringBuilder();
         sqlSb.append(SqlHelperCons.DELETE_FROM);
-        sqlSb.append(SqlBeanUtil.isOracleToUpperCase() ? delete.getDeleteBable().toUpperCase() : delete.getDeleteBable());
+        sqlSb.append(SqlBeanUtil.isToUpperCase() ? delete.getDeleteBable().toUpperCase() : delete.getDeleteBable());
         sqlSb.append(whereSql(delete));
         return sqlSb.toString();
     }
@@ -263,7 +263,7 @@ public class SqlHelper {
         } else {
             tableName = bean.getClass().getSimpleName();
         }
-        return SqlBeanUtil.isOracleToUpperCase() ? tableName.toUpperCase() : tableName;
+        return SqlBeanUtil.isToUpperCase() ? tableName.toUpperCase() : tableName;
     }
 
     /**
@@ -298,11 +298,11 @@ public class SqlHelper {
         StringBuilder fromSql = new StringBuilder();
         if (select.getFrom() != null && select.getFrom().length == 1) {
             String tableName = select.getFrom()[0];
-            return SqlBeanUtil.isOracleToUpperCase() ? tableName.toUpperCase() : tableName;
+            return SqlBeanUtil.isToUpperCase() ? tableName.toUpperCase() : tableName;
         } else if (select.getFrom() != null && select.getFrom().length > 1) {
             for (int i = 0; i < select.getFrom().length; i++) {
                 String tableName = select.getFrom()[i];
-                fromSql.append(SqlBeanUtil.isOracleToUpperCase() ? tableName.toUpperCase() : tableName);
+                fromSql.append(SqlBeanUtil.isToUpperCase() ? tableName.toUpperCase() : tableName);
                 fromSql.append(SqlHelperCons.COMMA);
             }
             fromSql.deleteCharAt(fromSql.length() - SqlHelperCons.COMMA.length());
@@ -412,7 +412,7 @@ public class SqlHelper {
         List<String> valueSqlList = new ArrayList<>();
         String transferred = SqlBeanUtil.getTransferred();
         if (sqlBeanConfig.getDbType() == DbType.Oracle) {
-            if (sqlBeanConfig.getOracleToUpperCase()) {
+            if (sqlBeanConfig.getToUpperCase()) {
                 tableName = tableName.toUpperCase();
             }
             if (objects != null && objects.length > 1) {
@@ -441,7 +441,7 @@ public class SqlHelper {
                 }
                 //只有在循环第一遍的时候才会处理
                 if (i == 0) {
-                    fieldSql.append(transferred + (SqlBeanUtil.isOracleToUpperCase() ? name.toUpperCase() : name) + transferred);
+                    fieldSql.append(transferred + (SqlBeanUtil.isToUpperCase() ? name.toUpperCase() : name) + transferred);
                     fieldSql.append(SqlHelperCons.COMMA);
                 }
                 fields[j].setAccessible(true);
@@ -531,7 +531,7 @@ public class SqlHelper {
             } else {
                 value = SqlHelperCons.EQUAL_TO + SqlBeanUtil.getSqlValue(objectValue);
             }
-            setSql.append(transferred + (SqlBeanUtil.isOracleToUpperCase() ? name.toUpperCase() : name) + transferred + value);
+            setSql.append(transferred + (SqlBeanUtil.isToUpperCase() ? name.toUpperCase() : name) + transferred + value);
             setSql.append(SqlHelperCons.COMMA);
         }
         setSql.deleteCharAt(setSql.length() - SqlHelperCons.COMMA.length());
@@ -662,7 +662,7 @@ public class SqlHelper {
                             conditioneSql.append(getLogic(sqlCondition));
                         }
                         String fieldName = sqlCondition.getField();
-                        if (SqlBeanUtil.isOracleToUpperCase()) {
+                        if (SqlBeanUtil.isToUpperCase()) {
                             fieldName = fieldName.toUpperCase();
                         }
                         conditioneSql.append(valueOperator(operator, fieldName, value, needEndBracket));
@@ -914,7 +914,7 @@ public class SqlHelper {
             Integer[] param = pageParam(select);
             StringBuilder beginSqlSb = new StringBuilder();
             beginSqlSb.append(SqlHelperCons.SELECT + SqlHelperCons.ALL + SqlHelperCons.FROM + SqlHelperCons.BEGIN_BRACKET);
-            beginSqlSb.append(SqlHelperCons.SELECT + SqlHelperCons.T + SqlHelperCons.POINT + SqlHelperCons.ALL + SqlHelperCons.COMMA + SqlHelperCons.ROW_NUMBER + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.SPACES + SqlHelperCons.END_BRACKET);
+            beginSqlSb.append(SqlHelperCons.SELECT + SqlHelperCons.T + SqlHelperCons.POINT + SqlHelperCons.ALL + SqlHelperCons.COMMA + SqlHelperCons.ROWNUMBER);
             beginSqlSb.append(SqlHelperCons.OVER + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.SPACES + SqlHelperCons.END_BRACKET + SqlHelperCons.AS + SqlHelperCons.RN + SqlHelperCons.FROM + SqlHelperCons.BEGIN_BRACKET);
             sqlSb.insert(0, beginSqlSb);
             StringBuilder endSb = new StringBuilder();

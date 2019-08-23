@@ -51,6 +51,10 @@ public class ConditionOnDbType implements Condition {
                 if (DbType.MySQL == getDbType(driverClassName)) {
                     return true;
                 }
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseMariaDB.class.getName())) {
+                if (DbType.MariaDB == getDbType(driverClassName)) {
+                    return true;
+                }
             } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseOracle.class.getName())) {
                 if (DbType.Oracle == getDbType(driverClassName)) {
                     return true;

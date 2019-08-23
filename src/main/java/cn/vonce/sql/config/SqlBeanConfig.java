@@ -23,7 +23,7 @@ public class SqlBeanConfig implements Serializable {
     }
 
     private DbType dbType;
-    private Boolean oracleToUpperCase;
+    private Boolean toUpperCase;
 
     public DbType getDbType() {
         return dbType;
@@ -35,13 +35,13 @@ public class SqlBeanConfig implements Serializable {
         }
     }
 
-    public Boolean getOracleToUpperCase() {
-        return oracleToUpperCase;
+    public Boolean getToUpperCase() {
+        return toUpperCase;
     }
 
-    public void setOracleToUpperCase(Boolean oracleToUpperCase) {
-        if (this.oracleToUpperCase == null) {
-            this.oracleToUpperCase = oracleToUpperCase;
+    public void setToUpperCase(Boolean toUpperCase) {
+        if (this.toUpperCase == null) {
+            this.toUpperCase = toUpperCase;
         }
     }
 
