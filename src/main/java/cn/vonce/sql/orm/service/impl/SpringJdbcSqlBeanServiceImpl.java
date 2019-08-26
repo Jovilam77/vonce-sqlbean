@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -28,7 +26,6 @@ import java.util.Map;
  * @date 2019年5月22日下午16:20:12
  */
 @UseSpringJdbc
-@Transactional(readOnly = true)
 @Service
 public class SpringJdbcSqlBeanServiceImpl<T> extends SqlBeanProvider implements SqlBeanService<T> {
 
@@ -332,115 +329,96 @@ public class SpringJdbcSqlBeanServiceImpl<T> extends SqlBeanProvider implements 
         return jdbcTemplate.queryForObject(super.countSql(clazz, select), Long.class);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long deleteById(Object... id) {
         return jdbcTemplate.update(super.deleteByIdSql(clazz, id));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long deleteByCondition(String where, Object... args) {
         return jdbcTemplate.update(super.deleteByConditionSql(clazz, where, args));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long delete(Delete delete) {
         return jdbcTemplate.update(super.deleteSql(clazz, delete, false));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long delete(Delete delete, boolean ignore) {
         return jdbcTemplate.update(super.deleteSql(clazz, delete, ignore));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long logicallyDeleteById(Object id) {
         return jdbcTemplate.update(super.logicallyDeleteByIdSql(clazz, id));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long logicallyDeleteByCondition(String where, Object... args) {
         return jdbcTemplate.update(super.logicallyDeleteByConditionSql(clazz, where, args));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long update(Update update) {
         return jdbcTemplate.update(super.updateSql(update, false));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long update(Update update, boolean ignore) {
         return jdbcTemplate.update(super.updateSql(update, ignore));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateById(T bean, Object id, boolean updateNotNull) {
         return jdbcTemplate.update(super.updateByIdSql(bean, id, updateNotNull, null));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateById(T bean, Object id, boolean updateNotNull, String[] filterFields) {
         return jdbcTemplate.update(super.updateByIdSql(bean, id, updateNotNull, filterFields));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateByBeanId(T bean, boolean updateNotNull) {
         return jdbcTemplate.update(super.updateByBeanIdSql(bean, updateNotNull, null));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateByBeanId(T bean, boolean updateNotNull, String[] filterFields) {
         return jdbcTemplate.update(super.updateByBeanIdSql(bean, updateNotNull, filterFields));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateByCondition(T bean, boolean updateNotNull, String where, Object... args) {
         return jdbcTemplate.update(super.updateByConditionSql(bean, updateNotNull, null, where, args));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateByCondition(T bean, boolean updateNotNull, String[] filterFields, String where, Object... args) {
         return jdbcTemplate.update(super.updateByConditionSql(bean, updateNotNull, filterFields, where, args));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateByBeanCondition(T bean, boolean updateNotNull, String where) {
         return jdbcTemplate.update(super.updateByBeanConditionSql(bean, updateNotNull, null, where));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateByBeanCondition(T bean, boolean updateNotNull, String[] filterFields, String where) {
         return jdbcTemplate.update(super.updateByBeanConditionSql(bean, updateNotNull, filterFields, where));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long insert(T... bean) {
         return jdbcTemplate.update(super.insertBeanSql(bean));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long insert(List<T> beanList) {
         return jdbcTemplate.update(super.insertBeanSql(beanList));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long inset(Insert insert) {
         return jdbcTemplate.update(super.insertBeanSql(insert));

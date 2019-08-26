@@ -669,7 +669,7 @@ public class SqlBeanUtil {
     }
 
     /**
-     * 是否为Oracle数据是否需要转大写
+     * 是否需要转大写
      *
      * @return
      */

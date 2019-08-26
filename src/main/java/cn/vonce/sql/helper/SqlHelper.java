@@ -135,15 +135,11 @@ public class SqlHelper {
         }
         //MySQL,MariaDB 分页处理
         if (sqlBeanConfig.getDbType() == DbType.MySQL || sqlBeanConfig.getDbType() == DbType.MariaDB) {
-            if (SqlBeanUtil.isUsePage(select)) {
-                sqlSb.append(mysqlPageSql(select));
-            }
+            mysqlPageDispose(select, sqlSb);
         }
         //PostgreSQL 分页处理
         else if (sqlBeanConfig.getDbType() == DbType.PostgreSQL) {
-            if (SqlBeanUtil.isUsePage(select)) {
-                sqlSb.append(postgreSqlPageSql(select));
-            }
+            postgreSqlPageDispose(select, sqlSb);
         }
         //Oracle 分页处理
         else if (sqlBeanConfig.getDbType() == DbType.Oracle) {
@@ -849,14 +845,14 @@ public class SqlHelper {
      * @author Jovi
      * @date 2017年8月17日下午5:23:46
      */
-    private static String mysqlPageSql(Select select) {
-        StringBuilder limit = new StringBuilder();
-        Integer[] param = pageParam(select);
-        limit.append(SqlHelperCons.LIMIT);
-        limit.append(param[0]);
-        limit.append(SqlHelperCons.COMMA);
-        limit.append(param[1]);
-        return limit.toString();
+    private static void mysqlPageDispose(Select select, StringBuilder sqlSb) {
+        if (SqlBeanUtil.isUsePage(select)) {
+            Integer[] param = pageParam(select);
+            sqlSb.append(SqlHelperCons.LIMIT);
+            sqlSb.append(param[0]);
+            sqlSb.append(SqlHelperCons.COMMA);
+            sqlSb.append(param[1]);
+        }
     }
 
     /**
@@ -865,14 +861,14 @@ public class SqlHelper {
      * @param select
      * @return
      */
-    private static String postgreSqlPageSql(Select select) {
-        StringBuilder limit = new StringBuilder();
-        Integer[] param = pageParam(select);
-        limit.append(SqlHelperCons.LIMIT);
-        limit.append(param[1]);
-        limit.append(SqlHelperCons.OFFSET);
-        limit.append(param[0]);
-        return limit.toString();
+    private static void postgreSqlPageDispose(Select select, StringBuilder sqlSb) {
+        if (SqlBeanUtil.isUsePage(select)) {
+            Integer[] param = pageParam(select);
+            sqlSb.append(SqlHelperCons.LIMIT);
+            sqlSb.append(param[1]);
+            sqlSb.append(SqlHelperCons.OFFSET);
+            sqlSb.append(param[0]);
+        }
     }
 
     /**
@@ -919,9 +915,9 @@ public class SqlHelper {
             sqlSb.insert(0, beginSqlSb);
             StringBuilder endSb = new StringBuilder();
             endSb.append(SqlHelperCons.END_BRACKET + SqlHelperCons.T + SqlHelperCons.SPACES + SqlHelperCons.END_BRACKET + SqlHelperCons.TB + SqlHelperCons.WHERE + SqlHelperCons.TB + SqlHelperCons.POINT + SqlHelperCons.RN + SqlHelperCons.BETWEEN);
-            endSb.append(param[1]);
-            endSb.append(SqlHelperCons.AND);
             endSb.append(param[0]);
+            endSb.append(SqlHelperCons.AND);
+            endSb.append(param[1]);
             sqlSb.append(endSb);
         }
     }

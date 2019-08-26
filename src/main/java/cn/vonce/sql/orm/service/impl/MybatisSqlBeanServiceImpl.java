@@ -7,7 +7,6 @@ import cn.vonce.sql.orm.service.SqlBeanService;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -24,7 +23,6 @@ import java.util.Map;
  * @date 2018年5月15日下午3:57:58
  */
 @UseMybatis
-@Transactional(readOnly = true)
 @Service
 public class MybatisSqlBeanServiceImpl<T> implements SqlBeanService<T> {
 
@@ -201,116 +199,97 @@ public class MybatisSqlBeanServiceImpl<T> implements SqlBeanService<T> {
         return mybatisSqlBeanDao.count(clazz, select);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long deleteById(Object... id) {
         return mybatisSqlBeanDao.deleteById(clazz, id);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long deleteByCondition(String where, Object... args) {
         return mybatisSqlBeanDao.deleteByCondition(clazz, where, args);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long delete(Delete delete) {
         return mybatisSqlBeanDao.delete(clazz, delete, false);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long delete(Delete delete, boolean ignore) {
         return mybatisSqlBeanDao.delete(clazz, delete, ignore);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long logicallyDeleteById(Object id) {
         return mybatisSqlBeanDao.logicallyDeleteById(clazz, id);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long logicallyDeleteByCondition(String where, Object... args) {
         return mybatisSqlBeanDao.logicallyDeleteByCondition(clazz, where, args);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long update(Update update) {
         return mybatisSqlBeanDao.update(update, false);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long update(Update update, boolean ignore) {
         return mybatisSqlBeanDao.update(update, ignore);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateById(T bean, Object id, boolean updateNotNull) {
         return mybatisSqlBeanDao.updateById(bean, id, updateNotNull, null);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateById(T bean, Object id, boolean updateNotNull, String[] filterFields) {
         return mybatisSqlBeanDao.updateById(bean, id, updateNotNull, filterFields);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateByBeanId(T bean, boolean updateNotNull) {
         return mybatisSqlBeanDao.updateByBeanId(bean, updateNotNull, null);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateByBeanId(T bean, boolean updateNotNull, String[] filterFields) {
         return mybatisSqlBeanDao.updateByBeanId(bean, updateNotNull, filterFields);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateByCondition(T bean, boolean updateNotNull, String where, Object... args) {
         return mybatisSqlBeanDao.updateByCondition(bean, updateNotNull, null, where, args);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateByCondition(T bean, boolean updateNotNull, String[] filterFields, String where, Object... args) {
         return mybatisSqlBeanDao.updateByCondition(bean, updateNotNull, filterFields, where, args);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateByBeanCondition(T bean, boolean updateNotNull, String where) {
         return mybatisSqlBeanDao.updateByBeanCondition(bean, updateNotNull, null, where);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long updateByBeanCondition(T bean, boolean updateNotNull, String[] filterFields, String where) {
         return mybatisSqlBeanDao.updateByBeanCondition(bean, updateNotNull, filterFields, where);
     }
 
     @SuppressWarnings("unchecked")
-    @Transactional(readOnly = false)
     @Override
     public long insert(T... bean) {
         return mybatisSqlBeanDao.insertBean(Arrays.asList(bean));
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long insert(List<T> beanList) {
         return mybatisSqlBeanDao.insertBean(beanList);
     }
 
-    @Transactional(readOnly = false)
     @Override
     public long inset(Insert insert) {
         return mybatisSqlBeanDao.insert(insert);
