@@ -1,13 +1,12 @@
 package cn.vonce.sql.uitls;
 
-import cn.vonce.common.uitls.StringUtil;
+import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.annotation.SqlBeanField;
 import cn.vonce.sql.annotation.SqlBeanJoin;
 import cn.vonce.sql.annotation.SqlBeanPojo;
 import cn.vonce.sql.annotation.SqlBeanTable;
 import cn.vonce.sql.bean.Join;
 import cn.vonce.sql.bean.Select;
-import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.JoinType;

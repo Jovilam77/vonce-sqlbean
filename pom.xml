@@ -117,7 +117,7 @@
 
     <artifactId>vonce-sqlbean</artifactId>
     <groupId>cn.vonce</groupId>
-    <version>0.9.7</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <!-- 版本信息 -->
@@ -137,7 +137,7 @@
         <com.google.guava.version>20.0</com.google.guava.version>
         <com.github.penggle.version>2.3.2</com.github.penggle.version>
         <com.google.code.gson.version>2.3</com.google.code.gson.version>
-        <vonce.common.version>1.0.0</vonce.common.version>
+        <vonce.common.version>1.0.1</vonce.common.version>
         <junit>4.12</junit>
     </properties>
 

@@ -1,5 +1,5 @@
 
-import cn.vonce.common.uitls.DateUtil;
+import cn.vonce.common.utils.DateUtil;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.enumerate.DbType;

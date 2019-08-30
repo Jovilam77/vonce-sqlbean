@@ -1,6 +1,6 @@
 package cn.vonce.sql.orm.mapper;
 
-import cn.vonce.common.uitls.ReflectUtil;
+import cn.vonce.common.utils.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.resultset.DefaultResultSetHandler;

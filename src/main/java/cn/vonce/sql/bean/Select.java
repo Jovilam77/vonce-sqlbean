@@ -1,6 +1,6 @@
 package cn.vonce.sql.bean;
 
-import cn.vonce.common.uitls.StringUtil;
+import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.DbType;

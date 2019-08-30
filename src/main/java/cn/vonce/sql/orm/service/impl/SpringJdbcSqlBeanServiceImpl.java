@@ -42,9 +42,9 @@ public class SpringJdbcSqlBeanServiceImpl<T> extends SqlBeanProvider implements 
     public Class<?> clazz;
 
     public SpringJdbcSqlBeanServiceImpl() {
-        Type[] typeArray = getClass().getGenericInterfaces();
+        Type[] typeArray = new Type[]{getClass().getGenericSuperclass()};
         if (typeArray == null || typeArray.length == 0) {
-            typeArray = new Type[]{getClass().getGenericSuperclass()};
+            typeArray = getClass().getGenericInterfaces();
         }
         for (Type type : typeArray) {
             if (type instanceof ParameterizedType) {

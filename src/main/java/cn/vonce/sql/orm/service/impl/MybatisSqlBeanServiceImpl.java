@@ -7,6 +7,7 @@ import cn.vonce.sql.orm.service.SqlBeanService;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -37,9 +38,9 @@ public class MybatisSqlBeanServiceImpl<T> implements SqlBeanService<T> {
     public Class<?> clazz;
 
     public MybatisSqlBeanServiceImpl() {
-        Type[] typeArray = getClass().getGenericInterfaces();
+        Type[] typeArray = new Type[]{getClass().getGenericSuperclass()};
         if (typeArray == null || typeArray.length == 0) {
-            typeArray = new Type[]{getClass().getGenericSuperclass()};
+            typeArray = getClass().getGenericInterfaces();
         }
         for (Type type : typeArray) {
             if (type instanceof ParameterizedType) {

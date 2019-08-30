@@ -1,7 +1,7 @@
 package cn.vonce.sql.config;
 
-import cn.vonce.common.uitls.StringUtil;
-import cn.vonce.common.uitls.XmlConverUtil;
+import cn.vonce.common.utils.StringUtil;
+import cn.vonce.common.utils.XmlConverUtil;
 import cn.vonce.sql.enumerate.DbType;
 import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Value;
