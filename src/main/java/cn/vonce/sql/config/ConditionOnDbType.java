@@ -5,9 +5,10 @@ import cn.vonce.common.utils.XmlConverUtil;
 import cn.vonce.sql.enumerate.DbType;
 import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
-import org.springframework.core.env.Environment;
+import org.springframework.core.env.*;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.util.ClassUtils;
@@ -36,7 +37,7 @@ public class ConditionOnDbType implements Condition {
     public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
         String[] beanName = conditionContext.getBeanFactory().getBeanNamesForType(SqlBeanConfig.class);
         if (beanName == null || beanName.length == 0) {
-            String driverClassName = getDriverClassName(conditionContext.getEnvironment());
+            String driverClassName = getDriverClassName(conditionContext);
             if (driverClassName == null) {
                 Iterator<String> iterator = conditionContext.getBeanFactory().getBeanNamesIterator();
                 while (iterator.hasNext()) {
@@ -79,37 +80,70 @@ public class ConditionOnDbType implements Condition {
     /**
      * 获取jdbc驱动类名
      *
-     * @param environment
+     * @param conditionContext
      * @return
      */
-    private String getDriverClassName(Environment environment) {
+    private String getDriverClassName(ConditionContext conditionContext) {
         String driverClassName = null;
-        if (environment.containsProperty("spring.datasource.driverClassName")) {
-            driverClassName = environment.getProperty("spring.datasource.driverClassName");
-        } else if (environment.containsProperty("spring.datasource.driver-class-name")) {
-            driverClassName = environment.getProperty("spring.datasource.driver-class-name");
-        } else if (environment.containsProperty("datasource.driverClassName")) {
-            driverClassName = environment.getProperty("datasource.driverClassName");
-        } else if (environment.containsProperty("datasource.driver-class-name")) {
-            driverClassName = environment.getProperty("datasource.driver-class-name");
-        } else if (environment.containsProperty("jdbc.driverClassName")) {
-            driverClassName = environment.getProperty("jdbc.driverClassName");
-        } else if (environment.containsProperty("jdbc.driver-class-name")) {
-            driverClassName = environment.getProperty("jdbc.driver-class-name");
-        } else if (environment.containsProperty("jdbc.driver-class")) {
-            driverClassName = environment.getProperty("jdbc.driver-class");
-        } else if (environment.containsProperty("jdbc.driver")) {
-            driverClassName = environment.getProperty("jdbc.driver");
-        } else if (environment.containsProperty("driverClassName")) {
-            driverClassName = environment.getProperty("driverClassName");
-        } else if (environment.containsProperty("driver-class-name")) {
-            driverClassName = environment.getProperty("driver-class-name");
-        } else if (environment.containsProperty("driverClass")) {
-            driverClassName = environment.getProperty("driverClass");
-        } else if (environment.containsProperty("driver-class")) {
-            driverClassName = environment.getProperty("driver-class");
-        } else if (environment.containsProperty("driver")) {
-            driverClassName = environment.getProperty("driver");
+        List<File> dirFiles = new ArrayList<>();
+        try {
+            File rootDirFile = conditionContext.getResourceLoader().getResource("/").getFile();
+            if (rootDirFile != null && rootDirFile.exists()) {
+                dirFiles.add(rootDirFile);
+            }
+            File configDirFile = conditionContext.getResourceLoader().getResource("/config/").getFile();
+            if (configDirFile != null && configDirFile.exists()) {
+                dirFiles.add(configDirFile);
+            }
+        } catch (IOException e) {
+        }
+        try {
+            Environment environment = conditionContext.getEnvironment();
+            List<String> configFileNameList = new ArrayList<>();
+            for (File dirFile : dirFiles) {
+                for (String name : dirFile.list()) {
+                    if (environment.getDefaultProfiles() != null && name.indexOf("application.") > -1) {
+                        configFileNameList.add(name);
+                    }
+                    if (environment.getActiveProfiles() != null) {
+                        for (String active : environment.getActiveProfiles()) {
+                            if (name.indexOf("application-" + active + ".") > -1) {
+                                configFileNameList.add(name);
+                            }
+                        }
+                    }
+                }
+            }
+            List<String> driverNameList = new ArrayList<>();
+            driverNameList.add("driverClassName");
+            driverNameList.add("driver-class-name");
+            driverNameList.add("driverClass");
+            driverNameList.add("driver-class");
+            driverNameList.add("driver");
+            for (String configFileName : configFileNameList) {
+                Properties properties;
+                if (configFileName.indexOf(".yml") > -1) {
+                    YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
+                    yaml.setResources(conditionContext.getResourceLoader().getResource(configFileName));
+                    properties = yaml.getObject();
+                } else {
+                    properties = new Properties();
+                    properties.load(conditionContext.getResourceLoader().getResource(configFileName).getInputStream());
+                }
+                Enumeration enumeration = properties.propertyNames();
+                while (enumeration.hasMoreElements()) {
+                    String name = (String) enumeration.nextElement();
+                    for (String driverName : driverNameList) {
+                        if (name.indexOf(driverName) > -1) {
+                            driverClassName = properties.getProperty(name);
+                            break;
+                        }
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return driverClassName;
     }
