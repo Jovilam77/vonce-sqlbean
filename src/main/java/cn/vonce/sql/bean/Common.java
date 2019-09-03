@@ -54,7 +54,7 @@ public abstract class Common implements Serializable {
      * @date 2018年9月13日下午15:34:45
      */
     public void setWhere(String where, Object... args) {
-        this.where = SqlBeanUtil.getWhere(where, args);
+        this.where = SqlBeanUtil.getCondition(where, args);
     }
 
     /**

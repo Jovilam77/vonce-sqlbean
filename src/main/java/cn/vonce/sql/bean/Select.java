@@ -56,7 +56,7 @@ public class Select extends Common implements Serializable {
     /**
      * 设置useDistinct是否过滤重复
      *
-     * @param useDistinct
+     * @param useDistinct 是否过滤
      * @author Jovi
      * @date 2017年8月18日下午4:21:05
      */
@@ -107,7 +107,7 @@ public class Select extends Common implements Serializable {
     /**
      * 设置from sql 内容
      *
-     * @param clazz
+     * @param clazz 表对应的实体类
      * @author Jovi
      * @date 2018年5月14日下午11:54:45
      */
@@ -158,8 +158,8 @@ public class Select extends Common implements Serializable {
     /**
      * 添加column字段
      *
-     * @param subSql
-     * @param alias
+     * @param subSql 子sql
+     * @param alias  别名
      * @return
      * @author Jovi
      * @date 2017年8月18日下午4:18:18
@@ -185,9 +185,9 @@ public class Select extends Common implements Serializable {
     /**
      * 添加表内连接
      *
-     * @param table
-     * @param tableKeyword
-     * @param mainKeyword
+     * @param table        关联的表名
+     * @param tableKeyword 关联的表关键字段
+     * @param mainKeyword  主表关键字段
      * @author Jovi
      * @date 2017年8月18日上午10:54:26
      */
@@ -198,10 +198,10 @@ public class Select extends Common implements Serializable {
     /**
      * 添加表内连接
      *
-     * @param table
-     * @param tableAlias
-     * @param tableKeyword
-     * @param mainKeyword
+     * @param table        关联的表名
+     * @param tableAlias   关联的表别名
+     * @param tableKeyword 关联的表关键字段
+     * @param mainKeyword  主表关键字段
      * @author Jovi
      * @date 2017年8月18日上午10:54:26
      */
@@ -240,10 +240,10 @@ public class Select extends Common implements Serializable {
     /**
      * 添加表外连接
      *
-     * @param table
-     * @param tableAlias
-     * @param tableKeyword
-     * @param mainKeyword
+     * @param table        关联的表名
+     * @param tableAlias   关联的表别名
+     * @param tableKeyword 关联的表关键字段
+     * @param mainKeyword  主表关键字段
      * @author Jovi
      * @date 2017年8月18日上午10:55:52
      */
@@ -268,9 +268,9 @@ public class Select extends Common implements Serializable {
     /**
      * 添加表左外连接
      *
-     * @param table
-     * @param tableKeyword
-     * @param mainKeyword
+     * @param table        关联的表名
+     * @param tableKeyword 关联的表关键字段
+     * @param mainKeyword  主表关键字段
      * @author Jovi
      * @date 2017年8月18日上午10:55:04
      */
@@ -281,10 +281,10 @@ public class Select extends Common implements Serializable {
     /**
      * 添加表左外连接
      *
-     * @param table
-     * @param tableAlias
-     * @param tableKeyword
-     * @param mainKeyword
+     * @param table        关联的表名
+     * @param tableAlias   关联的表别名
+     * @param tableKeyword 关联的表关键字段
+     * @param mainKeyword  主表关键字段
      * @author Jovi
      * @date 2017年8月18日上午10:55:04
      */
@@ -309,9 +309,9 @@ public class Select extends Common implements Serializable {
     /**
      * 添加表右外连接
      *
-     * @param table
-     * @param tableKeyword
-     * @param mainKeyword
+     * @param table        关联的表名
+     * @param tableKeyword 关联的表关键字段
+     * @param mainKeyword  主表关键字段
      * @author Jovi
      * @date 2017年8月18日上午10:55:23
      */
@@ -322,10 +322,10 @@ public class Select extends Common implements Serializable {
     /**
      * 添加表右外连接
      *
-     * @param table
-     * @param tableAlias
-     * @param tableKeyword
-     * @param mainKeyword
+     * @param table        关联的表名
+     * @param tableAlias   关联的表别名
+     * @param tableKeyword 关联的表关键字段
+     * @param mainKeyword  主表关键字段
      * @author Jovi
      * @date 2017年8月18日上午10:55:23
      */
@@ -339,10 +339,10 @@ public class Select extends Common implements Serializable {
     /**
      * join 字符串拼接
      *
-     * @param table
-     * @param tableAlias
-     * @param tableKeyword
-     * @param mainKeyword
+     * @param table        关联的表名
+     * @param tableAlias   关联的表别名
+     * @param tableKeyword 关联的表关键字段
+     * @param mainKeyword  主表关键字段
      * @return
      */
     private String joinSplitJoint(String table, String tableAlias, String tableKeyword, String mainKeyword) {
@@ -352,9 +352,9 @@ public class Select extends Common implements Serializable {
     /**
      * 添加表连接
      *
-     * @param table
-     * @param tableKeyword
-     * @param mainKeyword
+     * @param table        关联的表名
+     * @param tableKeyword 关联的表关键字段
+     * @param mainKeyword  主表关键字段
      * @author Jovi
      * @date 2019年6月21日上午10:27:50
      */
@@ -365,9 +365,9 @@ public class Select extends Common implements Serializable {
     /**
      * 添加表连接
      *
-     * @param table
-     * @param tableKeyword
-     * @param mainKeyword
+     * @param table        关联的表名
+     * @param tableKeyword 关联的表关键字段
+     * @param mainKeyword  主表关键字段
      * @author Jovi
      * @date 2019年6月21日上午10:27:50
      */
@@ -403,7 +403,7 @@ public class Select extends Common implements Serializable {
     /**
      * 添加groupBy分组
      *
-     * @param field
+     * @param field 字段名
      * @return
      * @author Jovi
      * @date 2017年8月18日下午3:32:56
@@ -446,7 +446,7 @@ public class Select extends Common implements Serializable {
      * @date 2018年9月13日下午15:34:45
      */
     public void setHaving(String having, Object... args) {
-        this.having = SqlBeanUtil.getWhere(having, args);
+        this.having = SqlBeanUtil.getCondition(having, args);
     }
 
     /**
@@ -474,8 +474,8 @@ public class Select extends Common implements Serializable {
     /**
      * 添加字段排序
      *
-     * @param field
-     * @param sort
+     * @param field 字段名
+     * @param sort  排序方式
      * @author Jovi
      * @date 2017年8月18日上午11:10:11
      */
@@ -489,8 +489,8 @@ public class Select extends Common implements Serializable {
     /**
      * 添加字段排序
      *
-     * @param field
-     * @param sqlSort
+     * @param field   字段名
+     * @param sqlSort 排序方式
      * @return
      * @author Jovi
      * @date 2018年4月16日下午6:31:18

@@ -42,7 +42,7 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2018年5月15日下午2:22:05
      */
-    public String selectByIdsSql(Class<?> clazz, Object[] ids) {
+    public String selectByIdsSql(Class<?> clazz, Object... ids) {
         Select select;
         Field idField;
         try {
@@ -73,7 +73,7 @@ public class SqlBeanProvider {
      */
     public String selectByConditionSql(Class<?> clazz, Paging paging, String where, Object... args) {
         Select select = newSelect(clazz, false);
-        select.setWhere(SqlBeanUtil.getWhere(where, args));
+        select.setWhere(SqlBeanUtil.getCondition(where, args));
         setPaging(select, paging, clazz);
         return SqlHelper.buildSelectSql(select);
     }
@@ -90,7 +90,7 @@ public class SqlBeanProvider {
      */
     public String selectCountByConditionSql(Class<?> clazz, String where, Object[] args) {
         Select select = newSelect(clazz, true);
-        select.setWhere(SqlBeanUtil.getWhere(where, args));
+        select.setWhere(SqlBeanUtil.getCondition(where, args));
         return SqlHelper.buildSelectSql(select);
     }
 
@@ -184,7 +184,7 @@ public class SqlBeanProvider {
     public String deleteByConditionSql(Class<?> clazz, String where, Object[] args) {
         Delete delete = new Delete();
         delete.setDeleteBable(clazz);
-        delete.setWhere(SqlBeanUtil.getWhere(where, args));
+        delete.setWhere(SqlBeanUtil.getCondition(where, args));
         return SqlHelper.buildDeleteSql(delete);
     }
 
@@ -260,7 +260,7 @@ public class SqlBeanProvider {
         Update update = new Update();
         try {
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
-            update.setWhere(SqlBeanUtil.getWhere(where, args));
+            update.setWhere(SqlBeanUtil.getCondition(where, args));
             //sqlBean.where(SqlBeanUtil.getFieldName(idField), ReflectAsmUtil.get(bean.getClass(), bean, idField.getName()));
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -363,7 +363,7 @@ public class SqlBeanProvider {
     public String updateByConditionSql(Object bean, boolean updateNotNull, String[] filterFields, String where, Object[] args) {
         Update update = newUpdate(bean, updateNotNull);
         update.setFilterFields(filterFields);
-        update.setWhere(SqlBeanUtil.getWhere(where, args));
+        update.setWhere(SqlBeanUtil.getCondition(where, args));
         return SqlHelper.buildUpdateSql(update);
     }
 
@@ -381,7 +381,7 @@ public class SqlBeanProvider {
         Update update = newUpdate(bean, updateNotNull);
         update.setFilterFields(filterFields);
         try {
-            update.setWhere(SqlBeanUtil.getWhere(where, bean));
+            update.setWhere(SqlBeanUtil.getCondition(where, bean));
         } catch (NoSuchFieldException e) {
             try {
                 throw new SqlBeanException("bean找不到该字段：" + e.getMessage());

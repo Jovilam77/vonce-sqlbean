@@ -84,7 +84,7 @@ public class SpringJdbcSqlBeanServiceImpl<T> extends SqlBeanProvider implements 
     }
 
     @Override
-    public List<T> selectByIds(Object[] ids) {
+    public List<T> selectByIds(Object... ids) {
         try {
             return jdbcTemplate.queryForObject(super.selectByIdsSql(clazz, ids),
                     new SpringJbdcSqlBeanMapper<List<T>>(clazz, clazz));
@@ -95,7 +95,7 @@ public class SpringJdbcSqlBeanServiceImpl<T> extends SqlBeanProvider implements 
     }
 
     @Override
-    public <O> List<O> selectByIds(Class<O> returnType, Object[] ids) {
+    public <O> List<O> selectByIds(Class<O> returnType, Object... ids) {
         try {
             if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
                 clazz = returnType;

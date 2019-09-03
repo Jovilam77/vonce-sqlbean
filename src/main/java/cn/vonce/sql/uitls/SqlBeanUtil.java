@@ -385,21 +385,21 @@ public class SqlBeanUtil {
      * @author Jovi
      * @date 2018年5月15日下午2:15:37
      */
-    public static String getWhere(String where, Object[] args) {
+    public static String getCondition(String where, Object[] args) {
         if (where == null || where.equals("")) {
             return "";
         }
-        StringBuffer whereSql = new StringBuffer();
+        StringBuffer conditionSql = new StringBuffer();
         int index = 0;
         for (char c : where.toCharArray()) {
             if ('?' == c) {
-                whereSql.append(getSqlValue(args[index] == null ? "" : args[index]));
+                conditionSql.append(getSqlValue(args[index] == null ? "" : args[index]));
                 index++;
             } else {
-                whereSql.append(c);
+                conditionSql.append(c);
             }
         }
-        return whereSql.toString();
+        return conditionSql.toString();
     }
 
     /**
@@ -411,31 +411,31 @@ public class SqlBeanUtil {
      * @author Jovi
      * @date 2018年5月15日下午3:25:57
      */
-    public static String getWhere(String where, Object bean) throws NoSuchFieldException, IllegalAccessException {
+    public static String getCondition(String where, Object bean) throws NoSuchFieldException, IllegalAccessException {
         String prefix = "${";
         String suffix = "}";
         if (where == null || bean == null) {
             return where;
         }
-        StringBuffer whereSql = new StringBuffer(where);
-        int startIndex = whereSql.indexOf(prefix);
+        StringBuffer conditionSql = new StringBuffer(where);
+        int startIndex = conditionSql.indexOf(prefix);
         while (startIndex != -1) {
-            int endIndex = whereSql.indexOf(suffix, startIndex + prefix.length());
+            int endIndex = conditionSql.indexOf(suffix, startIndex + prefix.length());
             if (endIndex != -1) {
-                String name = whereSql.substring(startIndex + prefix.length(), endIndex);
+                String name = conditionSql.substring(startIndex + prefix.length(), endIndex);
                 int nextIndex = endIndex + suffix.length();
                 Field field = bean.getClass().getDeclaredField(name);
                 field.setAccessible(true);
                 String value = getSqlValue(field.get(bean));
                 //String value = SqlHelper.getSqlValue(ReflectAsmUtil.get(bean.getClass(), bean, name));
-                whereSql.replace(startIndex, endIndex + suffix.length(), value);
+                conditionSql.replace(startIndex, endIndex + suffix.length(), value);
                 nextIndex = startIndex + value.length();
-                startIndex = whereSql.indexOf(prefix, nextIndex);
+                startIndex = conditionSql.indexOf(prefix, nextIndex);
             } else {
                 startIndex = -1;
             }
         }
-        return whereSql.toString();
+        return conditionSql.toString();
     }
 
 

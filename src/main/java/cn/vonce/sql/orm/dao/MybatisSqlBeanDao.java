@@ -61,7 +61,7 @@ public interface MybatisSqlBeanDao<T> {
      * @author Jovi
      * @date 2018年5月15日下午3:58:28
      */
-    List<T> selectByIds(@Param("clazz") Class<?> clazz, @Param("ids") Object[] ids);
+    List<T> selectByIds(@Param("clazz") Class<?> clazz, @Param("ids") Object... ids);
 
     /**
      * 根据id条件查询(可指定返回类型、查询的表)
@@ -74,7 +74,7 @@ public interface MybatisSqlBeanDao<T> {
      * @author Jovi
      * @date 2018年6月15日下午6:36:38
      */
-    <O> List<O> selectByIdsO(@Param("clazz") Class<?> clazz, @Param("returnType") Class<O> returnType, @Param("ids") Object[] ids);
+    <O> List<O> selectByIdsO(@Param("clazz") Class<?> clazz, @Param("returnType") Class<O> returnType, @Param("ids") Object... ids);
 
     /**
      * 根据自定义条件查询 只返回一条记录

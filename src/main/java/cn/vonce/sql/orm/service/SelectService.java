@@ -48,7 +48,7 @@ public interface SelectService<T> extends PagingService {
      * @author Jovi
      * @date 2018年5月15日下午3:58:28
      */
-    List<T> selectByIds(Object[] ids);
+    List<T> selectByIds(Object... ids);
 
     /**
      * 根据id条件查询(可指定返回类型、查询的表)
@@ -60,7 +60,7 @@ public interface SelectService<T> extends PagingService {
      * @author Jovi
      * @date 2018年6月15日下午6:36:38
      */
-    <O> List<O> selectByIds(Class<O> returnType, Object[] ids);
+    <O> List<O> selectByIds(Class<O> returnType, Object... ids);
 
     /**
      * 根据自定义条件查询 只返回一条记录
@@ -253,7 +253,7 @@ public interface SelectService<T> extends PagingService {
      * @author Jovi
      * @date 2018年6月13日下午2:39:08
      */
-    public <O> List<O> select(Class<O> returnType, Select select);
+    <O> List<O> select(Class<O> returnType, Select select);
 
     /**
      * 根据自定义条件统计

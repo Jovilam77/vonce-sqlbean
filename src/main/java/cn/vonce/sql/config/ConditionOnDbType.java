@@ -148,6 +148,13 @@ public class ConditionOnDbType implements Condition {
         return driverClassName;
     }
 
+    /**
+     * 获取jdbc驱动类名
+     *
+     * @param conditionContext
+     * @param resourceDescription
+     * @return
+     */
     private String getDriverClassName(ConditionContext conditionContext, String resourceDescription) {
         String driverClassName = null;
         if (StringUtil.isEmpty(resourceDescription)) {
@@ -255,6 +262,14 @@ public class ConditionOnDbType implements Condition {
         return driverClassName;
     }
 
+    /**
+     * 获取配置值
+     *
+     * @param file
+     * @param key
+     * @return
+     * @throws IOException
+     */
     private String getValue(File file, String key) throws IOException {
         Properties properties = new Properties();
         InputStream inputStream = new FileInputStream(file);
