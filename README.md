@@ -72,23 +72,13 @@ return super.customHint(new PageHelper<Essay>(request).paging(new Select(),essay
 ###### 以上即可实现无条件分页查询
 ###### 如果使用的是Spring JDBC那么将“MybatisSqlBeanServiceImpl”改为“SpringJdbcSqlBeanServiceImpl”即可
 
-#### [Select][1]
-[1]:  "Select"
-#### [Insert][1]
-[1]:  "Insert"
-#### [Delete][1]
-[1]:  "Delete"
-#### [Update][1]
-[1]:  "Update"
-#### [Service接口和实现类][355]
-[355]:  "Service接口和实现类"
-#### [注解与联表查询][355]
-[355]:  "注解与联表查询"
-#### [分页查询][355]
-[355]:  "分页查询"
-#### [条件操作][355]
-[355]:  "条件操作"
-#### [条件逻辑][355]
-[355]:  "条件逻辑"
-#### [BaseController][355]
-[355]:  "BaseController"
+#### [Select](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Select.md "Select")
+#### [Insert](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Insert.md "Insert")
+#### [Delete](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Delete.md "Delete")
+#### [Update](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Update.md "Update")
+#### [Service接口和实现类](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Interface.md "Service接口和实现类")
+#### [注解与联表查询](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Annotation.md "注解与联表查询")
+#### [分页查询](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Paging.md "分页查询")
+#### [条件操作](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/SqlOperator.md "条件操作")
+#### [条件逻辑](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/SqlLogic.md "条件逻辑")
+#### [BaseController](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/BaseController.md "BaseController")
