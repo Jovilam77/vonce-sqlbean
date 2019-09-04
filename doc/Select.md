@@ -1,87 +1,384 @@
-## Sqlbean(Sql生成助手)
-#### 介绍
-###### 这是一款使用Java面向对象思想来编写并生成Sql语句的助手，并在此基础上对Mybatis、Spring Jdbc实现了轻量级的插件支持。该插件的目的是为了提高开发效率，减少大量的Sql语句编写，让开发者更专注于业务代码的编写。
-
-###### 特点：零配置，支持联表查询，支持Mybatis、Spring Jdbc，支持分页
-###### 环境：JDK7+，Mybatis3.2.4+，(Spring MVC 4.1.2+ 或 Spring Boot 1x 或 Spring Boot 2x)
-###### 数据库：Mysql，MariaDB，Oracle，Sqlserver2008+，PostgreSQL，DB2
-
-#### 简单上手
-###### 1：引入Maven依赖
-    <dependency>
-    	<groupId>cn.vonce</groupId>
-    	<artifactId>vonce-sqlbean</artifactId>
-    	<version>1.0.0</version>
-    </dependency>
-###### 2：标注实体类，也可以不写，但类名与字段名必须与数据库表名字段名保持一致
+## Select
+##### Select对象的方法请看代码中的文档描述
+#### 方法和示例
+###### 1：根据id条件查询
 ```java
-@SqlBeanTable("d_essay")
-public class Essay {
-
-    @SqlBeanField(value = "id" , id = true)
-    private String id;
-
-    @SqlBeanField(value = "userId" )
-    private String userId;
-
-    @SqlBeanField(value = "content" )
-    private String content;
-
-    @SqlBeanField(value = "creationTime" )
-    private Date creationTime;
-	
-    /**省略get set方法*/
-	
-}
+T selectById(Object id);
 ```
-###### 3：无需Dao层，Service层接口无需写任何方法（如果想写原始Sql可以自己定义）只需继承SqlBeanService<T>
 ```java
-public interface EssayService extends SqlBeanService<Essay> {
-
-}
-```
-###### 4：Service实现类无需实现任何方法（如果想写原始Sql可以自己实现）只需继承SqlBeanServiceImpl<T>和实现你的Service接口
-```java
-@Service
-public class EssayServiceImpl extends MybatisSqlBeanServiceImpl<Essay> implements EssayService {
-
-}
-```
-###### 5：Controller层
-```java
-@Autowired
-private EssayService essayService;
-
-@RequestMapping(value = "getList", method = RequestMethod.GET)
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
 @ResponseBody
-public RS getList(HttpServletRequest request, HttpServletResponse response) {
-      // 查询对象
-      Select select = new Select();
-      // 分页助手
-      PageHelper<Essay> pageHelper = new PageHelper<>(request);
-      // 分页查询
-      pageHelper.paging(select, essayService);
-      // 返回结果
-      return super.customHint(pageHelper.toResult("获取文章列表成功"));
+public RS getEssay() {
+	Essay essay = essayService.selectById(1);
+	return super.successHint("获取成功",essay);
 }
 ```
-###### 或者这样
+###### 2：根据id条件查询（指定返回类型）
 ```java
-return super.customHint(new PageHelper<Essay>(request).paging(new Select(),essayService).toResult("获取文章列表成功"));
+<O> O selectById(Class<O> returnType, Object id);
 ```
-###### 以上即可实现无条件分页查询
-###### 如果使用的是Spring JDBC那么将“MybatisSqlBeanServiceImpl”改为“SpringJdbcSqlBeanServiceImpl”即可
-[========]
-
-##### &darr;更多用法请查看下方文档&darr;
-
-#### [Select](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Select.md "Select")
-#### [Insert](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Insert.md "Insert")
-#### [Delete](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Delete.md "Delete")
-#### [Update](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Update.md "Update")
-#### [Service接口和实现类](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Interface.md "Service接口和实现类")
-#### [注解与联表查询](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Annotation.md "注解与联表查询")
-#### [分页查询](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Paging.md "分页查询")
-#### [条件操作](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/SqlOperator.md "条件操作")
-#### [条件逻辑](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/SqlLogic.md "条件逻辑")
-#### [BaseController](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/BaseController.md "BaseController")
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	EssayPojo essayPojo = essayService.selectById(EssayPojo.class,1);
+	//也可以这样使用
+	//返回第一个字段内容，可以用你想要的类型接收
+	//String id = essayService.selectById(String.class,1);
+	//返回Map
+	//Map<String,Object> map = essayService.selectById(Map.class,1);
+	return super.successHint("获取成功",essayPojo);
+}
+```
+###### 3：根据ids条件查询
+```java
+List<T> selectByIds(Object... ids);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	List<Essay> essayList = essayService.selectByIds(1,2,3);
+	return super.successHint("获取成功",essayList);
+}
+```
+###### 4：根据ids条件查询（指定返回类型）
+```java
+<O> List<O> selectByIds(Class<O> returnType, Object... ids);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	List<EssayPojo> essayPojoList = essayService.selectByIds(EssayPojo.class, 1,2,3);
+	//也可以这样使用
+	//返回第一个字段内容，可以用你想要的类型接收
+	//String id = essayService.selectByIds(String.class, 1,2,3);
+	//返回Map
+	//Map<String,Object> map = essayService.selectByIds(Map.class, 1,2,3);
+	return super.successHint("获取成功",essayPojoList);
+}
+```
+###### 5：根据自定义条件查询 只返回一条记录
+```java
+T selectOne(Select select);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	Select select = new Select();
+	select.column("id");
+	select.column("title");
+	select.where("id",1);
+	Essay essay = essayService.selectOne(select);
+	return super.successHint("获取成功",essay);
+}
+```
+###### 6：根据自定义条件查询 只返回一条记录（指定返回类型）
+```java
+<O> O selectOne(Class<O> returnType, Select select);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	Select select = new Select();
+	select.column("id");
+	select.column("title");
+	select.where("id",1);
+	EssayPojo essayPojo = essayService.selectOne(EssayPojo.class, select);	//也可以这样使用
+	//返回第一个字段内容,column("你想要的字段")，可以用你想要的类型接收
+	//String id = essayService.selectOne(String.class, select);
+	//返回Map
+	//Map<String,Object> map = essayService.selectOne(Map.class, select);
+	return super.successHint("获取成功",essayPojo);
+}
+```
+###### 7：根据自定义条件查询 返回Map
+```java
+Map<String, Object> selectMap(Select select);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	Select select = new Select();
+	select.column("id");
+	select.column("title");
+	select.where("id",1);
+	Map<String,Object> map = essayService.selectMap(select);
+	return super.successHint("获取成功",map);
+}
+```
+###### 8：根据条件查询
+```java
+T selectOneByCondition(String where, Object... args);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	Essay essay = essayService.selectOneByCondition("id = ?",1);
+	return super.successHint("获取成功",essay);
+}
+```
+###### 9：根据条件查询（指定返回类型）
+```java
+<O> O selectOneByCondition(Class<O> returnType, String where, Object... args);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	EssayPojo essayPojo = essayService.selectOneByCondition(EssayPojo.class, "id = ?",1);
+	//也可以这样使用
+	//返回第一个字段内容，可以用你想要的类型接收
+	//String id = essayService.selectOneByCondition(String.class, "id = ?",1);
+	//返回Map
+	//Map<String,Object> map = essayService.selectOneByCondition(Map.class, "id = ?",1);
+	return super.successHint("获取成功",essayPojo);
+}
+```
+###### 10：根据条件查询
+```java
+List<T> selectByCondition(String where, Object... args);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	List<Essay> essayList = essayService.selectByCondition("userId = ?",888);
+	return super.successHint("获取成功",essayPojo);
+}
+```
+###### 11：根据条件查询 分页
+```java
+List<T> selectByCondition(Paging paging, String where, Object... args);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	//查询第1页，一页显示10条，根据创建时间降序
+	Paging paging = new Paging(0,10,"creationTime","desc");
+	//PageHelper<Essay> pageHelper = new PageHelper<>(request);
+	//Paging paging = pageHelper.getPaging()
+	List<Essay> essayList = essayService.selectByCondition(paging,"userId = ?",888);
+	return super.successHint("获取成功",essayPojo);
+}
+```
+###### 12：根据条件查询（指定返回类型）
+```java
+<O> List<O> selectByCondition(Class<O> returnType, String where, Object... args);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	List<EssayPojo> essayPojoList = essayService.selectByCondition(EssayPojo.class,
+	"userId = ?",888);
+	//也可以这样使用
+	//返回第一个字段内容，可以用你想要的类型接收
+	//List<String> idList = essayService.selectByCondition(String.class,
+	"userId = ?",888);
+	//返回Map
+	//List<Map<String,Object>> mapList = essayService.selectByCondition(Map.class,
+	"userId = ?",888);
+	return super.successHint("获取成功",essayPojoList);
+}
+```
+###### 13：根据条件查询 分页（指定返回类型）
+```java
+<O> List<O> selectByCondition(Class<O> returnType, Paging paging, String where, Object... args);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	//查询第1页，一页显示10条，根据创建时间降序
+	Paging paging = new Paging(0,10,"creationTime","desc");
+	//PageHelper<Essay> pageHelper = new PageHelper<>(request);
+	//Paging paging = pageHelper.getPaging()
+	List<EssayPojo> essayPojoList = essayService.selectByCondition(EssayPojo.class, paging, 
+	"userId = ?",888);
+	//也可以这样使用
+	//返回第一个字段内容，可以用你想要的类型接收
+	//List<String> idList = essayService.selectByCondition(String.class, paging, 
+	"userId = ?",888);
+	//返回Map
+	//List<Map<String,Object>> mapList = essayService.selectByCondition(Map.class, paging, 
+	"userId = ?",888);
+	return super.successHint("获取成功",essayPojoList);
+}
+```
+###### 14：根据条件查询统计
+```java
+long selectCountByCondition(String where, Object... args);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	long count = essayService.selectCountByCondition("userId = ?",888);
+	return super.successHint("获取成功",count);
+}
+```
+###### 15：统计全部
+```java
+long countAll();
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	long count = essayService.countAll();
+	return super.successHint("获取成功",count);
+}
+```
+###### 15：查询全部
+```java
+List<T> selectAll();
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	List<Essay> essayList = essayService.selectAll();
+	return super.successHint("获取成功",essayList);
+}
+```
+###### 16：查询全部（指定返回类型）
+```java
+<O> List<O> selectAll(Class<O> returnType);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	List<EssayPojo> essayPojoList = essayService.selectAll(EssayPojo.class);
+	//也可以这样使用
+	//返回第一个字段内容，可以用你想要的类型接收
+	//List<String> idList = essayService.selectAll(String.class);
+	//返回Map
+	//List<Map<String,Object>> mapList = essayService.selectAll(Map.class);
+	return super.successHint("获取成功",essayPojoList);
+}
+```
+###### 17：查询全部 分页
+```java
+List<T> selectAll(Paging paging);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	//查询第1页，一页显示10条，根据创建时间降序
+	Paging paging = new Paging(0,10,"creationTime","desc");
+	//PageHelper<Essay> pageHelper = new PageHelper<>(request);
+	//Paging paging = pageHelper.getPaging()
+	List<Essay> essayList = essayService.selectAll(paging);
+	return super.successHint("获取成功",essayList);
+}
+```
+###### 18：查询全部 分页（指定返回类型）
+```java
+<O> List<O> selectAll(Class<O> returnType, Paging paging);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	//查询第1页，一页显示10条，根据创建时间降序
+	Paging paging = new Paging(0,10,"creationTime","desc");
+	//PageHelper<Essay> pageHelper = new PageHelper<>(request);
+	//Paging paging = pageHelper.getPaging()
+	List<EssayPojo> essayPojoList = essayService.selectAll(EssayPojo.class,paging);
+	//也可以这样使用
+	//返回第一个字段内容，可以用你想要的类型接收
+	//List<String> idList = essayService.selectAll(String.class,paging);
+	//返回Map
+	//List<Map<String,Object>> mapList = essayService.selectAll(Map.class,paging);
+	return super.successHint("获取成功",essayPojoList);
+}
+```
+###### 19：根据自定义条件查询 返回Map
+```java
+List<Map<String, Object>> selectMapList(Select select);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	Select select = new Select();
+	select.column("id");
+	select.column("title");
+	List<Map<String, Object>> mapList = essayService.selectMapList(select);
+	return super.successHint("获取成功",mapList);
+}
+```
+###### 21：根据自定义条件查询
+```java
+List<T> select(Select select);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	Select select = new Select();
+	select.column("id");
+	select.column("title");
+	List<Essay> essayList = essayService.select(select);
+	return super.successHint("获取成功",essayList);
+}
+```
+###### 22：根据自定义条件查询
+```java
+<O> List<O> select(Class<O> returnType, Select select);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	Select select = new Select();
+	select.column("id");
+	select.column("title");
+	List<EssayPojo> essayPojoList = essayService.select(EssayPojo.class, select);
+	//也可以这样使用
+	//返回第一个字段内容,column("你想要的字段")，可以用你想要的类型接收
+	//List<String> idList = essayService.select(String.class,select);
+	//返回Map
+	//List<Map<String,Object>> mapList = essayService.select(Map.class,select);
+	return super.successHint("获取成功",essayPojoList);
+}
+```
+###### 23：根据自定义条件查询
+```java
+long count(Select select);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	Select select = new Select();
+	select.column("id");
+	select.column("title");
+	long count = essayService.select(select);
+	return super.successHint("获取成功",count);
+}
+```
+###### 24：根据自定义条件查询（插件内部使用）
+```java
+long count(Class<?> clazz, Select select);
+```
+```java
+@RequestMapping(value = "getEssay", method = RequestMethod.GET)
+@ResponseBody
+public RS getEssay() {
+	Select select = new Select();
+	select.column("id");
+	select.column("title");
+	long count = essayService.select(EssayPojo.class, select);
+	return super.successHint("获取成功",count);
+}
+```

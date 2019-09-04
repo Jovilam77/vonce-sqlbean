@@ -9,6 +9,7 @@ import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.env.*;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.util.ClassUtils;
@@ -85,33 +86,35 @@ public class ConditionOnDbType implements Condition {
      */
     private String getDriverClassName(ConditionContext conditionContext) {
         String driverClassName = null;
-        List<File> dirFiles = new ArrayList<>();
-        try {
-            File rootDirFile = conditionContext.getResourceLoader().getResource("/").getFile();
-            if (rootDirFile != null && rootDirFile.exists()) {
-                dirFiles.add(rootDirFile);
-            }
-            File configDirFile = conditionContext.getResourceLoader().getResource("/config/").getFile();
-            if (configDirFile != null && configDirFile.exists()) {
-                dirFiles.add(configDirFile);
-            }
-        } catch (IOException e) {
-        }
         try {
             Environment environment = conditionContext.getEnvironment();
-            List<String> configFileNameList = new ArrayList<>();
-            for (File dirFile : dirFiles) {
-                for (String name : dirFile.list()) {
-                    if (environment.getDefaultProfiles() != null && name.indexOf("application.") > -1) {
-                        configFileNameList.add(name);
+            List<URL> configUrlList = new ArrayList<>();
+            if (environment.getDefaultProfiles() != null) {
+                URL url = ClassUtils.getDefaultClassLoader().getResource("config/application.yml");
+                if (url == null) {
+                    url = ClassUtils.getDefaultClassLoader().getResource("config/application.properties");
+                }
+                if (url == null) {
+                    url = ClassUtils.getDefaultClassLoader().getResource("application.yml");
+                }
+                if (url == null) {
+                    url = ClassUtils.getDefaultClassLoader().getResource("application.properties");
+                }
+                configUrlList.add(url);
+            }
+            if (environment.getActiveProfiles() != null) {
+                for (String active : environment.getActiveProfiles()) {
+                    URL url = ClassUtils.getDefaultClassLoader().getResource("config/application-" + active + ".yml");
+                    if (url == null) {
+                        url = ClassUtils.getDefaultClassLoader().getResource("config/application-" + active + ".properties");
                     }
-                    if (environment.getActiveProfiles() != null) {
-                        for (String active : environment.getActiveProfiles()) {
-                            if (name.indexOf("application-" + active + ".") > -1) {
-                                configFileNameList.add(name);
-                            }
-                        }
+                    if (url == null) {
+                        url = ClassUtils.getDefaultClassLoader().getResource("application-" + active + ".yml");
                     }
+                    if (url == null) {
+                        url = ClassUtils.getDefaultClassLoader().getResource("application-" + active + ".properties");
+                    }
+                    configUrlList.add(url);
                 }
             }
             List<String> driverNameList = new ArrayList<>();
@@ -120,29 +123,32 @@ public class ConditionOnDbType implements Condition {
             driverNameList.add("driverClass");
             driverNameList.add("driver-class");
             driverNameList.add("driver");
-            for (String configFileName : configFileNameList) {
+            for (URL url : configUrlList) {
                 Properties properties;
-                if (configFileName.indexOf(".yml") > -1) {
-                    YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
-                    yaml.setResources(conditionContext.getResourceLoader().getResource(configFileName));
-                    properties = yaml.getObject();
-                } else {
-                    properties = new Properties();
-                    properties.load(conditionContext.getResourceLoader().getResource(configFileName).getInputStream());
-                }
-                Enumeration enumeration = properties.propertyNames();
-                while (enumeration.hasMoreElements()) {
-                    String name = (String) enumeration.nextElement();
-                    for (String driverName : driverNameList) {
-                        if (name.indexOf(driverName) > -1) {
-                            driverClassName = properties.getProperty(name);
-                            break;
+                if (url != null) {
+                    System.out.println("url:" + url.getPath());
+                    if (url.getPath().lastIndexOf(".yml") > -1) {
+                        YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
+                        yaml.setResources(new InputStreamResource(url.openStream()));
+                        properties = yaml.getObject();
+                    } else {
+                        properties = new Properties();
+                        properties.load(url.openStream());
+                    }
+                    Enumeration enumeration = properties.propertyNames();
+                    while (enumeration.hasMoreElements()) {
+                        String name = (String) enumeration.nextElement();
+                        for (String driverName : driverNameList) {
+                            if (name.indexOf(driverName) > -1) {
+                                driverClassName = properties.getProperty(name);
+                                break;
+                            }
                         }
                     }
                 }
-
             }
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             e.printStackTrace();
         }
         return driverClassName;

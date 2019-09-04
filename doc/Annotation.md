@@ -18,21 +18,21 @@
 @SqlBeanTable("d_essay")//标识表名
 public class Essay {
 
-    //标识字段名，并指定为id
-    @SqlBeanField(value = "id" , id = true)
-    private String id;
+	//标识字段名，并指定为id
+	@SqlBeanField(value = "id" , id = true)
+	private String id;
 	
 	//标识字段名
-    @SqlBeanField(value = "userId" )
-    private String userId;
+	@SqlBeanField(value = "userId" )
+	private String userId;
 
-    //标识字段名
-    @SqlBeanField(value = "content" )
-    private String content;
+	//标识字段名
+	@SqlBeanField(value = "content" )
+	private String content;
 	
 	//标识字段名
-    @SqlBeanField(value = "creationTime" )
-    private Date creationTime;
+	@SqlBeanField(value = "creationTime" )
+	private Date creationTime;
 	
     /**省略get set方法*/
 	
@@ -79,28 +79,28 @@ public class EssayPojo extends Essay {
 	//@SqlBeanJoin的用法跟以上例子一样，但是这里需要注意的是
 	//因为这里的例子关联用到了两个不同的字段，所以需要设置别名tableAlias = "d_user0"
 	//field属性则为需要查询的字段，因为查询的不是一个对象，所以只能设置一个字段
-    @SqlBeanField(value = "userNickname", join = @SqlBeanJoin(table = "d_user",
+	@SqlBeanField(value = "userNickname", join = @SqlBeanJoin(table = "d_user",
 	tableAlias = "d_user0", tableKeyword = "id", mainKeyword = "userId", 
 	field = "nickname"))
-    private String userNickname;
+	private String userNickname;
 
-    //标识字段名，查询文章发布者的头像
+	//标识字段名，查询文章发布者的头像
 	//@SqlBeanJoin的用法跟以上例子一样，但是这里需要注意的是
 	//因为这里的例子关联用到了两个不同的字段，所以需要设置别名tableAlias = "d_user0"
 	//field属性则为需要查询的字段，因为查询的不是一个对象，所以只能设置一个字段
-    @SqlBeanField(value = "userHeadPortrait", join = @SqlBeanJoin(table = "d_user",
+	@SqlBeanField(value = "userHeadPortrait", join = @SqlBeanJoin(table = "d_user",
 	tableAlias = "d_user0", tableKeyword = "id", mainKeyword = "userId", 
 	field = "headPortrait"))
-    private String userHeadPortrait;
+	private String userHeadPortrait;
 
-    //标识字段名，查询文章原作者名称（可能不是同一个人）
+	//标识字段名，查询文章原作者名称（可能不是同一个人）
 	//@SqlBeanJoin的用法跟以上例子一样，但是这里需要注意的是
 	//因为这里的例子关联用到了两个不同的字段，所以需要设置别名tableAlias = "d_user1"
 	//field属性则为需要查询的字段，因为查询的不是一个对象，所以只能设置一个字段
-    @SqlBeanField(value = "originalAuthorName", join = @SqlBeanJoin(table = "d_user",
+	@SqlBeanField(value = "originalAuthorName", join = @SqlBeanJoin(table = "d_user",
 	tableAlias = "d_user1", tableKeyword = "id", mainKeyword = "originalAuthorId", 
 	field = "nickname"))
-    private String originalAuthorName;
+	private String originalAuthorName;
 
 	/**省略get set方法*/
 
