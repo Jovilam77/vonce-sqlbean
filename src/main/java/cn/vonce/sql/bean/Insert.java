@@ -1,5 +1,7 @@
 package cn.vonce.sql.bean;
 
+import cn.vonce.sql.annotation.SqlBeanTable;
+
 import java.io.Serializable;
 
 /**
@@ -35,6 +37,22 @@ public class Insert implements Serializable {
      */
     public void setInsertTable(String insertTable) {
         this.insertTable = insertTable;
+    }
+
+    /**
+     * 设置插入表名
+     *
+     * @param clazz
+     * @author Jovi
+     * @date 2018年3月30日上午10:38:39
+     */
+    public void setUpdateTable(Class<?> clazz) {
+        SqlBeanTable sqlBeanTable = clazz.getAnnotation(SqlBeanTable.class);
+        if (sqlBeanTable != null) {
+            this.insertTable = sqlBeanTable.value();
+        } else {
+            this.insertTable = clazz.getSimpleName();
+        }
     }
 
     /**

@@ -56,7 +56,7 @@ public interface DeleteService {
     long delete(Delete delete, boolean ignore);
 
     /**
-     * 逻辑删除
+     * 逻辑删除根据id条件
      *
      * @param id
      * @return

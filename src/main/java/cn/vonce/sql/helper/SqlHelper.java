@@ -78,7 +78,7 @@ public class SqlHelper {
      */
     public static String buildSelectSql(Select select) {
         checkInitStatus();
-        StringBuilder sqlSb = new StringBuilder();
+        StringBuffer sqlSb = new StringBuffer();
         Integer[] pageParam = null;
         String orderSql = orderBySql(select);
         //SQLServer2008 分页处理
@@ -163,7 +163,7 @@ public class SqlHelper {
      */
     public static String buildUpdateSql(Update update) {
         checkInitStatus();
-        StringBuilder sqlSb = new StringBuilder();
+        StringBuffer sqlSb = new StringBuffer();
         try {
             sqlSb.append(SqlHelperCons.UPDATE);
             sqlSb.append(updateTableName(update));
@@ -232,7 +232,7 @@ public class SqlHelper {
      */
     public static String buildDeleteSql(Delete delete) {
         checkInitStatus();
-        StringBuilder sqlSb = new StringBuilder();
+        StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlHelperCons.DELETE_FROM);
         sqlSb.append(SqlBeanUtil.isToUpperCase() ? delete.getDeleteBable().toUpperCase() : delete.getDeleteBable());
         sqlSb.append(whereSql(delete));
@@ -271,7 +271,7 @@ public class SqlHelper {
      * @date 2017年8月22日上午9:46:05
      */
     private static String select(Select select) {
-        StringBuilder selectSql = new StringBuilder();
+        StringBuffer selectSql = new StringBuffer();
         if (select.getColumn() != null && select.getColumn().size() != 0) {
             for (int i = 0; i < select.getColumn().size(); i++) {
                 selectSql.append(select.getColumn().get(i));
@@ -291,7 +291,7 @@ public class SqlHelper {
      * @date 2017年8月22日上午9:46:05
      */
     private static String from(Select select) {
-        StringBuilder fromSql = new StringBuilder();
+        StringBuffer fromSql = new StringBuffer();
         if (select.getFrom() != null && select.getFrom().length == 1) {
             String tableName = select.getFrom()[0];
             return SqlBeanUtil.isToUpperCase() ? tableName.toUpperCase() : tableName;
@@ -315,7 +315,7 @@ public class SqlHelper {
      * @date 2017年8月18日下午12:45:39
      */
     private static String innerJoinSql(Select select) {
-        StringBuilder innerJoinSql = new StringBuilder();
+        StringBuffer innerJoinSql = new StringBuffer();
         if (select.getInnerJoin() != null && select.getInnerJoin().size() != 0) {
             for (int i = 0; i < select.getInnerJoin().size(); i++) {
                 innerJoinSql.append(select.getInnerJoin().get(i));
@@ -336,7 +336,7 @@ public class SqlHelper {
      * @date 2017年8月18日下午12:45:39
      */
     private static String fullJoinSql(Select select) {
-        StringBuilder outerJoinSql = new StringBuilder();
+        StringBuffer outerJoinSql = new StringBuffer();
         if (select.getFullJoin() != null && select.getFullJoin().size() != 0) {
             for (int i = 0; i < select.getFullJoin().size(); i++) {
                 outerJoinSql.append(select.getFullJoin().get(i));
@@ -357,7 +357,7 @@ public class SqlHelper {
      * @date 2017年8月18日下午12:45:39
      */
     private static String leftJoinSql(Select select) {
-        StringBuilder leftJoinSql = new StringBuilder();
+        StringBuffer leftJoinSql = new StringBuffer();
         if (select.getLeftOuterJoin() != null && select.getLeftOuterJoin().size() != 0) {
             for (int i = 0; i < select.getLeftOuterJoin().size(); i++) {
                 leftJoinSql.append(select.getLeftOuterJoin().get(i));
@@ -378,7 +378,7 @@ public class SqlHelper {
      * @date 2017年8月18日下午12:45:39
      */
     private static String rightJoinSql(Select select) {
-        StringBuilder rightJoinSql = new StringBuilder();
+        StringBuffer rightJoinSql = new StringBuffer();
         if (select.getRightOuterJoin() != null && select.getRightOuterJoin().size() != 0) {
             for (int i = 0; i < select.getRightOuterJoin().size(); i++) {
                 rightJoinSql.append(select.getRightOuterJoin().get(i));
@@ -402,9 +402,9 @@ public class SqlHelper {
      * @date 2017年8月17日下午6:28:57
      */
     private static String fieldAndValuesSql(String tableName, Object[] objects) throws IllegalArgumentException, IllegalAccessException {
-        StringBuilder fieldSql = new StringBuilder();
-        StringBuilder valueSql = new StringBuilder();
-        StringBuilder fieldAndValuesSql = new StringBuilder();
+        StringBuffer fieldSql = new StringBuffer();
+        StringBuffer valueSql = new StringBuffer();
+        StringBuffer fieldAndValuesSql = new StringBuffer();
         List<String> valueSqlList = new ArrayList<>();
         String transferred = SqlBeanUtil.getTransferred();
         if (sqlBeanConfig.getDbType() == DbType.Oracle) {
@@ -491,7 +491,7 @@ public class SqlHelper {
      * @date 2017年8月17日下午5:28:26
      */
     private static String setSql(Update update) throws IllegalAccessException {
-        StringBuilder setSql = new StringBuilder();
+        StringBuffer setSql = new StringBuffer();
         String transferred = SqlBeanUtil.getTransferred();
         String[] filterFields = update.getFilterFields();
         Object bean = update.getUpdateBean();
@@ -557,7 +557,7 @@ public class SqlHelper {
      * @date 2017年8月17日下午5:24:04
      */
     private static String groupBySql(Select select) {
-        StringBuilder groupBySql = new StringBuilder();
+        StringBuffer groupBySql = new StringBuffer();
         String transferred = SqlBeanUtil.getTransferred();
         if (select.getGroupBy() != null && select.getGroupBy().size() != 0) {
             groupBySql.append(SqlHelperCons.GROUP_BY);
@@ -593,7 +593,7 @@ public class SqlHelper {
      * @date 2017年8月17日下午5:24:04
      */
     private static String orderBySql(Select select) {
-        StringBuilder orderBySql = new StringBuilder();
+        StringBuffer orderBySql = new StringBuffer();
         if (select.getOrderBy() != null && select.getOrderBy().size() != 0) {
             orderBySql.append(SqlHelperCons.ORDER_BY);
             for (int i = 0; i < select.getOrderBy().size(); i++) {
@@ -623,7 +623,7 @@ public class SqlHelper {
      * @return
      */
     private static String conditionHandle(ConditionType conditionType, String where, ListMultimap<String, SqlCondition> whereMap) {
-        StringBuilder conditioneSql = new StringBuilder();
+        StringBuffer conditioneSql = new StringBuffer();
         // 优先使用条件字符串拼接
         if (where != null && !"".equals(where)) {
             conditioneSql.append(ConditionType.WHERE == conditionType ? SqlHelperCons.WHERE : SqlHelperCons.HAVING);
@@ -774,8 +774,8 @@ public class SqlHelper {
      * @param needEndBracket
      * @return
      */
-    private static StringBuilder valueOperator(String operator, String fieldName, Object value, boolean needEndBracket) {
-        StringBuilder sql = new StringBuilder();
+    private static StringBuffer valueOperator(String operator, String fieldName, Object value, boolean needEndBracket) {
+        StringBuffer sql = new StringBuffer();
         // 如果操作符为BETWEEN ，IN、NOT IN 则需额外处理
         if (operator.indexOf(SqlHelperCons.BETWEEN) > -1) {
             Object[] betweenValues;
@@ -845,7 +845,7 @@ public class SqlHelper {
      * @author Jovi
      * @date 2017年8月17日下午5:23:46
      */
-    private static void mysqlPageDispose(Select select, StringBuilder sqlSb) {
+    private static void mysqlPageDispose(Select select, StringBuffer sqlSb) {
         if (SqlBeanUtil.isUsePage(select)) {
             Integer[] param = pageParam(select);
             sqlSb.append(SqlHelperCons.LIMIT);
@@ -861,7 +861,7 @@ public class SqlHelper {
      * @param select
      * @return
      */
-    private static void postgreSqlPageDispose(Select select, StringBuilder sqlSb) {
+    private static void postgreSqlPageDispose(Select select, StringBuffer sqlSb) {
         if (SqlBeanUtil.isUsePage(select)) {
             Integer[] param = pageParam(select);
             sqlSb.append(SqlHelperCons.LIMIT);
@@ -879,15 +879,15 @@ public class SqlHelper {
      * @author Jovi
      * @date 2019年4月1日下午6:18:20
      */
-    private static void oraclePageDispose(Select select, StringBuilder sqlSb) {
+    private static void oraclePageDispose(Select select, StringBuffer sqlSb) {
         //oracle 分页语句前缀
         if (SqlBeanUtil.isUsePage(select)) {
             Integer[] param = pageParam(select);
-            StringBuilder beginSqlSb = new StringBuilder();
+            StringBuffer beginSqlSb = new StringBuffer();
             beginSqlSb.append(SqlHelperCons.SELECT + SqlHelperCons.ALL + SqlHelperCons.FROM + SqlHelperCons.BEGIN_BRACKET);
             beginSqlSb.append(SqlHelperCons.SELECT + SqlHelperCons.TB + SqlHelperCons.POINT + SqlHelperCons.ALL + SqlHelperCons.COMMA + SqlHelperCons.ROWNUM + SqlHelperCons.RN + SqlHelperCons.FROM + SqlHelperCons.BEGIN_BRACKET);
             sqlSb.insert(0, beginSqlSb);
-            StringBuilder endSb = new StringBuilder();
+            StringBuffer endSb = new StringBuffer();
             endSb.append(SqlHelperCons.END_BRACKET + SqlHelperCons.TB + SqlHelperCons.WHERE + SqlHelperCons.ROWNUM + SqlHelperCons.LESS_THAN_OR_EQUAL_TO);
             endSb.append(param[1]);
             endSb.append(SqlHelperCons.END_BRACKET + SqlHelperCons.WHERE + SqlHelperCons.RN + SqlHelperCons.GREATER_THAN);
@@ -904,16 +904,16 @@ public class SqlHelper {
      * @author Jovi
      * @date 2019年8月22日下午20:14:10
      */
-    private static void db2PageDispose(Select select, StringBuilder sqlSb) {
+    private static void db2PageDispose(Select select, StringBuffer sqlSb) {
         //db2 分页语句前缀
         if (SqlBeanUtil.isUsePage(select)) {
             Integer[] param = pageParam(select);
-            StringBuilder beginSqlSb = new StringBuilder();
+            StringBuffer beginSqlSb = new StringBuffer();
             beginSqlSb.append(SqlHelperCons.SELECT + SqlHelperCons.ALL + SqlHelperCons.FROM + SqlHelperCons.BEGIN_BRACKET);
             beginSqlSb.append(SqlHelperCons.SELECT + SqlHelperCons.T + SqlHelperCons.POINT + SqlHelperCons.ALL + SqlHelperCons.COMMA + SqlHelperCons.ROWNUMBER);
             beginSqlSb.append(SqlHelperCons.OVER + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.SPACES + SqlHelperCons.END_BRACKET + SqlHelperCons.AS + SqlHelperCons.RN + SqlHelperCons.FROM + SqlHelperCons.BEGIN_BRACKET);
             sqlSb.insert(0, beginSqlSb);
-            StringBuilder endSb = new StringBuilder();
+            StringBuffer endSb = new StringBuffer();
             endSb.append(SqlHelperCons.END_BRACKET + SqlHelperCons.T + SqlHelperCons.SPACES + SqlHelperCons.END_BRACKET + SqlHelperCons.TB + SqlHelperCons.WHERE + SqlHelperCons.TB + SqlHelperCons.POINT + SqlHelperCons.RN + SqlHelperCons.BETWEEN);
             endSb.append(param[0]);
             endSb.append(SqlHelperCons.AND);
