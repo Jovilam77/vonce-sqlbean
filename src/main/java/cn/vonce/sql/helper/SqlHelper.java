@@ -563,7 +563,9 @@ public class SqlHelper {
             groupBySql.append(SqlHelperCons.GROUP_BY);
             for (int i = 0; i < select.getGroupBy().size(); i++) {
                 String groupBy = select.getGroupBy().get(i);
-                if (groupBy.indexOf(SqlHelperCons.POINT) == -1) {
+                if (groupBy.indexOf(SqlHelperCons.WELL_NUMBER) > -1) {
+                    groupBy = groupBy.substring(1);
+                } else if (groupBy.indexOf(SqlHelperCons.POINT) == -1) {
                     groupBy = transferred + select.getFrom()[0] + transferred + SqlHelperCons.POINT + groupBy;
                 }
                 groupBySql.append(groupBy);
@@ -594,12 +596,15 @@ public class SqlHelper {
      */
     private static String orderBySql(Select select) {
         StringBuffer orderBySql = new StringBuffer();
+        String transferred = SqlBeanUtil.getTransferred();
         if (select.getOrderBy() != null && select.getOrderBy().size() != 0) {
             orderBySql.append(SqlHelperCons.ORDER_BY);
             for (int i = 0; i < select.getOrderBy().size(); i++) {
                 String orderBy = select.getOrderBy().get(i);
-                if (orderBy.indexOf(SqlHelperCons.POINT) == -1) {
-                    orderBy = select.getFrom()[0] + SqlHelperCons.POINT + orderBy;
+                if (orderBy.indexOf(SqlHelperCons.WELL_NUMBER) > -1) {
+                    orderBy = orderBy.substring(1);
+                } else if (orderBy.indexOf(SqlHelperCons.POINT) == -1) {
+                    orderBy = transferred + select.getFrom()[0] + transferred + SqlHelperCons.POINT + orderBy;
                 }
                 orderBySql.append(orderBy);
                 orderBySql.append(SqlHelperCons.COMMA);

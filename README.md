@@ -11,7 +11,7 @@
     <dependency>
     	<groupId>cn.vonce</groupId>
     	<artifactId>vonce-sqlbean</artifactId>
-    	<version>1.2.0</version>
+    	<version>1.0.0</version>
     </dependency>
 ###### 2：标注实体类，也可以不写，但类名与字段名必须与数据库表名字段名保持一致
 ```java
@@ -41,7 +41,7 @@ public interface EssayService extends SqlBeanService<Essay> {
 
 }
 ```
-###### 4：Service实现类无需实现任何方法（如果想写原始Sql可以自己实现）只需继承SqlBeanServiceImpl<实体类>和实现你的Service接口
+###### 4：Service实现类无需实现任何方法（如果想写原始Sql可以自己实现）只需继承MybatisSqlBeanServiceImpl<实体类>和实现你的Service接口
 ```java
 @Service
 public class EssayServiceImpl extends MybatisSqlBeanServiceImpl<Essay> implements EssayService {

@@ -22,7 +22,7 @@ public interface EssayService extends InsertService<Essay> {
 ```
 ##### 仅删除
 ```java
-public interface EssayService extends DeleteService<Essay> {
+public interface EssayService extends DeleteService {
 
 }
 ```

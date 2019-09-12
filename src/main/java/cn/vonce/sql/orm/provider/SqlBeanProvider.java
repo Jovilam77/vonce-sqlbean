@@ -457,12 +457,12 @@ public class SqlBeanProvider {
     private String setSelectAndBuild(Class<?> clazz, Select select) {
         if (select.getFrom() == null || select.getFrom().equals("")) {
             select.setFrom(clazz);
-            try {
-                SqlBeanUtil.setJoin(select, clazz);
-            } catch (SqlBeanException e) {
-                e.printStackTrace();
-                return null;
-            }
+        }
+        try {
+            SqlBeanUtil.setJoin(select, clazz);
+        } catch (SqlBeanException e) {
+            e.printStackTrace();
+            return null;
         }
         return SqlHelper.buildSelectSql(select);
     }
