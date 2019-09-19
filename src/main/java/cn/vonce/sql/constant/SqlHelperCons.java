@@ -24,6 +24,8 @@ public class SqlHelperCons {
     public static final String NULL_VALUE = "null";
     public static final String INSERT_INTO = "INSERT INTO ";
     public static final String DELETE_FROM = "DELETE FROM ";
+    public static final String IS = " IS ";
+    public static final String IS_NOT = " IS NOT ";
     public static final String IN = " IN (";
     public static final String NOT_IN = " NOT IN (";
     //    public static final String EXISTS = " EXISTS (";

@@ -691,7 +691,11 @@ public class SqlHelper {
         // 优先使用枚举类型的操作符
         if (sqlCondition.getSqlOperator() != null) {
             SqlOperator sqlOperator = sqlCondition.getSqlOperator();
-            if (sqlOperator == SqlOperator.IN) {
+            if (sqlOperator == SqlOperator.IS) {
+                operator = SqlHelperCons.IS;
+            } else if (sqlOperator == SqlOperator.IS_NOT) {
+                operator = SqlHelperCons.IS_NOT;
+            } else if (sqlOperator == SqlOperator.IN) {
                 operator = SqlHelperCons.IN;
             } else if (sqlOperator == SqlOperator.NOT_IN) {
                 operator = SqlHelperCons.NOT_IN;
