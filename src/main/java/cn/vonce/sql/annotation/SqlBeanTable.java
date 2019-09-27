@@ -23,4 +23,11 @@ public @interface SqlBeanTable {
      */
     String value();
 
+    /**
+     * 表别名
+     *
+     * @return
+     */
+    String alias() default "";
+
 }

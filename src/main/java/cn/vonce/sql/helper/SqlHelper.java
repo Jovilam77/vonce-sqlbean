@@ -104,7 +104,7 @@ public class SqlHelper {
         //标准Sql
         sqlSb.append(select(select));
         sqlSb.append(SqlHelperCons.FROM);
-        sqlSb.append(from(select));
+        sqlSb.append(fromFullName(select));
         sqlSb.append(innerJoinSql(select));
         sqlSb.append(fullJoinSql(select));
         sqlSb.append(leftJoinSql(select));
@@ -291,18 +291,20 @@ public class SqlHelper {
      * @date 2017年8月22日上午9:46:05
      */
     private static String from(Select select) {
+        return SqlBeanUtil.isToUpperCase() ? select.getFrom().getName().toUpperCase() : select.getFrom().getName();
+    }
+
+    /**
+     * 返回from的表名包括别名
+     *
+     * @param select
+     * @return
+     */
+    private static String fromFullName(Select select) {
         StringBuffer fromSql = new StringBuffer();
-        if (select.getFrom() != null && select.getFrom().length == 1) {
-            String tableName = select.getFrom()[0];
-            return SqlBeanUtil.isToUpperCase() ? tableName.toUpperCase() : tableName;
-        } else if (select.getFrom() != null && select.getFrom().length > 1) {
-            for (int i = 0; i < select.getFrom().length; i++) {
-                String tableName = select.getFrom()[i];
-                fromSql.append(SqlBeanUtil.isToUpperCase() ? tableName.toUpperCase() : tableName);
-                fromSql.append(SqlHelperCons.COMMA);
-            }
-            fromSql.deleteCharAt(fromSql.length() - SqlHelperCons.COMMA.length());
-        }
+        fromSql.append(SqlBeanUtil.isToUpperCase() ? select.getFrom().getName().toUpperCase() : select.getFrom().getName());
+        fromSql.append(SqlHelperCons.SPACES);
+        fromSql.append(SqlBeanUtil.isToUpperCase() ? select.getFrom().getAlias().toUpperCase() : select.getFrom().getAlias());
         return fromSql.toString();
     }
 
@@ -566,7 +568,7 @@ public class SqlHelper {
                 if (groupBy.indexOf(SqlHelperCons.WELL_NUMBER) > -1) {
                     groupBy = groupBy.substring(1);
                 } else if (groupBy.indexOf(SqlHelperCons.POINT) == -1) {
-                    groupBy = transferred + select.getFrom()[0] + transferred + SqlHelperCons.POINT + groupBy;
+                    groupBy = transferred + from(select) + transferred + SqlHelperCons.POINT + groupBy;
                 }
                 groupBySql.append(groupBy);
                 groupBySql.append(SqlHelperCons.COMMA);
@@ -604,7 +606,7 @@ public class SqlHelper {
                 if (orderBy.indexOf(SqlHelperCons.WELL_NUMBER) > -1) {
                     orderBy = orderBy.substring(1);
                 } else if (orderBy.indexOf(SqlHelperCons.POINT) == -1) {
-                    orderBy = transferred + select.getFrom()[0] + transferred + SqlHelperCons.POINT + orderBy;
+                    orderBy = transferred + from(select) + transferred + SqlHelperCons.POINT + orderBy;
                 }
                 orderBySql.append(orderBy);
                 orderBySql.append(SqlHelperCons.COMMA);
@@ -613,7 +615,7 @@ public class SqlHelper {
         } else {
             if (sqlBeanConfig.getDbType() == DbType.SQLServer2008 && !SqlBeanUtil.isCount(select)) {
                 orderBySql.append(SqlHelperCons.ORDER_BY);
-                orderBySql.append(SqlBeanUtil.getFieldFullName(select.getFrom()[0], select.getPage().getIdName()));
+                orderBySql.append(SqlBeanUtil.getFieldFullName(from(select), select.getPage().getIdName()));
             }
         }
         return orderBySql.toString();

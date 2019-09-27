@@ -5,6 +5,7 @@ import cn.vonce.sql.annotation.SqlBeanField;
 import cn.vonce.sql.annotation.SqlBeanJoin;
 import cn.vonce.sql.annotation.SqlBeanPojo;
 import cn.vonce.sql.annotation.SqlBeanTable;
+import cn.vonce.sql.bean.From;
 import cn.vonce.sql.bean.Join;
 import cn.vonce.sql.bean.Select;
 import cn.vonce.sql.constant.SqlHelperCons;
@@ -30,17 +31,51 @@ public class SqlBeanUtil {
      * @param clazz
      * @return
      */
-    public static String getTableName(Class<?> clazz) {
+    public static From getFrom(Class<?> clazz) {
         SqlBeanTable sqlBeanTable = clazz.getAnnotation(SqlBeanTable.class);
         SqlBeanPojo sqlBeanPojo = clazz.getAnnotation(SqlBeanPojo.class);
         String tableName = clazz.getSimpleName();
+        String tableAlias = null;
         if (sqlBeanTable != null) {
             tableName = sqlBeanTable.value();
+            tableAlias = sqlBeanTable.alias();
         } else if (sqlBeanPojo != null) {
             tableName = clazz.getSuperclass().getSimpleName();
         }
-        return tableName;
+        if(StringUtil.isEmpty(tableAlias)){
+            tableAlias = tableName;
+        }
+        return new From(tableName, tableAlias);
     }
+
+    /**
+     * 获取表别名
+     *
+     * @param from
+     * @param clazz
+     * @return
+     */
+    public static String getTableAlias(From from, Class<?> clazz) {
+        if (from == null || StringUtil.isEmpty(from.getName())) {
+            from = getFrom(clazz);
+        }
+        String tableAlias = from.getAlias();
+        if (StringUtil.isEmpty(tableAlias)) {
+            SqlBeanTable sqlBeanTable = clazz.getAnnotation(SqlBeanTable.class);
+            if (sqlBeanTable != null) {
+                if (StringUtil.isEmpty(sqlBeanTable.alias())) {
+                    tableAlias = from.getName();
+                } else {
+                    tableAlias = sqlBeanTable.alias();
+                }
+            }
+        }
+        return tableAlias;
+    }
+
+//    public static String getTableName(From from) {
+//
+//    }
 
     /**
      * 获取Bean字段中实际对于的表字段
@@ -185,12 +220,12 @@ public class SqlBeanUtil {
      * @author Jovi
      * @date 2018年6月15日下午3:29:15
      */
-    public static String[] getSelectFields(Class<?> clazz, String[] filterFields) {
+    public static String[] getSelectFields(Class<?> clazz, From from, String[] filterFields) {
         if (clazz == null) {
             return null;
         }
         Set<String> list = new LinkedHashSet<>();
-        String tableName = getTableName(clazz);
+//        String tableName = getTableName(clazz);
         List<Field> fieldList = getBeanAllField(clazz);
         for (Field field : fieldList) {
             if (Modifier.isStatic(field.getModifiers())) {
@@ -209,9 +244,9 @@ public class SqlBeanUtil {
                     }
                 } else {
                     Field[] subBeanFields = subBeanClazz.getDeclaredFields();
-                    String subTableName = getTableName(subBeanClazz);
+                    String subTableAliasName = getFrom(subBeanClazz).getAlias();
                     if (sqlBeanJoinIsNotEmpty(sqlBeanJoin)) {
-                        subTableName = sqlBeanJoin.table();
+                        subTableAliasName = StringUtil.isNotEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.tableAlias() : sqlBeanJoin.table();
                     }
                     for (Field subBeanField : subBeanFields) {
                         if (Modifier.isStatic(subBeanField.getModifiers())) {
@@ -220,7 +255,7 @@ public class SqlBeanUtil {
                         if (isIgnore(field)) {
                             continue;
                         }
-                        list.add(getFieldNameAndAlias(subTableName, getFieldName(subBeanField)));
+                        list.add(getFieldNameAndAlias(subTableAliasName, getFieldName(subBeanField)));
                     }
                 }
             } else if (sqlBeanField != null) {
@@ -238,10 +273,10 @@ public class SqlBeanUtil {
                     }
                     list.add(getFieldFullName(StringUtil.isEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.table() : sqlBeanJoin.tableAlias(), fieldName, alias));
                 } else {
-                    list.add(getFieldNameAndAlias(tableName, sqlBeanField.value()));
+                    list.add(getFieldNameAndAlias(from.getAlias(), sqlBeanField.value()));
                 }
             } else {
-                list.add(getFieldNameAndAlias(tableName, field.getName()));
+                list.add(getFieldNameAndAlias(from.getAlias(), field.getName()));
             }
         }
         return list.toArray(new String[]{});
@@ -253,7 +288,7 @@ public class SqlBeanUtil {
      * @param clazz
      * @return
      */
-    public static Map<String, Join> getJoin(Class<?> clazz) throws SqlBeanException {
+    public static Map<String, Join> getJoin(Select select, Class<?> clazz) throws SqlBeanException {
         List<Field> fieldList = getBeanAllField(clazz);
         Map<String, Join> joinFieldMap = new HashMap<>();
         for (Field field : fieldList) {
@@ -270,20 +305,20 @@ public class SqlBeanUtil {
                 join.setTableName(sqlBeanField.join().table());
                 join.setTableAlias(StringUtil.isEmpty(sqlBeanField.join().tableAlias()) ? sqlBeanField.join().table() : sqlBeanField.join().tableAlias());
                 join.setTableKeyword(getFieldFullName(join.getTableAlias(), sqlBeanField.join().tableKeyword()));
-                join.setMainKeyword(getFieldFullName(getTableName(clazz), sqlBeanField.join().mainKeyword()));
+                join.setMainKeyword(getFieldFullName(select.getFrom().getAlias(), sqlBeanField.join().mainKeyword()));
                 //key是唯一的，作用是为了去重复，因为可能连接相同的表取不同的字段，但连接相同的表，连接条件不同是可以允许的
                 joinFieldMap.put(sqlBeanField.join().table().toLowerCase() + sqlBeanField.join().tableKeyword().toLowerCase() + sqlBeanField.join().mainKeyword().toLowerCase(), join);
             } else if (sqlBeanField != null && sqlBeanField.isBean()) {
                 Class<?> subClazz = field.getType();
-                String tableName = getTableName(subClazz);
+                From from = getFrom(subClazz);
                 String tableKeyword = getFieldName(getIdField(subClazz));
                 join.setJoinType(JoinType.INNER_JOIN);
-                join.setTableName(tableName);
-                join.setTableAlias(tableName);
-                join.setTableKeyword(getFieldFullName(subClazz, tableKeyword));
-                join.setMainKeyword(getFieldFullName(clazz, sqlBeanField.value()));
+                join.setTableName(from.getName());
+                join.setTableAlias(from.getAlias());
+                join.setTableKeyword(getFieldFullName(join.getTableAlias(), tableKeyword));
+                join.setMainKeyword(getFieldFullName(select.getFrom().getAlias(), sqlBeanField.value()));
                 //key是唯一的，作用是为了去重复，因为可能连接相同的表取不同的字段，但连接相同的表，连接条件不同是可以允许的
-                joinFieldMap.put(tableName.toLowerCase() + tableKeyword.toLowerCase() + sqlBeanField.value().toLowerCase(), join);
+                joinFieldMap.put(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlBeanField.value().toLowerCase(), join);
             }
         }
         return joinFieldMap;
@@ -297,7 +332,7 @@ public class SqlBeanUtil {
      * @throws SqlBeanException
      */
     public static void setJoin(Select select, Class<?> clazz) throws SqlBeanException {
-        Map<String, Join> joinFieldMap = getJoin(clazz);
+        Map<String, Join> joinFieldMap = getJoin(select, clazz);
         for (Join join : joinFieldMap.values()) {
             String tableName = join.getTableName();
             String tableAlias = join.getTableAlias();
@@ -354,7 +389,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static String getFieldFullName(Class<?> clazz, String fieldName) {
-        return getFieldFullName(getTableName(clazz), fieldName, "");
+        return getFieldFullName(getTableAlias(null, clazz), fieldName, "");
     }
 
     /**

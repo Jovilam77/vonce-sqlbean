@@ -1,9 +1,7 @@
 package cn.vonce.sql.bean;
 
 import cn.vonce.common.utils.StringUtil;
-import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.constant.SqlHelperCons;
-import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.enumerate.SqlLogic;
 import cn.vonce.sql.enumerate.SqlSort;
@@ -29,7 +27,7 @@ public class Select extends Common implements Serializable {
 
     private boolean useDistinct = false;//默认不去重复
     private boolean customMode = true;//默认为自定义模式
-    private String[] from = null;//来自哪张表
+    private From from = new From();//来自哪张表
     private List<String> columnList = new ArrayList<>();//查询的字段数组
     private List<String> innerJoinList = new ArrayList<>();//内连接的表数组
     private List<String> fullJoinList = new ArrayList<>();//全连接的表数组
@@ -89,8 +87,32 @@ public class Select extends Common implements Serializable {
      * @author Jovi
      * @date 2017年8月18日上午8:59:49
      */
-    public String[] getFrom() {
+    public From getFrom() {
         return from;
+    }
+
+    /**
+     * 设置from sql 内容
+     *
+     * @param name
+     * @author Jovi
+     * @date 2017年8月18日上午8:59:38
+     */
+    public void setFrom(String name) {
+        this.from.setName(name);
+    }
+
+    /**
+     * 设置from sql 内容
+     *
+     * @param name
+     * @param aliasName
+     * @author Jovi
+     * @date 2017年8月18日上午8:59:38
+     */
+    public void setFrom(String name, String aliasName) {
+        this.from.setName(name);
+        this.from.setAlias(aliasName);
     }
 
     /**
@@ -100,7 +122,7 @@ public class Select extends Common implements Serializable {
      * @author Jovi
      * @date 2017年8月18日上午8:59:38
      */
-    public void setFrom(String... from) {
+    public void setFrom(From from) {
         this.from = from;
     }
 
@@ -112,8 +134,7 @@ public class Select extends Common implements Serializable {
      * @date 2018年5月14日下午11:54:45
      */
     public void setFrom(Class<?> clazz) {
-        this.from = new String[1];
-        this.from[0] = SqlBeanUtil.getTableName(clazz);
+        this.from = SqlBeanUtil.getFrom(clazz);
     }
 
     /**

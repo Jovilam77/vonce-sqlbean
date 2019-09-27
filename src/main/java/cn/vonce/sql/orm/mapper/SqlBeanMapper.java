@@ -85,7 +85,7 @@ public class SqlBeanMapper {
         try {
             bean = clazz.newInstance();
             //Object bean = ReflectAsmUtil.getInstance(clazz);
-            String tableName = SqlBeanUtil.getTableName(clazz);
+            String tableAlias = SqlBeanUtil.getTableAlias(null, clazz);
             List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
             for (Field field : fieldList) {
                 if (Modifier.isStatic(field.getModifiers())) {
@@ -98,7 +98,7 @@ public class SqlBeanMapper {
                     if (sqlBeanField.isBean()) {
                         Class<?> subClazz = field.getType();
                         Object subBean = subClazz.newInstance();
-                        String subTableName = SqlBeanUtil.getTableName(subClazz);
+                        String subTableAlias = SqlBeanUtil.getTableAlias(null, subClazz);
                         Field[] subFields = subClazz.getDeclaredFields();
                         for (Field subField : subFields) {
                             if (Modifier.isStatic(subField.getModifiers())) {
@@ -109,7 +109,7 @@ public class SqlBeanMapper {
                             if (subSqlBeanField != null) {
                                 subFieldName = subSqlBeanField.value();
                             }
-                            subFieldName = subTableName + "." + subFieldName;
+                            subFieldName = subTableAlias + "." + subFieldName;
                             setFieldValue(subBean, subField, subFieldName, resultSet);
                         }
                         field.setAccessible(true);
@@ -118,7 +118,7 @@ public class SqlBeanMapper {
                     }
                 }
                 if (!columnNameList.contains(fieldName)) {
-                    fieldName = tableName + "." + fieldName;
+                    fieldName = tableAlias + "." + fieldName;
                 }
                 setFieldValue(bean, field, fieldName, resultSet);
             }

@@ -1,5 +1,6 @@
 package cn.vonce.sql.orm.provider;
 
+import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.DbType;
@@ -119,7 +120,7 @@ public class SqlBeanProvider {
      */
     public String selectSql(Class<?> clazz, Select select) {
         if (!select.isCustomMode() || select == null || select.getColumn().isEmpty()) {
-            select.setColumn(SqlBeanUtil.getSelectFields(clazz, select.getFilterFields()));
+            select.setColumn(SqlBeanUtil.getSelectFields(clazz, select.getFrom(), select.getFilterFields()));
             if (select.getPage() != null) {
                 try {
                     select.getPage().setIdName(SqlBeanUtil.getFieldName(SqlBeanUtil.getIdField(clazz)));
@@ -431,12 +432,12 @@ public class SqlBeanProvider {
      */
     private Select newSelect(Class<?> clazz, boolean isCount) {
         Select select = new Select();
+        select.setFrom(clazz);
         if (isCount) {
             select.column(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET);
         } else {
-            select.setColumn(SqlBeanUtil.getSelectFields(clazz, select.getFilterFields()));
+            select.setColumn(SqlBeanUtil.getSelectFields(clazz, select.getFrom(), select.getFilterFields()));
         }
-        select.setFrom(clazz);
         try {
             SqlBeanUtil.setJoin(select, clazz);
         } catch (SqlBeanException e) {
@@ -455,8 +456,15 @@ public class SqlBeanProvider {
      * @throws SqlBeanException
      */
     private String setSelectAndBuild(Class<?> clazz, Select select) {
-        if (select.getFrom() == null || select.getFrom().equals("")) {
-            select.setFrom(clazz);
+        From from = null;
+        if (StringUtil.isEmpty(select.getFrom().getName()) || StringUtil.isEmpty(select.getFrom().getAlias())) {
+            from = SqlBeanUtil.getFrom(clazz);
+        }
+        if (StringUtil.isEmpty(select.getFrom().getName())) {
+            select.getFrom().setName(from.getName());
+        }
+        if (StringUtil.isEmpty(select.getFrom().getAlias())) {
+            select.getFrom().setAlias(from.getAlias());
         }
         try {
             SqlBeanUtil.setJoin(select, clazz);
