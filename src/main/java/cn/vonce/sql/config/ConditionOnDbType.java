@@ -90,31 +90,51 @@ public class ConditionOnDbType implements Condition {
             Environment environment = conditionContext.getEnvironment();
             List<URL> configUrlList = new ArrayList<>();
             if (environment.getDefaultProfiles() != null) {
-                URL url = ClassUtils.getDefaultClassLoader().getResource("config/application.yml");
-                if (url == null) {
-                    url = ClassUtils.getDefaultClassLoader().getResource("config/application.properties");
+                File file = new File(System.getProperty("user.dir") + "/application.yml");
+                if (file.exists()) {
+                    configUrlList.add(file.toURI().toURL());
+                } else {
+                    file = new File(System.getProperty("user.dir") + "/application.properties");
+                    if (file.exists()) {
+                        configUrlList.add(file.toURI().toURL());
+                    } else {
+                        URL url = ClassUtils.getDefaultClassLoader().getResource("config/application.yml");
+                        if (url == null) {
+                            url = ClassUtils.getDefaultClassLoader().getResource("config/application.properties");
+                        }
+                        if (url == null) {
+                            url = ClassUtils.getDefaultClassLoader().getResource("application.yml");
+                        }
+                        if (url == null) {
+                            url = ClassUtils.getDefaultClassLoader().getResource("application.properties");
+                        }
+                        configUrlList.add(url);
+                    }
                 }
-                if (url == null) {
-                    url = ClassUtils.getDefaultClassLoader().getResource("application.yml");
-                }
-                if (url == null) {
-                    url = ClassUtils.getDefaultClassLoader().getResource("application.properties");
-                }
-                configUrlList.add(url);
             }
             if (environment.getActiveProfiles() != null) {
                 for (String active : environment.getActiveProfiles()) {
-                    URL url = ClassUtils.getDefaultClassLoader().getResource("config/application-" + active + ".yml");
-                    if (url == null) {
-                        url = ClassUtils.getDefaultClassLoader().getResource("config/application-" + active + ".properties");
+                    File file = new File(System.getProperty("user.dir") + "/application-" + active + ".yml");
+                    if (file.exists()) {
+                        configUrlList.add(file.toURI().toURL());
+                    } else {
+                        file = new File(System.getProperty("user.dir") + "/application-" + active + ".properties");
+                        if (file.exists()) {
+                            configUrlList.add(file.toURI().toURL());
+                        } else {
+                            URL url = ClassUtils.getDefaultClassLoader().getResource("config/application-" + active + ".yml");
+                            if (url == null) {
+                                url = ClassUtils.getDefaultClassLoader().getResource("config/application-" + active + ".properties");
+                            }
+                            if (url == null) {
+                                url = ClassUtils.getDefaultClassLoader().getResource("application-" + active + ".yml");
+                            }
+                            if (url == null) {
+                                url = ClassUtils.getDefaultClassLoader().getResource("application-" + active + ".properties");
+                            }
+                            configUrlList.add(url);
+                        }
                     }
-                    if (url == null) {
-                        url = ClassUtils.getDefaultClassLoader().getResource("application-" + active + ".yml");
-                    }
-                    if (url == null) {
-                        url = ClassUtils.getDefaultClassLoader().getResource("application-" + active + ".properties");
-                    }
-                    configUrlList.add(url);
                 }
             }
             List<String> driverNameList = new ArrayList<>();
@@ -126,7 +146,6 @@ public class ConditionOnDbType implements Condition {
             for (URL url : configUrlList) {
                 Properties properties;
                 if (url != null) {
-                    System.out.println("url:" + url.getPath());
                     if (url.getPath().lastIndexOf(".yml") > -1) {
                         YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
                         yaml.setResources(new InputStreamResource(url.openStream()));
