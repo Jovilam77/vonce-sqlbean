@@ -1,12 +1,14 @@
 package cn.vonce.sql.bean;
 
+import java.io.Serializable;
+
 /**
  * @author Jovi
  * @version 1.0
  * @email imjovi@qq.com
  * @date 2019/9/27 11:49
  */
-public class From {
+public class From implements Serializable {
 
     public From() {
 

@@ -42,7 +42,7 @@ public class SqlBeanUtil {
         } else if (sqlBeanPojo != null) {
             tableName = clazz.getSuperclass().getSimpleName();
         }
-        if(StringUtil.isEmpty(tableAlias)){
+        if (StringUtil.isEmpty(tableAlias)) {
             tableAlias = tableName;
         }
         return new From(tableName, tableAlias);
@@ -72,10 +72,6 @@ public class SqlBeanUtil {
         }
         return tableAlias;
     }
-
-//    public static String getTableName(From from) {
-//
-//    }
 
     /**
      * 获取Bean字段中实际对于的表字段
@@ -225,7 +221,7 @@ public class SqlBeanUtil {
             return null;
         }
         Set<String> list = new LinkedHashSet<>();
-//        String tableName = getTableName(clazz);
+        String tableAlias = getTableAlias(from, clazz);
         List<Field> fieldList = getBeanAllField(clazz);
         for (Field field : fieldList) {
             if (Modifier.isStatic(field.getModifiers())) {
@@ -263,20 +259,18 @@ public class SqlBeanUtil {
                 if (sqlBeanJoinIsNotEmpty(sqlBeanJoin)) {
                     //获取SqlBeanJoin 注解中的查询字段
                     String fieldName = sqlBeanJoin.field()[0];
-//                    String alias = getFieldName(field);
                     //可能会连同一个表，但连接条件不一样（这时表需要区分别名），所以查询的字段可能是同一个，但属于不同表别名下，所以用java字段名当sql字段别名不会出错
                     String alias = field.getName();
                     //如果join中字段未配置查询字段，那将取SqlBeanField注解上的字段名，再取不到就取java字段名
                     if (StringUtil.isEmpty(fieldName)) {
-//                        fieldName = alias;
                         fieldName = getFieldName(field);
                     }
                     list.add(getFieldFullName(StringUtil.isEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.table() : sqlBeanJoin.tableAlias(), fieldName, alias));
                 } else {
-                    list.add(getFieldNameAndAlias(from.getAlias(), sqlBeanField.value()));
+                    list.add(getFieldNameAndAlias(tableAlias, sqlBeanField.value()));
                 }
             } else {
-                list.add(getFieldNameAndAlias(from.getAlias(), field.getName()));
+                list.add(getFieldNameAndAlias(tableAlias, field.getName()));
             }
         }
         return list.toArray(new String[]{});
