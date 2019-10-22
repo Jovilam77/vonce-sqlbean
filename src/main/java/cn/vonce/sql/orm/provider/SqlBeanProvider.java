@@ -120,14 +120,14 @@ public class SqlBeanProvider {
      */
     public String selectSql(Class<?> clazz, Select select) {
         if (!select.isCustomMode() || select == null || select.getColumn().isEmpty()) {
-            select.setColumn(SqlBeanUtil.getSelectFields(clazz, select.getFrom(), select.getFilterFields()));
-            if (select.getPage() != null) {
-                try {
+            try {
+                select.setColumn(SqlBeanUtil.getSelectFields(clazz, select.getFrom(), select.getFilterFields()));
+                if (select.getPage() != null) {
                     select.getPage().setIdName(SqlBeanUtil.getFieldName(SqlBeanUtil.getIdField(clazz)));
-                } catch (SqlBeanException e) {
-                    e.printStackTrace();
-                    return null;
                 }
+            } catch (SqlBeanException e) {
+                e.printStackTrace();
+                return null;
             }
         }
         return setSelectAndBuild(clazz, select);
@@ -210,8 +210,8 @@ public class SqlBeanProvider {
                 throw new SqlBeanException("该delete sql未设置where条件，如果确实不需要where条件，请使用delete(Select select, boolean ignore)");
             } catch (SqlBeanException e) {
                 e.printStackTrace();
+                return null;
             }
-            return null;
         }
     }
 
@@ -433,12 +433,12 @@ public class SqlBeanProvider {
     private Select newSelect(Class<?> clazz, boolean isCount) {
         Select select = new Select();
         select.setFrom(clazz);
-        if (isCount) {
-            select.column(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET);
-        } else {
-            select.setColumn(SqlBeanUtil.getSelectFields(clazz, select.getFrom(), select.getFilterFields()));
-        }
         try {
+            if (isCount) {
+                select.column(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET);
+            } else {
+                select.setColumn(SqlBeanUtil.getSelectFields(clazz, select.getFrom(), select.getFilterFields()));
+            }
             SqlBeanUtil.setJoin(select, clazz);
         } catch (SqlBeanException e) {
             e.printStackTrace();

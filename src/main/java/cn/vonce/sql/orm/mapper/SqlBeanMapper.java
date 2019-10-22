@@ -1,7 +1,9 @@
 package cn.vonce.sql.orm.mapper;
 
 
+import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.annotation.SqlBeanField;
+import cn.vonce.sql.annotation.SqlBeanJoin;
 import cn.vonce.sql.orm.mapper.SpringJbdcSqlBeanMapper;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.slf4j.Logger;
@@ -94,21 +96,34 @@ public class SqlBeanMapper {
                 SqlBeanField sqlBeanField = field.getAnnotation(SqlBeanField.class);
                 String fieldName = field.getName();
                 if (sqlBeanField != null) {
-                    fieldName = sqlBeanField.value();
+//                    SqlBeanJoin sqlBeanJoin = sqlBeanField.join();
+//                    if (!SqlBeanUtil.sqlBeanJoinIsNotEmpty(sqlBeanJoin)) {
+//                        fieldName = sqlBeanField.value();
+//                    }
                     if (sqlBeanField.isBean()) {
                         Class<?> subClazz = field.getType();
                         Object subBean = subClazz.newInstance();
+                        //获取表的别名，先是获取别名，获取不到就会获取表名
                         String subTableAlias = SqlBeanUtil.getTableAlias(null, subClazz);
+                        SqlBeanJoin sqlBeanJoin = sqlBeanField.join();
+                        //如果在SqlBeanJoin中设置了表名，那么优先使用该表名，如果有多个联表查询的对象需要连接同一张表的，那么需要保证表名一致
+                        if (StringUtil.isNotEmpty(sqlBeanJoin.table())) {
+                            subTableAlias = sqlBeanJoin.table();
+                        }
+                        //如果在SqlBeanJoin中设置了别名，那么优先使用该别名，如果有多个联表查询的对象需要连接同一张表的，那么需要保证别名一致
+                        if (StringUtil.isNotEmpty(sqlBeanJoin.tableAlias())) {
+                            subTableAlias = sqlBeanJoin.tableAlias();
+                        }
                         Field[] subFields = subClazz.getDeclaredFields();
                         for (Field subField : subFields) {
                             if (Modifier.isStatic(subField.getModifiers())) {
                                 continue;
                             }
-                            SqlBeanField subSqlBeanField = subField.getAnnotation(SqlBeanField.class);
+//                            SqlBeanField subSqlBeanField = subField.getAnnotation(SqlBeanField.class);
                             String subFieldName = subField.getName();
-                            if (subSqlBeanField != null) {
-                                subFieldName = subSqlBeanField.value();
-                            }
+//                            if (subSqlBeanField != null) {
+//                                subFieldName = subSqlBeanField.value();
+//                            }
                             subFieldName = subTableAlias + "." + subFieldName;
                             setFieldValue(subBean, subField, subFieldName, resultSet);
                         }

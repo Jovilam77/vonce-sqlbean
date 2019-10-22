@@ -40,7 +40,13 @@ public class SqlBeanUtil {
             tableName = sqlBeanTable.value();
             tableAlias = sqlBeanTable.alias();
         } else if (sqlBeanPojo != null) {
-            tableName = clazz.getSuperclass().getSimpleName();
+            SqlBeanTable subSqlBeanTable = clazz.getAnnotation(SqlBeanTable.class);
+            if (subSqlBeanTable != null) {
+                tableName = subSqlBeanTable.value();
+                tableAlias = subSqlBeanTable.alias();
+            } else {
+                tableName = clazz.getSuperclass().getName();
+            }
         }
         if (StringUtil.isEmpty(tableAlias)) {
             tableAlias = tableName;
@@ -209,6 +215,26 @@ public class SqlBeanUtil {
     }
 
     /**
+     * 根据表字段获取java中对应的java字段
+     *
+     * @param fieldList
+     * @param tableFieldName
+     * @return
+     */
+    public static Field getFieldByTableFieldName(List<Field> fieldList, String tableFieldName) {
+        Field thisField = null;
+        for (Field field : fieldList) {
+            SqlBeanField sqlBeanField = field.getAnnotation(SqlBeanField.class);
+            if (sqlBeanField != null && sqlBeanField.value().equals(tableFieldName)) {
+                thisField = field;
+            } else if (field.getName().equals(tableFieldName)) {
+                thisField = field;
+            }
+        }
+        return thisField;
+    }
+
+    /**
      * 返回查询的字段
      *
      * @param clazz
@@ -216,7 +242,7 @@ public class SqlBeanUtil {
      * @author Jovi
      * @date 2018年6月15日下午3:29:15
      */
-    public static String[] getSelectFields(Class<?> clazz, From from, String[] filterFields) {
+    public static String[] getSelectFields(Class<?> clazz, From from, String[] filterFields) throws SqlBeanException {
         if (clazz == null) {
             return null;
         }
@@ -235,13 +261,19 @@ public class SqlBeanUtil {
                 Class<?> subBeanClazz = field.getType();
                 SqlBeanJoin sqlBeanJoin = sqlBeanField.join();
                 if (sqlBeanJoinIsNotEmpty(sqlBeanJoin) && sqlBeanJoin.field().length > 0 && !sqlBeanJoin.field()[0].equals("")) {
+                    List<Field> subBeanFieldList = getBeanAllField(subBeanClazz);
                     for (String joinFieldName : sqlBeanJoin.field()) {
-                        list.add(getFieldNameAndAlias(sqlBeanJoin.table(), joinFieldName));
+                        Field javaField = getFieldByTableFieldName(subBeanFieldList, joinFieldName);
+                        if (javaField == null) {
+                            throw new SqlBeanException("该类的表连接查询字段未与java字段关联：" + clazz.getName() + ">" + field.getName() + ">" + joinFieldName);
+                        }
+                        list.add(getFieldNameAndAlias(sqlBeanJoin.table(), joinFieldName, javaField.getName()));
+//                        list.add(getFieldNameAndAlias(sqlBeanJoin.table(), joinFieldName));
                     }
                 } else {
                     Field[] subBeanFields = subBeanClazz.getDeclaredFields();
                     String subTableAliasName = getFrom(subBeanClazz).getAlias();
-                    if (sqlBeanJoinIsNotEmpty(sqlBeanJoin)) {
+                    if (StringUtil.isNotEmpty(sqlBeanJoin.table()) || StringUtil.isNotEmpty(sqlBeanJoin.tableAlias())) {
                         subTableAliasName = StringUtil.isNotEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.tableAlias() : sqlBeanJoin.table();
                     }
                     for (Field subBeanField : subBeanFields) {
@@ -251,26 +283,30 @@ public class SqlBeanUtil {
                         if (isIgnore(field)) {
                             continue;
                         }
-                        list.add(getFieldNameAndAlias(subTableAliasName, getFieldName(subBeanField)));
+                        list.add(getFieldNameAndAlias(subTableAliasName, getFieldName(subBeanField), subBeanField.getName()));
+//                        list.add(getFieldNameAndAlias(subTableAliasName, getFieldName(subBeanField)));
                     }
                 }
             } else if (sqlBeanField != null) {
                 SqlBeanJoin sqlBeanJoin = sqlBeanField.join();
                 if (sqlBeanJoinIsNotEmpty(sqlBeanJoin)) {
                     //获取SqlBeanJoin 注解中的查询字段
-                    String fieldName = sqlBeanJoin.field()[0];
+                    String tableFieldName = sqlBeanJoin.field()[0];
                     //可能会连同一个表，但连接条件不一样（这时表需要区分别名），所以查询的字段可能是同一个，但属于不同表别名下，所以用java字段名当sql字段别名不会出错
                     String alias = field.getName();
                     //如果join中字段未配置查询字段，那将取SqlBeanField注解上的字段名，再取不到就取java字段名
-                    if (StringUtil.isEmpty(fieldName)) {
-                        fieldName = getFieldName(field);
+                    if (StringUtil.isEmpty(tableFieldName)) {
+                        tableFieldName = getFieldName(field);
                     }
-                    list.add(getFieldFullName(StringUtil.isEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.table() : sqlBeanJoin.tableAlias(), fieldName, alias));
+//                    list.add(getFieldFullName(StringUtil.isEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.table() : sqlBeanJoin.tableAlias(), fieldName, alias));
+                    list.add(getFieldFullName(StringUtil.isEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.table() : sqlBeanJoin.tableAlias(), tableFieldName, alias));
                 } else {
-                    list.add(getFieldNameAndAlias(tableAlias, sqlBeanField.value()));
+                    list.add(getFieldNameAndAlias(tableAlias, sqlBeanField.value(), field.getName()));
+//                    list.add(getFieldNameAndAlias(tableAlias, sqlBeanField.value()));
                 }
             } else {
-                list.add(getFieldNameAndAlias(tableAlias, field.getName()));
+                list.add(getFieldNameAndAlias(tableAlias, field.getName(), field.getName()));
+//                list.add(getFieldNameAndAlias(tableAlias, field.getName()));
             }
         }
         return list.toArray(new String[]{});
@@ -346,22 +382,26 @@ public class SqlBeanUtil {
      * 获得新的字段名 包含别名
      *
      * @param tableAlias
-     * @param fieldName
+     * @param tableFieldName
+     * @param javaFieldName
      * @return
      */
-    public static String getFieldNameAndAlias(String tableAlias, String fieldName) {
-        return getFieldFullName(tableAlias, fieldName, tableAlias + SqlHelperCons.POINT + fieldName);
+//    public static String getFieldNameAndAlias(String tableAlias, String tableFieldName) {
+//        return getFieldFullName(tableAlias, fieldName, tableAlias + SqlHelperCons.POINT + fieldName);
+//    }
+    public static String getFieldNameAndAlias(String tableAlias, String tableFieldName, String javaFieldName) {
+        return getFieldFullName(tableAlias, tableFieldName, tableAlias + SqlHelperCons.POINT + javaFieldName);
     }
 
     /**
      * 获得新的字段名
      *
      * @param tableAlias
-     * @param fieldName
+     * @param tableFieldName
      * @return
      */
-    public static String getFieldFullName(String tableAlias, String fieldName) {
-        return getFieldFullName(tableAlias, fieldName, "");
+    public static String getFieldFullName(String tableAlias, String tableFieldName) {
+        return getFieldFullName(tableAlias, tableFieldName, "");
     }
 
     /**
@@ -379,30 +419,30 @@ public class SqlBeanUtil {
      * 获取获取字段全名（表名+字段名）
      *
      * @param clazz
-     * @param fieldName
+     * @param tableFieldName
      * @return
      */
-    public static String getFieldFullName(Class<?> clazz, String fieldName) {
-        return getFieldFullName(getTableAlias(null, clazz), fieldName, "");
+    public static String getFieldFullName(Class<?> clazz, String tableFieldName) {
+        return getFieldFullName(getTableAlias(null, clazz), tableFieldName, "");
     }
 
     /**
      * 获得新的字段名
      *
      * @param tableAlias
-     * @param fieldName
+     * @param tableFieldName
      * @return
      */
-    public static String getFieldFullName(String tableAlias, String fieldName, String alias) {
+    public static String getFieldFullName(String tableAlias, String tableFieldName, String tableFieldAlias) {
         String transferred = getTransferred();
         if (isToUpperCase()) {
             tableAlias = tableAlias.toUpperCase();
-            fieldName = fieldName.toUpperCase();
+            tableFieldName = tableFieldName.toUpperCase();
         }
-        if (StringUtil.isNotEmpty(alias)) {
-            alias = SqlHelperCons.AS + transferred + alias + transferred;
+        if (StringUtil.isNotEmpty(tableFieldAlias)) {
+            tableFieldAlias = SqlHelperCons.AS + transferred + tableFieldAlias + transferred;
         }
-        return transferred + tableAlias + transferred + SqlHelperCons.POINT + transferred + fieldName + transferred + alias;
+        return transferred + tableAlias + transferred + SqlHelperCons.POINT + transferred + tableFieldName + transferred + tableFieldAlias;
     }
 
     /**

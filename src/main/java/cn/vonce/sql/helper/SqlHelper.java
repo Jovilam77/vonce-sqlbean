@@ -661,7 +661,7 @@ public class SqlHelper {
             }
             groupByAndOrderBySql.deleteCharAt(groupByAndOrderBySql.length() - SqlHelperCons.COMMA.length());
         } else {
-            if (sqlBeanConfig.getDbType() == DbType.SQLServer2008 && !SqlBeanUtil.isCount(select)) {
+            if (SqlHelperCons.ORDER_BY.equals(type) && sqlBeanConfig.getDbType() == DbType.SQLServer2008 && SqlBeanUtil.isUsePage(select) && !SqlBeanUtil.isCount(select)) {
                 groupByAndOrderBySql.append(type);
                 groupByAndOrderBySql.append(SqlBeanUtil.getFieldFullName(tableAlias(select), select.getPage().getIdName()));
             }
