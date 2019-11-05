@@ -13,7 +13,6 @@ import com.google.common.collect.ListMultimap;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -572,22 +571,6 @@ public class SqlHelper {
      * @date 2017年8月17日下午5:24:04
      */
     private static String groupBySql(Select select) {
-//        StringBuffer groupBySql = new StringBuffer();
-//        String transferred = SqlBeanUtil.getTransferred();
-//        if (select.getGroupBy() != null && select.getGroupBy().size() != 0) {
-//            groupBySql.append(SqlHelperCons.GROUP_BY);
-//            for (int i = 0; i < select.getGroupBy().size(); i++) {
-//                String groupBy = select.getGroupBy().get(i);
-//                if (groupBy.indexOf(SqlHelperCons.WELL_NUMBER) > -1) {
-//                    groupBy = groupBy.substring(1);
-//                } else if (groupBy.indexOf(SqlHelperCons.POINT) == -1) {
-//                    groupBy = transferred + tableAlias(select) + transferred + SqlHelperCons.POINT + groupBy;
-//                }
-//                groupBySql.append(groupBy);
-//                groupBySql.append(SqlHelperCons.COMMA);
-//            }
-//            groupBySql.deleteCharAt(groupBySql.length() - SqlHelperCons.COMMA.length());
-//        }
         return groupByAndOrderBySql(SqlHelperCons.GROUP_BY, select);
     }
 
@@ -610,27 +593,6 @@ public class SqlHelper {
      * @date 2017年8月17日下午5:24:04
      */
     private static String orderBySql(Select select) {
-//        StringBuffer orderBySql = new StringBuffer();
-//        String transferred = SqlBeanUtil.getTransferred();
-//        if (select.getOrderBy() != null && select.getOrderBy().size() != 0) {
-//            orderBySql.append(SqlHelperCons.ORDER_BY);
-//            for (int i = 0; i < select.getOrderBy().size(); i++) {
-//                String orderBy = select.getOrderBy().get(i);
-//                if (orderBy.indexOf(SqlHelperCons.WELL_NUMBER) > -1) {
-//                    orderBy = orderBy.substring(1);
-//                } else if (orderBy.indexOf(SqlHelperCons.POINT) == -1) {
-//                    orderBy = transferred + tableAlias(select) + transferred + SqlHelperCons.POINT + orderBy;
-//                }
-//                orderBySql.append(orderBy);
-//                orderBySql.append(SqlHelperCons.COMMA);
-//            }
-//            orderBySql.deleteCharAt(orderBySql.length() - SqlHelperCons.COMMA.length());
-//        } else {
-//            if (sqlBeanConfig.getDbType() == DbType.SQLServer2008 && !SqlBeanUtil.isCount(select)) {
-//                orderBySql.append(SqlHelperCons.ORDER_BY);
-//                orderBySql.append(SqlBeanUtil.getFieldFullName(tableAlias(select), select.getPage().getIdName()));
-//            }
-//        }
         return groupByAndOrderBySql(SqlHelperCons.ORDER_BY, select);
     }
 

@@ -4,11 +4,9 @@ package cn.vonce.sql.orm.mapper;
 import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.annotation.SqlBeanField;
 import cn.vonce.sql.annotation.SqlBeanJoin;
-import cn.vonce.sql.orm.mapper.SpringJbdcSqlBeanMapper;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
@@ -96,10 +94,6 @@ public class SqlBeanMapper {
                 SqlBeanField sqlBeanField = field.getAnnotation(SqlBeanField.class);
                 String fieldName = field.getName();
                 if (sqlBeanField != null) {
-//                    SqlBeanJoin sqlBeanJoin = sqlBeanField.join();
-//                    if (!SqlBeanUtil.sqlBeanJoinIsNotEmpty(sqlBeanJoin)) {
-//                        fieldName = sqlBeanField.value();
-//                    }
                     if (sqlBeanField.isBean()) {
                         Class<?> subClazz = field.getType();
                         Object subBean = subClazz.newInstance();
@@ -119,11 +113,7 @@ public class SqlBeanMapper {
                             if (Modifier.isStatic(subField.getModifiers())) {
                                 continue;
                             }
-//                            SqlBeanField subSqlBeanField = subField.getAnnotation(SqlBeanField.class);
                             String subFieldName = subField.getName();
-//                            if (subSqlBeanField != null) {
-//                                subFieldName = subSqlBeanField.value();
-//                            }
                             subFieldName = subTableAlias + "." + subFieldName;
                             setFieldValue(subBean, subField, subFieldName, resultSet);
                         }

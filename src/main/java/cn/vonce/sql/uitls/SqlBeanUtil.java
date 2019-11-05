@@ -268,7 +268,6 @@ public class SqlBeanUtil {
                             throw new SqlBeanException("该类的表连接查询字段未与java字段关联：" + clazz.getName() + ">" + field.getName() + ">" + joinFieldName);
                         }
                         list.add(getFieldNameAndAlias(sqlBeanJoin.table(), joinFieldName, javaField.getName()));
-//                        list.add(getFieldNameAndAlias(sqlBeanJoin.table(), joinFieldName));
                     }
                 } else {
                     Field[] subBeanFields = subBeanClazz.getDeclaredFields();
@@ -284,7 +283,6 @@ public class SqlBeanUtil {
                             continue;
                         }
                         list.add(getFieldNameAndAlias(subTableAliasName, getFieldName(subBeanField), subBeanField.getName()));
-//                        list.add(getFieldNameAndAlias(subTableAliasName, getFieldName(subBeanField)));
                     }
                 }
             } else if (sqlBeanField != null) {
@@ -298,15 +296,12 @@ public class SqlBeanUtil {
                     if (StringUtil.isEmpty(tableFieldName)) {
                         tableFieldName = getFieldName(field);
                     }
-//                    list.add(getFieldFullName(StringUtil.isEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.table() : sqlBeanJoin.tableAlias(), fieldName, alias));
                     list.add(getFieldFullName(StringUtil.isEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.table() : sqlBeanJoin.tableAlias(), tableFieldName, alias));
                 } else {
                     list.add(getFieldNameAndAlias(tableAlias, sqlBeanField.value(), field.getName()));
-//                    list.add(getFieldNameAndAlias(tableAlias, sqlBeanField.value()));
                 }
             } else {
                 list.add(getFieldNameAndAlias(tableAlias, field.getName(), field.getName()));
-//                list.add(getFieldNameAndAlias(tableAlias, field.getName()));
             }
         }
         return list.toArray(new String[]{});
@@ -386,9 +381,6 @@ public class SqlBeanUtil {
      * @param javaFieldName
      * @return
      */
-//    public static String getFieldNameAndAlias(String tableAlias, String tableFieldName) {
-//        return getFieldFullName(tableAlias, fieldName, tableAlias + SqlHelperCons.POINT + fieldName);
-//    }
     public static String getFieldNameAndAlias(String tableAlias, String tableFieldName, String javaFieldName) {
         return getFieldFullName(tableAlias, tableFieldName, tableAlias + SqlHelperCons.POINT + javaFieldName);
     }
