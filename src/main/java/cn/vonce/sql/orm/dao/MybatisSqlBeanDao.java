@@ -48,7 +48,7 @@ public interface MybatisSqlBeanDao<T> {
      * @author Jovi
      * @date 2018年6月15日下午6:36:38
      */
-    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectById")
+    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectByIds")
     <O> O selectByIdO(@Param("clazz") Class<?> clazz, @Param("returnType") Class<O> returnType, @Param("id") Object id);
 
     /**
@@ -61,6 +61,7 @@ public interface MybatisSqlBeanDao<T> {
      * @author Jovi
      * @date 2018年5月15日下午3:58:28
      */
+    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectByIds")
     List<T> selectByIds(@Param("clazz") Class<?> clazz, @Param("ids") Object... ids);
 
     /**
@@ -74,6 +75,7 @@ public interface MybatisSqlBeanDao<T> {
      * @author Jovi
      * @date 2018年6月15日下午6:36:38
      */
+    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectById")
     <O> List<O> selectByIdsO(@Param("clazz") Class<?> clazz, @Param("returnType") Class<O> returnType, @Param("ids") Object... ids);
 
     /**

@@ -60,6 +60,9 @@ public class SpringJdbcSqlBeanServiceImpl<T> extends SqlBeanProvider implements 
 
     @Override
     public T selectById(Object id) {
+        if (id == null) {
+            return null;
+        }
         try {
             return jdbcTemplate.queryForObject(super.selectByIdSql(clazz, id),
                     new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
@@ -71,6 +74,9 @@ public class SpringJdbcSqlBeanServiceImpl<T> extends SqlBeanProvider implements 
 
     @Override
     public <O> O selectById(Class<O> returnType, Object id) {
+        if (id == null) {
+            return null;
+        }
         try {
             if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
                 clazz = returnType;
@@ -85,6 +91,9 @@ public class SpringJdbcSqlBeanServiceImpl<T> extends SqlBeanProvider implements 
 
     @Override
     public List<T> selectByIds(Object... ids) {
+        if (ids == null || ids.length == 0) {
+            return null;
+        }
         try {
             return jdbcTemplate.queryForObject(super.selectByIdsSql(clazz, ids),
                     new SpringJbdcSqlBeanMapper<List<T>>(clazz, clazz));
@@ -96,6 +105,9 @@ public class SpringJdbcSqlBeanServiceImpl<T> extends SqlBeanProvider implements 
 
     @Override
     public <O> List<O> selectByIds(Class<O> returnType, Object... ids) {
+        if (ids == null || ids.length == 0) {
+            return null;
+        }
         try {
             if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
                 clazz = returnType;

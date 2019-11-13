@@ -56,11 +56,17 @@ public class MybatisSqlBeanServiceImpl<T> implements SqlBeanService<T> {
 
     @Override
     public T selectById(Object id) {
+        if (id == null) {
+            return null;
+        }
         return mybatisSqlBeanDao.selectById(clazz, id);
     }
 
     @Override
     public <O> O selectById(Class<O> returnType, Object id) {
+        if (id == null) {
+            return null;
+        }
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
             return mybatisSqlBeanDao.selectByIdO(clazz, returnType, id);
         }
@@ -69,11 +75,17 @@ public class MybatisSqlBeanServiceImpl<T> implements SqlBeanService<T> {
 
     @Override
     public List<T> selectByIds(Object... ids) {
+        if (ids == null || ids.length == 0) {
+            return null;
+        }
         return mybatisSqlBeanDao.selectByIds(clazz, ids);
     }
 
     @Override
     public <O> List<O> selectByIds(Class<O> returnType, Object... ids) {
+        if (ids == null || ids.length == 0) {
+            return null;
+        }
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
             return mybatisSqlBeanDao.selectByIdsO(clazz, returnType, ids);
         }

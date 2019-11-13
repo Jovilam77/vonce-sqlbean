@@ -8,7 +8,7 @@ package cn.vonce.sql.exception;
  * @version 1.0
  * @date 2018年4月15日下午5:16:51
  */
-public class SqlBeanException extends Exception {
+public class SqlBeanException extends RuntimeException {
 
 	public SqlBeanException(String message) {
 		super(message);

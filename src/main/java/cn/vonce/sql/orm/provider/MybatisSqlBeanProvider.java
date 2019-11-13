@@ -30,6 +30,18 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
     }
 
     /**
+     * 根据id条件查询
+     *
+     * @param map
+     * @return
+     * @author Jovi
+     * @date 2018年5月15日下午2:22:05
+     */
+    public String selectByIds(Map<String, Object> map) {
+        return super.selectByIdsSql((Class<?>) map.get("clazz"), (Object[]) map.get("ids"));
+    }
+
+    /**
      * 根据条件查询
      *
      * @param map
