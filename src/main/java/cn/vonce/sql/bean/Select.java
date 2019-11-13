@@ -100,6 +100,7 @@ public class Select extends Common implements Serializable {
      */
     public void setFrom(String name) {
         this.from.setName(name);
+        this.from.setAlias(name);
     }
 
     /**
