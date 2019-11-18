@@ -7,6 +7,7 @@ import cn.vonce.sql.annotation.SqlBeanJoin;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
@@ -53,11 +54,11 @@ public class SqlBeanMapper {
      * @return
      */
     public Object mapHandleResultSet(ResultSet resultSet) {
-        Map<String, Object> object = null;
+        Map<String, Object> map = null;
         try {
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
             int columns = resultSetMetaData.getColumnCount();
-            Map<String, Object> map = new HashMap<>();
+            map = new HashMap<>();
             for (int i = 1; i <= columns; i++) {
                 Object value = getValue(resultSetMetaData.getColumnTypeName(i), i, resultSet);
                 if (value == null || value.equals("null")) {
@@ -65,12 +66,11 @@ public class SqlBeanMapper {
                 }
                 map.put(resultSetMetaData.getColumnLabel(i), value);
             }
-            object = map;
         } catch (SQLException e) {
             e.printStackTrace();
             logger.error("map对象映射异常SQLException，{}", e.getMessage());
         }
-        return object;
+        return map;
     }
 
     /**
@@ -322,17 +322,35 @@ public class SqlBeanMapper {
         Object value = null;
         switch (typeName) {
             case "byte":
+            case "java.lang.Byte":
+                value = new Byte("0");
+                break;
             case "short":
+            case "java.lang.Short":
+                value = new Short("0");
+                break;
             case "int":
-            case "long":
-            case "float":
-            case "double":
+            case "java.lang.Integer":
                 value = 0;
                 break;
+            case "long":
+            case "java.lang.Long":
+                value = 0L;
+                break;
+            case "float":
+            case "java.lang.Float":
+                value = 0F;
+                break;
+            case "double":
+            case "java.lang.Double":
+                value = 0D;
+                break;
             case "char":
+            case "java.lang.Char":
                 value = '\u0000';
                 break;
             case "boolean":
+            case "java.lang.Boolean":
                 value = false;
                 break;
         }
@@ -375,5 +393,6 @@ public class SqlBeanMapper {
         }
         return value;
     }
+
 
 }
