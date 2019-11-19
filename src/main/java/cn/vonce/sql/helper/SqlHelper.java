@@ -6,6 +6,7 @@ import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.ConditionType;
 import cn.vonce.sql.enumerate.DbType;
+import cn.vonce.sql.enumerate.SqlLogic;
 import cn.vonce.sql.enumerate.SqlOperator;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.uitls.SqlBeanUtil;
@@ -13,6 +14,7 @@ import com.google.common.collect.ListMultimap;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -657,10 +659,12 @@ public class SqlHelper {
                     List<SqlCondition> sqlConditionSet = whereMap.get(key);
                     for (SqlCondition sqlCondition : sqlConditionSet) {
                         Object value;
+                        String fieldName = sqlCondition.getField();
                         // 如果key使用#开头，实际值为传入值，不做任何处理
                         if (key.indexOf(SqlHelperCons.WELL_NUMBER) > -1) {
                             value = sqlCondition.getValue().toString();
-                            sqlCondition.setField(sqlCondition.getField().substring(1));
+                            fieldName = sqlCondition.getField().substring(1);
+//                            sqlCondition.setField(sqlCondition.getField().substring(1));
                         } else {
                             value = sqlCondition.getValue();
                             // 如果值不为数组则做处理
@@ -668,13 +672,12 @@ public class SqlHelper {
                                 value = SqlBeanUtil.getSqlValue(value);
                             }
                         }
-                        boolean needEndBracket = isNeedEndBracket(sqlCondition);
+                        boolean needEndBracket = isNeedEndBracket(sqlCondition.getSqlOperator());
                         String operator = getOperator(sqlCondition);
                         // 遍历sql逻辑处理
                         if (((i == 0 && j != 0) || i != 0) && j < sqlConditionSet.size()) {
-                            conditioneSql.append(getLogic(sqlCondition));
+                            conditioneSql.append(getLogic(sqlCondition.getSqlLogic()));
                         }
-                        String fieldName = sqlCondition.getField();
                         if (SqlBeanUtil.isToUpperCase()) {
                             fieldName = fieldName.toUpperCase();
                         }
@@ -747,13 +750,13 @@ public class SqlHelper {
     /**
      * 获取逻辑
      *
-     * @param sqlCondition
+     * @param sqlLogic
      * @return
      */
-    private static String getLogic(SqlCondition sqlCondition) {
+    private static String getLogic(SqlLogic sqlLogic) {
         String logic = null;
-        if (sqlCondition.getSqlLogic() != null && !"".equals(sqlCondition.getSqlLogic())) {
-            switch (sqlCondition.getSqlLogic()) {
+        if (sqlLogic != null && !"".equals(sqlLogic)) {
+            switch (sqlLogic) {
                 case AND:
                     logic = SqlHelperCons.AND;
                     break;
@@ -776,11 +779,11 @@ public class SqlHelper {
     /**
      * 需要额外包裹括号
      *
-     * @param sqlCondition
+     * @param sqlOperator
      * @return
      */
-    private static boolean isNeedEndBracket(SqlCondition sqlCondition) {
-        if (sqlCondition.getSqlOperator() == SqlOperator.IN || sqlCondition.getSqlOperator() == SqlOperator.NOT_IN) {
+    private static boolean isNeedEndBracket(SqlOperator sqlOperator) {
+        if (sqlOperator == SqlOperator.IN || sqlOperator == SqlOperator.NOT_IN) {
             return true;
         }
         return false;
