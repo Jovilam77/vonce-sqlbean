@@ -18,7 +18,9 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * SQL 语句助手
@@ -654,36 +656,33 @@ public class SqlHelper {
                 conditioneSql.append(SqlHelperCons.BEGIN_BRACKET);
                 int i = 0;
                 // 遍历所有条件
-                for (String key : whereMap.keySet()) {
-                    int j = 0;
-                    List<SqlCondition> sqlConditionSet = whereMap.get(key);
-                    for (SqlCondition sqlCondition : sqlConditionSet) {
-                        Object value;
-                        String fieldName = sqlCondition.getField();
-                        // 如果key使用#开头，实际值为传入值，不做任何处理
-                        if (key.indexOf(SqlHelperCons.WELL_NUMBER) > -1) {
-                            value = sqlCondition.getValue().toString();
-                            fieldName = sqlCondition.getField().substring(1);
-//                            sqlCondition.setField(sqlCondition.getField().substring(1));
-                        } else {
-                            value = sqlCondition.getValue();
-                            // 如果值不为数组则做处理
-                            if (!value.getClass().isArray() && !(value instanceof List)) {
-                                value = SqlBeanUtil.getSqlValue(value);
-                            }
+                Collection<Map.Entry<String, SqlCondition>> sqlConditionEntryCollection = whereMap.entries();
+                for (Map.Entry<String, SqlCondition> sqlConditionEntry : sqlConditionEntryCollection) {
+                    String key = sqlConditionEntry.getKey();
+                    SqlCondition sqlCondition = sqlConditionEntry.getValue();
+                    Object value;
+                    String fieldName = sqlConditionEntry.getValue().getField();
+                    // 如果key使用#开头，实际值为传入值，不做任何处理
+                    if (key.indexOf(SqlHelperCons.WELL_NUMBER) > -1) {
+                        value = sqlCondition.getValue().toString();
+                        fieldName = sqlCondition.getField().substring(1);
+                    } else {
+                        value = sqlCondition.getValue();
+                        // 如果值不为数组则做处理
+                        if (!value.getClass().isArray() && !(value instanceof List)) {
+                            value = SqlBeanUtil.getSqlValue(value);
                         }
-                        boolean needEndBracket = isNeedEndBracket(sqlCondition.getSqlOperator());
-                        String operator = getOperator(sqlCondition);
-                        // 遍历sql逻辑处理
-                        if (((i == 0 && j != 0) || i != 0) && j < sqlConditionSet.size()) {
-                            conditioneSql.append(getLogic(sqlCondition.getSqlLogic()));
-                        }
-                        if (SqlBeanUtil.isToUpperCase()) {
-                            fieldName = fieldName.toUpperCase();
-                        }
-                        conditioneSql.append(valueOperator(operator, fieldName, value, needEndBracket));
-                        j++;
                     }
+                    boolean needEndBracket = isNeedEndBracket(sqlCondition.getSqlOperator());
+                    String operator = getOperator(sqlCondition);
+                    // 遍历sql逻辑处理
+                    if (i != 0 && i < sqlConditionEntryCollection.size()) {
+                        conditioneSql.append(getLogic(sqlCondition.getSqlLogic()));
+                    }
+                    if (SqlBeanUtil.isToUpperCase()) {
+                        fieldName = fieldName.toUpperCase();
+                    }
+                    conditioneSql.append(valueOperator(operator, fieldName, value, needEndBracket));
                     i++;
                 }
                 conditioneSql.append(SqlHelperCons.END_BRACKET);
