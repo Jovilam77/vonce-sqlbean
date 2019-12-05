@@ -1,5 +1,6 @@
 package cn.vonce.sql.helper;
 
+import cn.vonce.sql.annotation.SqlBeanPojo;
 import cn.vonce.sql.annotation.SqlBeanTable;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
@@ -513,7 +514,12 @@ public class SqlHelper {
         String transferred = SqlBeanUtil.getTransferred();
         String[] filterFields = update.getFilterFields();
         Object bean = update.getUpdateBean();
-        Field[] fields = bean.getClass().getDeclaredFields();
+        Field[] fields;
+        if (bean.getClass().getAnnotation(SqlBeanPojo.class) != null) {
+            fields = bean.getClass().getSuperclass().getDeclaredFields();
+        } else {
+            fields = bean.getClass().getDeclaredFields();
+        }
         List<Field> filterAfterList = new ArrayList<>();
         for (int i = 0; i < fields.length; i++) {
             if (Modifier.isStatic(fields[i].getModifiers())) {

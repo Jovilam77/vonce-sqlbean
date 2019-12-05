@@ -159,6 +159,14 @@ public class SqlBeanProvider {
      * @date 2018年5月15日下午2:20:10
      */
     public String deleteByIdSql(Class<?> clazz, Object id) {
+        if (StringUtil.isEmpty(id)) {
+            try {
+                throw new SqlBeanException("deleteByIdSql id不能为空");
+            } catch (SqlBeanException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
         Delete delete = new Delete();
         delete.setDeleteBable(clazz);
         Field idField;
@@ -308,6 +316,14 @@ public class SqlBeanProvider {
      * @date 2018年5月15日下午2:19:24
      */
     public String updateByIdSql(Object bean, Object id, boolean updateNotNull, String[] filterFields) {
+        if (StringUtil.isEmpty(id)) {
+            try {
+                throw new SqlBeanException("updateByIdSql id不能为空");
+            } catch (SqlBeanException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
         Update update = newUpdate(bean, updateNotNull);
         update.setFilterFields(filterFields);
         Field idField;
@@ -338,7 +354,16 @@ public class SqlBeanProvider {
         try {
             idField = SqlBeanUtil.getIdField(bean.getClass());
             idField.setAccessible(true);
-            update.where(SqlBeanUtil.getFieldName(idField), idField.get(bean));
+            Object id = idField.get(bean);
+            if (StringUtil.isEmpty(id)) {
+                try {
+                    throw new SqlBeanException("updateByBeanIdSql id不能为空");
+                } catch (SqlBeanException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+            update.where(SqlBeanUtil.getFieldName(idField), id);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return null;
