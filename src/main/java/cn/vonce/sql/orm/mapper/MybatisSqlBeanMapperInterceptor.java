@@ -43,20 +43,22 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             Object parameterObj = parameterHandler.getParameterObject();
             // 获取节点属性的集合
             List<ResultMap> resultMaps = mappedStatement.getResultMaps();
-            if (parameterObj instanceof HashMap && (resultMaps.get(0).getResultMappings() == null || resultMaps.get(0).getResultMappings().isEmpty())) {
-                // 获取当前resultType的类型
-                Class<?> resultType = resultMaps.get(0).getType();
+            if (parameterObj instanceof HashMap) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> mapParam = (HashMap<String, Object>) parameterObj;
-                // 获取当前statement
-                Statement stmt = (Statement) invocation.getArgs()[0];
-                if (resultType.getName().equals("java.lang.Object") || resultType.getName().equals("java.util.List")) {
-                    // 根据mapParam返回处理结果
-                    return handleResultSet(stmt.getResultSet(), mapParam, resultType.getName());
-                } else if (resultType.getName().equals("java.util.Map")) {
-                    return mapHandleResultSet(stmt.getResultSet());
+                if (mapParam.containsKey("clazz") && (resultMaps.get(0).getResultMappings() == null || resultMaps.get(0).getResultMappings().isEmpty())) {
+                    // 获取当前resultType的类型
+                    Class<?> resultType = resultMaps.get(0).getType();
+                    // 获取当前statement
+                    Statement stmt = (Statement) invocation.getArgs()[0];
+                    if (resultType.getName().equals("java.lang.Object") || resultType.getName().equals("java.util.List")) {
+                        // 根据mapParam返回处理结果
+                        return handleResultSet(stmt.getResultSet(), mapParam, resultType.getName());
+                    } else if (resultType.getName().equals("java.util.Map")) {
+                        return mapHandleResultSet(stmt.getResultSet());
+                    }
+                    return baseHandleResultSet(stmt.getResultSet(), resultType.getName());
                 }
-                return baseHandleResultSet(stmt.getResultSet(), resultType.getName());
             }
         }
         return invocation.proceed();
