@@ -440,7 +440,12 @@ public class SqlHelper {
         }
         for (int i = 0; i < objects.length; i++) {
             valueSql.delete(0, valueSql.length());
-            Field[] fields = objects[i].getClass().getDeclaredFields();
+            Field[] fields;
+            if (objects[i].getClass().getAnnotation(SqlBeanPojo.class) != null) {
+                fields = objects[i].getClass().getSuperclass().getDeclaredFields();
+            } else {
+                fields = objects[i].getClass().getDeclaredFields();
+            }
             //只有在循环第一遍的时候才会处理
             if (i == 0) {
                 fieldSql.append(SqlHelperCons.BEGIN_BRACKET);
