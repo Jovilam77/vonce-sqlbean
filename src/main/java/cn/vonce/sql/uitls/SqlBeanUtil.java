@@ -454,7 +454,25 @@ public class SqlBeanUtil {
         int index = 0;
         for (char c : where.toCharArray()) {
             if ('?' == c) {
-                conditionSql.append(getSqlValue(args[index] == null ? "" : args[index]));
+                StringBuffer value = new StringBuffer();
+                Object[] objects = null;
+                if (args[index] == null) {
+                    objects = null;
+                } else if (args[index].getClass().isArray()) {
+                    objects = (Object[]) args[index];
+                } else if (args[index] instanceof Collection) {
+                    objects = ((Collection) args[index]).toArray();
+                } else {
+                    objects = new Object[]{args[index]};
+                }
+                if (objects != null) {
+                    for (int i = 0; i < objects.length; i++) {
+                        value.append(getSqlValue(objects[i]));
+                        value.append(SqlHelperCons.COMMA);
+                    }
+                    value.deleteCharAt(value.length() - SqlHelperCons.COMMA.length());
+                }
+                conditionSql.append(value);
                 index++;
             } else {
                 conditionSql.append(c);
@@ -651,8 +669,6 @@ public class SqlBeanUtil {
         String sqlValue = "";
         switch (whatType(value.getClass().getSimpleName())) {
             case VALUE_TYPE:
-                sqlValue = value.toString();
-                break;
             case BOOL_TYPE:
                 sqlValue = value.toString();
                 break;

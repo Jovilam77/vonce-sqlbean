@@ -197,8 +197,8 @@ public class SqlHelper {
         String tableName;
         if (insert.getInsertBean().getClass().isArray()) {
             objects = (Object[]) insert.getInsertBean();
-        } else if (insert.getInsertBean() instanceof List) {
-            List<Object> list = (List<Object>) insert.getInsertBean();
+        } else if (insert.getInsertBean() instanceof Collection) {
+            Collection<Object> list = (Collection<Object>) insert.getInsertBean();
             objects = list.toArray();
         } else {
             objects = new Object[]{insert.getInsertBean()};
@@ -680,7 +680,7 @@ public class SqlHelper {
                     } else {
                         value = sqlCondition.getValue();
                         // 如果值不为数组则做处理
-                        if (!value.getClass().isArray() && !(value instanceof List)) {
+                        if (!value.getClass().isArray() && !(value instanceof Collection)) {
                             value = SqlBeanUtil.getSqlValue(value);
                         }
                     }
@@ -815,8 +815,8 @@ public class SqlHelper {
             Object[] betweenValues;
             if (value.getClass().isArray()) {
                 betweenValues = (Object[]) value;
-            } else if (value instanceof List) {
-                List<Object> list = ((List<Object>) value);
+            } else if (value instanceof Collection) {
+                Collection<Object> list = ((Collection<Object>) value);
                 betweenValues = list.toArray();
             } else {
                 try {
@@ -862,8 +862,8 @@ public class SqlHelper {
         Object[] objects;
         if (value.getClass().isArray()) {
             objects = (Object[]) value;
-        } else if (value instanceof List) {
-            List<Object> list = ((List<Object>) value);
+        } else if (value instanceof Collection) {
+            Collection<Object> list = ((Collection<Object>) value);
             objects = list.toArray();
         } else {
             objects = new Object[]{value};
