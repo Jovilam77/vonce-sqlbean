@@ -310,7 +310,7 @@ public class ConditionOnDbType implements Condition {
      * @return
      */
     private DbType getDbType(String driverClassName) {
-        if ("com.mysql.jdbc.Driver".equals(driverClassName) || "com.mysql.cj.jdbc.Driver".equals(driverClassName)) {
+        if ("com.mysql.jdbc.Driver".equals(driverClassName) || "com.mysql.cj.jdbc.Driver".equals(driverClassName) || "org.gjt.mm.mysql.Driver".equals(driverClassName)) {
             return DbType.MySQL;
         } else if ("org.mariadb.jdbc.Driver".equals(driverClassName)) {
             return DbType.MariaDB;
