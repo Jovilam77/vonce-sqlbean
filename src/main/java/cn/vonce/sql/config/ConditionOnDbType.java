@@ -19,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -79,7 +80,7 @@ public class ConditionOnDbType implements Condition {
     }
 
     /**
-     * 获取jdbc驱动类名
+     * 获取jdbc驱动类名(Spring boot)
      *
      * @param conditionContext
      * @return
@@ -90,51 +91,11 @@ public class ConditionOnDbType implements Condition {
             Environment environment = conditionContext.getEnvironment();
             List<URL> configUrlList = new ArrayList<>();
             if (environment.getDefaultProfiles() != null) {
-                File file = new File(System.getProperty("user.dir") + "/application.yml");
-                if (file.exists()) {
-                    configUrlList.add(file.toURI().toURL());
-                } else {
-                    file = new File(System.getProperty("user.dir") + "/application.properties");
-                    if (file.exists()) {
-                        configUrlList.add(file.toURI().toURL());
-                    } else {
-                        URL url = ClassUtils.getDefaultClassLoader().getResource("config/application.yml");
-                        if (url == null) {
-                            url = ClassUtils.getDefaultClassLoader().getResource("config/application.properties");
-                        }
-                        if (url == null) {
-                            url = ClassUtils.getDefaultClassLoader().getResource("application.yml");
-                        }
-                        if (url == null) {
-                            url = ClassUtils.getDefaultClassLoader().getResource("application.properties");
-                        }
-                        configUrlList.add(url);
-                    }
-                }
+                configUrlList.add(getApplicationFileUrl(null));
             }
             if (environment.getActiveProfiles() != null) {
                 for (String active : environment.getActiveProfiles()) {
-                    File file = new File(System.getProperty("user.dir") + "/application-" + active + ".yml");
-                    if (file.exists()) {
-                        configUrlList.add(file.toURI().toURL());
-                    } else {
-                        file = new File(System.getProperty("user.dir") + "/application-" + active + ".properties");
-                        if (file.exists()) {
-                            configUrlList.add(file.toURI().toURL());
-                        } else {
-                            URL url = ClassUtils.getDefaultClassLoader().getResource("config/application-" + active + ".yml");
-                            if (url == null) {
-                                url = ClassUtils.getDefaultClassLoader().getResource("config/application-" + active + ".properties");
-                            }
-                            if (url == null) {
-                                url = ClassUtils.getDefaultClassLoader().getResource("application-" + active + ".yml");
-                            }
-                            if (url == null) {
-                                url = ClassUtils.getDefaultClassLoader().getResource("application-" + active + ".properties");
-                            }
-                            configUrlList.add(url);
-                        }
-                    }
+                    configUrlList.add(getApplicationFileUrl(active));
                 }
             }
             List<String> driverNameList = new ArrayList<>();
@@ -174,7 +135,43 @@ public class ConditionOnDbType implements Condition {
     }
 
     /**
-     * 获取jdbc驱动类名
+     * 获取配置文件url
+     *
+     * @param active
+     * @return
+     * @throws MalformedURLException
+     */
+    private URL getApplicationFileUrl(String active) throws MalformedURLException {
+        URL url = null;
+        File file = new File(System.getProperty("user.dir") + "/config/application" + (StringUtil.isEmpty(active) ? "" : "-" + active) + ".properties");
+        if (!file.exists()) {
+            file = new File(System.getProperty("user.dir") + "/config/application" + (StringUtil.isEmpty(active) ? "" : "-" + active) + ".yml");
+        }
+        if (!file.exists()) {
+            file = new File(System.getProperty("user.dir") + "/application" + (StringUtil.isEmpty(active) ? "" : "-" + active) + ".properties");
+        }
+        if (!file.exists()) {
+            file = new File(System.getProperty("user.dir") + "/application" + (StringUtil.isEmpty(active) ? "" : "-" + active) + ".yml");
+        }
+        if(file.exists()){
+            url = file.toURI().toURL();
+        }else {
+            url = ClassUtils.getDefaultClassLoader().getResource("config/application" + (StringUtil.isEmpty(active) ? "" : "-" + active) + ".properties");
+            if (url == null) {
+                url = ClassUtils.getDefaultClassLoader().getResource("config/application" + (StringUtil.isEmpty(active) ? "" : "-" + active) + ".yml");
+            }
+            if (url == null) {
+                url = ClassUtils.getDefaultClassLoader().getResource("application" + (StringUtil.isEmpty(active) ? "" : "-" + active) + ".properties");
+            }
+            if (url == null) {
+                url = ClassUtils.getDefaultClassLoader().getResource("application" + (StringUtil.isEmpty(active) ? "" : "-" + active) + ".yml");
+            }
+        }
+        return url;
+    }
+
+    /**
+     * 获取jdbc驱动类名(Spring mvc)
      *
      * @param conditionContext
      * @param resourceDescription
@@ -219,6 +216,7 @@ public class ConditionOnDbType implements Condition {
                             for (Map<String, Object> propertyMap : (List<Map<String, Object>>) beanMap.get("property")) {
                                 if (propertyMap.containsKey("name") && ((String) propertyMap.get("name")).indexOf("driver") > -1) {
                                     driverClassName = (String) propertyMap.get("value");
+                                    break;
                                 }
                             }
                         }
@@ -240,6 +238,7 @@ public class ConditionOnDbType implements Condition {
                                     String value = getValue(itemFile, driverClassName);
                                     if (StringUtil.isNotEmpty(value)) {
                                         driverClassName = value;
+                                        break;
                                     }
                                 }
                             } else {
