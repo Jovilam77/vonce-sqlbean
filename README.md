@@ -11,7 +11,7 @@
     <dependency>
     	<groupId>cn.vonce</groupId>
     	<artifactId>vonce-sqlbean</artifactId>
-    	<version>1.2.2</version>
+    	<version>1.2.4</version>
     </dependency>
 ###### 2：标注实体类，也可以不写，但类名与字段名必须与数据库表名字段名保持一致
 ```java
