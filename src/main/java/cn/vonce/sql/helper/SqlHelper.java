@@ -1,5 +1,6 @@
 package cn.vonce.sql.helper;
 
+import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.annotation.SqlBeanPojo;
 import cn.vonce.sql.annotation.SqlBeanTable;
 import cn.vonce.sql.bean.*;
@@ -12,7 +13,6 @@ import cn.vonce.sql.enumerate.SqlOperator;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import com.google.common.collect.ListMultimap;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,7 +133,7 @@ public class SqlHelper {
             }
         }
         //标准Sql
-        if (SqlBeanUtil.isCount(select) && StringUtils.isNotEmpty(groupBySql)) {
+        if (SqlBeanUtil.isCount(select) && StringUtil.isNotEmpty(groupBySql)) {
             sqlSb.insert(0, SqlHelperCons.SELECT + SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET + SqlHelperCons.FROM + SqlHelperCons.BEGIN_BRACKET);
             sqlSb.append(SqlHelperCons.END_BRACKET + SqlHelperCons.AS + SqlHelperCons.T);
         }
