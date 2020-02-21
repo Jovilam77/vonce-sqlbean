@@ -32,19 +32,18 @@ public class SqlBeanMapper {
      * @return
      */
     public Object baseHandleResultSet(ResultSet resultSet) {
-        Object object = null;
+        Object value = null;
         try {
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-            Object value = getValue(resultSetMetaData.getColumnTypeName(1), 1, resultSet);
+            value = getValue(resultSetMetaData.getColumnTypeName(1), 1, resultSet);
             if (value == null || value.equals("null")) {
                 value = getDefaultValueByColumnType(resultSetMetaData.getColumnTypeName(1));
             }
-            object = value;
         } catch (SQLException e) {
             e.printStackTrace();
             logger.error("基础对象映射异常SQLException，{}", e.getMessage());
         }
-        return object;
+        return value;
     }
 
     /**
@@ -392,6 +391,44 @@ public class SqlBeanMapper {
                 break;
         }
         return value;
+    }
+
+    /**
+     * 获取转换后的值
+     *
+     * @param typeName
+     * @param value
+     * @return
+     */
+    public static Object getValueConvert(String typeName, Object value) {
+        Object newValue = value;
+        switch (typeName) {
+            case "byte":
+            case "java.lang.Byte":
+                newValue = new Byte(value.toString());
+                break;
+            case "short":
+            case "java.lang.Short":
+                newValue = new Short(value.toString());
+                break;
+            case "int":
+            case "java.lang.Integer":
+                newValue = new Integer(value.toString());
+                break;
+            case "long":
+            case "java.lang.Long":
+                newValue = new Long(value.toString());
+                break;
+            case "float":
+            case "java.lang.Float":
+                newValue = new Float(value.toString());
+                break;
+            case "double":
+            case "java.lang.Double":
+                newValue = new Double(value.toString());
+                break;
+        }
+        return newValue;
     }
 
 

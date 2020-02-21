@@ -74,6 +74,10 @@ public class ConditionOnDbType implements Condition {
                 if (DbType.DB2 == getDbType(driverClassName)) {
                     return true;
                 }
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseDerby.class.getName())) {
+                if (DbType.Derby == getDbType(driverClassName)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -321,6 +325,8 @@ public class ConditionOnDbType implements Condition {
             return DbType.PostgreSQL;
         } else if ("com.ibm.db2.jcc.DB2Driver".equals(driverClassName)) {
             return DbType.DB2;
+        } else if ("org.apache.derby.jdbc.EmbeddedDriver".equals(driverClassName)) {
+            return DbType.Derby;
         } else {
             return null;
         }

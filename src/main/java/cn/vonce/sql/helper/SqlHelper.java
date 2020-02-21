@@ -153,6 +153,10 @@ public class SqlHelper {
         else if (sqlBeanConfig.getDbType() == DbType.DB2) {
             db2PageDispose(select, sqlSb);
         }
+        //Derby 分页处理
+        else if (sqlBeanConfig.getDbType() == DbType.Derby) {
+            derbyPageDispose(select, sqlSb);
+        }
         return sqlSb.toString();
     }
 
@@ -953,6 +957,25 @@ public class SqlHelper {
             endSb.append(SqlHelperCons.AND);
             endSb.append(param[1]);
             sqlSb.append(endSb);
+        }
+    }
+
+    /**
+     * 返回Derby 分页语句
+     *
+     * @param select
+     * @return
+     * @author Jovi
+     * @date 2020年2月21日下午5:40:20
+     */
+    private static void derbyPageDispose(Select select, StringBuffer sqlSb) {
+        if (SqlBeanUtil.isUsePage(select)) {
+            Integer[] param = pageParam(select);
+            sqlSb.append(SqlHelperCons.OFFSET);
+            sqlSb.append(param[0]);
+            sqlSb.append(" ROWS FETCH NEXT ");
+            sqlSb.append(param[1]);
+            sqlSb.append(" ROWS ONLY");
         }
     }
 

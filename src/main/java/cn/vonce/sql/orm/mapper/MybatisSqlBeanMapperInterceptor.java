@@ -53,11 +53,11 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
                     Statement stmt = (Statement) invocation.getArgs()[0];
                     if (resultType.getName().equals("java.lang.Object") || resultType.getName().equals("java.util.List")) {
                         // 根据mapParam返回处理结果
-                        return handleResultSet(stmt.getResultSet(), mapParam, resultType.getName());
+                        return handleResultSet(stmt.getResultSet(), mapParam, resultType);
                     } else if (resultType.getName().equals("java.util.Map")) {
                         return mapHandleResultSet(stmt.getResultSet());
                     }
-                    return baseHandleResultSet(stmt.getResultSet(), resultType.getName());
+                    return baseHandleResultSet(stmt.getResultSet(), resultType);
                 }
             }
         }
@@ -84,7 +84,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
      * @author Jovi
      * @date 2018年5月15日上午9:21:22
      */
-    private Object handleResultSet(ResultSet resultSet, Map<String, Object> mapParam, String typeName) {
+    private Object handleResultSet(ResultSet resultSet, Map<String, Object> mapParam, Class<?> resultType) {
         if (null != resultSet) {
             // 获取实际需要返回的类型
             Class<?> clazz = (Class<?>) mapParam.get("clazz");
@@ -100,7 +100,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             } else if (!SqlBeanUtil.isBaseType(returnType.getName())) {
                 list = beanHandleResultSet(returnType, resultSet, super.getColumnNameList(resultSet));
             } else {
-                list = baseHandleResultSet(resultSet, typeName);
+                list = baseHandleResultSet(resultSet, resultType);
             }
             return list;
         }
@@ -157,12 +157,16 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
      * @param resultSet
      * @return
      */
-    public List<Object> baseHandleResultSet(ResultSet resultSet, String typeName) {
+    public List<Object> baseHandleResultSet(ResultSet resultSet, Class<?> resultType) {
         List<Object> resultList = new ArrayList<>();
         if (null != resultSet) {
             try {
                 while (resultSet.next()) {
-                    resultList.add(super.baseHandleResultSet(resultSet));
+                    Object value = super.baseHandleResultSet(resultSet);
+                    if (!value.getClass().getSimpleName().toLowerCase().equals(resultType.getSimpleName().toLowerCase())) {
+                        value = super.getValueConvert(resultType.getName(), value);
+                    }
+                    resultList.add(value);
                 }
             } catch (SQLException e) {
                 logger.error("基础对象映射异常SQLException，{}", e.getMessage());
@@ -172,7 +176,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             }
         }
         if (resultList.isEmpty()) {
-            resultList.add(getDefaultValue(typeName));
+            resultList.add(getDefaultValue(resultType.getName()));
         }
         return resultList;
     }

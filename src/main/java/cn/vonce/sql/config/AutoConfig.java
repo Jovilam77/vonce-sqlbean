@@ -64,4 +64,13 @@ public class AutoConfig {
         return sqlBeanConfig;
     }
 
+    @Bean
+    @ConditionalOnUseDerby
+    public SqlBeanConfig derbyConfig() {
+        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.Derby);
+        sqlBeanConfig.setToUpperCase(true);
+        SqlHelper.init(sqlBeanConfig);
+        return sqlBeanConfig;
+    }
+
 }
