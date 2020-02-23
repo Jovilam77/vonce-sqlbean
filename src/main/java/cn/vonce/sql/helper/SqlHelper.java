@@ -1002,7 +1002,7 @@ public class SqlHelper {
             int endIndex = (select.getPage().getPagenum() * select.getPage().getPagesize()) + select.getPage().getPagesize();
             param = new Integer[]{startIndex, endIndex};
         }
-        //Mysql,MariaDB,PostgreSQL
+        //Mysql,MariaDB,PostgreSQL,SQLite
         else {
             int limitOffset = select.getPage().getPagenum() * select.getPage().getPagesize();
             int limitAmount = select.getPage().getPagesize();
