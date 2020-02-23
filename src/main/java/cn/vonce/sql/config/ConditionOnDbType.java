@@ -78,6 +78,10 @@ public class ConditionOnDbType implements Condition {
                 if (DbType.Derby == getDbType(driverClassName)) {
                     return true;
                 }
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseSqlite.class.getName())) {
+                if (DbType.SQLite == getDbType(driverClassName)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -157,9 +161,9 @@ public class ConditionOnDbType implements Condition {
         if (!file.exists()) {
             file = new File(System.getProperty("user.dir") + "/application" + (StringUtil.isEmpty(active) ? "" : "-" + active) + ".yml");
         }
-        if(file.exists()){
+        if (file.exists()) {
             url = file.toURI().toURL();
-        }else {
+        } else {
             url = ClassUtils.getDefaultClassLoader().getResource("config/application" + (StringUtil.isEmpty(active) ? "" : "-" + active) + ".properties");
             if (url == null) {
                 url = ClassUtils.getDefaultClassLoader().getResource("config/application" + (StringUtil.isEmpty(active) ? "" : "-" + active) + ".yml");
@@ -327,6 +331,8 @@ public class ConditionOnDbType implements Condition {
             return DbType.DB2;
         } else if ("org.apache.derby.jdbc.EmbeddedDriver".equals(driverClassName)) {
             return DbType.Derby;
+        } else if ("org.sqlite.JDBC".equals(driverClassName)) {
+            return DbType.SQLite;
         } else {
             return null;
         }

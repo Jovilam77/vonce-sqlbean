@@ -73,4 +73,12 @@ public class AutoConfig {
         return sqlBeanConfig;
     }
 
+    @Bean
+    @ConditionalOnUseSqlite
+    public SqlBeanConfig sqliteConfig() {
+        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.SQLite);
+        SqlHelper.init(sqlBeanConfig);
+        return sqlBeanConfig;
+    }
+
 }

@@ -141,8 +141,8 @@ public class SqlHelper {
         if (sqlBeanConfig.getDbType() == DbType.MySQL || sqlBeanConfig.getDbType() == DbType.MariaDB) {
             mysqlPageDispose(select, sqlSb);
         }
-        //PostgreSQL 分页处理
-        else if (sqlBeanConfig.getDbType() == DbType.PostgreSQL) {
+        //PostgreSQL、SQLite 分页处理
+        else if (sqlBeanConfig.getDbType() == DbType.PostgreSQL || sqlBeanConfig.getDbType() == DbType.SQLite) {
             postgreSqlPageDispose(select, sqlSb);
         }
         //Oracle 分页处理
