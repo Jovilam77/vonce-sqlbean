@@ -115,8 +115,6 @@ public RS add() {
     // 更多用法请查看下方详细文档...
 }
 ```
-
-###### 以上即可实现无条件分页查询
 ###### 如果使用的是Spring JDBC那么将“MybatisSqlBeanServiceImpl”改为“SpringJdbcSqlBeanServiceImpl”即可
 [========]
 
