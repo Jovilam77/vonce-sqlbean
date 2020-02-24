@@ -64,7 +64,7 @@ public RS get() {
     // 更多用法请查看下方详细文档...
 }
 
-//查询
+//分页
 @GetMapping("getList")
 public RS getList(HttpServletRequest request) {
     // 查询对象
