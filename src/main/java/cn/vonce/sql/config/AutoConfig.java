@@ -81,4 +81,22 @@ public class AutoConfig {
         return sqlBeanConfig;
     }
 
+    @Bean
+    @ConditionalOnUseHSql
+    public SqlBeanConfig hsqlConfig() {
+        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.Hsql);
+        sqlBeanConfig.setToUpperCase(true);
+        SqlHelper.init(sqlBeanConfig);
+        return sqlBeanConfig;
+    }
+
+    @Bean
+    @ConditionalOnUseH2
+    public SqlBeanConfig h2Config() {
+        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.H2);
+        sqlBeanConfig.setToUpperCase(true);
+        SqlHelper.init(sqlBeanConfig);
+        return sqlBeanConfig;
+    }
+
 }

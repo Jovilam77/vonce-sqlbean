@@ -13,7 +13,6 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.util.ClassUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,41 +46,28 @@ public class ConditionOnDbType implements Condition {
                     if (name.toLowerCase().indexOf("DataSource".toLowerCase()) > -1) {
                         driverClassName = getDriverClassName(conditionContext, conditionContext.getRegistry().getBeanDefinition(name).getResourceDescription());
                     }
-
                 }
             }
-            if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseMysql.class.getName())) {
-                if (DbType.MySQL == getDbType(driverClassName)) {
-                    return true;
-                }
-            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseMariaDB.class.getName())) {
-                if (DbType.MariaDB == getDbType(driverClassName)) {
-                    return true;
-                }
-            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseOracle.class.getName())) {
-                if (DbType.Oracle == getDbType(driverClassName)) {
-                    return true;
-                }
-            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseSqlServer.class.getName())) {
-                if (DbType.SQLServer2008 == getDbType(driverClassName)) {
-                    return true;
-                }
-            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUsePostgreSql.class.getName())) {
-                if (DbType.PostgreSQL == getDbType(driverClassName)) {
-                    return true;
-                }
-            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseDB2.class.getName())) {
-                if (DbType.DB2 == getDbType(driverClassName)) {
-                    return true;
-                }
-            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseDerby.class.getName())) {
-                if (DbType.Derby == getDbType(driverClassName)) {
-                    return true;
-                }
-            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseSqlite.class.getName())) {
-                if (DbType.SQLite == getDbType(driverClassName)) {
-                    return true;
-                }
+            if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseMysql.class.getName()) && DbType.MySQL == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseMariaDB.class.getName()) && DbType.MariaDB == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseOracle.class.getName()) && DbType.Oracle == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseSqlServer.class.getName()) && DbType.SQLServer2008 == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUsePostgreSql.class.getName()) && DbType.PostgreSQL == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseDB2.class.getName()) && DbType.DB2 == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseDerby.class.getName()) && DbType.Derby == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseSqlite.class.getName()) && DbType.SQLite == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseHSql.class.getName()) && DbType.Hsql == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseH2.class.getName()) && DbType.H2 == getDbType(driverClassName)) {
+                return true;
             }
         }
         return false;
@@ -333,6 +319,10 @@ public class ConditionOnDbType implements Condition {
             return DbType.Derby;
         } else if ("org.sqlite.JDBC".equals(driverClassName)) {
             return DbType.SQLite;
+        } else if ("org.hsqldb.jdbcDriver".equals(driverClassName)) {
+            return DbType.Hsql;
+        } else if ("org.h2.Driver".equals(driverClassName)) {
+            return DbType.H2;
         } else {
             return null;
         }
