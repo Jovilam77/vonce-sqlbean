@@ -23,9 +23,9 @@ public class From implements Serializable {
         this.alias = alias;
     }
 
-    private String name;
+    private String name = "";
 
-    private String alias;
+    private String alias = "";
 
 
     public String getName() {

@@ -38,8 +38,11 @@ public class ConditionOnDbType implements Condition {
     @Override
     public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
         String[] beanName = conditionContext.getBeanFactory().getBeanNamesForType(SqlBeanConfig.class);
+        //如果未配置则进行配置，否则跳过
         if (beanName == null || beanName.length == 0) {
+            //一般spring boot/spring cloud 项目将通过该方式获取完成
             String driverClassName = getDriverClassName(conditionContext);
+            //如果找不到可能为spring mvc项目，将尝试从xml或class读取
             if (driverClassName == null) {
                 Iterator<String> iterator = conditionContext.getBeanFactory().getBeanNamesIterator();
                 while (iterator.hasNext()) {
@@ -47,41 +50,28 @@ public class ConditionOnDbType implements Condition {
                     if (name.toLowerCase().indexOf("DataSource".toLowerCase()) > -1) {
                         driverClassName = getDriverClassName(conditionContext, conditionContext.getRegistry().getBeanDefinition(name).getResourceDescription());
                     }
-
                 }
             }
-            if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseMysql.class.getName())) {
-                if (DbType.MySQL == getDbType(driverClassName)) {
-                    return true;
-                }
-            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseMariaDB.class.getName())) {
-                if (DbType.MariaDB == getDbType(driverClassName)) {
-                    return true;
-                }
-            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseOracle.class.getName())) {
-                if (DbType.Oracle == getDbType(driverClassName)) {
-                    return true;
-                }
-            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseSqlServer.class.getName())) {
-                if (DbType.SQLServer2008 == getDbType(driverClassName)) {
-                    return true;
-                }
-            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUsePostgreSql.class.getName())) {
-                if (DbType.PostgreSQL == getDbType(driverClassName)) {
-                    return true;
-                }
-            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseDB2.class.getName())) {
-                if (DbType.DB2 == getDbType(driverClassName)) {
-                    return true;
-                }
-            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseDerby.class.getName())) {
-                if (DbType.Derby == getDbType(driverClassName)) {
-                    return true;
-                }
-            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseSqlite.class.getName())) {
-                if (DbType.SQLite == getDbType(driverClassName)) {
-                    return true;
-                }
+            if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseMysql.class.getName()) && DbType.MySQL == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseMariaDB.class.getName()) && DbType.MariaDB == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseOracle.class.getName()) && DbType.Oracle == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseSqlServer.class.getName()) && DbType.SQLServer2008 == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUsePostgreSql.class.getName()) && DbType.PostgreSQL == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseDB2.class.getName()) && DbType.DB2 == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseDerby.class.getName()) && DbType.Derby == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseSqlite.class.getName()) && DbType.SQLite == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseHSql.class.getName()) && DbType.Hsql == getDbType(driverClassName)) {
+                return true;
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseH2.class.getName()) && DbType.H2 == getDbType(driverClassName)) {
+                return true;
             }
         }
         return false;
@@ -94,9 +84,27 @@ public class ConditionOnDbType implements Condition {
      * @return
      */
     private String getDriverClassName(ConditionContext conditionContext) {
-        String driverClassName = null;
+        String driverClassName;
+        Environment environment = conditionContext.getEnvironment();
+        //优先根据指定的key来获取
+        driverClassName = environment.getProperty("spring.datasource.driver-class-name");
+        if (driverClassName == null) {
+            driverClassName = environment.getProperty("spring.datasource.driverClassName");
+        }
+        if (driverClassName == null) {
+            driverClassName = environment.getProperty("spring.datasource.driver-class");
+        }
+        if (driverClassName == null) {
+            driverClassName = environment.getProperty("spring.datasource.driverClass");
+        }
+        if (driverClassName == null) {
+            driverClassName = environment.getProperty("spring.datasource.driver");
+        }
+        if (driverClassName != null) {
+            return driverClassName;
+        }
+        //如果找不到，那么将从配置文件中模糊匹配
         try {
-            Environment environment = conditionContext.getEnvironment();
             List<URL> configUrlList = new ArrayList<>();
             if (environment.getDefaultProfiles() != null) {
                 configUrlList.add(getApplicationFileUrl(null));
@@ -107,14 +115,15 @@ public class ConditionOnDbType implements Condition {
                 }
             }
             List<String> driverNameList = new ArrayList<>();
-            driverNameList.add("driverClassName");
             driverNameList.add("driver-class-name");
-            driverNameList.add("driverClass");
+            driverNameList.add("driverClassName");
             driverNameList.add("driver-class");
+            driverNameList.add("driverClass");
             driverNameList.add("driver");
             for (URL url : configUrlList) {
                 Properties properties;
                 if (url != null) {
+                    //如果是yml配置
                     if (url.getPath().lastIndexOf(".yml") > -1) {
                         YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
                         yaml.setResources(new InputStreamResource(url.openStream()));
@@ -151,6 +160,7 @@ public class ConditionOnDbType implements Condition {
      */
     private URL getApplicationFileUrl(String active) throws MalformedURLException {
         URL url = null;
+        //优先从项目路径查找配置文件
         File file = new File(System.getProperty("user.dir") + "/config/application" + (StringUtil.isEmpty(active) ? "" : "-" + active) + ".properties");
         if (!file.exists()) {
             file = new File(System.getProperty("user.dir") + "/config/application" + (StringUtil.isEmpty(active) ? "" : "-" + active) + ".yml");
@@ -164,6 +174,7 @@ public class ConditionOnDbType implements Condition {
         if (file.exists()) {
             url = file.toURI().toURL();
         } else {
+            //如果找不到，那么将从classpath查找配置文件
             url = ClassUtils.getDefaultClassLoader().getResource("config/application" + (StringUtil.isEmpty(active) ? "" : "-" + active) + ".properties");
             if (url == null) {
                 url = ClassUtils.getDefaultClassLoader().getResource("config/application" + (StringUtil.isEmpty(active) ? "" : "-" + active) + ".yml");
@@ -191,9 +202,11 @@ public class ConditionOnDbType implements Condition {
             return null;
         }
         try {
+            //先解析文件名及后缀
             int index = resourceDescription.lastIndexOf(".");
             String suffix = resourceDescription.substring(index + 1, resourceDescription.length() - 1);
             String fileName = resourceDescription.substring(resourceDescription.lastIndexOf("[") + 1, index);
+            //如果是xml方式配置
             if (suffix.equals("xml")) {
                 File file;
                 if (resourceDescription.indexOf("file") > -1) {
@@ -207,6 +220,7 @@ public class ConditionOnDbType implements Condition {
                     Resource resource = conditionContext.getResourceLoader().getResource(fileName + ".xml");
                     file = resource.getFile();
                 }
+                //如果xml配置存在则解析xml
                 if (file.exists()) {
                     byte[] bytes = Files.readAllBytes(Paths.get(file.toURI()));
                     Map<String, Object> xmlMap = XmlConverUtil.xml2JsonStyleMap(new String(bytes));
@@ -255,7 +269,9 @@ public class ConditionOnDbType implements Condition {
                         }
                     }
                 }
-            } else if (suffix.equals("class")) {
+            }
+            //如果是类方式配置
+            else if (suffix.equals("class")) {
                 String className = fileName.replace("/", ".");
                 Class<?> clazz = ClassUtils.forName(className, ClassUtils.getDefaultClassLoader());
                 Map<String, ?> beanMap = conditionContext.getBeanFactory().getBeansOfType(clazz);
@@ -333,6 +349,10 @@ public class ConditionOnDbType implements Condition {
             return DbType.Derby;
         } else if ("org.sqlite.JDBC".equals(driverClassName)) {
             return DbType.SQLite;
+        } else if ("org.hsqldb.jdbcDriver".equals(driverClassName)) {
+            return DbType.Hsql;
+        } else if ("org.h2.Driver".equals(driverClassName)) {
+            return DbType.H2;
         } else {
             return null;
         }

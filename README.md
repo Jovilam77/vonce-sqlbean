@@ -4,7 +4,7 @@
 
 ###### 特点：零配置，支持联表查询，支持Mybatis、Spring Jdbc，支持分页
 ###### 环境：JDK7+，Mybatis3.2.4+，(Spring MVC 4.1.2+ 或 Spring Boot 1x 或 Spring Boot 2x)
-###### 数据库：Mysql，MariaDB，Oracle，Sqlserver2008+，PostgreSQL，DB2
+###### 数据库：Mysql，MariaDB，Oracle，Sqlserver2008+，PostgreSQL，DB2，Derby，Sqlite，HSQL，H2
 
 #### 简单上手
 ###### 1：引入Maven依赖
@@ -53,24 +53,68 @@ public class EssayServiceImpl extends MybatisSqlBeanServiceImpl<Essay> implement
 @Autowired
 private EssayService essayService;
 
-@RequestMapping(value = "getList", method = RequestMethod.GET)
-@ResponseBody
-public RS getList(HttpServletRequest request, HttpServletResponse response) {
-	// 查询对象
-	Select select = new Select();
-	// 分页助手
-	PageHelper<Essay> pageHelper = new PageHelper<>(request);
-	// 分页查询
-	pageHelper.paging(select, essayService);
-	// 返回结果
-	return super.customHint(pageHelper.toResult("获取文章列表成功"));
+//查询
+@GetMapping("get")
+public RS get() {
+    List<Essay> list = essayService.selectAll();
+    list = essayService.selectByCondition("type = ?" , 2);
+    Essay essay = essayService.selectById(1);
+    essay = essayService.selectOneByCondition("id = ?" , 1);
+    return super.successHint("获取成功", list);
+    // 更多用法请查看下方详细文档...
+}
+
+//分页
+@GetMapping("getList")
+public RS getList(HttpServletRequest request) {
+    // 查询对象
+    //Select select = new Select();
+    // 分页助手
+    //PageHelper<Essay> pageHelper = new PageHelper<>(request);
+    // 分页查询
+    //pageHelper.paging(select, essayService);
+    // 返回结果
+    //return super.customHint(pageHelper.toResult("获取列表成功"));
+    // 或者这样
+    return super.customHint(new PageHelper<Essay>(request).paging(new Select(),essayService).toResult("获取文章列表成功"));
+    // 更多用法请查看下方详细文档...
+}
+
+//更新
+@PostMapping("update")
+public RS update(Essay essay) {
+    long i = essayService.updateByBeanId(essay, true);
+    if (i > 0) {
+        return super.successHint("更新成功");
+    }
+    return super.othersHint("更新失败");
+    // 更多用法请查看下方详细文档...
+}
+
+//删除
+@PostMapping("deleteById")
+public RS deleteById(Integer[] id) {
+    long i = essayService.deleteById(id);
+    if (i > 0) {
+        return super.successHint("删除成功");
+    }
+    return super.othersHint("删除失败");
+    // 更多用法请查看下方详细文档...
+}
+
+//插入
+@PostMapping("add")
+public RS add() {
+    List<Essay> essayList = new ArrayList<>();
+    for (int i = 0; i < 100; i++) {
+        Essay essay = new Essay(i, "name" + i);
+        essayList.add(essay);
+    }
+    essayService.insert(essayList);
+    return successHint("成功");
+    // 更多用法请查看下方详细文档...
 }
 ```
-###### 或者这样
-```java
-return super.customHint(new PageHelper<Essay>(request).paging(new Select(),essayService).toResult("获取文章列表成功"));
-```
-###### 以上即可实现无条件分页查询
 ###### 如果使用的是Spring JDBC那么将“MybatisSqlBeanServiceImpl”改为“SpringJdbcSqlBeanServiceImpl”即可
 [========]
 

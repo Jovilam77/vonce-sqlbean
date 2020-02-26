@@ -137,12 +137,12 @@ public class SqlHelper {
             sqlSb.insert(0, SqlHelperCons.SELECT + SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET + SqlHelperCons.FROM + SqlHelperCons.BEGIN_BRACKET);
             sqlSb.append(SqlHelperCons.END_BRACKET + SqlHelperCons.AS + SqlHelperCons.T);
         }
-        //MySQL,MariaDB 分页处理
-        if (sqlBeanConfig.getDbType() == DbType.MySQL || sqlBeanConfig.getDbType() == DbType.MariaDB) {
+        //MySQL,MariaDB,H2 分页处理
+        if (sqlBeanConfig.getDbType() == DbType.MySQL || sqlBeanConfig.getDbType() == DbType.MariaDB || sqlBeanConfig.getDbType() == DbType.H2) {
             mysqlPageDispose(select, sqlSb);
         }
-        //PostgreSQL、SQLite 分页处理
-        else if (sqlBeanConfig.getDbType() == DbType.PostgreSQL || sqlBeanConfig.getDbType() == DbType.SQLite) {
+        //PostgreSQL,SQLite,Hsql 分页处理
+        else if (sqlBeanConfig.getDbType() == DbType.PostgreSQL || sqlBeanConfig.getDbType() == DbType.SQLite || sqlBeanConfig.getDbType() == DbType.Hsql) {
             postgreSqlPageDispose(select, sqlSb);
         }
         //Oracle 分页处理
@@ -876,7 +876,7 @@ public class SqlHelper {
     }
 
     /**
-     * 返回MySQL 分页语句
+     * 返回MySQL,MariaDB,H2 分页语句
      *
      * @param select
      * @return
@@ -894,7 +894,7 @@ public class SqlHelper {
     }
 
     /**
-     * 返回PostgreSql 分页语句
+     * 返回PostgreSql,Sqlite,Hsql 分页语句
      *
      * @param select
      * @return
@@ -1002,7 +1002,7 @@ public class SqlHelper {
             int endIndex = (select.getPage().getPagenum() * select.getPage().getPagesize()) + select.getPage().getPagesize();
             param = new Integer[]{startIndex, endIndex};
         }
-        //Mysql,MariaDB,PostgreSQL,SQLite
+        //Mysql,MariaDB,PostgreSQL,Sqlite,Hsql
         else {
             int limitOffset = select.getPage().getPagenum() * select.getPage().getPagesize();
             int limitAmount = select.getPage().getPagesize();

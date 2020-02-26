@@ -10,6 +10,6 @@ package cn.vonce.sql.enumerate;
  */
 public enum DbType {
 
-    MySQL, MariaDB, SQLServer2008, Oracle, PostgreSQL, DB2, H2, Derby, SQLite
+    MySQL, MariaDB, SQLServer2008, Oracle, PostgreSQL, DB2, H2, Hsql, Derby, SQLite
 
 }
