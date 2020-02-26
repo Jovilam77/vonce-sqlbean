@@ -14,7 +14,7 @@ import java.io.Serializable;
  */
 public class Insert implements Serializable {
 
-    private String insertTable = null;//插入哪张表
+    private String insertTable = "";//插入哪张表
     private Object insertBean = null;//插入的实体对象
 
     /**

@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 public class Delete extends Common implements Serializable {
 
-    private String deleteTable = null;//删除哪张表
+    private String deleteTable = "";//删除哪张表
 
     /**
      * 获取删除表名

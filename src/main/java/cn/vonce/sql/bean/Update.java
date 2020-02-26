@@ -7,7 +7,7 @@ import java.io.Serializable;
 public class Update extends Common implements Serializable {
 
     private boolean updateNotNull = true;//默认只更新不为空的字段
-    private String updateTable = null;//更新哪张表
+    private String updateTable = "";//更新哪张表
     private Object updateBean = null;//更新的实体对象
     private String[] filterFields = null;//需要过滤的字段
 
