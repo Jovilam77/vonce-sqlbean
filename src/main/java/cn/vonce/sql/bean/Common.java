@@ -20,7 +20,7 @@ public abstract class Common implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String where = "";//条件
+    private String where = null;//条件
     private ListMultimap<String, SqlCondition> whereMap = LinkedListMultimap.create();//where条件包含的逻辑
 
     /**
