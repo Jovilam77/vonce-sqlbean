@@ -1,6 +1,7 @@
 package cn.vonce.sql.helper;
 
 import cn.vonce.common.utils.StringUtil;
+import cn.vonce.sql.annotation.SqlBeanId;
 import cn.vonce.sql.annotation.SqlBeanPojo;
 import cn.vonce.sql.annotation.SqlBeanTable;
 import cn.vonce.sql.bean.*;
@@ -174,7 +175,7 @@ public class SqlHelper {
         StringBuffer sqlSb = new StringBuffer();
         try {
             sqlSb.append(SqlHelperCons.UPDATE);
-            sqlSb.append(updateTableName(update));
+            sqlSb.append(getTableName(update.getUpdateTable(), update.getUpdateBean()));
             sqlSb.append(SqlHelperCons.SET);
             sqlSb.append(setSql(update));
             sqlSb.append(whereSql(update));
@@ -198,7 +199,6 @@ public class SqlHelper {
     public static String buildInsertSql(Insert insert) {
         checkInitStatus();
         Object[] objects;
-        String tableName;
         if (insert.getInsertBean().getClass().isArray()) {
             objects = (Object[]) insert.getInsertBean();
         } else if (insert.getInsertBean() instanceof Collection) {
@@ -207,15 +207,7 @@ public class SqlHelper {
         } else {
             objects = new Object[]{insert.getInsertBean()};
         }
-        SqlBeanTable sqlBeanTable = objects[0].getClass().getAnnotation(SqlBeanTable.class);
-        // 优先级 注解第一，getUpdateTable第二，第三为类名
-        if (sqlBeanTable != null) {
-            tableName = sqlBeanTable.value();
-        } else if (insert.getInsertTable() != null && !"".equals(insert.getInsertTable())) {
-            tableName = insert.getInsertTable();
-        } else {
-            tableName = objects[0].getClass().getSimpleName();
-        }
+        String tableName = getTableName(insert.getInsertTable(), objects[0]);
         String sql = null;
         try {
             sql = fieldAndValuesSql(tableName, objects);
@@ -248,23 +240,20 @@ public class SqlHelper {
     }
 
     /**
-     * 返回表名
+     * 返回表名,优先级 tableName第一，注解第二，类名第三
      *
-     * @param update
+     * @param tableName
+     * @param bean
      * @return
      * @author Jovi
      * @date 2017年8月17日下午5:24:25
      */
-    private static String updateTableName(Update update) {
-        String tableName;
-        Object bean = update.getUpdateBean();
+    private static String getTableName(String tableName, Object bean) {
         SqlBeanTable sqlBeanTable = bean.getClass().getAnnotation(SqlBeanTable.class);
-        // 优先级 注解第一，getUpdateTable第二，第三为类名
-        if (sqlBeanTable != null) {
+        if (StringUtil.isEmpty(tableName)) {
             tableName = sqlBeanTable.value();
-        } else if (update.getUpdateTable() != null && !"".equals(update.getUpdateTable())) {
-            tableName = update.getUpdateTable();
-        } else {
+        }
+        if (StringUtil.isEmpty(tableName)) {
             tableName = bean.getClass().getSimpleName();
         }
         return SqlBeanUtil.isToUpperCase() ? tableName.toUpperCase() : tableName;
@@ -443,7 +432,9 @@ public class SqlHelper {
             fieldAndValuesSql.append(SqlHelperCons.INSERT_INTO);
         }
         for (int i = 0; i < objects.length; i++) {
+            //每次必须清空
             valueSql.delete(0, valueSql.length());
+            //获取sqlbean字段
             Field[] fields;
             if (objects[i].getClass().getAnnotation(SqlBeanPojo.class) != null) {
                 fields = objects[i].getClass().getSuperclass().getDeclaredFields();
@@ -459,17 +450,25 @@ public class SqlHelper {
                 if (Modifier.isStatic(fields[j].getModifiers())) {
                     continue;
                 }
-                String name = SqlBeanUtil.getFieldName(fields[j]);
                 if (SqlBeanUtil.isIgnore(fields[j])) {
                     continue;
                 }
+                SqlBeanId sqlBeanId = fields[j].getAnnotation(SqlBeanId.class);
                 //只有在循环第一遍的时候才会处理
                 if (i == 0) {
-                    fieldSql.append(transferred + (SqlBeanUtil.isToUpperCase() ? name.toUpperCase() : name) + transferred);
-                    fieldSql.append(SqlHelperCons.COMMA);
+                    String tableFieldName = SqlBeanUtil.getTableFieldName(fields[j]);
+                    //如果此字段非id字段 或者 此字段为id字段但是不是自增的id则生成该字段的insert语句
+                    if (sqlBeanId == null || (sqlBeanId != null && sqlBeanId.generate() != SqlBeanId.GenerateType.AUTO)) {
+                        fieldSql.append(transferred + (SqlBeanUtil.isToUpperCase() ? tableFieldName.toUpperCase() : tableFieldName) + transferred);
+                        fieldSql.append(SqlHelperCons.COMMA);
+                    }
                 }
-                fields[j].setAccessible(true);
-                valueSql.append(SqlBeanUtil.getSqlValue(fields[j].get(objects[i])));
+                if (sqlBeanId != null && sqlBeanId.generate() != SqlBeanId.GenerateType.AUTO && sqlBeanId.generate() != SqlBeanId.GenerateType.NORMAL) {
+                    valueSql.append(SqlBeanUtil.getSqlValue("生成的id"));
+                } else {
+                    fields[j].setAccessible(true);
+                    valueSql.append(SqlBeanUtil.getSqlValue(fields[j].get(objects[i])));
+                }
                 //valuesSql.append(getSqlValue(ReflectAsmUtil.get(objects[i].getClass(), objects[i], fields[j].getName())));
                 valueSql.append(SqlHelperCons.COMMA);
             }
@@ -535,7 +534,7 @@ public class SqlHelper {
                 continue;
             }
             fields[i].setAccessible(true);
-            String name = SqlBeanUtil.getFieldName(fields[i]);
+            String name = SqlBeanUtil.getTableFieldName(fields[i]);
             Object objectValue = fields[i].get(bean);
             //Object objectValue = ReflectAsmUtil.get(bean.getClass(), bean, fields[i].getName());
             if (update.isUpdateNotNull()) {
@@ -547,11 +546,12 @@ public class SqlHelper {
                 continue;
             }
             if (SqlBeanUtil.isFilter(filterFields, name)) {
-                filterAfterList.add(fields[i]);
+                continue;
             }
+            filterAfterList.add(fields[i]);
         }
         for (int i = 0; i < filterAfterList.size(); i++) {
-            String name = SqlBeanUtil.getFieldName(filterAfterList.get(i));
+            String name = SqlBeanUtil.getTableFieldName(filterAfterList.get(i));
             filterAfterList.get(i).setAccessible(true);
             Object objectValue = filterAfterList.get(i).get(bean);
             String value;
@@ -644,7 +644,7 @@ public class SqlHelper {
         } else {
             if (SqlHelperCons.ORDER_BY.equals(type) && sqlBeanConfig.getDbType() == DbType.SQLServer2008 && SqlBeanUtil.isUsePage(select) && !SqlBeanUtil.isCount(select)) {
                 groupByAndOrderBySql.append(type);
-                groupByAndOrderBySql.append(SqlBeanUtil.getFieldFullName(tableAlias(select), select.getPage().getIdName()));
+                groupByAndOrderBySql.append(SqlBeanUtil.getTableFieldFullName(tableAlias(select), select.getPage().getIdName()));
             }
         }
         return groupByAndOrderBySql.toString();

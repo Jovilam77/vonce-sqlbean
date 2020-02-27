@@ -54,9 +54,9 @@ public class SqlBeanProvider {
             return null;
         }
         if (ids.length > 1) {
-            select.where(SqlBeanUtil.getFieldFullName(clazz, idField), ids, SqlOperator.IN);
+            select.where(SqlBeanUtil.getTableFieldFullName(clazz, idField), ids, SqlOperator.IN);
         } else {
-            select.where(SqlBeanUtil.getFieldFullName(clazz, idField), ids[0]);
+            select.where(SqlBeanUtil.getTableFieldFullName(clazz, idField), ids[0]);
         }
         return SqlHelper.buildSelectSql(select);
     }
@@ -123,7 +123,7 @@ public class SqlBeanProvider {
             try {
                 select.setColumn(SqlBeanUtil.getSelectFields(clazz, select.getFrom(), select.getFilterFields()));
                 if (select.getPage() != null) {
-                    select.getPage().setIdName(SqlBeanUtil.getFieldName(SqlBeanUtil.getIdField(clazz)));
+                    select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)));
                 }
             } catch (SqlBeanException e) {
                 e.printStackTrace();
@@ -176,7 +176,7 @@ public class SqlBeanProvider {
             e.printStackTrace();
             return null;
         }
-        delete.where(SqlBeanUtil.getFieldName(idField), id, SqlOperator.IN);
+        delete.where(SqlBeanUtil.getTableFieldName(idField), id, SqlOperator.IN);
         return SqlHelper.buildDeleteSql(delete);
     }
 
@@ -240,7 +240,7 @@ public class SqlBeanProvider {
             update.setUpdateBean(bean);
             Field idField = SqlBeanUtil.getIdField(bean.getClass());
             idField.setAccessible(true);
-            update.where(SqlBeanUtil.getFieldName(idField), id);
+            update.where(SqlBeanUtil.getTableFieldName(idField), id);
             //sqlBean.where(SqlBeanUtil.getFieldName(idField), ReflectAsmUtil.get(bean.getClass(), bean, idField.getName()));
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -311,6 +311,7 @@ public class SqlBeanProvider {
      *
      * @param bean
      * @param updateNotNull
+     * @param filterFields
      * @return
      * @author Jovi
      * @date 2018年5月15日下午2:19:24
@@ -333,7 +334,7 @@ public class SqlBeanProvider {
             e.printStackTrace();
             return null;
         }
-        update.where(SqlBeanUtil.getFieldName(idField), id);
+        update.where(SqlBeanUtil.getTableFieldName(idField), id);
         //sqlBean.where(SqlBeanUtil.getFieldName(idField), id);
         return SqlHelper.buildUpdateSql(update);
     }
@@ -343,6 +344,7 @@ public class SqlBeanProvider {
      *
      * @param bean
      * @param updateNotNull
+     * @param filterFields
      * @return
      * @author Jovi
      * @date 2018年5月15日下午2:19:24
@@ -363,7 +365,7 @@ public class SqlBeanProvider {
                     return null;
                 }
             }
-            update.where(SqlBeanUtil.getFieldName(idField), id);
+            update.where(SqlBeanUtil.getTableFieldName(idField), id);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return null;
@@ -380,6 +382,7 @@ public class SqlBeanProvider {
      *
      * @param bean
      * @param updateNotNull
+     * @param filterFields
      * @param where
      * @param args
      * @return
@@ -398,6 +401,7 @@ public class SqlBeanProvider {
      *
      * @param bean
      * @param updateNotNull
+     * @param filterFields
      * @param where
      * @return
      * @author Jovi
@@ -452,6 +456,7 @@ public class SqlBeanProvider {
      * 实例化Select
      *
      * @param clazz
+     * @param isCount
      * @return
      * @throws SqlBeanException
      */
@@ -535,12 +540,13 @@ public class SqlBeanProvider {
      *
      * @param select
      * @param paging
+     * @param clazz
      */
     private void setPaging(Select select, Paging paging, Class<?> clazz) {
         if (paging != null) {
             if (SqlHelper.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
                 try {
-                    select.setPage(SqlBeanUtil.getFieldName(SqlBeanUtil.getIdField(clazz)), paging.getPagenum(), paging.getPagesize());
+                    select.setPage(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)), paging.getPagenum(), paging.getPagesize());
                 } catch (SqlBeanException e) {
                     e.printStackTrace();
                 }

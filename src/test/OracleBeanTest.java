@@ -21,7 +21,7 @@ System.out.println(DateUtil.differentDays(DateUtil.stringToDate("2019-07-10 10:0
     public static void sql(){
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig();
         sqlBeanConfig.setDbType(DbType.Oracle);
-        sqlBeanConfig.setOracleToUpperCase(true);
+        sqlBeanConfig.setToUpperCase(true);
         SqlHelper.init(sqlBeanConfig);
 
         long startTime = System.currentTimeMillis();

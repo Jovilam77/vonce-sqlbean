@@ -30,7 +30,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param clazz
      * @param id
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午3:58:28
      */
@@ -44,7 +43,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param returnType
      * @param id
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年6月15日下午6:36:38
      */
@@ -57,7 +55,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param clazz
      * @param ids
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午3:58:28
      */
@@ -71,7 +68,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param returnType
      * @param ids
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年6月15日下午6:36:38
      */
@@ -84,7 +80,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param clazz
      * @param select
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午3:58:46
      */
@@ -95,9 +90,9 @@ public interface MybatisSqlBeanDao<T> {
      * 根据自定义条件查询 只返回一条记录(可指定返回类型)
      *
      * @param clazz
+     * @param returnType
+     * @param select
      * @return
-     * @Param selectConfig
-     * @Param select
      * @author Jovi
      * @date 2018年5月15日下午3:58:46
      */
@@ -108,9 +103,7 @@ public interface MybatisSqlBeanDao<T> {
      * 根据自定义条件查询返回Map
      *
      * @param clazz
-     * @return
-     * @Param selectConfig
-     * @Param select
+     * @param select
      * @author Jovi
      * @date 2019年5月17日下午5:11:22
      */
@@ -124,7 +117,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param where
      * @param args
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午4:03:56
      */
@@ -135,10 +127,10 @@ public interface MybatisSqlBeanDao<T> {
      * 根据条件查询(可指定返回类型、查询的表)
      *
      * @param clazz
+     * @param returnType
      * @param where
      * @param args
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午4:03:56
      */
@@ -153,7 +145,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param where
      * @param args
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午4:03:56
      */
@@ -168,7 +159,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param where
      * @param args
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午3:58:50
      */
@@ -182,7 +172,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param where
      * @param args
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年7月5日下午4:09:45
      */
@@ -195,8 +184,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param clazz
      * @param paging
      * @return
-     * @Param selectConfig
-     * @ @param paging
      * @author Jovi
      * @date 2018年5月15日下午3:59:27
      */
@@ -210,7 +197,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param returnType
      * @param paging
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午3:59:27
      */
@@ -222,9 +208,8 @@ public interface MybatisSqlBeanDao<T> {
      * 根据自定义条件查询（可自动分页）返回List<Map>结果集
      *
      * @param clazz
+     * @param select
      * @return
-     * @Param selectConfig
-     * @Param select
      * @author Jovi
      * @date 2018年6月8日下午2:34:06
      */
@@ -235,9 +220,8 @@ public interface MybatisSqlBeanDao<T> {
      * 根据自定义条件查询（可自动分页）返回List<T>
      *
      * @param clazz
+     * @param select
      * @return
-     * @Param selectConfig
-     * @Param select
      * @author Jovi
      * @date 2018年5月15日下午3:59:43
      */
@@ -248,9 +232,9 @@ public interface MybatisSqlBeanDao<T> {
      * 根据自定义条件查询（可自动分页）返回List<O> (可指定返回类型)
      *
      * @param clazz
+     * @param returnType
+     * @param select
      * @return
-     * @Param selectConfig
-     * @Param select
      * @author Jovi
      * @date 2018年6月13日下午2:39:08
      */
@@ -261,9 +245,8 @@ public interface MybatisSqlBeanDao<T> {
      * 根据自定义条件统计
      *
      * @param clazz
+     * @param select
      * @return
-     * @Param selectConfig
-     * @Param select
      * @author Jovi
      * @date 2018年5月15日下午3:59:47
      */
@@ -276,7 +259,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param clazz
      * @param id
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午4:00:43
      */
@@ -290,7 +272,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param where
      * @param args
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午4:00:57
      */
@@ -304,7 +285,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param delete
      * @param ignore
      * @return
-     * @Param selectConfig
      */
     @DeleteProvider(type = MybatisSqlBeanProvider.class, method = "delete")
     long delete(@Param("clazz") Class<?> clazz, @Param("delete") Delete delete, @Param("ignore") boolean ignore);
@@ -315,7 +295,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param clazz
      * @param id
      * @return
-     * @Param selectConfig
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "logicallyDeleteById")
     long logicallyDeleteById(@Param("clazz") Class<?> clazz, @Param("id") Object id);
@@ -327,7 +306,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param where
      * @param args
      * @return
-     * @Param selectConfig
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "logicallyDeleteByCondition")
     long logicallyDeleteByCondition(@Param("clazz") Class<?> clazz, @Param("where") String where, @Param("args") Object... args);
@@ -338,7 +316,6 @@ public interface MybatisSqlBeanDao<T> {
      * @param update
      * @param ignore
      * @return
-     * @Param selectConfig
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "update")
     long update(@Param("update") Update update, @Param("ignore") boolean ignore);
@@ -348,8 +325,8 @@ public interface MybatisSqlBeanDao<T> {
      *
      * @param bean
      * @param updateNotNull
+     * @param filterFields
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午4:01:00
      */
@@ -361,8 +338,8 @@ public interface MybatisSqlBeanDao<T> {
      *
      * @param bean
      * @param updateNotNull
+     * @param filterFields
      * @return
-     * @Param selectConfig
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateByBeanId")
     long updateByBeanId(@Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("filterFields") String[] filterFields);
@@ -371,11 +348,11 @@ public interface MybatisSqlBeanDao<T> {
      * 根据条件更新
      *
      * @param bean
-     * @param where
      * @param updateNotNull
+     * @param filterFields
+     * @param where
      * @param args
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午4:01:03
      */
@@ -386,10 +363,10 @@ public interface MybatisSqlBeanDao<T> {
      * 根据实体类字段条件更新
      *
      * @param bean
-     * @param where
      * @param updateNotNull
+     * @param filterFields
+     * @param where
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午4:01:06
      */
@@ -401,7 +378,6 @@ public interface MybatisSqlBeanDao<T> {
      *
      * @param beanList
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午4:01:09
      */
@@ -413,7 +389,6 @@ public interface MybatisSqlBeanDao<T> {
      *
      * @param insert
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午4:01:09
      */

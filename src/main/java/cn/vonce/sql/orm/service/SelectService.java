@@ -44,7 +44,6 @@ public interface SelectService<T> extends PagingService {
      *
      * @param ids
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年5月15日下午3:58:28
      */
@@ -56,7 +55,6 @@ public interface SelectService<T> extends PagingService {
      * @param returnType
      * @param ids
      * @return
-     * @Param selectConfig
      * @author Jovi
      * @date 2018年6月15日下午6:36:38
      */

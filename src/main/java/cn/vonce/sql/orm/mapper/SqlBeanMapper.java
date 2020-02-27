@@ -90,15 +90,14 @@ public class SqlBeanMapper {
                 if (Modifier.isStatic(field.getModifiers())) {
                     continue;
                 }
-                SqlBeanField sqlBeanField = field.getAnnotation(SqlBeanField.class);
+                SqlBeanJoin sqlBeanJoin = field.getAnnotation(SqlBeanJoin.class);
                 String fieldName = field.getName();
-                if (sqlBeanField != null) {
-                    if (sqlBeanField.isBean()) {
+                if (sqlBeanJoin != null) {
+                    if (sqlBeanJoin.isBean()) {
                         Class<?> subClazz = field.getType();
                         Object subBean = subClazz.newInstance();
                         //获取表的别名，先是获取别名，获取不到就会获取表名
                         String subTableAlias = SqlBeanUtil.getTableAlias(null, subClazz);
-                        SqlBeanJoin sqlBeanJoin = sqlBeanField.join();
                         //如果在SqlBeanJoin中设置了表名，那么优先使用该表名，如果有多个联表查询的对象需要连接同一张表的，那么需要保证表名一致
                         if (StringUtil.isNotEmpty(sqlBeanJoin.table())) {
                             subTableAlias = sqlBeanJoin.table();
