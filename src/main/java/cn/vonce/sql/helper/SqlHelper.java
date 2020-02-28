@@ -7,10 +7,7 @@ import cn.vonce.sql.annotation.SqlBeanTable;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.constant.SqlHelperCons;
-import cn.vonce.sql.enumerate.ConditionType;
-import cn.vonce.sql.enumerate.DbType;
-import cn.vonce.sql.enumerate.SqlLogic;
-import cn.vonce.sql.enumerate.SqlOperator;
+import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import com.google.common.collect.ListMultimap;
@@ -419,6 +416,13 @@ public class SqlHelper {
         StringBuffer fieldAndValuesSql = new StringBuffer();
         List<String> valueSqlList = new ArrayList<>();
         String transferred = SqlBeanUtil.getTransferred();
+        //获取sqlbean的全部字段
+        Field[] fields;
+        if (objects[0].getClass().getAnnotation(SqlBeanPojo.class) != null) {
+            fields = objects[0].getClass().getSuperclass().getDeclaredFields();
+        } else {
+            fields = objects[0].getClass().getDeclaredFields();
+        }
         if (sqlBeanConfig.getDbType() == DbType.Oracle) {
             if (sqlBeanConfig.getToUpperCase()) {
                 tableName = tableName.toUpperCase();
@@ -434,43 +438,45 @@ public class SqlHelper {
         for (int i = 0; i < objects.length; i++) {
             //每次必须清空
             valueSql.delete(0, valueSql.length());
-            //获取sqlbean字段
-            Field[] fields;
-            if (objects[i].getClass().getAnnotation(SqlBeanPojo.class) != null) {
-                fields = objects[i].getClass().getSuperclass().getDeclaredFields();
-            } else {
-                fields = objects[i].getClass().getDeclaredFields();
-            }
             //只有在循环第一遍的时候才会处理
             if (i == 0) {
                 fieldSql.append(SqlHelperCons.BEGIN_BRACKET);
             }
             valueSql.append(SqlHelperCons.BEGIN_BRACKET);
-            for (int j = 0; j < fields.length; j++) {
-                if (Modifier.isStatic(fields[j].getModifiers())) {
+            int existId = 0;
+            for (Field field : fields) {
+                if (Modifier.isStatic(field.getModifiers())) {
                     continue;
                 }
-                if (SqlBeanUtil.isIgnore(fields[j])) {
+                if (SqlBeanUtil.isIgnore(field)) {
                     continue;
                 }
-                SqlBeanId sqlBeanId = fields[j].getAnnotation(SqlBeanId.class);
+                SqlBeanId sqlBeanId = field.getAnnotation(SqlBeanId.class);
+                if (sqlBeanId != null) {
+                    existId++;
+                }
+                if (existId > 1) {
+                    throw new SqlBeanException("请正确的标识id字段，id字段只能标识一个，但我们在'" + field.getDeclaringClass().getName() + "'此实体类或其父类找到了不止一处");
+                }
                 //只有在循环第一遍的时候才会处理
                 if (i == 0) {
-                    String tableFieldName = SqlBeanUtil.getTableFieldName(fields[j]);
+                    String tableFieldName = SqlBeanUtil.getTableFieldName(field);
                     //如果此字段非id字段 或者 此字段为id字段但是不是自增的id则生成该字段的insert语句
-                    if (sqlBeanId == null || (sqlBeanId != null && sqlBeanId.generate() != SqlBeanId.GenerateType.AUTO)) {
+                    if (sqlBeanId == null || (sqlBeanId != null && sqlBeanId.generateType() != GenerateType.AUTO)) {
                         fieldSql.append(transferred + (SqlBeanUtil.isToUpperCase() ? tableFieldName.toUpperCase() : tableFieldName) + transferred);
                         fieldSql.append(SqlHelperCons.COMMA);
                     }
                 }
-                if (sqlBeanId != null && sqlBeanId.generate() != SqlBeanId.GenerateType.AUTO && sqlBeanId.generate() != SqlBeanId.GenerateType.NORMAL) {
-                    valueSql.append(SqlBeanUtil.getSqlValue("生成的id"));
-                } else {
-                    fields[j].setAccessible(true);
-                    valueSql.append(SqlBeanUtil.getSqlValue(fields[j].get(objects[i])));
+                //如果此字段为id且需要生成唯一id
+                if (sqlBeanId != null && sqlBeanId.generateType() != GenerateType.AUTO && sqlBeanId.generateType() != GenerateType.NORMAL) {
+                    valueSql.append(SqlBeanUtil.getSqlValue(sqlBeanConfig.getUniqueIdProcessor().uniqueId(sqlBeanId.generateType())));
+                    valueSql.append(SqlHelperCons.COMMA);
+                } else if (sqlBeanId == null) {
+                    field.setAccessible(true);
+                    valueSql.append(SqlBeanUtil.getSqlValue(field.get(objects[i])));
+                    //valuesSql.append(getSqlValue(ReflectAsmUtil.get(objects[i].getClass(), objects[i], fields[j].getName())));
+                    valueSql.append(SqlHelperCons.COMMA);
                 }
-                //valuesSql.append(getSqlValue(ReflectAsmUtil.get(objects[i].getClass(), objects[i], fields[j].getName())));
-                valueSql.append(SqlHelperCons.COMMA);
             }
             valueSql.deleteCharAt(valueSql.length() - SqlHelperCons.COMMA.length());
             valueSql.append(SqlHelperCons.END_BRACKET);

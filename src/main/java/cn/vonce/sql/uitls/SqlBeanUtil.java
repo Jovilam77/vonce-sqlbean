@@ -112,13 +112,22 @@ public class SqlBeanUtil {
      * @return
      */
     public static Field getIdField(List<Field> fieldList) throws SqlBeanException {
+        Field idField = null;
+        int existId = 0;
         for (Field field : fieldList) {
             SqlBeanId sqlBeanField = field.getAnnotation(SqlBeanId.class);
             if (sqlBeanField != null) {
-                return field;
+                idField = field;
+                existId++;
+            }
+            if (existId > 0) {
+                throw new SqlBeanException("请正确的标识id字段，id字段只能标识一个，但我们在'" + field.getDeclaringClass().getName() + "'此实体类或其父类找到了不止一处");
             }
         }
-        throw new SqlBeanException("请检查SqlBean是否有设置id");
+        if (existId == 0) {
+            throw new SqlBeanException("请检查实体类是否有标识id字段");
+        }
+        return idField;
     }
 
     /**

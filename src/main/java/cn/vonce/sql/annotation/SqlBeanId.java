@@ -1,5 +1,7 @@
 package cn.vonce.sql.annotation;
 
+import cn.vonce.sql.enumerate.GenerateType;
+
 import java.lang.annotation.*;
 
 /**
@@ -16,17 +18,6 @@ import java.lang.annotation.*;
 @Inherited
 public @interface SqlBeanId {
 
-    /**
-     * NORMAL：常规的，手写id
-     * AUTO：自增长id
-     * UUID：长度32位的uuid
-     * SNOWFLAKE_ID_18：长度18位的唯一有序id（64bits JavaScript会丢失精度，只能当作String类型处理）
-     * SNOWFLAKE_ID_16：长度16位的唯一有序id（53bits JavaScript能正常处理）
-     */
-    public enum GenerateType {
-        NORMAL, AUTO, UUID, SNOWFLAKE_ID_16, SNOWFLAKE_ID_18
-    }
-
-    GenerateType generate() default GenerateType.NORMAL;
+    GenerateType generateType() default GenerateType.NORMAL;
 
 }

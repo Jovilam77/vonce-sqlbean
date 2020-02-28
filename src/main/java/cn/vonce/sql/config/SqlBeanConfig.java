@@ -1,6 +1,8 @@
 package cn.vonce.sql.config;
 
 import cn.vonce.sql.enumerate.DbType;
+import cn.vonce.sql.processor.DefaultUniqueIdProcessor;
+import cn.vonce.sql.processor.UniqueIdProcessor;
 
 import java.io.Serializable;
 
@@ -24,6 +26,7 @@ public class SqlBeanConfig implements Serializable {
 
     private DbType dbType;
     private Boolean toUpperCase;
+    private UniqueIdProcessor uniqueIdProcessor;
 
     public DbType getDbType() {
         return dbType;
@@ -45,4 +48,16 @@ public class SqlBeanConfig implements Serializable {
         }
     }
 
+    public UniqueIdProcessor getUniqueIdProcessor() {
+        if (uniqueIdProcessor == null) {
+            uniqueIdProcessor = new DefaultUniqueIdProcessor();
+        }
+        return uniqueIdProcessor;
+    }
+
+    public void setUniqueIdProcessor(UniqueIdProcessor uniqueIdProcessor) {
+        if (this.uniqueIdProcessor == null) {
+            this.uniqueIdProcessor = uniqueIdProcessor;
+        }
+    }
 }
