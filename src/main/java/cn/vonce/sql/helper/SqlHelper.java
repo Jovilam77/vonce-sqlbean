@@ -308,6 +308,20 @@ public class SqlHelper {
         if (select != null && select.getJoin().size() != 0) {
             for (int i = 0; i < select.getJoin().size(); i++) {
                 Join join = select.getJoin().get(i);
+                switch (join.getJoinType()) {
+                    case INNER_JOIN:
+                        joinSql.append(SqlHelperCons.INNER_JOIN);
+                        break;
+                    case LEFT_JOIN:
+                        joinSql.append(SqlHelperCons.LEFT_JOIN);
+                        break;
+                    case RIGHT_JOIN:
+                        joinSql.append(SqlHelperCons.RIGHT_JOIN);
+                        break;
+                    case FULL_JOIN:
+                        joinSql.append(SqlHelperCons.FULL_JOIN);
+                        break;
+                }
                 joinSql.append(join.getTableName());
                 joinSql.append(SqlHelperCons.SPACES);
                 joinSql.append(join.getTableAlias());

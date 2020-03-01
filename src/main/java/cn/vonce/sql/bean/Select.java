@@ -29,11 +29,7 @@ public class Select extends Condition implements Serializable {
     private boolean useDistinct = false;//默认不去重复
     private boolean customMode = true;//默认为自定义模式
     private List<Column> columnList = new ArrayList<>();//查询的字段数组
-    private List<Join> joinList = new ArrayList<>();//内连接的表数组
-    //    private List<Join> innerJoinList = new ArrayList<>();//内连接的表数组
-//    private List<Join> fullJoinList = new ArrayList<>();//全连接的表数组
-//    private List<Join> leftJoinList = new ArrayList<>();//左连接的表数组
-//    private List<Join> rightJoinList = new ArrayList<>();//右连接的表数组
+    private List<Join> joinList = new ArrayList<>();//表连接的表数组
     private List<String> groupByList = new ArrayList<>();//分组
     private List<String> orderByList = new ArrayList<>();//排序
     private Page page = null;
@@ -142,192 +138,9 @@ public class Select extends Condition implements Serializable {
     public Select column(String columnName, String columnAlias) {
         if (StringUtil.isNotEmpty(columnName) && StringUtil.isNotEmpty(columnAlias)) {
             columnList.add(new Column(columnName, columnAlias));
-//            columnList.add(SqlHelperCons.BEGIN_BRACKET + subSql + SqlHelperCons.END_BRACKET + SqlHelperCons.AS + SqlBeanUtil.getTransferred() + alias + SqlBeanUtil.getTransferred());
         }
         return this;
     }
-
-//    /**
-//     * 获取内连接的表
-//     *
-//     * @return
-//     * @author Jovi
-//     * @date 2017年8月18日下午4:20:49
-//     */
-//    public List<Join> getInnerJoin() {
-//        return innerJoinList;
-//    }
-//
-//    /**
-//     * 添加表内连接
-//     *
-//     * @param table        关联的表名
-//     * @param tableKeyword 关联的表关键字段
-//     * @param mainKeyword  主表关键字段
-//     * @author Jovi
-//     * @date 2017年8月18日上午10:54:26
-//     */
-//    public Select innerJoin(String table, String tableKeyword, String mainKeyword) {
-//        return innerJoin(table, table, tableKeyword, mainKeyword);
-//    }
-//
-//    /**
-//     * 添加表内连接
-//     *
-//     * @param table        关联的表名
-//     * @param tableAlias   关联的表别名
-//     * @param tableKeyword 关联的表关键字段
-//     * @param mainKeyword  主表关键字段
-//     * @author Jovi
-//     * @date 2017年8月18日上午10:54:26
-//     */
-//    public Select innerJoin(String table, String tableAlias, String tableKeyword, String mainKeyword) {
-//        if (SqlBeanUtil.joinIsNotEmpty(table, tableKeyword, mainKeyword)) {
-////            innerJoinList.add(SqlHelperCons.INNER_JOIN + joinSplitJoint(table, tableAlias, tableKeyword, mainKeyword));
-//            innerJoinList.add(new Join(JoinType.INNER_JOIN, table, tableAlias, tableKeyword, mainKeyword));
-//        }
-//        return this;
-//    }
-//
-//
-//    /**
-//     * 获取外连接的表
-//     *
-//     * @return
-//     * @author Jovi
-//     * @date 2017年8月18日下午4:20:41
-//     */
-//    public List<Join> getFullJoin() {
-//        return fullJoinList;
-//    }
-//
-//    /**
-//     * 添加表外连接
-//     *
-//     * @param table
-//     * @param tableKeyword
-//     * @param mainKeyword
-//     * @author Jovi
-//     * @date 2017年8月18日上午10:55:52
-//     */
-//    public Select fullJoin(String table, String tableKeyword, String mainKeyword) {
-//        return fullJoin(table, table, tableKeyword, mainKeyword);
-//    }
-//
-//    /**
-//     * 添加表外连接
-//     *
-//     * @param table        关联的表名
-//     * @param tableAlias   关联的表别名
-//     * @param tableKeyword 关联的表关键字段
-//     * @param mainKeyword  主表关键字段
-//     * @author Jovi
-//     * @date 2017年8月18日上午10:55:52
-//     */
-//    public Select fullJoin(String table, String tableAlias, String tableKeyword, String mainKeyword) {
-//        if (SqlBeanUtil.joinIsNotEmpty(table, tableKeyword, mainKeyword)) {
-////            fullJoinList.add(SqlHelperCons.FULL_JOIN + joinSplitJoint(table, tableAlias, tableKeyword, mainKeyword));
-//            fullJoinList.add(new Join(JoinType.FULL_JOIN, table, tableAlias, tableKeyword, mainKeyword));
-//        }
-//        return this;
-//    }
-//
-//    /**
-//     * 获取左外连接的表
-//     *
-//     * @return
-//     * @author Jovi
-//     * @date 2017年8月18日下午4:20:33
-//     */
-//    public List<Join> getLeftOuterJoin() {
-//        return leftJoinList;
-//    }
-//
-//    /**
-//     * 添加表左外连接
-//     *
-//     * @param table        关联的表名
-//     * @param tableKeyword 关联的表关键字段
-//     * @param mainKeyword  主表关键字段
-//     * @author Jovi
-//     * @date 2017年8月18日上午10:55:04
-//     */
-//    public Select leftJoin(String table, String tableKeyword, String mainKeyword) {
-//        return leftJoin(table, table, tableKeyword, mainKeyword);
-//    }
-//
-//    /**
-//     * 添加表左外连接
-//     *
-//     * @param table        关联的表名
-//     * @param tableAlias   关联的表别名
-//     * @param tableKeyword 关联的表关键字段
-//     * @param mainKeyword  主表关键字段
-//     * @author Jovi
-//     * @date 2017年8月18日上午10:55:04
-//     */
-//    public Select leftJoin(String table, String tableAlias, String tableKeyword, String mainKeyword) {
-//        if (SqlBeanUtil.joinIsNotEmpty(table, tableKeyword, mainKeyword)) {
-////            leftJoinList.add(SqlHelperCons.LEFT_JOIN + joinSplitJoint(table, tableAlias, tableKeyword, mainKeyword));
-//            leftJoinList.add(new Join(JoinType.LEFT_JOIN, table, tableAlias, tableKeyword, mainKeyword));
-//        }
-//        return this;
-//    }
-//
-//    /**
-//     * 获取右外连接的表
-//     *
-//     * @return
-//     * @author Jovi
-//     * @date 2017年8月18日下午4:20:01
-//     */
-//    public List<Join> getRightOuterJoin() {
-//        return rightJoinList;
-//    }
-//
-//    /**
-//     * 添加表右外连接
-//     *
-//     * @param table        关联的表名
-//     * @param tableKeyword 关联的表关键字段
-//     * @param mainKeyword  主表关键字段
-//     * @author Jovi
-//     * @date 2017年8月18日上午10:55:23
-//     */
-//    public Select rightJoin(String table, String tableKeyword, String mainKeyword) {
-//        return rightJoin(table, table, tableKeyword, mainKeyword);
-//    }
-//
-//    /**
-//     * 添加表右外连接
-//     *
-//     * @param table        关联的表名
-//     * @param tableAlias   关联的表别名
-//     * @param tableKeyword 关联的表关键字段
-//     * @param mainKeyword  主表关键字段
-//     * @author Jovi
-//     * @date 2017年8月18日上午10:55:23
-//     */
-//    public Select rightJoin(String table, String tableAlias, String tableKeyword, String mainKeyword) {
-//        if (SqlBeanUtil.joinIsNotEmpty(table, tableKeyword, mainKeyword)) {
-////            rightJoinList.add(SqlHelperCons.RIGHT_JOIN + joinSplitJoint(table, tableAlias, tableKeyword, mainKeyword));
-//            rightJoinList.add(new Join(JoinType.RIGHT_JOIN, table, tableAlias, tableKeyword, mainKeyword));
-//        }
-//        return this;
-//    }
-
-//    /**
-//     * join 字符串拼接
-//     *
-//     * @param table        关联的表名
-//     * @param tableAlias   关联的表别名
-//     * @param tableKeyword 关联的表关键字段
-//     * @param mainKeyword  主表关键字段
-//     * @return
-//     */
-//    private String joinSplitJoint(String table, String tableAlias, String tableKeyword, String mainKeyword) {
-//        return table + SqlHelperCons.SPACES + tableAlias + SqlHelperCons.ON + tableKeyword + SqlHelperCons.EQUAL_TO + mainKeyword;
-//    }
 
     /**
      * 获取表连接
@@ -359,21 +172,7 @@ public class Select extends Condition implements Serializable {
      * @date 2019年6月21日上午10:27:50
      */
     public Select join(JoinType joinType, String table, String tableAlias, String tableKeyword, String mainKeyword) {
-//        switch (joinType) {
-//            case INNER_JOIN:
-//                innerJoin(table, tableAlias, tableKeyword, mainKeyword);
-//                break;
-//            case FULL_JOIN:
-//                fullJoin(table, tableAlias, tableKeyword, mainKeyword);
-//                break;
-//            case LEFT_JOIN:
-//                leftJoin(table, tableAlias, tableKeyword, mainKeyword);
-//                break;
-//            case RIGHT_JOIN:
-//                rightJoin(table, tableAlias, tableKeyword, mainKeyword);
-//                break;
-//        }
-        joinList.add(new Join(JoinType.INNER_JOIN, table, tableAlias, tableKeyword, mainKeyword));
+        joinList.add(new Join(joinType, table, tableAlias, tableKeyword, mainKeyword));
         return this;
     }
 
@@ -434,7 +233,6 @@ public class Select extends Condition implements Serializable {
      * @date 2018年9月13日下午15:34:45
      */
     public void setHaving(String having, Object... args) {
-//        this.having = SqlBeanUtil.getCondition(having, args);
         this.having = having;
         this.havingArgs = args;
     }
