@@ -2,15 +2,11 @@ package cn.vonce.sql.uitls;
 
 import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.annotation.*;
-import cn.vonce.sql.bean.From;
-import cn.vonce.sql.bean.Join;
-import cn.vonce.sql.bean.Select;
+import cn.vonce.sql.bean.*;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.DbType;
-import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.enumerate.WhatType;
 import cn.vonce.sql.exception.SqlBeanException;
-import cn.vonce.sql.helper.SqlHelper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -28,7 +24,7 @@ public class SqlBeanUtil {
      * @param clazz
      * @return
      */
-    public static From getFrom(Class<?> clazz) {
+    public static Table getTable(Class<?> clazz) {
         SqlBeanTable sqlBeanTable = clazz.getAnnotation(SqlBeanTable.class);
         SqlBeanPojo sqlBeanPojo = clazz.getAnnotation(SqlBeanPojo.class);
         String tableName = clazz.getSimpleName();
@@ -48,26 +44,26 @@ public class SqlBeanUtil {
         if (StringUtil.isEmpty(tableAlias)) {
             tableAlias = tableName;
         }
-        return new From(tableName, tableAlias);
+        return new Table(tableName, tableAlias);
     }
 
     /**
      * 获取表别名
      *
-     * @param from
+     * @param table
      * @param clazz
      * @return
      */
-    public static String getTableAlias(From from, Class<?> clazz) {
-        if (from == null || StringUtil.isEmpty(from.getName())) {
-            from = getFrom(clazz);
+    public static String getTableAlias(Table table, Class<?> clazz) {
+        if (table == null || StringUtil.isEmpty(table.getName())) {
+            table = getTable(clazz);
         }
-        String tableAlias = from.getAlias();
+        String tableAlias = table.getAlias();
         if (StringUtil.isEmpty(tableAlias)) {
             SqlBeanTable sqlBeanTable = clazz.getAnnotation(SqlBeanTable.class);
             if (sqlBeanTable != null) {
                 if (StringUtil.isEmpty(sqlBeanTable.alias())) {
-                    tableAlias = from.getName();
+                    tableAlias = table.getName();
                 } else {
                     tableAlias = sqlBeanTable.alias();
                 }
@@ -120,7 +116,7 @@ public class SqlBeanUtil {
                 idField = field;
                 existId++;
             }
-            if (existId > 0) {
+            if (existId > 1) {
                 throw new SqlBeanException("请正确的标识id字段，id字段只能标识一个，但我们在'" + field.getDeclaringClass().getName() + "'此实体类或其父类找到了不止一处");
             }
         }
@@ -254,12 +250,12 @@ public class SqlBeanUtil {
      * @author Jovi
      * @date 2018年6月15日下午3:29:15
      */
-    public static String[] getSelectFields(Class<?> clazz, From from, String[] filterTableFields) throws SqlBeanException {
+    public static List<Column> getSelectColumns(Common common, Class<?> clazz, Table table, String[] filterTableFields) throws SqlBeanException {
         if (clazz == null) {
             return null;
         }
-        Set<String> list = new LinkedHashSet<>();
-        String tableAlias = getTableAlias(from, clazz);
+        Set<Column> columnSet = new LinkedHashSet<>();
+        String tableAlias = getTableAlias(table, clazz);
         List<Field> fieldList = getBeanAllField(clazz);
         for (Field field : fieldList) {
             if (Modifier.isStatic(field.getModifiers())) {
@@ -277,18 +273,18 @@ public class SqlBeanUtil {
                 //如果有指定查询的字段
                 if (sqlBeanJoinIsNotEmpty(sqlBeanJoin) && sqlBeanJoin.value().length > 0 && !sqlBeanJoin.value()[0].equals("")) {
                     List<Field> subBeanFieldList = getBeanAllField(subBeanClazz);
-                    for (String joinFieldName : sqlBeanJoin.value()) {
-                        Field javaField = getFieldByTableFieldName(subBeanFieldList, joinFieldName);
+                    for (String fieldName : sqlBeanJoin.value()) {
+                        Field javaField = getFieldByTableFieldName(subBeanFieldList, fieldName);
                         if (javaField == null) {
-                            throw new SqlBeanException("该类的表连接查询字段未与java字段关联：" + clazz.getName() + ">" + field.getName() + ">" + joinFieldName);
+                            throw new SqlBeanException("该类的表连接查询字段未与java字段关联：" + clazz.getName() + ">" + field.getName() + ">" + fieldName);
                         }
-                        list.add(getTableFieldNameAndAlias(sqlBeanJoin.table(), joinFieldName, javaField.getName()));
+                        columnSet.add(new Column(sqlBeanJoin.table(), fieldName, javaField.getName()));
                     }
                 }
                 //没有指定查询的字段则查询所有字段
                 else {
                     Field[] subBeanFields = subBeanClazz.getDeclaredFields();
-                    String subTableAliasName = getFrom(subBeanClazz).getAlias();
+                    String subTableAliasName = getTable(subBeanClazz).getAlias();
                     if (StringUtil.isNotEmpty(sqlBeanJoin.table()) || StringUtil.isNotEmpty(sqlBeanJoin.tableAlias())) {
                         subTableAliasName = StringUtil.isNotEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.tableAlias() : sqlBeanJoin.table();
                     }
@@ -299,7 +295,7 @@ public class SqlBeanUtil {
                         if (isIgnore(field)) {
                             continue;
                         }
-                        list.add(getTableFieldNameAndAlias(subTableAliasName, getTableFieldName(subBeanField), subBeanField.getName()));
+                        columnSet.add(new Column(subTableAliasName, getTableFieldName(subBeanField), subBeanField.getName()));
                     }
                 }
             } else if (sqlBeanJoin != null) {
@@ -311,13 +307,13 @@ public class SqlBeanUtil {
                     }
                     //可能会连同一个表，但连接条件不一样（这时表需要区分别名），所以查询的字段可能是同一个，但属于不同表别名下，所以用java字段名当sql字段别名不会出错
                     String alias = field.getName();
-                    list.add(getTableFieldFullName(StringUtil.isEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.table() : sqlBeanJoin.tableAlias(), tableFieldName, alias));
+                    columnSet.add(new Column(StringUtil.isEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.table() : sqlBeanJoin.tableAlias(), tableFieldName, alias));
                 }
             } else {
-                list.add(getTableFieldNameAndAlias(tableAlias, getTableFieldName(field), field.getName()));
+                columnSet.add(new Column(tableAlias, getTableFieldName(field), field.getName()));
             }
         }
-        return list.toArray(new String[]{});
+        return new ArrayList<>(columnSet);
     }
 
 
@@ -340,19 +336,19 @@ public class SqlBeanUtil {
                 join.setJoinType(sqlBeanJoin.type());
                 join.setTableName(sqlBeanJoin.table());
                 join.setTableAlias(StringUtil.isEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.table() : sqlBeanJoin.tableAlias());
-                join.setTableKeyword(getTableFieldFullName(join.getTableAlias(), sqlBeanJoin.tableKeyword()));
-                join.setMainKeyword(getTableFieldFullName(select.getFrom().getAlias(), sqlBeanJoin.mainKeyword()));
+                join.setTableKeyword(sqlBeanJoin.tableKeyword());
+                join.setMainKeyword(sqlBeanJoin.mainKeyword());
                 //key是唯一的，作用是为了去重复，因为可能连接相同的表取不同的字段，但连接相同的表，连接条件不同是可以允许的
                 joinFieldMap.put(sqlBeanJoin.table().toLowerCase() + sqlBeanJoin.tableKeyword().toLowerCase() + sqlBeanJoin.mainKeyword().toLowerCase(), join);
             } else if (sqlBeanJoin != null && sqlBeanJoin.isBean()) {
                 Class<?> subClazz = field.getType();
-                From from = getFrom(subClazz);
+                Table table = getTable(subClazz);
                 String tableKeyword = getTableFieldName(getIdField(subClazz));
                 join.setJoinType(sqlBeanJoin.type());
-                join.setTableName(from.getName());
-                join.setTableAlias(from.getAlias());
-                join.setTableKeyword(getTableFieldFullName(join.getTableAlias(), tableKeyword));
-                join.setMainKeyword(getTableFieldFullName(select.getFrom().getAlias(), sqlBeanJoin.mainKeyword()));
+                join.setTableName(table.getName());
+                join.setTableAlias(table.getAlias());
+                join.setTableKeyword(tableKeyword);
+                join.setMainKeyword(sqlBeanJoin.mainKeyword());
                 //key是唯一的，作用是为了去重复，因为可能连接相同的表取不同的字段，但连接相同的表，连接条件不同是可以允许的
                 joinFieldMap.put(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlBeanJoin.mainKeyword().toLowerCase(), join);
             }
@@ -374,7 +370,7 @@ public class SqlBeanUtil {
             String tableAlias = join.getTableAlias();
             String tableKeyword = join.getTableKeyword();
             String mainKeyword = join.getMainKeyword();
-            if (isToUpperCase()) {
+            if (isToUpperCase(select)) {
                 tableName = tableName.toUpperCase();
                 tableAlias = tableAlias.toUpperCase();
                 tableKeyword = tableKeyword.toUpperCase();
@@ -385,60 +381,52 @@ public class SqlBeanUtil {
     }
 
     /**
-     * 获得新的表字段名 包含别名
-     *
-     * @param tableAlias
-     * @param tableFieldName
-     * @param javaFieldName
-     * @return
-     */
-    public static String getTableFieldNameAndAlias(String tableAlias, String tableFieldName, String javaFieldName) {
-        return getTableFieldFullName(tableAlias, tableFieldName, tableAlias + SqlHelperCons.POINT + javaFieldName);
-    }
-
-    /**
      * 获得新的表字段名
      *
+     * @param common
      * @param tableAlias
      * @param tableFieldName
      * @return
      */
-    public static String getTableFieldFullName(String tableAlias, String tableFieldName) {
-        return getTableFieldFullName(tableAlias, tableFieldName, "");
+    public static String getTableFieldFullName(Common common, String tableAlias, String tableFieldName) {
+        return getTableFieldFullName(common, tableAlias, tableFieldName, "");
     }
 
     /**
      * 获取获取表字段全名（表名+字段名）
      *
+     * @param common
      * @param clazz
      * @param field
      * @return
      */
-    public static String getTableFieldFullName(Class<?> clazz, Field field) {
-        return getTableFieldFullName(clazz, getTableFieldName(field));
+    public static String getTableFieldFullName(Common common, Class<?> clazz, Field field) {
+        return getTableFieldFullName(common, clazz, getTableFieldName(field));
     }
 
     /**
      * 获取获取表字段全名（表名+字段名）
      *
+     * @param common
      * @param clazz
      * @param tableFieldName
      * @return
      */
-    public static String getTableFieldFullName(Class<?> clazz, String tableFieldName) {
-        return getTableFieldFullName(getTableAlias(null, clazz), tableFieldName, "");
+    public static String getTableFieldFullName(Common common, Class<?> clazz, String tableFieldName) {
+        return getTableFieldFullName(common, getTableAlias(null, clazz), tableFieldName, "");
     }
 
     /**
      * 获得新的表字段名
      *
+     * @param common
      * @param tableAlias
      * @param tableFieldName
      * @return
      */
-    public static String getTableFieldFullName(String tableAlias, String tableFieldName, String tableFieldAlias) {
-        String transferred = getTransferred();
-        if (isToUpperCase()) {
+    public static String getTableFieldFullName(Common common, String tableAlias, String tableFieldName, String tableFieldAlias) {
+        String transferred = getTransferred(common);
+        if (isToUpperCase(common)) {
             tableAlias = tableAlias.toUpperCase();
             tableFieldName = tableFieldName.toUpperCase();
         }
@@ -451,13 +439,14 @@ public class SqlBeanUtil {
     /**
      * 获取处理后的where语句
      *
+     * @param common
      * @param where
      * @param args
      * @return
      * @author Jovi
      * @date 2018年5月15日下午2:15:37
      */
-    public static String getCondition(String where, Object[] args) {
+    public static String getCondition(Common common, String where, Object[] args) {
         if (where == null || where.equals("")) {
             return "";
         }
@@ -478,7 +467,7 @@ public class SqlBeanUtil {
                 }
                 if (objects != null) {
                     for (int i = 0; i < objects.length; i++) {
-                        value.append(getSqlValue(objects[i]));
+                        value.append(getSqlValue(common, objects[i]));
                         value.append(SqlHelperCons.COMMA);
                     }
                     value.deleteCharAt(value.length() - SqlHelperCons.COMMA.length());
@@ -498,17 +487,18 @@ public class SqlBeanUtil {
     /**
      * 获取处理后的where语句
      *
+     * @param common
      * @param where
      * @param bean
      * @return
      * @author Jovi
      * @date 2018年5月15日下午3:25:57
      */
-    public static String getCondition(String where, Object bean) throws NoSuchFieldException, IllegalAccessException {
+    public static String getCondition(Common common, String where, Object bean) throws NoSuchFieldException, IllegalAccessException {
         String prefix = "${";
         String suffix = "}";
         if (where == null || bean == null) {
-            return where;
+            return "";
         }
         StringBuffer conditionSql = new StringBuffer(where);
         int startIndex = conditionSql.indexOf(prefix);
@@ -519,7 +509,7 @@ public class SqlBeanUtil {
                 int nextIndex = endIndex + suffix.length();
                 Field field = bean.getClass().getDeclaredField(name);
                 field.setAccessible(true);
-                String value = getSqlValue(field.get(bean));
+                String value = getSqlValue(common, field.get(bean));
                 //String value = SqlHelper.getSqlValue(ReflectAsmUtil.get(bean.getClass(), bean, name));
                 conditionSql.replace(startIndex, endIndex + suffix.length(), value);
                 nextIndex = startIndex + value.length();
@@ -674,8 +664,7 @@ public class SqlBeanUtil {
      * @author Jovi
      * @date 2018年3月1日下午12:01:05
      */
-    public static String getSqlValue(Object value) {
-        SqlHelper.checkInitStatus();
+    public static String getSqlValue(Common common, Object value) {
         if (value == null) {
             return null;
         }
@@ -688,7 +677,7 @@ public class SqlBeanUtil {
                 break;
             case DATE_TYPE:
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                switch (SqlHelper.getSqlBeanConfig().getDbType()) {
+                switch (common.getSqlBeanConfig().getDbType()) {
                     case Oracle:
                         sqlValue = "to_timestamp(" + single_quotation_mark + sdf.format(value) + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
                         break;
@@ -712,7 +701,7 @@ public class SqlBeanUtil {
      */
     public static boolean isCount(Select select) {
         boolean isTrue = true;
-        if (select.getColumn() != null && !select.getColumn().contains(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET)) {
+        if (select.getColumnList() != null && !select.getColumnList().contains(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET)) {
             isTrue = false;
         }
         return isTrue;
@@ -746,12 +735,12 @@ public class SqlBeanUtil {
     /**
      * 获取不同数据库的转义符号
      *
+     * @param common
      * @return
      */
-    public static String getTransferred() {
-        SqlHelper.checkInitStatus();
+    public static String getTransferred(Common common) {
         String transferred = SqlHelperCons.DOUBLE_ESCAPE_CHARACTER;
-        DbType dbType = SqlHelper.getSqlBeanConfig().getDbType();
+        DbType dbType = common.getSqlBeanConfig().getDbType();
         if (dbType == DbType.MySQL || dbType == DbType.MariaDB) {
             transferred = SqlHelperCons.SINGLE_ESCAPE_CHARACTER;
         }
@@ -761,11 +750,11 @@ public class SqlBeanUtil {
     /**
      * 是否需要转大写
      *
+     * @param common
      * @return
      */
-    public static boolean isToUpperCase() {
-        SqlHelper.checkInitStatus();
-        if (SqlHelper.getSqlBeanConfig().getToUpperCase() != null && SqlHelper.getSqlBeanConfig().getToUpperCase()) {
+    public static boolean isToUpperCase(Common common) {
+        if (common.getSqlBeanConfig().getToUpperCase() != null && common.getSqlBeanConfig().getToUpperCase()) {
             return true;
         }
         return false;

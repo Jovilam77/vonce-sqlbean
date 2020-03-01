@@ -5,7 +5,6 @@ import cn.vonce.sql.annotation.SqlBeanId;
 import cn.vonce.sql.annotation.SqlBeanPojo;
 import cn.vonce.sql.annotation.SqlBeanTable;
 import cn.vonce.sql.bean.*;
-import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
@@ -33,30 +32,6 @@ public class SqlHelper {
 
     private static Logger logger = LoggerFactory.getLogger(SqlHelper.class);
 
-    private static SqlBeanConfig sqlBeanConfig;
-
-    public static void init(SqlBeanConfig sqlBeanConfig) {
-        if (SqlHelper.sqlBeanConfig == null) {
-            isNull(sqlBeanConfig, "参数sqlBeanConfig为null");
-            isNull(sqlBeanConfig.getDbType(), "请设置sqlBeanConfig > dbType(数据库类型)");
-            if (sqlBeanConfig.getDbType() == DbType.Oracle || sqlBeanConfig.getDbType() == DbType.DB2) {
-                isNull(sqlBeanConfig.getToUpperCase(), "请设置sqlBeanConfig > toUpperCase(sql语句是否转大写)");
-            }
-            SqlHelper.sqlBeanConfig = sqlBeanConfig;
-        }
-    }
-
-    public static SqlBeanConfig getSqlBeanConfig() {
-        return sqlBeanConfig;
-    }
-
-    /**
-     * 检查SqlHelper初始化状态
-     */
-    public static void checkInitStatus() {
-        isNull(sqlBeanConfig, "请初始化SqlHelper");
-    }
-
     /**
      * 参数为空抛出异常
      *
@@ -79,12 +54,11 @@ public class SqlHelper {
      * @date 2017年6月2日下午5:41:45
      */
     public static String buildSelectSql(Select select) {
-        checkInitStatus();
         StringBuffer sqlSb = new StringBuffer();
         Integer[] pageParam = null;
         String orderSql = orderBySql(select);
         //SQLServer2008 分页处理
-        if (sqlBeanConfig.getDbType() == DbType.SQLServer2008) {
+        if (select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
             if (SqlBeanUtil.isUsePage(select)) {
                 pageParam = pageParam(select);
                 sqlSb.append(SqlHelperCons.SELECT);
@@ -96,7 +70,7 @@ public class SqlHelper {
         //标准Sql
         sqlSb.append(select.isUseDistinct() ? SqlHelperCons.SELECT_DISTINCT : SqlHelperCons.SELECT);
         //SqlServer 分页处理
-        if (sqlBeanConfig.getDbType() == DbType.SQLServer2008) {
+        if (select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
             if (SqlBeanUtil.isUsePage(select)) {
                 sqlSb.append(SqlHelperCons.TOP);
                 sqlSb.append(pageParam[0]);
@@ -104,14 +78,11 @@ public class SqlHelper {
             }
         }
         //标准Sql
-        sqlSb.append(select(select));
+        sqlSb.append(column(select));
         sqlSb.append(SqlHelperCons.FROM);
         sqlSb.append(fromFullName(select));
-        sqlSb.append(innerJoinSql(select));
-        sqlSb.append(fullJoinSql(select));
-        sqlSb.append(leftJoinSql(select));
-        sqlSb.append(rightJoinSql(select));
-        sqlSb.append(whereSql(select));
+        sqlSb.append(joinSql(select));
+        sqlSb.append(whereSql(select, null));
         String groupBySql = groupBySql(select);
         sqlSb.append(groupBySql);
         sqlSb.append(havingSql(select));
@@ -119,7 +90,7 @@ public class SqlHelper {
             sqlSb.append(orderSql);
         }
         //SQLServer2008 分页处理
-        if (sqlBeanConfig.getDbType() == DbType.SQLServer2008) {
+        if (select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
             // 主要逻辑 结束
             if (SqlBeanUtil.isUsePage(select)) {
                 sqlSb.append(SqlHelperCons.END_BRACKET);
@@ -136,23 +107,23 @@ public class SqlHelper {
             sqlSb.append(SqlHelperCons.END_BRACKET + SqlHelperCons.AS + SqlHelperCons.T);
         }
         //MySQL,MariaDB,H2 分页处理
-        if (sqlBeanConfig.getDbType() == DbType.MySQL || sqlBeanConfig.getDbType() == DbType.MariaDB || sqlBeanConfig.getDbType() == DbType.H2) {
+        if (select.getSqlBeanConfig().getDbType() == DbType.MySQL || select.getSqlBeanConfig().getDbType() == DbType.MariaDB || select.getSqlBeanConfig().getDbType() == DbType.H2) {
             mysqlPageDispose(select, sqlSb);
         }
         //PostgreSQL,SQLite,Hsql 分页处理
-        else if (sqlBeanConfig.getDbType() == DbType.PostgreSQL || sqlBeanConfig.getDbType() == DbType.SQLite || sqlBeanConfig.getDbType() == DbType.Hsql) {
+        else if (select.getSqlBeanConfig().getDbType() == DbType.PostgreSQL || select.getSqlBeanConfig().getDbType() == DbType.SQLite || select.getSqlBeanConfig().getDbType() == DbType.Hsql) {
             postgreSqlPageDispose(select, sqlSb);
         }
         //Oracle 分页处理
-        else if (sqlBeanConfig.getDbType() == DbType.Oracle) {
+        else if (select.getSqlBeanConfig().getDbType() == DbType.Oracle) {
             oraclePageDispose(select, sqlSb);
         }
         //DB2 分页处理
-        else if (sqlBeanConfig.getDbType() == DbType.DB2) {
+        else if (select.getSqlBeanConfig().getDbType() == DbType.DB2) {
             db2PageDispose(select, sqlSb);
         }
         //Derby 分页处理
-        else if (sqlBeanConfig.getDbType() == DbType.Derby) {
+        else if (select.getSqlBeanConfig().getDbType() == DbType.Derby) {
             derbyPageDispose(select, sqlSb);
         }
         return sqlSb.toString();
@@ -168,14 +139,13 @@ public class SqlHelper {
      * @date 2017年6月21日下午6:44:57
      */
     public static String buildUpdateSql(Update update) {
-        checkInitStatus();
         StringBuffer sqlSb = new StringBuffer();
         try {
             sqlSb.append(SqlHelperCons.UPDATE);
-            sqlSb.append(getTableName(update.getUpdateTable(), update.getUpdateBean()));
+            sqlSb.append(getTableName(update, update.getUpdateBean()));
             sqlSb.append(SqlHelperCons.SET);
             sqlSb.append(setSql(update));
-            sqlSb.append(whereSql(update));
+            sqlSb.append(whereSql(update, update.getUpdateBean()));
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             logger.error(e.getMessage(), e);
@@ -194,7 +164,6 @@ public class SqlHelper {
      */
     @SuppressWarnings("unchecked")
     public static String buildInsertSql(Insert insert) {
-        checkInitStatus();
         Object[] objects;
         if (insert.getInsertBean().getClass().isArray()) {
             objects = (Object[]) insert.getInsertBean();
@@ -204,10 +173,9 @@ public class SqlHelper {
         } else {
             objects = new Object[]{insert.getInsertBean()};
         }
-        String tableName = getTableName(insert.getInsertTable(), objects[0]);
         String sql = null;
         try {
-            sql = fieldAndValuesSql(tableName, objects);
+            sql = fieldAndValuesSql(insert, objects);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             logger.error(e.getMessage(), e);
@@ -228,52 +196,64 @@ public class SqlHelper {
      * @date 2017年6月28日下午4:58:27
      */
     public static String buildDeleteSql(Delete delete) {
-        checkInitStatus();
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlHelperCons.DELETE_FROM);
-        sqlSb.append(SqlBeanUtil.isToUpperCase() ? delete.getDeleteBable().toUpperCase() : delete.getDeleteBable());
-        sqlSb.append(whereSql(delete));
+        sqlSb.append(SqlBeanUtil.isToUpperCase(delete) ? delete.getTable().getName().toUpperCase() : delete.getTable().getName());
+        sqlSb.append(whereSql(delete, null));
         return sqlSb.toString();
     }
 
     /**
      * 返回表名,优先级 tableName第一，注解第二，类名第三
      *
-     * @param tableName
+     * @param common
      * @param bean
      * @return
      * @author Jovi
      * @date 2017年8月17日下午5:24:25
      */
-    private static String getTableName(String tableName, Object bean) {
+    private static String getTableName(Common common, Object bean) {
         SqlBeanTable sqlBeanTable = bean.getClass().getAnnotation(SqlBeanTable.class);
-        if (StringUtil.isEmpty(tableName)) {
+        String tableName;
+        if (common.getTable() == null || StringUtil.isEmpty(common.getTable().getName())) {
             tableName = sqlBeanTable.value();
+        } else {
+            tableName = common.getTable().getName();
         }
         if (StringUtil.isEmpty(tableName)) {
             tableName = bean.getClass().getSimpleName();
         }
-        return SqlBeanUtil.isToUpperCase() ? tableName.toUpperCase() : tableName;
+        return SqlBeanUtil.isToUpperCase(common) ? tableName.toUpperCase() : tableName;
     }
 
     /**
-     * 返回select语句
+     * 返回column语句
      *
      * @param select
      * @return
      * @author Jovi
      * @date 2017年8月22日上午9:46:05
      */
-    private static String select(Select select) {
-        StringBuffer selectSql = new StringBuffer();
-        if (select.getColumn() != null && select.getColumn().size() != 0) {
-            for (int i = 0; i < select.getColumn().size(); i++) {
-                selectSql.append(select.getColumn().get(i));
-                selectSql.append(SqlHelperCons.COMMA);
+    private static String column(Select select) {
+        StringBuffer columnSql = new StringBuffer();
+        if (select.getColumnList() != null && select.getColumnList().size() != 0) {
+            for (int i = 0; i < select.getColumnList().size(); i++) {
+                if (StringUtil.isNotEmpty(select.getColumnList().get(i).getName()) && StringUtil.isNotEmpty(select.getColumnList().get(i).getAlias())) {
+                    columnSql.append(SqlHelperCons.BEGIN_BRACKET);
+                    columnSql.append(select.getColumnList().get(i).getName());
+                    columnSql.append(SqlHelperCons.END_BRACKET);
+                    columnSql.append(SqlHelperCons.AS);
+                    columnSql.append(SqlBeanUtil.getTransferred(select));
+                    columnSql.append(select.getColumnList().get(i).getAlias());
+                    columnSql.append(SqlBeanUtil.getTransferred(select));
+                } else {
+                    columnSql.append(select.getColumnList().get(i).getName());
+                }
+                columnSql.append(SqlHelperCons.COMMA);
             }
-            selectSql.deleteCharAt(selectSql.length() - SqlHelperCons.COMMA.length());
+            columnSql.deleteCharAt(columnSql.length() - SqlHelperCons.COMMA.length());
         }
-        return selectSql.toString();
+        return columnSql.toString();
     }
 
     /**
@@ -285,7 +265,7 @@ public class SqlHelper {
      * @date 2017年8月22日上午9:46:05
      */
     private static String tableName(Select select) {
-        return SqlBeanUtil.isToUpperCase() ? select.getFrom().getName().toUpperCase() : select.getFrom().getName();
+        return SqlBeanUtil.isToUpperCase(select) ? select.getTable().getName().toUpperCase() : select.getTable().getName();
     }
 
     /**
@@ -297,7 +277,7 @@ public class SqlHelper {
      * @date 2017年8月22日上午9:46:05
      */
     private static String tableAlias(Select select) {
-        return SqlBeanUtil.isToUpperCase() ? select.getFrom().getAlias().toUpperCase() : select.getFrom().getAlias();
+        return SqlBeanUtil.isToUpperCase(select) ? select.getTable().getAlias().toUpperCase() : select.getTable().getAlias();
     }
 
     /**
@@ -307,7 +287,7 @@ public class SqlHelper {
      * @return
      */
     private static String fromFullName(Select select) {
-        String transferred = SqlBeanUtil.getTransferred();
+        String transferred = SqlBeanUtil.getTransferred(select);
         StringBuffer fromSql = new StringBuffer();
         fromSql.append(tableName(select));
         fromSql.append(SqlHelperCons.SPACES);
@@ -323,86 +303,30 @@ public class SqlHelper {
      * @author Jovi
      * @date 2017年8月18日下午12:45:39
      */
-    private static String innerJoinSql(Select select) {
-        StringBuffer innerJoinSql = new StringBuffer();
-        if (select.getInnerJoin() != null && select.getInnerJoin().size() != 0) {
-            for (int i = 0; i < select.getInnerJoin().size(); i++) {
-                innerJoinSql.append(select.getInnerJoin().get(i));
-                if (i < select.getInnerJoin().size() - 1) {
-                    innerJoinSql.append(SqlHelperCons.SPACES);
+    private static String joinSql(Select select) {
+        StringBuffer joinSql = new StringBuffer();
+        if (select != null && select.getJoin().size() != 0) {
+            for (int i = 0; i < select.getJoin().size(); i++) {
+                Join join = select.getJoin().get(i);
+                joinSql.append(join.getTableName());
+                joinSql.append(SqlHelperCons.SPACES);
+                joinSql.append(join.getTableAlias());
+                joinSql.append(SqlHelperCons.ON);
+                joinSql.append(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), join.getTableKeyword()));
+                joinSql.append(SqlHelperCons.EQUAL_TO);
+                joinSql.append(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), join.getMainKeyword()));
+                if (i < select.getJoin().size() - 1) {
+                    joinSql.append(SqlHelperCons.SPACES);
                 }
             }
         }
-        return innerJoinSql.toString();
-    }
-
-    /**
-     * 返回outerJoin语句
-     *
-     * @param select
-     * @return
-     * @author Jovi
-     * @date 2017年8月18日下午12:45:39
-     */
-    private static String fullJoinSql(Select select) {
-        StringBuffer outerJoinSql = new StringBuffer();
-        if (select.getFullJoin() != null && select.getFullJoin().size() != 0) {
-            for (int i = 0; i < select.getFullJoin().size(); i++) {
-                outerJoinSql.append(select.getFullJoin().get(i));
-                if (i < select.getFullJoin().size() - 1) {
-                    outerJoinSql.append(SqlHelperCons.SPACES);
-                }
-            }
-        }
-        return outerJoinSql.toString();
-    }
-
-    /**
-     * 返回leftOuterJoin语句
-     *
-     * @param select
-     * @return
-     * @author Jovi
-     * @date 2017年8月18日下午12:45:39
-     */
-    private static String leftJoinSql(Select select) {
-        StringBuffer leftJoinSql = new StringBuffer();
-        if (select.getLeftOuterJoin() != null && select.getLeftOuterJoin().size() != 0) {
-            for (int i = 0; i < select.getLeftOuterJoin().size(); i++) {
-                leftJoinSql.append(select.getLeftOuterJoin().get(i));
-                if (i < select.getLeftOuterJoin().size() - 1) {
-                    leftJoinSql.append(SqlHelperCons.SPACES);
-                }
-            }
-        }
-        return leftJoinSql.toString();
-    }
-
-    /**
-     * 返回rightOuterJoin语句
-     *
-     * @param select
-     * @return
-     * @author Jovi
-     * @date 2017年8月18日下午12:45:39
-     */
-    private static String rightJoinSql(Select select) {
-        StringBuffer rightJoinSql = new StringBuffer();
-        if (select.getRightOuterJoin() != null && select.getRightOuterJoin().size() != 0) {
-            for (int i = 0; i < select.getRightOuterJoin().size(); i++) {
-                rightJoinSql.append(select.getRightOuterJoin().get(i));
-                if (i < select.getRightOuterJoin().size() - 1) {
-                    rightJoinSql.append(SqlHelperCons.SPACES);
-                }
-            }
-        }
-        return rightJoinSql.toString();
+        return joinSql.toString();
     }
 
     /**
      * 返回field及values语句
      *
-     * @param tableName
+     * @param common
      * @param objects
      * @return
      * @throws IllegalAccessException
@@ -410,12 +334,13 @@ public class SqlHelper {
      * @author Jovi
      * @date 2017年8月17日下午6:28:57
      */
-    private static String fieldAndValuesSql(String tableName, Object[] objects) throws IllegalArgumentException, IllegalAccessException {
+    private static String fieldAndValuesSql(Common common, Object[] objects) throws IllegalArgumentException, IllegalAccessException {
+        String tableName = getTableName(common, objects[0]);
         StringBuffer fieldSql = new StringBuffer();
         StringBuffer valueSql = new StringBuffer();
         StringBuffer fieldAndValuesSql = new StringBuffer();
         List<String> valueSqlList = new ArrayList<>();
-        String transferred = SqlBeanUtil.getTransferred();
+        String transferred = SqlBeanUtil.getTransferred(common);
         //获取sqlbean的全部字段
         Field[] fields;
         if (objects[0].getClass().getAnnotation(SqlBeanPojo.class) != null) {
@@ -423,8 +348,8 @@ public class SqlHelper {
         } else {
             fields = objects[0].getClass().getDeclaredFields();
         }
-        if (sqlBeanConfig.getDbType() == DbType.Oracle) {
-            if (sqlBeanConfig.getToUpperCase()) {
+        if (common.getSqlBeanConfig().getDbType() == DbType.Oracle) {
+            if (common.getSqlBeanConfig().getToUpperCase()) {
                 tableName = tableName.toUpperCase();
             }
             if (objects != null && objects.length > 1) {
@@ -463,17 +388,21 @@ public class SqlHelper {
                     String tableFieldName = SqlBeanUtil.getTableFieldName(field);
                     //如果此字段非id字段 或者 此字段为id字段但是不是自增的id则生成该字段的insert语句
                     if (sqlBeanId == null || (sqlBeanId != null && sqlBeanId.generateType() != GenerateType.AUTO)) {
-                        fieldSql.append(transferred + (SqlBeanUtil.isToUpperCase() ? tableFieldName.toUpperCase() : tableFieldName) + transferred);
+                        fieldSql.append(transferred + (SqlBeanUtil.isToUpperCase(common) ? tableFieldName.toUpperCase() : tableFieldName) + transferred);
                         fieldSql.append(SqlHelperCons.COMMA);
                     }
                 }
                 //如果此字段为id且需要生成唯一id
                 if (sqlBeanId != null && sqlBeanId.generateType() != GenerateType.AUTO && sqlBeanId.generateType() != GenerateType.NORMAL) {
-                    valueSql.append(SqlBeanUtil.getSqlValue(sqlBeanConfig.getUniqueIdProcessor().uniqueId(sqlBeanId.generateType())));
+                    Object value = field.get(objects[i]);
+                    if (StringUtil.isEmpty(value)) {
+                        value = common.getSqlBeanConfig().getUniqueIdProcessor().uniqueId(sqlBeanId.generateType());
+                    }
+                    valueSql.append(SqlBeanUtil.getSqlValue(common, value));
                     valueSql.append(SqlHelperCons.COMMA);
                 } else if (sqlBeanId == null) {
                     field.setAccessible(true);
-                    valueSql.append(SqlBeanUtil.getSqlValue(field.get(objects[i])));
+                    valueSql.append(SqlBeanUtil.getSqlValue(common, field.get(objects[i])));
                     //valuesSql.append(getSqlValue(ReflectAsmUtil.get(objects[i].getClass(), objects[i], fields[j].getName())));
                     valueSql.append(SqlHelperCons.COMMA);
                 }
@@ -487,7 +416,7 @@ public class SqlHelper {
                 fieldSql.append(SqlHelperCons.END_BRACKET);
             }
         }
-        if (sqlBeanConfig.getDbType() == DbType.Oracle) {
+        if (common.getSqlBeanConfig().getDbType() == DbType.Oracle) {
             for (int k = 0; k < valueSqlList.size(); k++) {
                 if (k > 0) {
                     fieldAndValuesSql.append(SqlHelperCons.INTO);
@@ -525,7 +454,7 @@ public class SqlHelper {
      */
     private static String setSql(Update update) throws IllegalAccessException {
         StringBuffer setSql = new StringBuffer();
-        String transferred = SqlBeanUtil.getTransferred();
+        String transferred = SqlBeanUtil.getTransferred(update);
         String[] filterFields = update.getFilterFields();
         Object bean = update.getUpdateBean();
         Field[] fields;
@@ -564,9 +493,9 @@ public class SqlHelper {
             if (objectValue == null || objectValue.equals(SqlHelperCons.WELL_NUMBER + SqlHelperCons.NULL_VALUE)) {
                 value = SqlHelperCons.EQUAL_TO + SqlHelperCons.NULL_VALUE;
             } else {
-                value = SqlHelperCons.EQUAL_TO + SqlBeanUtil.getSqlValue(objectValue);
+                value = SqlHelperCons.EQUAL_TO + SqlBeanUtil.getSqlValue(update, objectValue);
             }
-            setSql.append(transferred + (SqlBeanUtil.isToUpperCase() ? name.toUpperCase() : name) + transferred + value);
+            setSql.append(transferred + (SqlBeanUtil.isToUpperCase(update) ? name.toUpperCase() : name) + transferred + value);
             setSql.append(SqlHelperCons.COMMA);
         }
         setSql.deleteCharAt(setSql.length() - SqlHelperCons.COMMA.length());
@@ -576,15 +505,16 @@ public class SqlHelper {
     /**
      * 返回where语句
      *
-     * @param common
+     * @param condition
+     * @param bean
      * @return
      * @throws Exception
      * @author Jovi
      * @date 2017年8月17日下午4:29:30
      */
     @SuppressWarnings("unchecked")
-    private static String whereSql(Common common) {
-        return conditionHandle(ConditionType.WHERE, common.getWhere(), common.getWhereMap());
+    private static String whereSql(Condition condition, Object bean) {
+        return conditionHandle(ConditionType.WHERE, condition, condition.getWhere(), condition.getAgrs(), bean, condition.getWhereMap());
     }
 
     /**
@@ -606,7 +536,7 @@ public class SqlHelper {
      * @date 2017年8月18日下午9:38:55
      */
     private static String havingSql(Select select) {
-        return conditionHandle(ConditionType.HAVING, select.getHaving(), select.getHavingMap());
+        return conditionHandle(ConditionType.HAVING, select, select.getHaving(), select.getHavingArgs(), null, select.getHavingMap());
     }
 
     /**
@@ -633,7 +563,7 @@ public class SqlHelper {
     private static String groupByAndOrderBySql(String type, Select select) {
         StringBuffer groupByAndOrderBySql = new StringBuffer();
         List<String> by = SqlHelperCons.ORDER_BY.equals(type) ? select.getOrderBy() : select.getGroupBy();
-        String transferred = SqlBeanUtil.getTransferred();
+        String transferred = SqlBeanUtil.getTransferred(select);
         if (by != null && by.size() != 0) {
             groupByAndOrderBySql.append(type);
             for (int i = 0; i < by.size(); i++) {
@@ -648,9 +578,9 @@ public class SqlHelper {
             }
             groupByAndOrderBySql.deleteCharAt(groupByAndOrderBySql.length() - SqlHelperCons.COMMA.length());
         } else {
-            if (SqlHelperCons.ORDER_BY.equals(type) && sqlBeanConfig.getDbType() == DbType.SQLServer2008 && SqlBeanUtil.isUsePage(select) && !SqlBeanUtil.isCount(select)) {
+            if (SqlHelperCons.ORDER_BY.equals(type) && select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008 && SqlBeanUtil.isUsePage(select) && !SqlBeanUtil.isCount(select)) {
                 groupByAndOrderBySql.append(type);
-                groupByAndOrderBySql.append(SqlBeanUtil.getTableFieldFullName(tableAlias(select), select.getPage().getIdName()));
+                groupByAndOrderBySql.append(SqlBeanUtil.getTableFieldFullName(select, tableAlias(select), select.getPage().getIdName()));
             }
         }
         return groupByAndOrderBySql.toString();
@@ -660,17 +590,33 @@ public class SqlHelper {
      * 条件处理
      *
      * @param conditionType
+     * @param common
      * @param where
+     * @param args
      * @param whereMap
      * @return
      */
-    private static String conditionHandle(ConditionType conditionType, String where, ListMultimap<String, SqlCondition> whereMap) {
+    private static String conditionHandle(ConditionType conditionType, Common common, String where, Object[] args, Object bean, ListMultimap<String, SqlCondition> whereMap) {
         StringBuffer conditioneSql = new StringBuffer();
         // 优先使用条件字符串拼接
         if (where != null && !"".equals(where)) {
             conditioneSql.append(ConditionType.WHERE == conditionType ? SqlHelperCons.WHERE : SqlHelperCons.HAVING);
             conditioneSql.append(SqlHelperCons.BEGIN_BRACKET);
-            conditioneSql.append(where);
+            if (args != null && args.length > 0) {
+                conditioneSql.append(SqlBeanUtil.getCondition(common, where, args));
+            } else if (where.indexOf("${") > -1 && bean != null) {
+                try {
+                    conditioneSql.append(SqlBeanUtil.getCondition(common, where, bean));
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                    logger.error(e.getMessage(), e);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    logger.error(e.getMessage(), e);
+                }
+            } else {
+                conditioneSql.append(where);
+            }
             conditioneSql.append(SqlHelperCons.END_BRACKET);
         } else {
             if (whereMap.size() > 0) {
@@ -682,16 +628,19 @@ public class SqlHelper {
                     String key = sqlConditionEntry.getKey();
                     SqlCondition sqlCondition = sqlConditionEntry.getValue();
                     Object value;
-                    String fieldName = sqlConditionEntry.getValue().getField();
+                    String fieldName = sqlCondition.getField();
+                    if (StringUtil.isNotEmpty(sqlCondition.getTableAlias())) {
+                        fieldName = sqlCondition.getTableAlias() + SqlHelperCons.POINT + fieldName;
+                    }
                     // 如果key使用#开头，实际值为传入值，不做任何处理
                     if (key.indexOf(SqlHelperCons.WELL_NUMBER) > -1) {
                         value = sqlCondition.getValue().toString();
-                        fieldName = sqlCondition.getField().substring(1);
+                        fieldName = sqlCondition.getTableAlias() + SqlHelperCons.POINT + sqlCondition.getField().substring(1);
                     } else {
                         value = sqlCondition.getValue();
                         // 如果值不为数组则做处理
                         if (!value.getClass().isArray() && !(value instanceof Collection)) {
-                            value = SqlBeanUtil.getSqlValue(value);
+                            value = SqlBeanUtil.getSqlValue(common, value);
                         }
                     }
                     boolean needEndBracket = isNeedEndBracket(sqlCondition.getSqlOperator());
@@ -700,10 +649,10 @@ public class SqlHelper {
                     if (i != 0 && i < sqlConditionEntryCollection.size()) {
                         conditioneSql.append(getLogic(sqlCondition.getSqlLogic()));
                     }
-                    if (SqlBeanUtil.isToUpperCase()) {
+                    if (SqlBeanUtil.isToUpperCase(common)) {
                         fieldName = fieldName.toUpperCase();
                     }
-                    conditioneSql.append(valueOperator(operator, fieldName, value, needEndBracket));
+                    conditioneSql.append(valueOperator(common, operator, fieldName, value, needEndBracket));
                     i++;
                 }
                 conditioneSql.append(SqlHelperCons.END_BRACKET);
@@ -759,8 +708,6 @@ public class SqlHelper {
             } else if (sqlOperator == SqlOperator.NOT_EQUAL_TO) {
                 operator = SqlHelperCons.NOT_EQUAL_TO;
             }
-        } else if (sqlCondition.getOperator() != null && !"".equals(sqlCondition.getOperator())) {
-            operator = SqlHelperCons.SPACES + sqlCondition.getOperator() + SqlHelperCons.SPACES;
         } else {
             operator = SqlHelperCons.EQUAL_TO;
         }
@@ -812,13 +759,14 @@ public class SqlHelper {
     /**
      * 值操作
      *
+     * @param common
      * @param operator
      * @param fieldName
      * @param value
      * @param needEndBracket
      * @return
      */
-    private static StringBuffer valueOperator(String operator, String fieldName, Object value, boolean needEndBracket) {
+    private static StringBuffer valueOperator(Common common, String operator, String fieldName, Object value, boolean needEndBracket) {
         StringBuffer sql = new StringBuffer();
         // 如果操作符为BETWEEN ，IN、NOT IN 则需额外处理
         if (operator.indexOf(SqlHelperCons.BETWEEN) > -1) {
@@ -837,13 +785,13 @@ public class SqlHelper {
                     return null;
                 }
             }
-            sql.append(fieldName + operator + SqlBeanUtil.getSqlValue(betweenValues[0]) + SqlHelperCons.AND + SqlBeanUtil.getSqlValue(betweenValues[1]));
+            sql.append(fieldName + operator + SqlBeanUtil.getSqlValue(common, betweenValues[0]) + SqlHelperCons.AND + SqlBeanUtil.getSqlValue(common, betweenValues[1]));
         } else if (operator.indexOf(SqlHelperCons.IN) > -1) {
             Object[] in_notInValues = getObjects(value);
             StringBuffer in_notIn = new StringBuffer();
             if (in_notInValues != null && in_notInValues.length > 0) {
                 for (int k = 0; k < in_notInValues.length; k++) {
-                    in_notIn.append(SqlBeanUtil.getSqlValue(in_notInValues[k]));
+                    in_notIn.append(SqlBeanUtil.getSqlValue(common, in_notInValues[k]));
                     in_notIn.append(SqlHelperCons.COMMA);
                 }
                 in_notIn.deleteCharAt(in_notIn.length() - SqlHelperCons.COMMA.length());
@@ -994,13 +942,13 @@ public class SqlHelper {
     public static Integer[] pageParam(Select select) {
         Integer[] param;
         //SQLServer2008
-        if (DbType.SQLServer2008 == sqlBeanConfig.getDbType()) {
+        if (DbType.SQLServer2008 == select.getSqlBeanConfig().getDbType()) {
             int top = (select.getPage().getPagenum() + 1) * select.getPage().getPagesize();
             int begin = top - select.getPage().getPagesize();
             param = new Integer[]{top, begin};
         }
         //Oracle,DB2
-        else if (DbType.Oracle == sqlBeanConfig.getDbType() || DbType.DB2 == sqlBeanConfig.getDbType()) {
+        else if (DbType.Oracle == select.getSqlBeanConfig().getDbType() || DbType.DB2 == select.getSqlBeanConfig().getDbType()) {
             //startIndex = (当前页 * 每页显示的数量)，例如：(0 * 10)
             //endIndex = (当前页 * 每页显示的数量) + 每页显示的数量，例如：10 = (0 * 10) + 10
             //那么如果startIndex=0，endIndex=10，就是查询第0到10条数据

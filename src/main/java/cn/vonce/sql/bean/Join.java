@@ -12,6 +12,17 @@ import cn.vonce.sql.enumerate.JoinType;
  */
 public class Join {
 
+    public Join() {
+    }
+
+    public Join(JoinType joinType, String tableName, String tableAlias, String tableKeyword, String mainKeyword) {
+        this.joinType = joinType;
+        this.tableName = tableName;
+        this.tableAlias = tableAlias;
+        this.tableKeyword = tableKeyword;
+        this.mainKeyword = mainKeyword;
+    }
+
     private JoinType joinType;
 
     private String tableName;

@@ -2,6 +2,7 @@ package cn.vonce.sql.orm.provider;
 
 import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.bean.*;
+import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.SqlOperator;
@@ -30,8 +31,8 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2018年5月15日下午2:22:05
      */
-    public String selectByIdSql(Class<?> clazz, Object id) {
-        return selectByIdsSql(clazz, new Object[]{id});
+    public String selectByIdSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object id) {
+        return selectByIdsSql(sqlBeanConfig, clazz, new Object[]{id});
     }
 
     /**
@@ -43,20 +44,20 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2018年5月15日下午2:22:05
      */
-    public String selectByIdsSql(Class<?> clazz, Object... ids) {
+    public String selectByIdsSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object... ids) {
         Select select;
         Field idField;
         try {
-            select = newSelect(clazz, false);
+            select = newSelect(sqlBeanConfig, clazz, false);
             idField = SqlBeanUtil.getIdField(clazz);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
         }
         if (ids.length > 1) {
-            select.where(SqlBeanUtil.getTableFieldFullName(clazz, idField), ids, SqlOperator.IN);
+            select.where(SqlBeanUtil.getTableAlias(null, clazz), SqlBeanUtil.getTableFieldName(idField), ids, SqlOperator.IN);
         } else {
-            select.where(SqlBeanUtil.getTableFieldFullName(clazz, idField), ids[0]);
+            select.where(SqlBeanUtil.getTableAlias(null, clazz), SqlBeanUtil.getTableFieldName(idField), ids[0]);
         }
         return SqlHelper.buildSelectSql(select);
     }
@@ -72,9 +73,9 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2018年5月15日下午2:21:33
      */
-    public String selectByConditionSql(Class<?> clazz, Paging paging, String where, Object... args) {
-        Select select = newSelect(clazz, false);
-        select.setWhere(SqlBeanUtil.getCondition(where, args));
+    public String selectByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Paging paging, String where, Object... args) {
+        Select select = newSelect(sqlBeanConfig, clazz, false);
+        select.setWhere(where, args);
         setPaging(select, paging, clazz);
         return SqlHelper.buildSelectSql(select);
     }
@@ -89,9 +90,9 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2018年7月5日下午4:09:45
      */
-    public String selectCountByConditionSql(Class<?> clazz, String where, Object[] args) {
-        Select select = newSelect(clazz, true);
-        select.setWhere(SqlBeanUtil.getCondition(where, args));
+    public String selectCountByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String where, Object[] args) {
+        Select select = newSelect(sqlBeanConfig, clazz, true);
+        select.setWhere(where, args);
         return SqlHelper.buildSelectSql(select);
     }
 
@@ -103,8 +104,8 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2018年5月15日下午2:21:27
      */
-    public String selectAllSql(Class<?> clazz, Paging paging) {
-        Select select = newSelect(clazz, false);
+    public String selectAllSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Paging paging) {
+        Select select = newSelect(sqlBeanConfig, clazz, false);
         setPaging(select, paging, clazz);
         return SqlHelper.buildSelectSql(select);
     }
@@ -112,17 +113,21 @@ public class SqlBeanProvider {
     /**
      * 根据自定义条件查询（可自动分页）
      *
+     * @param sqlBeanConfig
      * @param clazz
      * @param select
      * @return
      * @author Jovi
      * @date 2018年5月15日下午2:21:05
      */
-    public String selectSql(Class<?> clazz, Select select) {
-        if (!select.isCustomMode() || select == null || select.getColumn().isEmpty()) {
+    public String selectSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Select select) {
+        if (select.getSqlBeanConfig() == null) {
+            select.setSqlBeanConfig(sqlBeanConfig);
+        }
+        if (!select.isCustomMode() || select == null || select.getColumnList().isEmpty()) {
             try {
-                select.setColumn(SqlBeanUtil.getSelectFields(clazz, select.getFrom(), select.getFilterFields()));
-                if (select.getPage() != null) {
+                select.setColumnList(SqlBeanUtil.getSelectColumns(select, clazz, select.getTable(), select.getFilterFields()));
+                if (select.getPage() != null && select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
                     select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)));
                 }
             } catch (SqlBeanException e) {
@@ -136,14 +141,18 @@ public class SqlBeanProvider {
     /**
      * 根据自定义条件统计
      *
+     * @param sqlBeanConfig
      * @param clazz
      * @param select
      * @return
      * @author Jovi
      * @date 2018年5月15日下午2:20:22
      */
-    public String countSql(Class<?> clazz, Select select) {
-        if (select == null || select.getColumn().isEmpty()) {
+    public String countSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Select select) {
+        if (select.getSqlBeanConfig() == null) {
+            select.setSqlBeanConfig(sqlBeanConfig);
+        }
+        if (select.getColumnList() == null || select.getColumnList().isEmpty()) {
             select.column(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET);
         }
         return setSelectAndBuild(clazz, select);
@@ -158,7 +167,7 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2018年5月15日下午2:20:10
      */
-    public String deleteByIdSql(Class<?> clazz, Object id) {
+    public String deleteByIdSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object id) {
         if (StringUtil.isEmpty(id)) {
             try {
                 throw new SqlBeanException("deleteByIdSql id不能为空");
@@ -168,7 +177,8 @@ public class SqlBeanProvider {
             }
         }
         Delete delete = new Delete();
-        delete.setDeleteBable(clazz);
+        delete.setSqlBeanConfig(sqlBeanConfig);
+        delete.setTable(clazz);
         Field idField;
         try {
             idField = SqlBeanUtil.getIdField(clazz);
@@ -176,7 +186,7 @@ public class SqlBeanProvider {
             e.printStackTrace();
             return null;
         }
-        delete.where(SqlBeanUtil.getTableFieldName(idField), id, SqlOperator.IN);
+        delete.where("", SqlBeanUtil.getTableFieldName(idField), id, SqlOperator.IN);
         return SqlHelper.buildDeleteSql(delete);
     }
 
@@ -190,10 +200,11 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2018年5月15日下午2:19:59
      */
-    public String deleteByConditionSql(Class<?> clazz, String where, Object[] args) {
+    public String deleteByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String where, Object[] args) {
         Delete delete = new Delete();
-        delete.setDeleteBable(clazz);
-        delete.setWhere(SqlBeanUtil.getCondition(where, args));
+        delete.setSqlBeanConfig(sqlBeanConfig);
+        delete.setTable(clazz);
+        delete.setWhere(where, args);
         return SqlHelper.buildDeleteSql(delete);
     }
 
@@ -207,9 +218,12 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2019年1月12日下午2:19:59
      */
-    public String deleteSql(Class<?> clazz, Delete delete, boolean ignore) {
-        if (delete.getDeleteBable() == null || delete.getDeleteBable().equals("")) {
-            delete.setDeleteBable(clazz);
+    public String deleteSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Delete delete, boolean ignore) {
+        if (delete.getSqlBeanConfig() == null) {
+            delete.setSqlBeanConfig(sqlBeanConfig);
+        }
+        if (delete.getTable() == null || StringUtil.isEmpty(delete.getTable().getName())) {
+            delete.setTable(clazz);
         }
         if (ignore || !delete.getWhereMap().isEmpty()) {
             return SqlHelper.buildDeleteSql(delete);
@@ -232,8 +246,9 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2019年6月12日下午2:19:59
      */
-    public String logicallyDeleteByIdSql(Class<?> clazz, Object id) {
+    public String logicallyDeleteByIdSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object id) {
         Update update = new Update();
+        update.setSqlBeanConfig(sqlBeanConfig);
         Object bean;
         try {
             bean = newLogicallyDeleteBean(clazz);
@@ -265,11 +280,12 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2019年6月12日下午2:19:59
      */
-    public String logicallyDeleteByConditionSql(Class<?> clazz, String where, Object[] args) {
+    public String logicallyDeleteByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String where, Object[] args) {
         Update update = new Update();
+        update.setSqlBeanConfig(sqlBeanConfig);
         try {
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
-            update.setWhere(SqlBeanUtil.getCondition(where, args));
+            update.setWhere(where, args);
             //sqlBean.where(SqlBeanUtil.getFieldName(idField), ReflectAsmUtil.get(bean.getClass(), bean, idField.getName()));
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -287,13 +303,17 @@ public class SqlBeanProvider {
     /**
      * 更新
      *
+     * @param sqlBeanConfig
      * @param update
      * @param ignore
      * @return
      * @author Jovi
      * @date 2019年1月12日下午4:16:24
      */
-    public String updateSql(Update update, boolean ignore) {
+    public String updateSql(SqlBeanConfig sqlBeanConfig, Update update, boolean ignore) {
+        if (update.getSqlBeanConfig() == null) {
+            update.setSqlBeanConfig(sqlBeanConfig);
+        }
         if (ignore || !update.getWhereMap().isEmpty()) {
             return SqlHelper.buildUpdateSql(update);
         } else {
@@ -316,7 +336,7 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2018年5月15日下午2:19:24
      */
-    public String updateByIdSql(Object bean, Object id, boolean updateNotNull, String[] filterFields) {
+    public String updateByIdSql(SqlBeanConfig sqlBeanConfig, Object bean, Object id, boolean updateNotNull, String[] filterFields) {
         if (StringUtil.isEmpty(id)) {
             try {
                 throw new SqlBeanException("updateByIdSql id不能为空");
@@ -325,7 +345,7 @@ public class SqlBeanProvider {
                 return null;
             }
         }
-        Update update = newUpdate(bean, updateNotNull);
+        Update update = newUpdate(sqlBeanConfig, bean, updateNotNull);
         update.setFilterFields(filterFields);
         Field idField;
         try {
@@ -335,7 +355,6 @@ public class SqlBeanProvider {
             return null;
         }
         update.where(SqlBeanUtil.getTableFieldName(idField), id);
-        //sqlBean.where(SqlBeanUtil.getFieldName(idField), id);
         return SqlHelper.buildUpdateSql(update);
     }
 
@@ -349,8 +368,8 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2018年5月15日下午2:19:24
      */
-    public String updateByBeanIdSql(Object bean, boolean updateNotNull, String[] filterFields) {
-        Update update = newUpdate(bean, updateNotNull);
+    public String updateByBeanIdSql(SqlBeanConfig sqlBeanConfig, Object bean, boolean updateNotNull, String[] filterFields) {
+        Update update = newUpdate(sqlBeanConfig, bean, updateNotNull);
         update.setFilterFields(filterFields);
         Field idField;
         try {
@@ -389,10 +408,10 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2018年5月15日下午2:18:03
      */
-    public String updateByConditionSql(Object bean, boolean updateNotNull, String[] filterFields, String where, Object[] args) {
-        Update update = newUpdate(bean, updateNotNull);
+    public String updateByConditionSql(SqlBeanConfig sqlBeanConfig, Object bean, boolean updateNotNull, String[] filterFields, String where, Object[] args) {
+        Update update = newUpdate(sqlBeanConfig, bean, updateNotNull);
         update.setFilterFields(filterFields);
-        update.setWhere(SqlBeanUtil.getCondition(where, args));
+        update.setWhere(where, args);
         return SqlHelper.buildUpdateSql(update);
     }
 
@@ -407,22 +426,10 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2018年5月15日下午2:16:36
      */
-    public String updateByBeanConditionSql(Object bean, boolean updateNotNull, String[] filterFields, String where) {
-        Update update = newUpdate(bean, updateNotNull);
+    public String updateByBeanConditionSql(SqlBeanConfig sqlBeanConfig, Object bean, boolean updateNotNull, String[] filterFields, String where) {
+        Update update = newUpdate(sqlBeanConfig, bean, updateNotNull);
         update.setFilterFields(filterFields);
-        try {
-            update.setWhere(SqlBeanUtil.getCondition(where, bean));
-        } catch (NoSuchFieldException e) {
-            try {
-                throw new SqlBeanException("bean找不到该字段：" + e.getMessage());
-            } catch (SqlBeanException e1) {
-                e1.printStackTrace();
-            }
-            return null;
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        }
+        update.setWhere(where, null);
         return SqlHelper.buildUpdateSql(update);
     }
 
@@ -434,8 +441,9 @@ public class SqlBeanProvider {
      * @author Jovi
      * @date 2018年5月15日下午2:16:30
      */
-    public String insertBeanSql(Object bean) {
+    public String insertBeanSql(SqlBeanConfig sqlBeanConfig, Object bean) {
         Insert insert = new Insert();
+        insert.setSqlBeanConfig(sqlBeanConfig);
         insert.setInsertBean(bean);
         return SqlHelper.buildInsertSql(insert);
     }
@@ -443,12 +451,16 @@ public class SqlBeanProvider {
     /**
      * 插入数据
      *
+     * @param sqlBeanConfig
      * @param insert
      * @return
      * @author Jovi
      * @date 2018年5月15日下午2:16:30
      */
-    public String insertSql(Insert insert) {
+    public String insertSql(SqlBeanConfig sqlBeanConfig, Insert insert) {
+        if (insert.getSqlBeanConfig() == null) {
+            insert.setSqlBeanConfig(sqlBeanConfig);
+        }
         return SqlHelper.buildInsertSql(insert);
     }
 
@@ -460,14 +472,15 @@ public class SqlBeanProvider {
      * @return
      * @throws SqlBeanException
      */
-    private Select newSelect(Class<?> clazz, boolean isCount) {
+    private Select newSelect(SqlBeanConfig sqlBeanConfig, Class<?> clazz, boolean isCount) {
         Select select = new Select();
-        select.setFrom(clazz);
+        select.setSqlBeanConfig(sqlBeanConfig);
+        select.setTable(clazz);
         try {
             if (isCount) {
                 select.column(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET);
             } else {
-                select.setColumn(SqlBeanUtil.getSelectFields(clazz, select.getFrom(), select.getFilterFields()));
+                select.setColumnList(SqlBeanUtil.getSelectColumns(select, clazz, select.getTable(), select.getFilterFields()));
             }
             SqlBeanUtil.setJoin(select, clazz);
         } catch (SqlBeanException e) {
@@ -486,15 +499,14 @@ public class SqlBeanProvider {
      * @throws SqlBeanException
      */
     private String setSelectAndBuild(Class<?> clazz, Select select) {
-        From from = null;
-        if (StringUtil.isEmpty(select.getFrom().getName()) || StringUtil.isEmpty(select.getFrom().getAlias())) {
-            from = SqlBeanUtil.getFrom(clazz);
+        if (select.getTable() == null || StringUtil.isEmpty(select.getTable().getName()) || StringUtil.isEmpty(select.getTable().getAlias())) {
+            select.setTable(SqlBeanUtil.getTable(clazz));
         }
-        if (StringUtil.isEmpty(select.getFrom().getName())) {
-            select.getFrom().setName(from.getName());
+        if (StringUtil.isEmpty(select.getTable().getName())) {
+            select.getTable().setName(select.getTable().getName());
         }
-        if (StringUtil.isEmpty(select.getFrom().getAlias())) {
-            select.getFrom().setAlias(from.getAlias());
+        if (StringUtil.isEmpty(select.getTable().getAlias())) {
+            select.getTable().setAlias(select.getTable().getAlias());
         }
         try {
             SqlBeanUtil.setJoin(select, clazz);
@@ -528,8 +540,9 @@ public class SqlBeanProvider {
      * @return
      * @throws SqlBeanException
      */
-    private Update newUpdate(Object bean, boolean updateNotNull) {
+    private Update newUpdate(SqlBeanConfig sqlBeanConfig, Object bean, boolean updateNotNull) {
         Update update = new Update();
+        update.setSqlBeanConfig(sqlBeanConfig);
         update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
         return update;
@@ -544,7 +557,7 @@ public class SqlBeanProvider {
      */
     private void setPaging(Select select, Paging paging, Class<?> clazz) {
         if (paging != null) {
-            if (SqlHelper.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
+            if (select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
                 try {
                     select.setPage(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)), paging.getPagenum(), paging.getPagesize());
                 } catch (SqlBeanException e) {

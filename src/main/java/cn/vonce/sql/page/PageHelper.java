@@ -363,7 +363,7 @@ public class PageHelper<T> {
             // 衍生一个对象用于select查询
             Select sqlBeanSelect = (Select) select.copy();
             // 预防设置了查询字段，故将查询字段换位统计字段
-            select.getColumn().clear();
+            select.getColumnList().clear();
             select.column(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET);
             // 先统计数量
             long count;

@@ -4,6 +4,7 @@ import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.enumerate.SqlLogic;
+import cn.vonce.sql.enumerate.SqlOperator;
 import cn.vonce.sql.enumerate.SqlSort;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import com.google.common.collect.LinkedListMultimap;
@@ -14,29 +15,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * column
+ * 查询
  *
  * @author Jovi
  * @version 1.0
  * @email 766255988@qq.com
  * @date 2017年8月18日上午9:00:19
  */
-public class Select extends Common implements Serializable {
+public class Select extends Condition implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private boolean useDistinct = false;//默认不去重复
     private boolean customMode = true;//默认为自定义模式
-    private From from = new From();//来自哪张表
-    private List<String> columnList = new ArrayList<>();//查询的字段数组
-    private List<String> innerJoinList = new ArrayList<>();//内连接的表数组
-    private List<String> fullJoinList = new ArrayList<>();//全连接的表数组
-    private List<String> leftJoinList = new ArrayList<>();//左连接的表数组
-    private List<String> rightJoinList = new ArrayList<>();//右连接的表数组
+    private List<Column> columnList = new ArrayList<>();//查询的字段数组
+    private List<Join> joinList = new ArrayList<>();//内连接的表数组
+    //    private List<Join> innerJoinList = new ArrayList<>();//内连接的表数组
+//    private List<Join> fullJoinList = new ArrayList<>();//全连接的表数组
+//    private List<Join> leftJoinList = new ArrayList<>();//左连接的表数组
+//    private List<Join> rightJoinList = new ArrayList<>();//右连接的表数组
     private List<String> groupByList = new ArrayList<>();//分组
     private List<String> orderByList = new ArrayList<>();//排序
     private Page page = null;
-    private String having = null;//条件
+    private String having = null;
+    private Object[] havingArgs = null;
     private ListMultimap<String, SqlCondition> havingMap = LinkedListMultimap.create();//having条件包含的逻辑
     private String[] filterFields = null;//需要过滤的字段
 
@@ -81,98 +83,49 @@ public class Select extends Common implements Serializable {
     }
 
     /**
-     * 获取from sql 内容
-     *
-     * @return
-     * @author Jovi
-     * @date 2017年8月18日上午8:59:49
-     */
-    public From getFrom() {
-        return from;
-    }
-
-    /**
-     * 设置from sql 内容
-     *
-     * @param name
-     * @author Jovi
-     * @date 2017年8月18日上午8:59:38
-     */
-    public void setFrom(String name) {
-        this.from.setName(name);
-        this.from.setAlias(name);
-    }
-
-    /**
-     * 设置from sql 内容
-     *
-     * @param name
-     * @param aliasName
-     * @author Jovi
-     * @date 2017年8月18日上午8:59:38
-     */
-    public void setFrom(String name, String aliasName) {
-        this.from.setName(name);
-        this.from.setAlias(aliasName);
-    }
-
-    /**
-     * 设置from sql 内容
-     *
-     * @param from
-     * @author Jovi
-     * @date 2017年8月18日上午8:59:38
-     */
-    public void setFrom(From from) {
-        this.from = from;
-    }
-
-    /**
-     * 设置from sql 内容
-     *
-     * @param clazz 表对应的实体类
-     * @author Jovi
-     * @date 2018年5月14日下午11:54:45
-     */
-    public void setFrom(Class<?> clazz) {
-        this.from = SqlBeanUtil.getFrom(clazz);
-    }
-
-    /**
      * 获取column sql 内容
      *
      * @return
      * @author Jovi
      * @date 2017年8月18日上午9:00:05
      */
-    public List<String> getColumn() {
+    public List<Column> getColumnList() {
         return columnList;
     }
 
     /**
-     * 设置column sql 内容
+     * 设置column list
      *
-     * @param column
+     * @param columnList
+     */
+    public void setColumnList(List<Column> columnList) {
+        this.columnList = columnList;
+    }
+
+    /**
+     * 设置column（追加）
+     *
+     * @param columnNames
      * @author Jovi
      * @date 2017年8月18日上午8:59:56
      */
-    public void setColumn(String... column) {
-        for (String string : column) {
-            this.columnList.add(string);
+    public void setColumn(String... columnNames) {
+        for (String columnName : columnNames) {
+            this.columnList.add(new Column(columnName));
         }
     }
 
     /**
      * 添加column字段
      *
-     * @param column
+     * @param columnName
      * @return
      * @author Jovi
      * @date 2017年8月18日下午4:18:18
      */
-    public Select column(String column) {
-        if (StringUtil.isNotEmpty(column)) {
-            columnList.add(column);
+    public Select column(String columnName) {
+        if (StringUtil.isNotEmpty(columnName)) {
+            columnList.add(new Column(columnName));
         }
         return this;
     }
@@ -180,195 +133,207 @@ public class Select extends Common implements Serializable {
     /**
      * 添加column字段
      *
-     * @param subSql 子sql
-     * @param alias  别名
+     * @param columnName  列字段名
+     * @param columnAlias 别名
      * @return
      * @author Jovi
      * @date 2017年8月18日下午4:18:18
      */
-    public Select column(String subSql, String alias) {
-        if (StringUtil.isNotEmpty(subSql) && StringUtil.isNotEmpty(alias)) {
-            columnList.add(SqlHelperCons.BEGIN_BRACKET + subSql + SqlHelperCons.END_BRACKET + SqlHelperCons.AS + SqlBeanUtil.getTransferred() + alias + SqlBeanUtil.getTransferred());
+    public Select column(String columnName, String columnAlias) {
+        if (StringUtil.isNotEmpty(columnName) && StringUtil.isNotEmpty(columnAlias)) {
+            columnList.add(new Column(columnName, columnAlias));
+//            columnList.add(SqlHelperCons.BEGIN_BRACKET + subSql + SqlHelperCons.END_BRACKET + SqlHelperCons.AS + SqlBeanUtil.getTransferred() + alias + SqlBeanUtil.getTransferred());
         }
         return this;
     }
 
-    /**
-     * 获取内连接的表
-     *
-     * @return
-     * @author Jovi
-     * @date 2017年8月18日下午4:20:49
-     */
-    public List<String> getInnerJoin() {
-        return innerJoinList;
-    }
+//    /**
+//     * 获取内连接的表
+//     *
+//     * @return
+//     * @author Jovi
+//     * @date 2017年8月18日下午4:20:49
+//     */
+//    public List<Join> getInnerJoin() {
+//        return innerJoinList;
+//    }
+//
+//    /**
+//     * 添加表内连接
+//     *
+//     * @param table        关联的表名
+//     * @param tableKeyword 关联的表关键字段
+//     * @param mainKeyword  主表关键字段
+//     * @author Jovi
+//     * @date 2017年8月18日上午10:54:26
+//     */
+//    public Select innerJoin(String table, String tableKeyword, String mainKeyword) {
+//        return innerJoin(table, table, tableKeyword, mainKeyword);
+//    }
+//
+//    /**
+//     * 添加表内连接
+//     *
+//     * @param table        关联的表名
+//     * @param tableAlias   关联的表别名
+//     * @param tableKeyword 关联的表关键字段
+//     * @param mainKeyword  主表关键字段
+//     * @author Jovi
+//     * @date 2017年8月18日上午10:54:26
+//     */
+//    public Select innerJoin(String table, String tableAlias, String tableKeyword, String mainKeyword) {
+//        if (SqlBeanUtil.joinIsNotEmpty(table, tableKeyword, mainKeyword)) {
+////            innerJoinList.add(SqlHelperCons.INNER_JOIN + joinSplitJoint(table, tableAlias, tableKeyword, mainKeyword));
+//            innerJoinList.add(new Join(JoinType.INNER_JOIN, table, tableAlias, tableKeyword, mainKeyword));
+//        }
+//        return this;
+//    }
+//
+//
+//    /**
+//     * 获取外连接的表
+//     *
+//     * @return
+//     * @author Jovi
+//     * @date 2017年8月18日下午4:20:41
+//     */
+//    public List<Join> getFullJoin() {
+//        return fullJoinList;
+//    }
+//
+//    /**
+//     * 添加表外连接
+//     *
+//     * @param table
+//     * @param tableKeyword
+//     * @param mainKeyword
+//     * @author Jovi
+//     * @date 2017年8月18日上午10:55:52
+//     */
+//    public Select fullJoin(String table, String tableKeyword, String mainKeyword) {
+//        return fullJoin(table, table, tableKeyword, mainKeyword);
+//    }
+//
+//    /**
+//     * 添加表外连接
+//     *
+//     * @param table        关联的表名
+//     * @param tableAlias   关联的表别名
+//     * @param tableKeyword 关联的表关键字段
+//     * @param mainKeyword  主表关键字段
+//     * @author Jovi
+//     * @date 2017年8月18日上午10:55:52
+//     */
+//    public Select fullJoin(String table, String tableAlias, String tableKeyword, String mainKeyword) {
+//        if (SqlBeanUtil.joinIsNotEmpty(table, tableKeyword, mainKeyword)) {
+////            fullJoinList.add(SqlHelperCons.FULL_JOIN + joinSplitJoint(table, tableAlias, tableKeyword, mainKeyword));
+//            fullJoinList.add(new Join(JoinType.FULL_JOIN, table, tableAlias, tableKeyword, mainKeyword));
+//        }
+//        return this;
+//    }
+//
+//    /**
+//     * 获取左外连接的表
+//     *
+//     * @return
+//     * @author Jovi
+//     * @date 2017年8月18日下午4:20:33
+//     */
+//    public List<Join> getLeftOuterJoin() {
+//        return leftJoinList;
+//    }
+//
+//    /**
+//     * 添加表左外连接
+//     *
+//     * @param table        关联的表名
+//     * @param tableKeyword 关联的表关键字段
+//     * @param mainKeyword  主表关键字段
+//     * @author Jovi
+//     * @date 2017年8月18日上午10:55:04
+//     */
+//    public Select leftJoin(String table, String tableKeyword, String mainKeyword) {
+//        return leftJoin(table, table, tableKeyword, mainKeyword);
+//    }
+//
+//    /**
+//     * 添加表左外连接
+//     *
+//     * @param table        关联的表名
+//     * @param tableAlias   关联的表别名
+//     * @param tableKeyword 关联的表关键字段
+//     * @param mainKeyword  主表关键字段
+//     * @author Jovi
+//     * @date 2017年8月18日上午10:55:04
+//     */
+//    public Select leftJoin(String table, String tableAlias, String tableKeyword, String mainKeyword) {
+//        if (SqlBeanUtil.joinIsNotEmpty(table, tableKeyword, mainKeyword)) {
+////            leftJoinList.add(SqlHelperCons.LEFT_JOIN + joinSplitJoint(table, tableAlias, tableKeyword, mainKeyword));
+//            leftJoinList.add(new Join(JoinType.LEFT_JOIN, table, tableAlias, tableKeyword, mainKeyword));
+//        }
+//        return this;
+//    }
+//
+//    /**
+//     * 获取右外连接的表
+//     *
+//     * @return
+//     * @author Jovi
+//     * @date 2017年8月18日下午4:20:01
+//     */
+//    public List<Join> getRightOuterJoin() {
+//        return rightJoinList;
+//    }
+//
+//    /**
+//     * 添加表右外连接
+//     *
+//     * @param table        关联的表名
+//     * @param tableKeyword 关联的表关键字段
+//     * @param mainKeyword  主表关键字段
+//     * @author Jovi
+//     * @date 2017年8月18日上午10:55:23
+//     */
+//    public Select rightJoin(String table, String tableKeyword, String mainKeyword) {
+//        return rightJoin(table, table, tableKeyword, mainKeyword);
+//    }
+//
+//    /**
+//     * 添加表右外连接
+//     *
+//     * @param table        关联的表名
+//     * @param tableAlias   关联的表别名
+//     * @param tableKeyword 关联的表关键字段
+//     * @param mainKeyword  主表关键字段
+//     * @author Jovi
+//     * @date 2017年8月18日上午10:55:23
+//     */
+//    public Select rightJoin(String table, String tableAlias, String tableKeyword, String mainKeyword) {
+//        if (SqlBeanUtil.joinIsNotEmpty(table, tableKeyword, mainKeyword)) {
+////            rightJoinList.add(SqlHelperCons.RIGHT_JOIN + joinSplitJoint(table, tableAlias, tableKeyword, mainKeyword));
+//            rightJoinList.add(new Join(JoinType.RIGHT_JOIN, table, tableAlias, tableKeyword, mainKeyword));
+//        }
+//        return this;
+//    }
+
+//    /**
+//     * join 字符串拼接
+//     *
+//     * @param table        关联的表名
+//     * @param tableAlias   关联的表别名
+//     * @param tableKeyword 关联的表关键字段
+//     * @param mainKeyword  主表关键字段
+//     * @return
+//     */
+//    private String joinSplitJoint(String table, String tableAlias, String tableKeyword, String mainKeyword) {
+//        return table + SqlHelperCons.SPACES + tableAlias + SqlHelperCons.ON + tableKeyword + SqlHelperCons.EQUAL_TO + mainKeyword;
+//    }
 
     /**
-     * 添加表内连接
-     *
-     * @param table        关联的表名
-     * @param tableKeyword 关联的表关键字段
-     * @param mainKeyword  主表关键字段
-     * @author Jovi
-     * @date 2017年8月18日上午10:54:26
+     * 获取表连接
      */
-    public Select innerJoin(String table, String tableKeyword, String mainKeyword) {
-        return innerJoin(table, table, tableKeyword, mainKeyword);
-    }
-
-    /**
-     * 添加表内连接
-     *
-     * @param table        关联的表名
-     * @param tableAlias   关联的表别名
-     * @param tableKeyword 关联的表关键字段
-     * @param mainKeyword  主表关键字段
-     * @author Jovi
-     * @date 2017年8月18日上午10:54:26
-     */
-    public Select innerJoin(String table, String tableAlias, String tableKeyword, String mainKeyword) {
-        if (SqlBeanUtil.joinIsNotEmpty(table, tableKeyword, mainKeyword)) {
-            innerJoinList.add(SqlHelperCons.INNER_JOIN + joinSplitJoint(table, tableAlias, tableKeyword, mainKeyword));
-        }
-        return this;
-    }
-
-
-    /**
-     * 获取外连接的表
-     *
-     * @return
-     * @author Jovi
-     * @date 2017年8月18日下午4:20:41
-     */
-    public List<String> getFullJoin() {
-        return fullJoinList;
-    }
-
-    /**
-     * 添加表外连接
-     *
-     * @param table
-     * @param tableKeyword
-     * @param mainKeyword
-     * @author Jovi
-     * @date 2017年8月18日上午10:55:52
-     */
-    public Select fullJoin(String table, String tableKeyword, String mainKeyword) {
-        return fullJoin(table, table, tableKeyword, mainKeyword);
-    }
-
-    /**
-     * 添加表外连接
-     *
-     * @param table        关联的表名
-     * @param tableAlias   关联的表别名
-     * @param tableKeyword 关联的表关键字段
-     * @param mainKeyword  主表关键字段
-     * @author Jovi
-     * @date 2017年8月18日上午10:55:52
-     */
-    public Select fullJoin(String table, String tableAlias, String tableKeyword, String mainKeyword) {
-        if (SqlBeanUtil.joinIsNotEmpty(table, tableKeyword, mainKeyword)) {
-            fullJoinList.add(SqlHelperCons.FULL_JOIN + joinSplitJoint(table, tableAlias, tableKeyword, mainKeyword));
-        }
-        return this;
-    }
-
-    /**
-     * 获取左外连接的表
-     *
-     * @return
-     * @author Jovi
-     * @date 2017年8月18日下午4:20:33
-     */
-    public List<String> getLeftOuterJoin() {
-        return leftJoinList;
-    }
-
-    /**
-     * 添加表左外连接
-     *
-     * @param table        关联的表名
-     * @param tableKeyword 关联的表关键字段
-     * @param mainKeyword  主表关键字段
-     * @author Jovi
-     * @date 2017年8月18日上午10:55:04
-     */
-    public Select leftJoin(String table, String tableKeyword, String mainKeyword) {
-        return leftJoin(table, table, tableKeyword, mainKeyword);
-    }
-
-    /**
-     * 添加表左外连接
-     *
-     * @param table        关联的表名
-     * @param tableAlias   关联的表别名
-     * @param tableKeyword 关联的表关键字段
-     * @param mainKeyword  主表关键字段
-     * @author Jovi
-     * @date 2017年8月18日上午10:55:04
-     */
-    public Select leftJoin(String table, String tableAlias, String tableKeyword, String mainKeyword) {
-        if (SqlBeanUtil.joinIsNotEmpty(table, tableKeyword, mainKeyword)) {
-            leftJoinList.add(SqlHelperCons.LEFT_JOIN + joinSplitJoint(table, tableAlias, tableKeyword, mainKeyword));
-        }
-        return this;
-    }
-
-    /**
-     * 获取右外连接的表
-     *
-     * @return
-     * @author Jovi
-     * @date 2017年8月18日下午4:20:01
-     */
-    public List<String> getRightOuterJoin() {
-        return rightJoinList;
-    }
-
-    /**
-     * 添加表右外连接
-     *
-     * @param table        关联的表名
-     * @param tableKeyword 关联的表关键字段
-     * @param mainKeyword  主表关键字段
-     * @author Jovi
-     * @date 2017年8月18日上午10:55:23
-     */
-    public Select rightJoin(String table, String tableKeyword, String mainKeyword) {
-        return rightJoin(table, table, tableKeyword, mainKeyword);
-    }
-
-    /**
-     * 添加表右外连接
-     *
-     * @param table        关联的表名
-     * @param tableAlias   关联的表别名
-     * @param tableKeyword 关联的表关键字段
-     * @param mainKeyword  主表关键字段
-     * @author Jovi
-     * @date 2017年8月18日上午10:55:23
-     */
-    public Select rightJoin(String table, String tableAlias, String tableKeyword, String mainKeyword) {
-        if (SqlBeanUtil.joinIsNotEmpty(table, tableKeyword, mainKeyword)) {
-            rightJoinList.add(SqlHelperCons.RIGHT_JOIN + joinSplitJoint(table, tableAlias, tableKeyword, mainKeyword));
-        }
-        return this;
-    }
-
-    /**
-     * join 字符串拼接
-     *
-     * @param table        关联的表名
-     * @param tableAlias   关联的表别名
-     * @param tableKeyword 关联的表关键字段
-     * @param mainKeyword  主表关键字段
-     * @return
-     */
-    private String joinSplitJoint(String table, String tableAlias, String tableKeyword, String mainKeyword) {
-        return table + SqlHelperCons.SPACES + tableAlias + SqlHelperCons.ON + tableKeyword + SqlHelperCons.EQUAL_TO + mainKeyword;
+    public List<Join> getJoin() {
+        return joinList;
     }
 
     /**
@@ -394,20 +359,21 @@ public class Select extends Common implements Serializable {
      * @date 2019年6月21日上午10:27:50
      */
     public Select join(JoinType joinType, String table, String tableAlias, String tableKeyword, String mainKeyword) {
-        switch (joinType) {
-            case INNER_JOIN:
-                innerJoin(table, tableAlias, tableKeyword, mainKeyword);
-                break;
-            case FULL_JOIN:
-                fullJoin(table, tableAlias, tableKeyword, mainKeyword);
-                break;
-            case LEFT_JOIN:
-                leftJoin(table, tableAlias, tableKeyword, mainKeyword);
-                break;
-            case RIGHT_JOIN:
-                rightJoin(table, tableAlias, tableKeyword, mainKeyword);
-                break;
-        }
+//        switch (joinType) {
+//            case INNER_JOIN:
+//                innerJoin(table, tableAlias, tableKeyword, mainKeyword);
+//                break;
+//            case FULL_JOIN:
+//                fullJoin(table, tableAlias, tableKeyword, mainKeyword);
+//                break;
+//            case LEFT_JOIN:
+//                leftJoin(table, tableAlias, tableKeyword, mainKeyword);
+//                break;
+//            case RIGHT_JOIN:
+//                rightJoin(table, tableAlias, tableKeyword, mainKeyword);
+//                break;
+//        }
+        joinList.add(new Join(JoinType.INNER_JOIN, table, tableAlias, tableKeyword, mainKeyword));
         return this;
     }
 
@@ -468,7 +434,27 @@ public class Select extends Common implements Serializable {
      * @date 2018年9月13日下午15:34:45
      */
     public void setHaving(String having, Object... args) {
-        this.having = SqlBeanUtil.getCondition(having, args);
+//        this.having = SqlBeanUtil.getCondition(having, args);
+        this.having = having;
+        this.havingArgs = args;
+    }
+
+    /**
+     * 获取Having
+     *
+     * @return
+     */
+    public Object[] getHavingArgs() {
+        return havingArgs;
+    }
+
+    /**
+     * 设置Having
+     *
+     * @param havingArgs
+     */
+    public void setHavingArgs(Object[] havingArgs) {
+        this.havingArgs = havingArgs;
     }
 
     /**
@@ -557,63 +543,47 @@ public class Select extends Common implements Serializable {
     /**
      * 添加having条件
      *
-     * @param field 字段
-     * @param value 字段值
-     * @return
-     * @author Jovi
-     * @date 2017年8月18日下午3:41:07
-     */
-    public Select having(String field, Object value) {
-        if (StringUtil.isNotEmpty(field) && value != null) {
-            having(field, value, SqlLogic.AND);
-        }
-        return this;
-    }
-
-    /**
-     * @param field    字段
-     * @param value    字段值
-     * @param sqlLogic 该条件与下一条件之间的逻辑关系
+     * @param field       字段
+     * @param value       字段值
+     * @param sqlOperator 操作符
      * @return
      * @author Jovi
      * @date 2017年8月18日下午4:23:17
      */
-    public Select having(String field, Object value, SqlLogic sqlLogic) {
-        if (StringUtil.isNotEmpty(field) && value != null) {
-            havingMap.put(field.replaceAll("\\.", "*"), new SqlCondition(sqlLogic, field, value, ""));
-        }
-        return this;
+    public Select having(String field, Object value, SqlOperator sqlOperator) {
+        return having("", field, value, sqlOperator);
     }
 
     /**
      * 添加having条件
      *
-     * @param field    字段
-     * @param value    字段值
-     * @param operator 操作符
+     * @param tableAlias  表别名
+     * @param field       字段
+     * @param value       字段值
+     * @param sqlOperator 操作符
      * @return
      * @author Jovi
-     * @date 2017年8月18日下午3:40:52
+     * @date 2017年8月18日下午4:23:17
      */
-    public Select having(String field, Object value, String operator) {
-        if (StringUtil.isNotEmpty(field) && value != null) {
-            having(field, value, operator, SqlLogic.AND);
-        }
-        return this;
+    public Select having(String tableAlias, String field, Object value, SqlOperator sqlOperator) {
+        return having(SqlLogic.AND, tableAlias, field, value, sqlOperator);
     }
 
     /**
-     * @param field    字段
-     * @param value    字段值
-     * @param operator 操作符
-     * @param sqlLogic 该条件与下一条件之间的逻辑关系
+     * 添加having条件
+     *
+     * @param sqlLogic    该条件与下一条件之间的逻辑关系
+     * @param tableAlias  表别名
+     * @param field       字段
+     * @param value       字段值
+     * @param sqlOperator 操作符
      * @return
      * @author Jovi
-     * @date 2017年8月18日下午4:25:05
+     * @date 2017年8月18日下午4:23:17
      */
-    public Select having(String field, Object value, String operator, SqlLogic sqlLogic) {
+    public Select having(SqlLogic sqlLogic, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
         if (StringUtil.isNotEmpty(field) && value != null) {
-            havingMap.put(field.replaceAll("\\.", "*"), new SqlCondition(sqlLogic, field, value, operator));
+            havingMap.put(tableAlias + field, new SqlCondition(sqlLogic, tableAlias, field, value, sqlOperator));
         }
         return this;
     }

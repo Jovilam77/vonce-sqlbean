@@ -3,22 +3,24 @@ package cn.vonce.sql.bean;
 import java.io.Serializable;
 
 /**
+ * 表名
+ *
  * @author Jovi
  * @version 1.0
  * @email imjovi@qq.com
  * @date 2019/9/27 11:49
  */
-public class From implements Serializable {
+public class Table implements Serializable {
 
-    public From() {
+    public Table() {
 
     }
 
-    public From(String name) {
+    public Table(String name) {
         this.name = name;
     }
 
-    public From(String name, String alias) {
+    public Table(String name, String alias) {
         this.name = name;
         this.alias = alias;
     }

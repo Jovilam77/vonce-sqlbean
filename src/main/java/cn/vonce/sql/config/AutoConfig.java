@@ -18,7 +18,7 @@ public class AutoConfig {
     @ConditionalOnUseMysql
     public SqlBeanConfig mysqlConfig() {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.MySQL);
-        SqlHelper.init(sqlBeanConfig);
+//        SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
     }
 
@@ -26,7 +26,7 @@ public class AutoConfig {
     @ConditionalOnUseMariaDB
     public SqlBeanConfig mariaDBConfig() {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.MariaDB);
-        SqlHelper.init(sqlBeanConfig);
+//        SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
     }
 
@@ -35,7 +35,7 @@ public class AutoConfig {
     public SqlBeanConfig oracleConfig() {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.Oracle);
         sqlBeanConfig.setToUpperCase(true);
-        SqlHelper.init(sqlBeanConfig);
+//        SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
     }
 
@@ -43,7 +43,7 @@ public class AutoConfig {
     @ConditionalOnUseSqlServer
     public SqlBeanConfig sqlServerConfig() {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.SQLServer2008);
-        SqlHelper.init(sqlBeanConfig);
+//        SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
     }
 
@@ -51,7 +51,7 @@ public class AutoConfig {
     @ConditionalOnUsePostgreSql
     public SqlBeanConfig postgreSqlConfig() {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.PostgreSQL);
-        SqlHelper.init(sqlBeanConfig);
+//        SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
     }
 
@@ -60,7 +60,7 @@ public class AutoConfig {
     public SqlBeanConfig db2Config() {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.DB2);
         sqlBeanConfig.setToUpperCase(true);
-        SqlHelper.init(sqlBeanConfig);
+//        SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
     }
 
@@ -69,7 +69,7 @@ public class AutoConfig {
     public SqlBeanConfig derbyConfig() {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.Derby);
         sqlBeanConfig.setToUpperCase(true);
-        SqlHelper.init(sqlBeanConfig);
+//        SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
     }
 
@@ -77,7 +77,7 @@ public class AutoConfig {
     @ConditionalOnUseSqlite
     public SqlBeanConfig sqliteConfig() {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.SQLite);
-        SqlHelper.init(sqlBeanConfig);
+//        SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
     }
 
@@ -86,7 +86,7 @@ public class AutoConfig {
     public SqlBeanConfig hsqlConfig() {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.Hsql);
         sqlBeanConfig.setToUpperCase(true);
-        SqlHelper.init(sqlBeanConfig);
+//        SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
     }
 
@@ -95,7 +95,7 @@ public class AutoConfig {
     public SqlBeanConfig h2Config() {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.H2);
         sqlBeanConfig.setToUpperCase(true);
-        SqlHelper.init(sqlBeanConfig);
+//        SqlHelper.init(sqlBeanConfig);
         return sqlBeanConfig;
     }
 
