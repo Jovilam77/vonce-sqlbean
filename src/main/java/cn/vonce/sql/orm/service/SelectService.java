@@ -16,7 +16,7 @@ import java.util.Map;
  * @email 766255988@qq.com
  * @date 2019年6月27日下午3:57:33
  */
-public interface SelectService<T> extends PagingService {
+public interface SelectService<T, ID> extends PagingService {
 
     /**
      * 根据id条件查询
@@ -26,7 +26,7 @@ public interface SelectService<T> extends PagingService {
      * @author Jovi
      * @date 2018年5月15日下午4:03:28
      */
-    T selectById(Object id);
+    T selectById(ID id);
 
     /**
      * 根据id条件查询(可指定返回类型、查询的表)
@@ -37,7 +37,7 @@ public interface SelectService<T> extends PagingService {
      * @author Jovi
      * @date 2018年6月15日下午6:36:38
      */
-    <O> O selectById(Class<O> returnType, Object id);
+    <O> O selectById(Class<O> returnType, ID id);
 
     /**
      * 根据ids条件查询
@@ -47,7 +47,7 @@ public interface SelectService<T> extends PagingService {
      * @author Jovi
      * @date 2018年5月15日下午3:58:28
      */
-    List<T> selectByIds(Object... ids);
+    List<T> selectByIds(ID... ids);
 
     /**
      * 根据id条件查询(可指定返回类型、查询的表)
@@ -58,7 +58,7 @@ public interface SelectService<T> extends PagingService {
      * @author Jovi
      * @date 2018年6月15日下午6:36:38
      */
-    <O> List<O> selectByIds(Class<O> returnType, Object... ids);
+    <O> List<O> selectByIds(Class<O> returnType, ID... ids);
 
     /**
      * 根据自定义条件查询 只返回一条记录

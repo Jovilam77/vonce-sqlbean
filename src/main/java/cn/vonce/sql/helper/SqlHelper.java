@@ -1,5 +1,6 @@
 package cn.vonce.sql.helper;
 
+import cn.vonce.common.utils.ReflectAsmUtil;
 import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.annotation.SqlBeanId;
 import cn.vonce.sql.annotation.SqlBeanPojo;
@@ -213,10 +214,12 @@ public class SqlHelper {
      * @date 2017年8月17日下午5:24:25
      */
     private static String getTableName(Common common, Object bean) {
-        SqlBeanTable sqlBeanTable = bean.getClass().getAnnotation(SqlBeanTable.class);
-        String tableName;
+        String tableName = "";
         if (common.getTable() == null || StringUtil.isEmpty(common.getTable().getName())) {
-            tableName = sqlBeanTable.value();
+            SqlBeanTable sqlBeanTable = bean.getClass().getAnnotation(SqlBeanTable.class);
+            if (sqlBeanTable != null) {
+                tableName = sqlBeanTable.value();
+            }
         } else {
             tableName = common.getTable().getName();
         }
@@ -408,16 +411,14 @@ public class SqlHelper {
                 }
                 //如果此字段为id且需要生成唯一id
                 if (sqlBeanId != null && sqlBeanId.generateType() != GenerateType.AUTO && sqlBeanId.generateType() != GenerateType.NORMAL) {
-                    Object value = field.get(objects[i]);
+                    Object value = ReflectAsmUtil.get(objects[i].getClass(), objects[i], field.getName());
                     if (StringUtil.isEmpty(value)) {
                         value = common.getSqlBeanConfig().getUniqueIdProcessor().uniqueId(sqlBeanId.generateType());
                     }
                     valueSql.append(SqlBeanUtil.getSqlValue(common, value));
                     valueSql.append(SqlHelperCons.COMMA);
                 } else if (sqlBeanId == null) {
-                    field.setAccessible(true);
-                    valueSql.append(SqlBeanUtil.getSqlValue(common, field.get(objects[i])));
-                    //valuesSql.append(getSqlValue(ReflectAsmUtil.get(objects[i].getClass(), objects[i], fields[j].getName())));
+                    valueSql.append(SqlBeanUtil.getSqlValue(common, ReflectAsmUtil.get(objects[i].getClass(), objects[i], field.getName())));
                     valueSql.append(SqlHelperCons.COMMA);
                 }
             }
@@ -482,10 +483,8 @@ public class SqlHelper {
             if (Modifier.isStatic(fields[i].getModifiers())) {
                 continue;
             }
-            fields[i].setAccessible(true);
             String name = SqlBeanUtil.getTableFieldName(fields[i]);
-            Object objectValue = fields[i].get(bean);
-            //Object objectValue = ReflectAsmUtil.get(bean.getClass(), bean, fields[i].getName());
+            Object objectValue = ReflectAsmUtil.get(bean.getClass(), bean, fields[i].getName());
             if (update.isUpdateNotNull()) {
                 if (objectValue == null) {
                     continue;
@@ -501,8 +500,7 @@ public class SqlHelper {
         }
         for (int i = 0; i < filterAfterList.size(); i++) {
             String name = SqlBeanUtil.getTableFieldName(filterAfterList.get(i));
-            filterAfterList.get(i).setAccessible(true);
-            Object objectValue = filterAfterList.get(i).get(bean);
+            Object objectValue = ReflectAsmUtil.get(filterAfterList.get(i).getClass(), bean, filterAfterList.get(i).getName());
             String value;
             if (objectValue == null || objectValue.equals(SqlHelperCons.WELL_NUMBER + SqlHelperCons.NULL_VALUE)) {
                 value = SqlHelperCons.EQUAL_TO + SqlHelperCons.NULL_VALUE;

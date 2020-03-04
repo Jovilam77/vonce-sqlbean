@@ -9,7 +9,7 @@ package cn.vonce.sql.orm.service;
  * @email 766255988@qq.com
  * @date 2018年5月15日下午3:57:33
  */
-public interface SqlBeanService<T> extends SelectService<T>, InsertService<T>, UpdateService<T>, DeleteService {
+public interface SqlBeanService<T, ID> extends SelectService<T, ID>, InsertService<T>, UpdateService<T, ID>, DeleteService<ID> {
 
 
 }

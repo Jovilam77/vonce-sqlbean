@@ -11,7 +11,7 @@ import cn.vonce.sql.bean.Update;
  * @email 766255988@qq.com
  * @date 2019年6月27日下午3:57:33
  */
-public interface UpdateService<T> {
+public interface UpdateService<T,ID> {
 
     /**
      * 根据id条件更新
@@ -23,7 +23,7 @@ public interface UpdateService<T> {
      * @author Jovi
      * @date 2018年5月15日下午4:04:51
      */
-    long updateById(T bean, Object id, boolean updateNotNull);
+    long updateById(T bean, ID id, boolean updateNotNull);
 
     /**
      * 根据实体类id条件更新
@@ -59,7 +59,7 @@ public interface UpdateService<T> {
      * @author Jovi
      * @date 2018年5月15日下午4:04:51
      */
-    long updateById(T bean, Object id, boolean updateNotNull, String[] filterFields);
+    long updateById(T bean, ID id, boolean updateNotNull, String[] filterFields);
 
     /**
      * 根据条件更新

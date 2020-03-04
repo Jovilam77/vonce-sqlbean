@@ -15,8 +15,8 @@ import com.google.common.collect.ListMultimap;
  */
 public class Condition extends Common {
 
-    private String where;//条件
-    private Object[] agrs;
+    private String where = "";//条件
+    private Object[] agrs = null;
     private ListMultimap<String, SqlCondition> whereMap = LinkedListMultimap.create();//where条件包含的逻辑
 
     /**

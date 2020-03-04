@@ -11,7 +11,7 @@ import cn.vonce.sql.bean.Delete;
  * @email 766255988@qq.com
  * @date 2019年6月27日下午3:57:33
  */
-public interface DeleteService {
+public interface DeleteService<ID> {
 
     /**
      * 根据id条件删除
@@ -21,7 +21,7 @@ public interface DeleteService {
      * @author Jovi
      * @date 2018年5月15日下午4:04:39
      */
-    long deleteById(Object... id);
+    long deleteById(ID... id);
 
     /**
      * 根据条件删除
@@ -63,7 +63,7 @@ public interface DeleteService {
      * @author Jovi
      * @date 2019年6月6日下午16:41:20
      */
-    long logicallyDeleteById(Object id);
+    long logicallyDeleteById(ID id);
 
     /**
      * 根据条件逻辑删除

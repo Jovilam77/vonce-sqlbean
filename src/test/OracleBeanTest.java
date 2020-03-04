@@ -1,11 +1,10 @@
 
-import cn.vonce.common.utils.DateUtil;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.SqlLogic;
+import cn.vonce.sql.enumerate.SqlOperator;
 import cn.vonce.sql.helper.SqlHelper;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,32 +12,31 @@ import java.util.List;
 public class OracleBeanTest {
 
     public static void main(String[] agrs) {
-
-//        sql();
-System.out.println(DateUtil.differentDays(DateUtil.stringToDate("2019-07-10 10:00:00"),DateUtil.stringToDate("2019-07-10 11:00:00")));
+        sql();
     }
 
-    public static void sql(){
+    public static void sql() {
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig();
         sqlBeanConfig.setDbType(DbType.Oracle);
         sqlBeanConfig.setToUpperCase(true);
-        SqlHelper.init(sqlBeanConfig);
 
         long startTime = System.currentTimeMillis();
 
         // select
         Select select = new Select();
+        select.setSqlBeanConfig(sqlBeanConfig);
         select.column("id,name");
-        select.setFrom(Join.class);
+        select.setTable(Join.class);
         select.where("name", "jenny");
-        select.where(SqlLogic.OR, "name", "jovi");
-        select.where(SqlLogic.ANDBracket, "sex", 1);
+        select.where(SqlLogic.OR, "", "name", "jovi");
+        select.where(SqlLogic.ANDBracket, "", "sex", 1);
         select.setPage(0, 10);
         System.out.println("---select---");
         System.out.println(SqlHelper.buildSelectSql(select));
 
         // insert
         Insert insert = new Insert();
+        insert.setSqlBeanConfig(sqlBeanConfig);
         List<Join> list = new ArrayList<>();
         Join insertJoin = new Join();
         insertJoin.setTableName("name1");
@@ -54,7 +52,8 @@ System.out.println(DateUtil.differentDays(DateUtil.stringToDate("2019-07-10 10:0
 
         // update
         Update update = new Update();
-        update.setUpdateTable("sys_user");
+        update.setSqlBeanConfig(sqlBeanConfig);
+        update.setTable("sys_user");
         update.setFilterFields("extra");
         Join updateJoin = new Join();
         updateJoin.setMainKeyword("name");
@@ -69,9 +68,10 @@ System.out.println(DateUtil.differentDays(DateUtil.stringToDate("2019-07-10 10:0
 
         // delete
         Delete delete = new Delete();
-        delete.where("id", 1, ">");
+        delete.setSqlBeanConfig(sqlBeanConfig);
+        delete.where("", "id", 1, SqlOperator.GREATER_THAN);
         delete.where("name", "jovi");
-        delete.setDeleteBable("user");
+        delete.setTable("user");
         System.out.println("---delete---");
         System.out.println(SqlHelper.buildDeleteSql(delete));
 

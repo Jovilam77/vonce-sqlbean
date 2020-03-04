@@ -1,5 +1,6 @@
 package cn.vonce.sql.config;
 
+import cn.vonce.common.utils.ReflectAsmUtil;
 import cn.vonce.common.utils.StringUtil;
 import cn.vonce.common.utils.XmlConverUtil;
 import cn.vonce.sql.enumerate.DbType;
@@ -280,8 +281,7 @@ public class ConditionOnDbType implements Condition {
                     if (fields != null && fields.length > 0) {
                         for (Field field : fields) {
                             if (field.getName().toLowerCase().indexOf("driver") > -1) {
-                                field.setAccessible(true);
-                                driverClassName = (String) field.get(object);
+                                driverClassName = (String) ReflectAsmUtil.get(object.getClass(), object, field.getName());
                                 if (driverClassName == null) {
                                     Value valueAnn = field.getAnnotation(Value.class);
                                     if (valueAnn != null) {
@@ -299,8 +299,6 @@ public class ConditionOnDbType implements Condition {
                 return null;
             }
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();

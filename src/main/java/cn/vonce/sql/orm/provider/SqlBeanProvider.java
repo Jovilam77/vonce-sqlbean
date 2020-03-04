@@ -1,5 +1,6 @@
 package cn.vonce.sql.orm.provider;
 
+import cn.vonce.common.utils.ReflectAsmUtil;
 import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
@@ -254,15 +255,7 @@ public class SqlBeanProvider {
             bean = newLogicallyDeleteBean(clazz);
             update.setUpdateBean(bean);
             Field idField = SqlBeanUtil.getIdField(bean.getClass());
-            idField.setAccessible(true);
             update.where(SqlBeanUtil.getTableFieldName(idField), id);
-            //sqlBean.where(SqlBeanUtil.getFieldName(idField), ReflectAsmUtil.get(bean.getClass(), bean, idField.getName()));
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-            return null;
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -286,13 +279,6 @@ public class SqlBeanProvider {
         try {
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
             update.setWhere(where, args);
-            //sqlBean.where(SqlBeanUtil.getFieldName(idField), ReflectAsmUtil.get(bean.getClass(), bean, idField.getName()));
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-            return null;
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -374,8 +360,7 @@ public class SqlBeanProvider {
         Field idField;
         try {
             idField = SqlBeanUtil.getIdField(bean.getClass());
-            idField.setAccessible(true);
-            Object id = idField.get(bean);
+            Object id = ReflectAsmUtil.get(bean.getClass(), bean, idField.getName());
             if (StringUtil.isEmpty(id)) {
                 try {
                     throw new SqlBeanException("updateByBeanIdSql id不能为空");
@@ -385,14 +370,10 @@ public class SqlBeanProvider {
                 }
             }
             update.where(SqlBeanUtil.getTableFieldName(idField), id);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
         }
-        //sqlBean.where(SqlBeanUtil.getFieldName(idField), ReflectAsmUtil.get(bean.getClass(), bean, idField.getName()));
         return SqlHelper.buildUpdateSql(update);
     }
 
@@ -524,11 +505,10 @@ public class SqlBeanProvider {
      * @return
      * @throws IllegalAccessException
      */
-    private Object newLogicallyDeleteBean(Class<?> clazz) throws IllegalAccessException, InstantiationException, SqlBeanException {
-        Object bean = clazz.newInstance();
+    private Object newLogicallyDeleteBean(Class<?> clazz) throws SqlBeanException {
+        Object bean = ReflectAsmUtil.getInstance(clazz);
         Field field = SqlBeanUtil.getLogicallyField(clazz);
-        field.setAccessible(true);
-        field.setBoolean(bean, true);
+        ReflectAsmUtil.set(clazz, bean, field.getName(), true);
         return bean;
     }
 

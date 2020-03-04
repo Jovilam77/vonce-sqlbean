@@ -29,7 +29,7 @@ import java.util.Map;
  */
 @UseSpringJdbc
 @Service
-public class SpringJdbcSqlBeanServiceImpl<T> extends SqlBeanProvider implements SqlBeanService<T> {
+public class SpringJdbcSqlBeanServiceImpl<T,ID> extends SqlBeanProvider implements SqlBeanService<T,ID> {
 
     /**
      *
@@ -78,7 +78,7 @@ public class SpringJdbcSqlBeanServiceImpl<T> extends SqlBeanProvider implements 
     }
 
     @Override
-    public <O> O selectById(Class<O> returnType, Object id) {
+    public <O> O selectById(Class<O> returnType, ID id) {
         if (id == null) {
             return null;
         }
@@ -109,7 +109,7 @@ public class SpringJdbcSqlBeanServiceImpl<T> extends SqlBeanProvider implements 
     }
 
     @Override
-    public <O> List<O> selectByIds(Class<O> returnType, Object... ids) {
+    public <O> List<O> selectByIds(Class<O> returnType, ID... ids) {
         if (ids == null || ids.length == 0) {
             return null;
         }
@@ -387,12 +387,12 @@ public class SpringJdbcSqlBeanServiceImpl<T> extends SqlBeanProvider implements 
     }
 
     @Override
-    public long updateById(T bean, Object id, boolean updateNotNull) {
+    public long updateById(T bean, ID id, boolean updateNotNull) {
         return jdbcTemplate.update(super.updateByIdSql(sqlBeanConfig, bean, id, updateNotNull, null));
     }
 
     @Override
-    public long updateById(T bean, Object id, boolean updateNotNull, String[] filterFields) {
+    public long updateById(T bean, ID id, boolean updateNotNull, String[] filterFields) {
         return jdbcTemplate.update(super.updateByIdSql(sqlBeanConfig, bean, id, updateNotNull, filterFields));
     }
 

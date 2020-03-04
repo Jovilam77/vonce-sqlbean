@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @UseMybatis
 @Service
-public class MybatisSqlBeanServiceImpl<T> implements SqlBeanService<T> {
+public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
 
     /**
      *
@@ -59,7 +59,7 @@ public class MybatisSqlBeanServiceImpl<T> implements SqlBeanService<T> {
     }
 
     @Override
-    public T selectById(Object id) {
+    public T selectById(ID id) {
         if (id == null) {
             return null;
         }
@@ -67,7 +67,7 @@ public class MybatisSqlBeanServiceImpl<T> implements SqlBeanService<T> {
     }
 
     @Override
-    public <O> O selectById(Class<O> returnType, Object id) {
+    public <O> O selectById(Class<O> returnType, ID id) {
         if (id == null) {
             return null;
         }
@@ -86,7 +86,7 @@ public class MybatisSqlBeanServiceImpl<T> implements SqlBeanService<T> {
     }
 
     @Override
-    public <O> List<O> selectByIds(Class<O> returnType, Object... ids) {
+    public <O> List<O> selectByIds(Class<O> returnType, ID... ids) {
         if (ids == null || ids.length == 0) {
             return null;
         }
@@ -257,12 +257,12 @@ public class MybatisSqlBeanServiceImpl<T> implements SqlBeanService<T> {
     }
 
     @Override
-    public long updateById(T bean, Object id, boolean updateNotNull) {
+    public long updateById(T bean, ID id, boolean updateNotNull) {
         return mybatisSqlBeanDao.updateById(sqlBeanConfig, bean, id, updateNotNull, null);
     }
 
     @Override
-    public long updateById(T bean, Object id, boolean updateNotNull, String[] filterFields) {
+    public long updateById(T bean, ID id, boolean updateNotNull, String[] filterFields) {
         return mybatisSqlBeanDao.updateById(sqlBeanConfig, bean, id, updateNotNull, filterFields);
     }
 

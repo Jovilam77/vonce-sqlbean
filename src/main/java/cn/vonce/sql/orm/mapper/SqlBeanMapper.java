@@ -1,8 +1,8 @@
 package cn.vonce.sql.orm.mapper;
 
 
+import cn.vonce.common.utils.ReflectAsmUtil;
 import cn.vonce.common.utils.StringUtil;
-import cn.vonce.sql.annotation.SqlBeanField;
 import cn.vonce.sql.annotation.SqlBeanJoin;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.slf4j.Logger;
@@ -80,58 +80,46 @@ public class SqlBeanMapper {
      * @return
      */
     public Object beanHandleResultSet(Class<?> clazz, ResultSet resultSet, List<String> columnNameList) {
-        Object bean = null;
-        try {
-            bean = clazz.newInstance();
-            //Object bean = ReflectAsmUtil.getInstance(clazz);
-            String tableAlias = SqlBeanUtil.getTableAlias(null, clazz);
-            List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
-            for (Field field : fieldList) {
-                if (Modifier.isStatic(field.getModifiers())) {
+        Object bean = ReflectAsmUtil.getInstance(clazz);
+        String tableAlias = SqlBeanUtil.getTableAlias(null, clazz);
+        List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
+        for (Field field : fieldList) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+            SqlBeanJoin sqlBeanJoin = field.getAnnotation(SqlBeanJoin.class);
+            String fieldName = field.getName();
+            if (sqlBeanJoin != null) {
+                if (sqlBeanJoin.isBean()) {
+                    Class<?> subClazz = field.getType();
+                    Object subBean = ReflectAsmUtil.getInstance(subClazz);
+                    //获取表的别名，先是获取别名，获取不到就会获取表名
+                    String subTableAlias = SqlBeanUtil.getTableAlias(null, subClazz);
+                    //如果在SqlBeanJoin中设置了表名，那么优先使用该表名，如果有多个联表查询的对象需要连接同一张表的，那么需要保证表名一致
+                    if (StringUtil.isNotEmpty(sqlBeanJoin.table())) {
+                        subTableAlias = sqlBeanJoin.table();
+                    }
+                    //如果在SqlBeanJoin中设置了别名，那么优先使用该别名，如果有多个联表查询的对象需要连接同一张表的，那么需要保证别名一致
+                    if (StringUtil.isNotEmpty(sqlBeanJoin.tableAlias())) {
+                        subTableAlias = sqlBeanJoin.tableAlias();
+                    }
+                    Field[] subFields = subClazz.getDeclaredFields();
+                    for (Field subField : subFields) {
+                        if (Modifier.isStatic(subField.getModifiers())) {
+                            continue;
+                        }
+                        String subFieldName = subField.getName();
+                        subFieldName = subTableAlias + "." + subFieldName;
+                        setFieldValue(subBean, subField, subFieldName, resultSet);
+                    }
+                    ReflectAsmUtil.set(bean.getClass(), bean, field.getName(), subBean);
                     continue;
                 }
-                SqlBeanJoin sqlBeanJoin = field.getAnnotation(SqlBeanJoin.class);
-                String fieldName = field.getName();
-                if (sqlBeanJoin != null) {
-                    if (sqlBeanJoin.isBean()) {
-                        Class<?> subClazz = field.getType();
-                        Object subBean = subClazz.newInstance();
-                        //获取表的别名，先是获取别名，获取不到就会获取表名
-                        String subTableAlias = SqlBeanUtil.getTableAlias(null, subClazz);
-                        //如果在SqlBeanJoin中设置了表名，那么优先使用该表名，如果有多个联表查询的对象需要连接同一张表的，那么需要保证表名一致
-                        if (StringUtil.isNotEmpty(sqlBeanJoin.table())) {
-                            subTableAlias = sqlBeanJoin.table();
-                        }
-                        //如果在SqlBeanJoin中设置了别名，那么优先使用该别名，如果有多个联表查询的对象需要连接同一张表的，那么需要保证别名一致
-                        if (StringUtil.isNotEmpty(sqlBeanJoin.tableAlias())) {
-                            subTableAlias = sqlBeanJoin.tableAlias();
-                        }
-                        Field[] subFields = subClazz.getDeclaredFields();
-                        for (Field subField : subFields) {
-                            if (Modifier.isStatic(subField.getModifiers())) {
-                                continue;
-                            }
-                            String subFieldName = subField.getName();
-                            subFieldName = subTableAlias + "." + subFieldName;
-                            setFieldValue(subBean, subField, subFieldName, resultSet);
-                        }
-                        field.setAccessible(true);
-                        field.set(bean, subBean);
-                        continue;
-                    }
-                }
-                if (!columnNameList.contains(fieldName)) {
-                    fieldName = tableAlias + "." + fieldName;
-                }
-                setFieldValue(bean, field, fieldName, resultSet);
             }
-
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            logger.error("bean对象映射IllegalAccessException，反射操作私有字段异常：{}", e.getMessage());
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-            logger.error("bean对象映射InstantiationException，实例化对象异常：{}", e.getMessage());
+            if (!columnNameList.contains(fieldName)) {
+                fieldName = tableAlias + "." + fieldName;
+            }
+            setFieldValue(bean, field, fieldName, resultSet);
         }
         return bean;
     }
@@ -167,15 +155,13 @@ public class SqlBeanMapper {
      * @param field
      * @param fieldName
      * @param resultSet
-     * @throws IllegalAccessException
      */
-    public void setFieldValue(Object obj, Field field, String fieldName, ResultSet resultSet) throws IllegalAccessException {
-        field.setAccessible(true);
+    public void setFieldValue(Object obj, Field field, String fieldName, ResultSet resultSet) {
         Object value = getValue(field.getType().getSimpleName(), fieldName, resultSet);
         if (value == null || value.equals("null")) {
             value = getDefaultValue(field.getType().getSimpleName());
         }
-        field.set(obj, value);
+        ReflectAsmUtil.set(obj.getClass(), obj, field.getName(), value);
     }
 
     /**

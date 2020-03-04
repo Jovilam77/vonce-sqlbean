@@ -1,12 +1,8 @@
 package cn.vonce.sql.bean;
 
 import cn.vonce.sql.config.SqlBeanConfig;
-import cn.vonce.sql.enumerate.SqlLogic;
-import cn.vonce.sql.enumerate.SqlOperator;
+import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.uitls.SqlBeanUtil;
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.ListMultimap;
-
 import java.io.Serializable;
 
 /**
@@ -21,8 +17,8 @@ public abstract class Common implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Table table;
-    private SqlBeanConfig sqlBeanConfig;
+    private Table table = new Table();
+    private SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.MySQL);
 
     /**
      * 获取table sql 内容

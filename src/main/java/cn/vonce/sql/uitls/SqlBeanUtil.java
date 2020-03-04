@@ -1,5 +1,6 @@
 package cn.vonce.sql.uitls;
 
+import cn.vonce.common.utils.ReflectAsmUtil;
 import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.bean.*;
@@ -507,10 +508,7 @@ public class SqlBeanUtil {
             if (endIndex != -1) {
                 String name = conditionSql.substring(startIndex + prefix.length(), endIndex);
                 int nextIndex = endIndex + suffix.length();
-                Field field = bean.getClass().getDeclaredField(name);
-                field.setAccessible(true);
-                String value = getSqlValue(common, field.get(bean));
-                //String value = SqlHelper.getSqlValue(ReflectAsmUtil.get(bean.getClass(), bean, name));
+                String value = getSqlValue(common,ReflectAsmUtil.get(bean.getClass(), bean, name));
                 conditionSql.replace(startIndex, endIndex + suffix.length(), value);
                 nextIndex = startIndex + value.length();
                 startIndex = conditionSql.indexOf(prefix, nextIndex);

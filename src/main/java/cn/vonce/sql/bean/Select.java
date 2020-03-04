@@ -1,12 +1,10 @@
 package cn.vonce.sql.bean;
 
 import cn.vonce.common.utils.StringUtil;
-import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.enumerate.SqlLogic;
 import cn.vonce.sql.enumerate.SqlOperator;
 import cn.vonce.sql.enumerate.SqlSort;
-import cn.vonce.sql.uitls.SqlBeanUtil;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
 
@@ -158,6 +156,20 @@ public class Select extends Condition implements Serializable {
      * @author Jovi
      * @date 2019年6月21日上午10:27:50
      */
+    public Select join(String table, String tableKeyword, String mainKeyword) {
+        return join(JoinType.INNER_JOIN, table, table, tableKeyword, mainKeyword);
+    }
+
+    /**
+     * 添加表连接
+     *
+     * @param joinType     连接类型
+     * @param table        关联的表名
+     * @param tableKeyword 关联的表关键字段
+     * @param mainKeyword  主表关键字段
+     * @author Jovi
+     * @date 2019年6月21日上午10:27:50
+     */
     public Select join(JoinType joinType, String table, String tableKeyword, String mainKeyword) {
         return join(joinType, table, table, tableKeyword, mainKeyword);
     }
@@ -165,6 +177,20 @@ public class Select extends Condition implements Serializable {
     /**
      * 添加表连接
      *
+     * @param table        关联的表名
+     * @param tableKeyword 关联的表关键字段
+     * @param mainKeyword  主表关键字段
+     * @author Jovi
+     * @date 2019年6月21日上午10:27:50
+     */
+    public Select join(String table, String tableAlias, String tableKeyword, String mainKeyword) {
+        return join(JoinType.INNER_JOIN, table, tableAlias, tableKeyword, mainKeyword);
+    }
+
+    /**
+     * 添加表连接
+     *
+     * @param joinType     连接类型
      * @param table        关联的表名
      * @param tableKeyword 关联的表关键字段
      * @param mainKeyword  主表关键字段

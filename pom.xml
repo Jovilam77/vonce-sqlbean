@@ -137,6 +137,7 @@
         <mysql.version>5.1.14</mysql.version>
         <com.google.guava.version>20.0</com.google.guava.version>
         <vonce.common.version>1.0.4</vonce.common.version>
+        <com.esotericsoftware.version>1.11.0</com.esotericsoftware.version>
         <dom4j>1.6.1</dom4j>
         <junit>4.12</junit>
     </properties>
@@ -225,6 +226,13 @@
             <groupId>cn.vonce</groupId>
             <artifactId>vonce-common</artifactId>
             <version>${vonce.common.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>reflectasm</artifactId>
+            <version>${com.esotericsoftware.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
