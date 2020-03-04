@@ -205,7 +205,7 @@ public class SqlHelper {
     }
 
     /**
-     * 返回表名,优先级 tableName第一，注解第二，类名第三
+     * 返回带转义表名,优先级 tableName第一，注解第二，类名第三
      *
      * @param common
      * @param bean

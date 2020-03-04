@@ -20,7 +20,7 @@ import java.util.*;
 public class SqlBeanUtil {
 
     /**
-     * 获取表名
+     * 根据类名获取表名信息
      *
      * @param clazz
      * @return
@@ -49,7 +49,7 @@ public class SqlBeanUtil {
     }
 
     /**
-     * 获取表别名
+     * 根据表名信息或类获取表别名
      *
      * @param table
      * @param clazz
@@ -508,7 +508,7 @@ public class SqlBeanUtil {
             if (endIndex != -1) {
                 String name = conditionSql.substring(startIndex + prefix.length(), endIndex);
                 int nextIndex = endIndex + suffix.length();
-                String value = getSqlValue(common,ReflectAsmUtil.get(bean.getClass(), bean, name));
+                String value = getSqlValue(common, ReflectAsmUtil.get(bean.getClass(), bean, name));
                 conditionSql.replace(startIndex, endIndex + suffix.length(), value);
                 nextIndex = startIndex + value.length();
                 startIndex = conditionSql.indexOf(prefix, nextIndex);
