@@ -7,10 +7,10 @@ import cn.vonce.sql.bean.Paging;
 import cn.vonce.sql.bean.Select;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.SqlSort;
+import com.esotericsoftware.reflectasm.MethodAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -330,7 +330,7 @@ public class PageHelper<T> {
     /**
      * 获得分页数据
      *
-     * @param select     查询条件拓展
+     * @param select      查询条件拓展
      * @param pageService 分页接口
      * @author jovi
      * @date 2017年3月14日上午11:58:41
@@ -343,7 +343,7 @@ public class PageHelper<T> {
      * 获得分页数据
      *
      * @param tClazz
-     * @param select     SqlBean
+     * @param select      SqlBean
      * @param pageService 分页接口
      * @author jovi
      * @date 2017年3月14日上午11:58:41
@@ -351,15 +351,7 @@ public class PageHelper<T> {
     public PageHelper<T> paging(Class<T> tClazz, Select select, PagingService pageService) {
         try {
             Class<? extends PagingService> clazz = pageService.getClass();
-            Method countMethod = null;
-            Method selectMethod = null;
-            if (tClazz != null) {
-                countMethod = clazz.getMethod(this.getPagingMethod().getCount(), Class.class, Select.class);
-                selectMethod = clazz.getMethod(this.getPagingMethod().getSelect(), Class.class, Select.class);
-            } else {
-                countMethod = clazz.getMethod(this.getPagingMethod().getCount(), Select.class);
-                selectMethod = clazz.getMethod(this.getPagingMethod().getSelect(), Select.class);
-            }
+            MethodAccess methodAccess = MethodAccess.get(clazz);
             // 衍生一个对象用于select查询
             Select sqlBeanSelect = (Select) select.copy();
             // 预防设置了查询字段，故将查询字段换位统计字段
@@ -368,9 +360,9 @@ public class PageHelper<T> {
             // 先统计数量
             long count;
             if (tClazz != null) {
-                count = (long) countMethod.invoke(pageService, tClazz, select);
+                count = (long) methodAccess.invoke(pageService, this.getPagingMethod().getCount(), tClazz, select);
             } else {
-                count = (long) countMethod.invoke(pageService, select);
+                count = (long) methodAccess.invoke(pageService, this.getPagingMethod().getCount(), select);
             }
             // 计算共有几页
             this.dispose(count);
@@ -380,9 +372,9 @@ public class PageHelper<T> {
             addOrderBy(sqlBeanSelect);
             Object obj = null;
             if (tClazz != null) {
-                obj = selectMethod.invoke(pageService, tClazz, sqlBeanSelect);
+                obj = methodAccess.invoke(pageService, this.getPagingMethod().getSelect(), tClazz, sqlBeanSelect);
             } else {
-                obj = selectMethod.invoke(pageService, sqlBeanSelect);
+                obj = methodAccess.invoke(pageService, this.getPagingMethod().getSelect(), sqlBeanSelect);
             }
             this.setDataList((List<T>) obj);
             logger.debug(clazz.getName() + "获取分页数据成功");

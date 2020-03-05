@@ -93,18 +93,22 @@ public class Condition extends Common {
      * @date 2017年8月18日上午8:53:11
      */
     public Condition where(String field, Object value) {
-        return where("", field, value);
+        return where(field, value, SqlOperator.EQUAL_TO);
     }
+
 
     /**
      * 添加where条件
      *
-     * @param tableAlias 表别名
-     * @param field      字段
-     * @param value      字段值
+     * @param field       字段
+     * @param value       字段值
+     * @param sqlOperator 操作符
+     * @return
+     * @author Jovi
+     * @date 2017年8月30日上午11:37:56
      */
-    public Condition where(String tableAlias, String field, Object value) {
-        return where(SqlLogic.AND, tableAlias, field, value);
+    public Condition where(String field, Object value, SqlOperator sqlOperator) {
+        return where(SqlLogic.AND, "", field, value, sqlOperator);
     }
 
     /**
@@ -173,21 +177,6 @@ public class Condition extends Common {
     /**
      * where 条件 and 方法
      *
-     * @param tableAlias
-     * @param field
-     * @param value
-     * @return
-     * @author Jovi
-     * @date 2018年4月16日上午11:33:56
-     */
-    public Condition wAND(String tableAlias, String field, Object value) {
-        where(SqlLogic.AND, tableAlias, field, value, SqlOperator.EQUAL_TO);
-        return this;
-    }
-
-    /**
-     * where 条件 and 方法
-     *
      * @param field
      * @param value
      * @param sqlOperator
@@ -226,19 +215,6 @@ public class Condition extends Common {
      */
     public Condition wOR(String field, Object value) {
         where(SqlLogic.OR, "", field, value, SqlOperator.EQUAL_TO);
-        return this;
-    }
-
-    /**
-     * where 条件 or 方法
-     *
-     * @param tableAlias
-     * @param field
-     * @param value
-     * @return
-     */
-    public Condition wOR(String tableAlias, String field, Object value) {
-        where(SqlLogic.OR, tableAlias, field, value, SqlOperator.EQUAL_TO);
         return this;
     }
 
@@ -288,19 +264,6 @@ public class Condition extends Common {
     /**
      * where 条件 andBracket 方法
      *
-     * @param tableAlias
-     * @param field
-     * @param value
-     * @return
-     */
-    public Condition wANDBracket(String tableAlias, String field, Object value) {
-        where(SqlLogic.ANDBracket, tableAlias, field, value, SqlOperator.EQUAL_TO);
-        return this;
-    }
-
-    /**
-     * where 条件 andBracket 方法
-     *
      * @param field
      * @param value
      * @param sqlOperator
@@ -338,19 +301,6 @@ public class Condition extends Common {
      */
     public Condition wORBracket(String field, Object value) {
         where(SqlLogic.ORBracket, "", field, value, SqlOperator.EQUAL_TO);
-        return this;
-    }
-
-    /**
-     * where 条件 orBracket 方法
-     *
-     * @param tableAlias
-     * @param field
-     * @param value
-     * @return
-     */
-    public Condition wORBracket(String tableAlias, String field, Object value) {
-        where(SqlLogic.ORBracket, tableAlias, field, value, SqlOperator.EQUAL_TO);
         return this;
     }
 
