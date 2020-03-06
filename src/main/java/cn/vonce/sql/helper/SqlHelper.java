@@ -243,14 +243,18 @@ public class SqlHelper {
             for (int i = 0; i < select.getColumnList().size(); i++) {
                 if (StringUtil.isNotEmpty(select.getColumnList().get(i).getName()) && StringUtil.isNotEmpty(select.getColumnList().get(i).getAlias())) {
                     columnSql.append(SqlHelperCons.BEGIN_BRACKET);
-                    columnSql.append(select.getColumnList().get(i).getTableAlias());
-                    columnSql.append(SqlHelperCons.POINT);
+                    if(StringUtil.isNotEmpty(select.getColumnList().get(i).getTableAlias())){
+                        columnSql.append(select.getColumnList().get(i).getTableAlias());
+                        columnSql.append(SqlHelperCons.POINT);
+                    }
                     columnSql.append(select.getColumnList().get(i).getName());
                     columnSql.append(SqlHelperCons.END_BRACKET);
                     columnSql.append(SqlHelperCons.AS);
                     columnSql.append(SqlBeanUtil.getTransferred(select));
-                    columnSql.append(select.getColumnList().get(i).getTableAlias());
-                    columnSql.append(SqlHelperCons.POINT);
+                    if(StringUtil.isNotEmpty(select.getColumnList().get(i).getTableAlias())){
+                        columnSql.append(select.getColumnList().get(i).getTableAlias());
+                        columnSql.append(SqlHelperCons.POINT);
+                    }
                     columnSql.append(select.getColumnList().get(i).getAlias());
                     columnSql.append(SqlBeanUtil.getTransferred(select));
                 } else {
