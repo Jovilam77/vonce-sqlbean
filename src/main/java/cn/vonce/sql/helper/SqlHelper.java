@@ -508,7 +508,7 @@ public class SqlHelper {
         }
         for (int i = 0; i < filterAfterList.size(); i++) {
             String name = SqlBeanUtil.getTableFieldName(filterAfterList.get(i));
-            Object objectValue = ReflectAsmUtil.get(filterAfterList.get(i).getClass(), bean, filterAfterList.get(i).getName());
+            Object objectValue = ReflectAsmUtil.get(bean.getClass(), bean, filterAfterList.get(i).getName());
             String value;
             if (objectValue == null || objectValue.equals(SqlHelperCons.WELL_NUMBER + SqlHelperCons.NULL_VALUE)) {
                 value = SqlHelperCons.EQUAL_TO + SqlHelperCons.NULL_VALUE;
