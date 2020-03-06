@@ -1,5 +1,7 @@
 package cn.vonce.sql.bean;
 
+import java.io.Serializable;
+
 /**
  * Common
  *
@@ -8,7 +10,7 @@ package cn.vonce.sql.bean;
  * @email 766255988@qq.com
  * @date 2020年3月1日上午10:00:00
  */
-public class Column {
+public class Column implements Serializable {
     public Column() {
     }
 

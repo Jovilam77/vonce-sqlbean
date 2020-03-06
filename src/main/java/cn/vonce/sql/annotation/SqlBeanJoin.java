@@ -67,11 +67,4 @@ public @interface SqlBeanJoin {
      */
     String mainKeyword();
 
-//    /**
-//     * 连表查询的字段
-//     *
-//     * @return
-//     */
-//    String[] field() default "";
-
 }

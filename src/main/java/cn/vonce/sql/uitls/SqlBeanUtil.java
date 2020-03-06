@@ -27,13 +27,13 @@ public class SqlBeanUtil {
      */
     public static Table getTable(Class<?> clazz) {
         SqlBeanTable sqlBeanTable = clazz.getAnnotation(SqlBeanTable.class);
-        SqlBeanPojo sqlBeanPojo = clazz.getAnnotation(SqlBeanPojo.class);
+        SqlBeanUnion sqlBeanUnion = clazz.getAnnotation(SqlBeanUnion.class);
         String tableName = clazz.getSimpleName();
         String tableAlias = null;
         if (sqlBeanTable != null) {
             tableName = sqlBeanTable.value();
             tableAlias = sqlBeanTable.alias();
-        } else if (sqlBeanPojo != null) {
+        } else if (sqlBeanUnion != null) {
             SqlBeanTable subSqlBeanTable = clazz.getAnnotation(SqlBeanTable.class);
             if (subSqlBeanTable != null) {
                 tableName = subSqlBeanTable.value();
@@ -216,8 +216,8 @@ public class SqlBeanUtil {
     public static List<Field> getBeanAllField(Class<?> clazz) {
         List<Field> fieldList = new ArrayList<>();
         fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
-        SqlBeanPojo sqlBeanPojo = clazz.getAnnotation(SqlBeanPojo.class);
-        if (sqlBeanPojo != null && sqlBeanPojo.value()) {
+        SqlBeanUnion sqlBeanUnion = clazz.getAnnotation(SqlBeanUnion.class);
+        if (sqlBeanUnion != null && sqlBeanUnion.value()) {
             fieldList.addAll(Arrays.asList(clazz.getSuperclass().getDeclaredFields()));
         }
         return fieldList;

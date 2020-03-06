@@ -2,6 +2,8 @@ package cn.vonce.sql.bean;
 
 import cn.vonce.sql.enumerate.JoinType;
 
+import java.io.Serializable;
+
 /**
  * Select
  *
@@ -10,7 +12,7 @@ import cn.vonce.sql.enumerate.JoinType;
  * @email 766255988@qq.com
  * @date 2019年6月10日上午12:00:00
  */
-public class Join {
+public class Join implements Serializable {
 
     public Join() {
     }

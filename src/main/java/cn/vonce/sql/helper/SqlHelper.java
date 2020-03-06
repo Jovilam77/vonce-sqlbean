@@ -3,7 +3,7 @@ package cn.vonce.sql.helper;
 import cn.vonce.common.utils.ReflectAsmUtil;
 import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.annotation.SqlBeanId;
-import cn.vonce.sql.annotation.SqlBeanPojo;
+import cn.vonce.sql.annotation.SqlBeanUnion;
 import cn.vonce.sql.annotation.SqlBeanTable;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.constant.SqlHelperCons;
@@ -360,7 +360,7 @@ public class SqlHelper {
         String transferred = SqlBeanUtil.getTransferred(common);
         //获取sqlbean的全部字段
         Field[] fields;
-        if (objects[0].getClass().getAnnotation(SqlBeanPojo.class) != null) {
+        if (objects[0].getClass().getAnnotation(SqlBeanUnion.class) != null) {
             fields = objects[0].getClass().getSuperclass().getDeclaredFields();
         } else {
             fields = objects[0].getClass().getDeclaredFields();
@@ -473,7 +473,7 @@ public class SqlHelper {
         String[] filterFields = update.getFilterFields();
         Object bean = update.getUpdateBean();
         Field[] fields;
-        if (bean.getClass().getAnnotation(SqlBeanPojo.class) != null) {
+        if (bean.getClass().getAnnotation(SqlBeanUnion.class) != null) {
             fields = bean.getClass().getSuperclass().getDeclaredFields();
         } else {
             fields = bean.getClass().getDeclaredFields();
