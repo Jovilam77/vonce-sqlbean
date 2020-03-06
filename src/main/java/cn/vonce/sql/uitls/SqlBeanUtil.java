@@ -26,21 +26,22 @@ public class SqlBeanUtil {
      * @return
      */
     public static Table getTable(Class<?> clazz) {
-        SqlBeanTable sqlBeanTable = clazz.getAnnotation(SqlBeanTable.class);
         SqlBeanUnion sqlBeanUnion = clazz.getAnnotation(SqlBeanUnion.class);
-        String tableName = clazz.getSimpleName();
-        String tableAlias = null;
+        SqlBeanTable sqlBeanTable;
+        String className = "";
+        String tableName = "";
+        String tableAlias = "";
+        if (sqlBeanUnion != null) {
+            sqlBeanTable = clazz.getSuperclass().getAnnotation(SqlBeanTable.class);
+        } else {
+            sqlBeanTable = clazz.getAnnotation(SqlBeanTable.class);
+        }
         if (sqlBeanTable != null) {
             tableName = sqlBeanTable.value();
             tableAlias = sqlBeanTable.alias();
-        } else if (sqlBeanUnion != null) {
-            SqlBeanTable subSqlBeanTable = clazz.getAnnotation(SqlBeanTable.class);
-            if (subSqlBeanTable != null) {
-                tableName = subSqlBeanTable.value();
-                tableAlias = subSqlBeanTable.alias();
-            } else {
-                tableName = clazz.getSuperclass().getName();
-            }
+        } else {
+            tableName = className;
+            tableAlias = tableName;
         }
         if (StringUtil.isEmpty(tableAlias)) {
             tableAlias = tableName;
@@ -217,7 +218,7 @@ public class SqlBeanUtil {
         List<Field> fieldList = new ArrayList<>();
         fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
         SqlBeanUnion sqlBeanUnion = clazz.getAnnotation(SqlBeanUnion.class);
-        if (sqlBeanUnion != null && sqlBeanUnion.value()) {
+        if (sqlBeanUnion != null) {
             fieldList.addAll(Arrays.asList(clazz.getSuperclass().getDeclaredFields()));
         }
         return fieldList;
@@ -247,11 +248,13 @@ public class SqlBeanUtil {
      * 返回查询的字段
      *
      * @param clazz
+     * @param table
+     * @param filterTableFields
      * @return
      * @author Jovi
      * @date 2018年6月15日下午3:29:15
      */
-    public static List<Column> getSelectColumns(Common common, Class<?> clazz, Table table, String[] filterTableFields) throws SqlBeanException {
+    public static List<Column> getSelectColumns(Class<?> clazz, Table table, String[] filterTableFields) throws SqlBeanException {
         if (clazz == null) {
             return null;
         }

@@ -127,7 +127,7 @@ public class SqlBeanProvider {
         }
         if (!select.isCustomMode() || select == null || select.getColumnList().isEmpty()) {
             try {
-                select.setColumnList(SqlBeanUtil.getSelectColumns(select, clazz, select.getTable(), select.getFilterFields()));
+                select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getTable(), select.getFilterFields()));
                 if (select.getPage() != null && select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
                     select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)));
                 }
@@ -461,7 +461,7 @@ public class SqlBeanProvider {
             if (isCount) {
                 select.column(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET);
             } else {
-                select.setColumnList(SqlBeanUtil.getSelectColumns(select, clazz, select.getTable(), select.getFilterFields()));
+                select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getTable(), select.getFilterFields()));
             }
             SqlBeanUtil.setJoin(select, clazz);
         } catch (SqlBeanException e) {

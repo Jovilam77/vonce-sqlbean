@@ -8,6 +8,6 @@ import java.lang.annotation.*;
 @Inherited
 public @interface SqlBeanUnion {
 
-    boolean value() default true;
+
 
 }
