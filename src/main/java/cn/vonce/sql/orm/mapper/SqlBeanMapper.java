@@ -4,6 +4,7 @@ package cn.vonce.sql.orm.mapper;
 import cn.vonce.common.utils.ReflectAsmUtil;
 import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.annotation.SqlBeanJoin;
+import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,17 +110,24 @@ public class SqlBeanMapper {
                             continue;
                         }
                         String subFieldName = subField.getName();
-                        subFieldName = subTableAlias + "." + subFieldName;
+                        subFieldName = subTableAlias + SqlHelperCons.POINT + subFieldName;
                         setFieldValue(subBean, subField, subFieldName, resultSet);
                     }
-                    ReflectAsmUtil.set(bean.getClass(), bean, field.getName(), subBean);
+                    ReflectAsmUtil.set(bean.getClass(), bean, fieldName, subBean);
                     continue;
+                } else {
+                    String subTableAlias = sqlBeanJoin.table();
+                    if (StringUtil.isNotEmpty(sqlBeanJoin.tableAlias())) {
+                        subTableAlias = sqlBeanJoin.tableAlias();
+                    }
+                    setFieldValue(bean, field, subTableAlias + SqlHelperCons.POINT + fieldName, resultSet);
                 }
+            } else {
+                if (!columnNameList.contains(fieldName)) {
+                    fieldName = tableAlias + SqlHelperCons.POINT + fieldName;
+                }
+                setFieldValue(bean, field, fieldName, resultSet);
             }
-            if (!columnNameList.contains(fieldName)) {
-                fieldName = tableAlias + "." + fieldName;
-            }
-            setFieldValue(bean, field, fieldName, resultSet);
         }
         return bean;
     }

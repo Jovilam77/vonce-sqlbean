@@ -1,5 +1,6 @@
 package cn.vonce.sql.processor;
 
+import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.annotation.SqlBeanField;
 import cn.vonce.sql.annotation.SqlBeanTable;
 
@@ -43,6 +44,9 @@ public class SqlBeanConsProcessor extends AbstractProcessor {
                 if (sqlBeanTable != null) {
                     tableName = sqlBeanTable.value();
                     tableAlias = sqlBeanTable.alias();
+                }
+                if (StringUtil.isEmpty(tableAlias)) {
+                    tableAlias = tableName;
                 }
                 try {
                     //创建Java 文件
