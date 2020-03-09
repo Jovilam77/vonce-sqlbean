@@ -82,7 +82,7 @@ public class SqlBeanMapper {
      */
     public Object beanHandleResultSet(Class<?> clazz, ResultSet resultSet, List<String> columnNameList) {
         Object bean = ReflectAsmUtil.getInstance(clazz);
-        String tableAlias = SqlBeanUtil.getTableAlias(null, clazz);
+        String tableAlias = SqlBeanUtil.getTable(clazz).getAlias();
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
         for (Field field : fieldList) {
             if (Modifier.isStatic(field.getModifiers())) {
@@ -95,7 +95,7 @@ public class SqlBeanMapper {
                     Class<?> subClazz = field.getType();
                     Object subBean = ReflectAsmUtil.getInstance(subClazz);
                     //获取表的别名，先是获取别名，获取不到就会获取表名
-                    String subTableAlias = SqlBeanUtil.getTableAlias(null, subClazz);
+                    String subTableAlias = SqlBeanUtil.getTable(subClazz).getAlias();
                     //如果在SqlBeanJoin中设置了表名，那么优先使用该表名，如果有多个联表查询的对象需要连接同一张表的，那么需要保证表名一致
                     if (StringUtil.isNotEmpty(sqlBeanJoin.table())) {
                         subTableAlias = sqlBeanJoin.table();

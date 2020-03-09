@@ -50,28 +50,25 @@ public class SqlBeanUtil {
     }
 
     /**
-     * 根据表名信息或类获取表别名
+     * 优先根据@SqlBeanJoin注解获取，获取不到则从类获取
      *
-     * @param table
      * @param clazz
      * @return
      */
-    public static String getTableAlias(Table table, Class<?> clazz) {
-        if (table == null || StringUtil.isEmpty(table.getName())) {
-            table = getTable(clazz);
+    public static Table getTable(Class<?> clazz, SqlBeanJoin sqlBeanJoin) {
+        Table table = new Table();
+        if (sqlBeanJoin != null) {
+            table.setName(sqlBeanJoin.table());
+            table.setAlias(sqlBeanJoin.tableAlias());
         }
-        String tableAlias = table.getAlias();
-        if (StringUtil.isEmpty(tableAlias)) {
-            SqlBeanTable sqlBeanTable = clazz.getAnnotation(SqlBeanTable.class);
-            if (sqlBeanTable != null) {
-                if (StringUtil.isEmpty(sqlBeanTable.alias())) {
-                    tableAlias = table.getName();
-                } else {
-                    tableAlias = sqlBeanTable.alias();
-                }
-            }
+        Table classTable = getTable(clazz);
+        if (StringUtil.isEmpty(table.getName())) {
+            table.setName(classTable.getName());
         }
-        return tableAlias;
+        if (StringUtil.isEmpty(table.getAlias())) {
+            table.setAlias(classTable.getAlias());
+        }
+        return table;
     }
 
     /**
@@ -259,7 +256,7 @@ public class SqlBeanUtil {
             return null;
         }
         Set<Column> columnSet = new LinkedHashSet<>();
-        String tableAlias = getTableAlias(table, clazz);
+        String tableAlias = getTable(clazz).getAlias();
         List<Field> fieldList = getBeanAllField(clazz);
         for (Field field : fieldList) {
             if (Modifier.isStatic(field.getModifiers())) {
@@ -288,10 +285,12 @@ public class SqlBeanUtil {
                 //没有指定查询的字段则查询所有字段
                 else {
                     Field[] subBeanFields = subBeanClazz.getDeclaredFields();
-                    String subTableAliasName = getTable(subBeanClazz).getAlias();
-                    if (StringUtil.isNotEmpty(sqlBeanJoin.table()) || StringUtil.isNotEmpty(sqlBeanJoin.tableAlias())) {
-                        subTableAliasName = StringUtil.isNotEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.tableAlias() : sqlBeanJoin.table();
-                    }
+                    //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
+                    Table subTable = getTable(subBeanClazz, sqlBeanJoin);
+//                    String subTableAliasName = getTable(subBeanClazz).getAlias();
+//                    if (StringUtil.isNotEmpty(sqlBeanJoin.table()) || StringUtil.isNotEmpty(sqlBeanJoin.tableAlias())) {
+//                        subTableAliasName = StringUtil.isNotEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.tableAlias() : sqlBeanJoin.table();
+//                    }
                     for (Field subBeanField : subBeanFields) {
                         if (Modifier.isStatic(subBeanField.getModifiers())) {
                             continue;
@@ -299,7 +298,7 @@ public class SqlBeanUtil {
                         if (isIgnore(field)) {
                             continue;
                         }
-                        columnSet.add(new Column(subTableAliasName, getTableFieldName(subBeanField), subBeanField.getName()));
+                        columnSet.add(new Column(subTable.getAlias(), getTableFieldName(subBeanField), subBeanField.getName()));
                     }
                 }
             } else if (sqlBeanJoin != null) {
@@ -346,7 +345,17 @@ public class SqlBeanUtil {
                 joinFieldMap.put(sqlBeanJoin.table().toLowerCase() + sqlBeanJoin.tableKeyword().toLowerCase() + sqlBeanJoin.mainKeyword().toLowerCase(), join);
             } else if (sqlBeanJoin != null && sqlBeanJoin.isBean()) {
                 Class<?> subClazz = field.getType();
-                Table table = getTable(subClazz);
+                //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
+//                Table table = getTable(subClazz);
+                Table table = getTable(subClazz, sqlBeanJoin);
+//                String tableName = sqlBeanJoin.table();
+//                String tableAlias = sqlBeanJoin.tableAlias();
+//                if (StringUtil.isEmpty(tableName)) {
+//                    tableName = table.getName();
+//                }
+//                if (StringUtil.isEmpty(tableAlias)) {
+//                    tableName = table.getAlias();
+//                }
                 String tableKeyword = getTableFieldName(getIdField(subClazz));
                 join.setJoinType(sqlBeanJoin.type());
                 join.setTableName(table.getName());
@@ -417,7 +426,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static String getTableFieldFullName(Common common, Class<?> clazz, String tableFieldName) {
-        return getTableFieldFullName(common, getTableAlias(null, clazz), tableFieldName, "");
+        return getTableFieldFullName(common, getTable(clazz).getAlias(), tableFieldName, "");
     }
 
     /**
