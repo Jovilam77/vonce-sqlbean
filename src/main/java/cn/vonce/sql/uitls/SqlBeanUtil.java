@@ -477,7 +477,7 @@ public class SqlBeanUtil {
                 }
                 conditionSql.append(value);
                 index++;
-            } else if ('!' == c) {
+            } else if ('&' == c) {
                 conditionSql.append(args[index]);
                 index++;
             } else {
