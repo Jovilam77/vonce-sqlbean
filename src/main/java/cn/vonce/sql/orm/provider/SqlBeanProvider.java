@@ -125,7 +125,7 @@ public class SqlBeanProvider {
         if (select.getSqlBeanConfig() == null) {
             select.setSqlBeanConfig(sqlBeanConfig);
         }
-        if (!select.isCustomMode() || select == null || select.getColumnList().isEmpty()) {
+        if (select.getColumnList().isEmpty()) {
             try {
                 select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getTable(), select.getFilterFields()));
                 if (select.getPage() != null && select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {

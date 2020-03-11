@@ -154,9 +154,7 @@ public class Condition extends Common {
      * @date 2017年8月30日上午11:43:15
      */
     public Condition where(SqlLogic sqlLogic, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        if (field != null && value != null) {
-            whereMap.put(tableAlias + field, new SqlCondition(sqlLogic, tableAlias, field, value, sqlOperator));
-        }
+        whereMap.put(tableAlias + field, new SqlCondition(sqlLogic, tableAlias, field, value, sqlOperator));
         return this;
     }
 

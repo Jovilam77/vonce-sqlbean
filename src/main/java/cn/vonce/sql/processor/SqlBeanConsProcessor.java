@@ -3,6 +3,7 @@ package cn.vonce.sql.processor;
 import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.annotation.SqlBeanField;
 import cn.vonce.sql.annotation.SqlBeanTable;
+
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
@@ -65,7 +66,7 @@ public class SqlBeanConsProcessor extends AbstractProcessor {
                             if (subElement.getKind().isField()) {
                                 String sqlFieldName = subElement.getSimpleName().toString();
                                 SqlBeanField sqlBeanField = subElement.getAnnotation(SqlBeanField.class);
-                                if (sqlBeanField != null) {
+                                if (sqlBeanField != null && StringUtil.isNotEmpty(sqlBeanField.value())) {
                                     sqlFieldName = sqlBeanField.value();
                                 }
                                 printWriter.println("    public static final String " + sqlFieldName + " = \"" + sqlFieldName + "\";");

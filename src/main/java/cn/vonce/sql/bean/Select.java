@@ -25,7 +25,6 @@ public class Select extends Condition implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private boolean useDistinct = false;//默认不去重复
-    private boolean customMode = true;//默认为自定义模式
     private List<Column> columnList = new ArrayList<>();//查询的字段数组
     private List<Join> joinList = new ArrayList<>();//表连接的表数组
     private List<String> groupByList = new ArrayList<>();//分组
@@ -56,24 +55,6 @@ public class Select extends Condition implements Serializable {
      */
     public void setUseDistinct(boolean useDistinct) {
         this.useDistinct = useDistinct;
-    }
-
-    /**
-     * 获取是否为自定义模式
-     *
-     * @return
-     */
-    public boolean isCustomMode() {
-        return customMode;
-    }
-
-    /**
-     * 设置是否为自定义模式
-     *
-     * @param customMode
-     */
-    public void setCustomMode(boolean customMode) {
-        this.customMode = customMode;
     }
 
     /**
@@ -118,9 +99,7 @@ public class Select extends Condition implements Serializable {
      * @date 2017年8月18日下午4:18:18
      */
     public Select column(String columnName) {
-        if (StringUtil.isNotEmpty(columnName)) {
-            columnList.add(new Column(columnName));
-        }
+        columnList.add(new Column(columnName));
         return this;
     }
 
@@ -134,9 +113,22 @@ public class Select extends Condition implements Serializable {
      * @date 2017年8月18日下午4:18:18
      */
     public Select column(String columnName, String columnAlias) {
-        if (StringUtil.isNotEmpty(columnName) && StringUtil.isNotEmpty(columnAlias)) {
-            columnList.add(new Column(columnName, columnAlias));
-        }
+        columnList.add(new Column(columnName, columnAlias));
+        return this;
+    }
+
+    /**
+     * 添加column字段
+     *
+     * @param tableAlias  表别名
+     * @param columnName  列字段名
+     * @param columnAlias 别名
+     * @return
+     * @author Jovi
+     * @date 2017年8月18日下午4:18:18
+     */
+    public Select column(String tableAlias, String columnName, String columnAlias) {
+        columnList.add(new Column(tableAlias, columnName, columnAlias));
         return this;
     }
 
@@ -222,9 +214,7 @@ public class Select extends Condition implements Serializable {
      * @date 2017年8月18日下午3:32:56
      */
     public Select groupBy(String field) {
-        if (StringUtil.isNotEmpty(field)) {
-            groupByList.add(field);
-        }
+        groupByList.add(field);
         return this;
     }
 
@@ -312,9 +302,7 @@ public class Select extends Condition implements Serializable {
      * @date 2017年8月18日上午11:10:11
      */
     public Select orderBy(String field, String sort) {
-        if (StringUtil.isNotEmpty(field) && StringUtil.isNotEmpty(sort)) {
-            orderByList.add(field + " " + sort);
-        }
+        orderByList.add(field + " " + sort);
         return this;
     }
 
@@ -328,9 +316,7 @@ public class Select extends Condition implements Serializable {
      * @date 2018年4月16日下午6:31:18
      */
     public Select orderBy(String field, SqlSort sqlSort) {
-        if (StringUtil.isNotEmpty(field) && sqlSort != null) {
-            orderByList.add(field + " " + sqlSort.name().toUpperCase());
-        }
+        orderByList.add(field + " " + sqlSort.name().toUpperCase());
         return this;
     }
 
@@ -434,9 +420,7 @@ public class Select extends Condition implements Serializable {
      * @date 2017年8月30日上午11:43:15
      */
     public Select having(SqlLogic sqlLogic, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        if (field != null && value != null) {
-            havingMap.put(tableAlias + field, new SqlCondition(sqlLogic, tableAlias, field, value, sqlOperator));
-        }
+        havingMap.put(tableAlias + field, new SqlCondition(sqlLogic, tableAlias, field, value, sqlOperator));
         return this;
     }
 

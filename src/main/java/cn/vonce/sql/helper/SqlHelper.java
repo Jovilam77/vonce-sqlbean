@@ -141,17 +141,11 @@ public class SqlHelper {
      */
     public static String buildUpdateSql(Update update) {
         StringBuffer sqlSb = new StringBuffer();
-        try {
-            sqlSb.append(SqlHelperCons.UPDATE);
-            sqlSb.append(getTableName(update, update.getUpdateBean()));
-            sqlSb.append(SqlHelperCons.SET);
-            sqlSb.append(setSql(update));
-            sqlSb.append(whereSql(update, update.getUpdateBean()));
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            logger.error(e.getMessage(), e);
-            return null;
-        }
+        sqlSb.append(SqlHelperCons.UPDATE);
+        sqlSb.append(getTableName(update, update.getUpdateBean()));
+        sqlSb.append(SqlHelperCons.SET);
+        sqlSb.append(setSql(update));
+        sqlSb.append(whereSql(update, update.getUpdateBean()));
         return sqlSb.toString();
     }
 
@@ -335,7 +329,10 @@ public class SqlHelper {
                 }
                 joinSql.append(join.getTableName());
                 joinSql.append(SqlHelperCons.SPACES);
+                String transferred = SqlBeanUtil.getTransferred(select);
+                joinSql.append(transferred);
                 joinSql.append(join.getTableAlias());
+                joinSql.append(transferred);
                 joinSql.append(SqlHelperCons.ON);
                 joinSql.append(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), join.getTableKeyword()));
                 joinSql.append(SqlHelperCons.EQUAL_TO);
@@ -425,7 +422,7 @@ public class SqlHelper {
                     }
                     valueSql.append(SqlBeanUtil.getSqlValue(common, value));
                     valueSql.append(SqlHelperCons.COMMA);
-                } else if (sqlBeanId == null) {
+                } else {
                     valueSql.append(SqlBeanUtil.getSqlValue(common, ReflectAsmUtil.get(objects[i].getClass(), objects[i], field.getName())));
                     valueSql.append(SqlHelperCons.COMMA);
                 }
@@ -475,7 +472,7 @@ public class SqlHelper {
      * @author Jovi
      * @date 2017年8月17日下午5:28:26
      */
-    private static String setSql(Update update) throws IllegalAccessException {
+    private static String setSql(Update update) {
         StringBuffer setSql = new StringBuffer();
         String transferred = SqlBeanUtil.getTransferred(update);
         String[] filterFields = update.getFilterFields();
@@ -655,7 +652,11 @@ public class SqlHelper {
                     // 如果key使用#开头，实际值为传入值，不做任何处理
                     if (key.indexOf(SqlHelperCons.WELL_NUMBER) > -1) {
                         value = sqlCondition.getValue().toString();
-                        fieldName = sqlCondition.getTableAlias() + SqlHelperCons.POINT + sqlCondition.getField().substring(1);
+                        if (StringUtil.isNotEmpty(sqlCondition.getTableAlias())) {
+                            fieldName = sqlCondition.getTableAlias() + SqlHelperCons.POINT + sqlCondition.getField().substring(1);
+                        } else {
+                            fieldName = sqlCondition.getField().substring(1);
+                        }
                     } else {
                         value = sqlCondition.getValue();
                         // 如果值不为数组则做处理
