@@ -3,17 +3,13 @@ package cn.vonce.sql.processor;
 import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.annotation.SqlBeanField;
 import cn.vonce.sql.annotation.SqlBeanTable;
-
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.io.*;
 import java.util.Set;
 
 /**
@@ -48,12 +44,19 @@ public class SqlBeanConsProcessor extends AbstractProcessor {
                 if (StringUtil.isEmpty(tableAlias)) {
                     tableAlias = tableName;
                 }
+                String projectPath = System.getProperty("user.dir");
+                String resPath = projectPath + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + packageName.replace(".", File.separator) + File.separator;
                 try {
+                    File file = new File(resPath);
+                    if (!file.exists()) {
+                        file.mkdir();
+                    }
                     //创建Java 文件
-                    JavaFileObject javaFileObject = processingEnv.getFiler().createSourceFile(className);
-                    Writer writer = javaFileObject.openWriter();
+//                    JavaFileObject javaFileObject = processingEnv.getFiler().createSourceFile(resPath + className);
+//                    Writer writer = javaFileObject.openWriter();
+                    FileOutputStream fos = new FileOutputStream(resPath + className + ".java");
                     try {
-                        PrintWriter printWriter = new PrintWriter(writer);
+                        PrintWriter printWriter = new PrintWriter(fos);
                         printWriter.println("package " + packageName + ";");
                         printWriter.println("\npublic class " + className + " { ");
                         printWriter.println("    public static final String tableName = \"" + tableName + "\";");
@@ -71,7 +74,7 @@ public class SqlBeanConsProcessor extends AbstractProcessor {
                         printWriter.println("}");
                         printWriter.flush();
                     } finally {
-                        writer.close();
+                        fos.close();
                     }
                 } catch (IOException e1) {
                     processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR,
