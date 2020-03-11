@@ -367,15 +367,43 @@ public class Select extends Condition implements Serializable {
     /**
      * 添加having条件
      *
+     * @param field 字段
+     * @param value 字段值
+     * @author Jovi
+     * @date 2017年8月18日上午8:53:11
+     */
+    public Select having(String field, Object value) {
+        return having(field, value, SqlOperator.EQUAL_TO);
+    }
+
+
+    /**
+     * 添加having条件
+     *
      * @param field       字段
      * @param value       字段值
      * @param sqlOperator 操作符
      * @return
      * @author Jovi
-     * @date 2017年8月18日下午4:23:17
+     * @date 2017年8月30日上午11:37:56
      */
     public Select having(String field, Object value, SqlOperator sqlOperator) {
-        return having("", field, value, sqlOperator);
+        return having(SqlLogic.AND, "", field, value, sqlOperator);
+    }
+
+    /**
+     * @param sqlLogic   该条件与下一条件之间的逻辑关系
+     * @param tableAlias 表别名
+     * @param field      字段
+     * @param value      字段值
+     * @return
+     * @author Jovi
+     * @date 2017年8月18日下午4:08:28
+     * @author Jovi
+     * @date 2017年8月18日上午8:53:13
+     */
+    public Select having(SqlLogic sqlLogic, String tableAlias, String field, Object value) {
+        return having(sqlLogic, tableAlias, field, value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -387,7 +415,7 @@ public class Select extends Condition implements Serializable {
      * @param sqlOperator 操作符
      * @return
      * @author Jovi
-     * @date 2017年8月18日下午4:23:17
+     * @date 2017年8月30日上午11:37:56
      */
     public Select having(String tableAlias, String field, Object value, SqlOperator sqlOperator) {
         return having(SqlLogic.AND, tableAlias, field, value, sqlOperator);
@@ -403,10 +431,10 @@ public class Select extends Condition implements Serializable {
      * @param sqlOperator 操作符
      * @return
      * @author Jovi
-     * @date 2017年8月18日下午4:23:17
+     * @date 2017年8月30日上午11:43:15
      */
     public Select having(SqlLogic sqlLogic, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        if (StringUtil.isNotEmpty(field) && value != null) {
+        if (field != null && value != null) {
             havingMap.put(tableAlias + field, new SqlCondition(sqlLogic, tableAlias, field, value, sqlOperator));
         }
         return this;

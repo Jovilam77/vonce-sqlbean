@@ -60,6 +60,9 @@ public class SqlBeanUtil {
         if (sqlBeanJoin != null) {
             table.setName(sqlBeanJoin.table());
             table.setAlias(sqlBeanJoin.tableAlias());
+            if (StringUtil.isEmpty(table.getAlias())) {
+                table.setAlias(table.getName());
+            }
         }
         Table classTable = getTable(clazz);
         if (StringUtil.isEmpty(table.getName())) {
@@ -287,10 +290,6 @@ public class SqlBeanUtil {
                     Field[] subBeanFields = subBeanClazz.getDeclaredFields();
                     //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
                     Table subTable = getTable(subBeanClazz, sqlBeanJoin);
-//                    String subTableAliasName = getTable(subBeanClazz).getAlias();
-//                    if (StringUtil.isNotEmpty(sqlBeanJoin.table()) || StringUtil.isNotEmpty(sqlBeanJoin.tableAlias())) {
-//                        subTableAliasName = StringUtil.isNotEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.tableAlias() : sqlBeanJoin.table();
-//                    }
                     for (Field subBeanField : subBeanFields) {
                         if (Modifier.isStatic(subBeanField.getModifiers())) {
                             continue;
@@ -346,16 +345,7 @@ public class SqlBeanUtil {
             } else if (sqlBeanJoin != null && sqlBeanJoin.isBean()) {
                 Class<?> subClazz = field.getType();
                 //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
-//                Table table = getTable(subClazz);
                 Table table = getTable(subClazz, sqlBeanJoin);
-//                String tableName = sqlBeanJoin.table();
-//                String tableAlias = sqlBeanJoin.tableAlias();
-//                if (StringUtil.isEmpty(tableName)) {
-//                    tableName = table.getName();
-//                }
-//                if (StringUtil.isEmpty(tableAlias)) {
-//                    tableName = table.getAlias();
-//                }
                 String tableKeyword = getTableFieldName(getIdField(subClazz));
                 join.setJoinType(sqlBeanJoin.type());
                 join.setTableName(table.getName());
