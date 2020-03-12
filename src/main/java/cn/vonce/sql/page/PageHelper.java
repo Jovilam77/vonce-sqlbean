@@ -3,6 +3,7 @@ package cn.vonce.sql.page;
 
 import cn.vonce.common.bean.PagingRS;
 import cn.vonce.common.enumerate.ResultCode;
+import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.bean.Paging;
 import cn.vonce.sql.bean.Select;
 import cn.vonce.sql.constant.SqlHelperCons;
@@ -10,6 +11,7 @@ import cn.vonce.sql.enumerate.SqlSort;
 import com.esotericsoftware.reflectasm.MethodAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -402,11 +404,11 @@ public class PageHelper<T> {
                 } catch (Exception e) {
                     //e.printStackTrace();
                 }
-                if (sort == null || sort.equals("") || !SqlSort.ASC.name().equals(sort.toUpperCase())) {
-                    sort = SqlSort.DESC.name();
-                }
-                if (field != null && !"".equals(field) && sort != null && !"".equals(sort)) {
-                    select.orderBy(field, sort.toUpperCase());
+                if (StringUtil.isNotEmpty(field) && field.indexOf(SqlHelperCons.POINT) > -1) {
+                    String[] tableNameAndField = field.split("\\" + SqlHelperCons.POINT);
+                    select.orderBy(tableNameAndField[0], tableNameAndField[1], SqlSort.get(sort));
+                } else {
+                    select.orderBy(field, SqlSort.get(sort));
                 }
             }
         }

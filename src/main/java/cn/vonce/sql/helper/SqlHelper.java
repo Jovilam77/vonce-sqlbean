@@ -174,10 +174,6 @@ public class SqlHelper {
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             logger.error(e.getMessage(), e);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            logger.error(e.getMessage(), e);
-            return null;
         }
         return sql;
     }
@@ -235,24 +231,19 @@ public class SqlHelper {
         StringBuffer columnSql = new StringBuffer();
         if (select.getColumnList() != null && select.getColumnList().size() != 0) {
             for (int i = 0; i < select.getColumnList().size(); i++) {
-                if (StringUtil.isNotEmpty(select.getColumnList().get(i).getName()) && StringUtil.isNotEmpty(select.getColumnList().get(i).getAlias())) {
-                    columnSql.append(SqlHelperCons.BEGIN_BRACKET);
-                    if (StringUtil.isNotEmpty(select.getColumnList().get(i).getTableAlias())) {
-                        columnSql.append(select.getColumnList().get(i).getTableAlias());
-                        columnSql.append(SqlHelperCons.POINT);
-                    }
-                    columnSql.append(select.getColumnList().get(i).getName());
-                    columnSql.append(SqlHelperCons.END_BRACKET);
+                columnSql.append(SqlHelperCons.BEGIN_BRACKET);
+                if (StringUtil.isNotEmpty(select.getColumnList().get(i).getTableAlias())) {
+                    columnSql.append(select.getColumnList().get(i).getTableAlias());
+                    columnSql.append(SqlHelperCons.POINT);
+                }
+                columnSql.append(select.getColumnList().get(i).getName());
+                columnSql.append(SqlHelperCons.END_BRACKET);
+                if (StringUtil.isNotEmpty(select.getColumnList().get(i).getAlias())) {
+                    String transferred = SqlBeanUtil.getTransferred(select);
                     columnSql.append(SqlHelperCons.AS);
-                    columnSql.append(SqlBeanUtil.getTransferred(select));
-                    if (StringUtil.isNotEmpty(select.getColumnList().get(i).getTableAlias())) {
-                        columnSql.append(select.getColumnList().get(i).getTableAlias());
-                        columnSql.append(SqlHelperCons.POINT);
-                    }
+                    columnSql.append(transferred);
                     columnSql.append(select.getColumnList().get(i).getAlias());
-                    columnSql.append(SqlBeanUtil.getTransferred(select));
-                } else {
-                    columnSql.append(select.getColumnList().get(i).getName());
+                    columnSql.append(transferred);
                 }
                 columnSql.append(SqlHelperCons.COMMA);
             }
@@ -356,7 +347,7 @@ public class SqlHelper {
      * @author Jovi
      * @date 2017年8月17日下午6:28:57
      */
-    private static String fieldAndValuesSql(Common common, Object[] objects) throws IllegalArgumentException, IllegalAccessException {
+    private static String fieldAndValuesSql(Common common, Object[] objects) throws IllegalArgumentException {
         String tableName = getTableName(common, objects[0]);
         StringBuffer fieldSql = new StringBuffer();
         StringBuffer valueSql = new StringBuffer();
@@ -579,18 +570,33 @@ public class SqlHelper {
      */
     private static String groupByAndOrderBySql(String type, Select select) {
         StringBuffer groupByAndOrderBySql = new StringBuffer();
-        List<String> by = SqlHelperCons.ORDER_BY.equals(type) ? select.getOrderBy() : select.getGroupBy();
+        cn.vonce.sql.bean.Field[] sqlFields;
+        if (SqlHelperCons.ORDER_BY.equals(type)) {
+            sqlFields = select.getOrderBy().toArray(new cn.vonce.sql.bean.Field[]{});
+        } else {
+            sqlFields = select.getGroupBy().toArray(new cn.vonce.sql.bean.Field[]{});
+        }
         String transferred = SqlBeanUtil.getTransferred(select);
-        if (by != null && by.size() != 0) {
+        if (sqlFields != null && sqlFields.length != 0) {
             groupByAndOrderBySql.append(type);
-            for (int i = 0; i < by.size(); i++) {
-                String orderBy = by.get(i);
-                if (orderBy.indexOf(SqlHelperCons.WELL_NUMBER) > -1) {
-                    orderBy = orderBy.substring(1);
-                } else if (orderBy.indexOf(SqlHelperCons.POINT) == -1) {
-                    orderBy = transferred + tableAlias(select) + transferred + SqlHelperCons.POINT + orderBy;
+            for (int i = 0; i < sqlFields.length; i++) {
+                cn.vonce.sql.bean.Field orderBy = sqlFields[i];
+                groupByAndOrderBySql.append(transferred);
+                if (StringUtil.isNotEmpty(orderBy.getTableAlias())) {
+                    groupByAndOrderBySql.append(orderBy.getTableAlias());
+                } else {
+                    groupByAndOrderBySql.append(tableAlias(select));
                 }
-                groupByAndOrderBySql.append(orderBy);
+                groupByAndOrderBySql.append(transferred);
+                groupByAndOrderBySql.append(SqlHelperCons.POINT);
+                groupByAndOrderBySql.append(transferred);
+                groupByAndOrderBySql.append(orderBy.getName());
+                groupByAndOrderBySql.append(transferred);
+                if (SqlHelperCons.ORDER_BY.equals(type)) {
+                    groupByAndOrderBySql.append(SqlHelperCons.SPACES);
+                    groupByAndOrderBySql.append(select.getOrderBy().get(i).getSqlSort().name());
+                    groupByAndOrderBySql.append(SqlHelperCons.SPACES);
+                }
                 groupByAndOrderBySql.append(SqlHelperCons.COMMA);
             }
             groupByAndOrderBySql.deleteCharAt(groupByAndOrderBySql.length() - SqlHelperCons.COMMA.length());
@@ -622,15 +628,7 @@ public class SqlHelper {
             if (args != null && args.length > 0) {
                 conditioneSql.append(SqlBeanUtil.getCondition(common, where, args));
             } else if (where.indexOf("${") > -1 && bean != null) {
-                try {
-                    conditioneSql.append(SqlBeanUtil.getCondition(common, where, bean));
-                } catch (NoSuchFieldException e) {
-                    e.printStackTrace();
-                    logger.error(e.getMessage(), e);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                    logger.error(e.getMessage(), e);
-                }
+                conditioneSql.append(SqlBeanUtil.getCondition(common, where, bean));
             } else {
                 conditioneSql.append(where);
             }
@@ -645,18 +643,10 @@ public class SqlHelper {
                     String key = sqlConditionEntry.getKey();
                     SqlCondition sqlCondition = sqlConditionEntry.getValue();
                     Object value;
-                    String fieldName = sqlCondition.getField();
-                    if (StringUtil.isNotEmpty(sqlCondition.getTableAlias())) {
-                        fieldName = sqlCondition.getTableAlias() + SqlHelperCons.POINT + fieldName;
-                    }
                     // 如果key使用#开头，实际值为传入值，不做任何处理
                     if (key.indexOf(SqlHelperCons.WELL_NUMBER) > -1) {
                         value = sqlCondition.getValue().toString();
-                        if (StringUtil.isNotEmpty(sqlCondition.getTableAlias())) {
-                            fieldName = sqlCondition.getTableAlias() + SqlHelperCons.POINT + sqlCondition.getField().substring(1);
-                        } else {
-                            fieldName = sqlCondition.getField().substring(1);
-                        }
+                        sqlCondition.setName(sqlCondition.getName().substring(1));
                     } else {
                         value = sqlCondition.getValue();
                         // 如果值不为数组则做处理
@@ -671,9 +661,9 @@ public class SqlHelper {
                         conditioneSql.append(getLogic(sqlCondition.getSqlLogic()));
                     }
                     if (SqlBeanUtil.isToUpperCase(common)) {
-                        fieldName = fieldName.toUpperCase();
+                        sqlCondition.setName(sqlCondition.getName().toUpperCase());
                     }
-                    conditioneSql.append(valueOperator(common, operator, fieldName, value, needEndBracket));
+                    conditioneSql.append(valueOperator(common, operator, sqlCondition, value, needEndBracket));
                     i++;
                 }
                 conditioneSql.append(SqlHelperCons.END_BRACKET);
@@ -782,12 +772,12 @@ public class SqlHelper {
      *
      * @param common
      * @param operator
-     * @param fieldName
+     * @param sqlField
      * @param value
      * @param needEndBracket
      * @return
      */
-    private static StringBuffer valueOperator(Common common, String operator, String fieldName, Object value, boolean needEndBracket) {
+    private static StringBuffer valueOperator(Common common, String operator, cn.vonce.sql.bean.Field sqlField, Object value, boolean needEndBracket) {
         StringBuffer sql = new StringBuffer();
         // 如果操作符为BETWEEN ，IN、NOT IN 则需额外处理
         if (operator.indexOf(SqlHelperCons.BETWEEN) > -1) {
@@ -806,7 +796,15 @@ public class SqlHelper {
                     return null;
                 }
             }
-            sql.append(fieldName + operator + SqlBeanUtil.getSqlValue(common, betweenValues[0]) + SqlHelperCons.AND + SqlBeanUtil.getSqlValue(common, betweenValues[1]));
+            if (StringUtil.isNotEmpty(sqlField.getTableAlias())) {
+                sql.append(sqlField.getTableAlias());
+                sql.append(SqlHelperCons.POINT);
+            }
+            sql.append(sqlField.getName());
+            sql.append(operator);
+            sql.append(SqlBeanUtil.getSqlValue(common, betweenValues[0]));
+            sql.append(SqlHelperCons.AND);
+            sql.append(SqlBeanUtil.getSqlValue(common, betweenValues[1]));
         } else if (operator.indexOf(SqlHelperCons.IN) > -1) {
             Object[] in_notInValues = getObjects(value);
             StringBuffer in_notIn = new StringBuffer();
@@ -816,10 +814,22 @@ public class SqlHelper {
                     in_notIn.append(SqlHelperCons.COMMA);
                 }
                 in_notIn.deleteCharAt(in_notIn.length() - SqlHelperCons.COMMA.length());
-                sql.append(fieldName + operator + in_notIn.toString());
+                if (StringUtil.isNotEmpty(sqlField.getTableAlias())) {
+                    sql.append(sqlField.getTableAlias());
+                    sql.append(SqlHelperCons.POINT);
+                }
+                sql.append(sqlField.getName());
+                sql.append(operator);
+                sql.append(in_notIn.toString());
             }
         } else {
-            sql.append(fieldName + operator + value);
+            if (StringUtil.isNotEmpty(sqlField.getTableAlias())) {
+                sql.append(sqlField.getTableAlias());
+                sql.append(SqlHelperCons.POINT);
+            }
+            sql.append(sqlField.getName());
+            sql.append(operator);
+            sql.append(value);
         }
         // in与not in 额外加结束括号
         if (needEndBracket) {

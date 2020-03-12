@@ -1,6 +1,5 @@
 package cn.vonce.sql.bean;
 
-import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.enumerate.SqlLogic;
 import cn.vonce.sql.enumerate.SqlOperator;
@@ -25,15 +24,15 @@ public class Select extends Condition implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private boolean useDistinct = false;//默认不去重复
-    private List<Column> columnList = new ArrayList<>();//查询的字段数组
+    private List<Column> columnList = new ArrayList<>();//查询的列字段数组
     private List<Join> joinList = new ArrayList<>();//表连接的表数组
-    private List<String> groupByList = new ArrayList<>();//分组
-    private List<String> orderByList = new ArrayList<>();//排序
+    private List<Group> groupByList = new ArrayList<>();//分组
+    private List<Order> orderByList = new ArrayList<>();//排序
     private Page page = null;
     private String having = null;
     private Object[] havingArgs = null;
     private ListMultimap<String, SqlCondition> havingMap = LinkedListMultimap.create();//having条件包含的逻辑
-    private String[] filterFields = null;//需要过滤的字段
+    private String[] filterFields = null;//需要过滤的列字段
 
     /**
      * 获取useDistinct是否过滤重复
@@ -74,7 +73,7 @@ public class Select extends Condition implements Serializable {
      * @param columnList
      */
     public void setColumnList(List<Column> columnList) {
-        this.columnList = columnList;
+        this.columnList.addAll(columnList);
     }
 
     /**
@@ -91,7 +90,7 @@ public class Select extends Condition implements Serializable {
     }
 
     /**
-     * 添加column字段
+     * 添加column列字段
      *
      * @param columnName
      * @return
@@ -104,9 +103,9 @@ public class Select extends Condition implements Serializable {
     }
 
     /**
-     * 添加column字段
+     * 添加column列字段
      *
-     * @param columnName  列字段名
+     * @param columnName  列列字段名
      * @param columnAlias 别名
      * @return
      * @author Jovi
@@ -118,10 +117,10 @@ public class Select extends Condition implements Serializable {
     }
 
     /**
-     * 添加column字段
+     * 添加column列字段
      *
      * @param tableAlias  表别名
-     * @param columnName  列字段名
+     * @param columnName  列列字段名
      * @param columnAlias 别名
      * @return
      * @author Jovi
@@ -143,8 +142,8 @@ public class Select extends Condition implements Serializable {
      * 添加表连接
      *
      * @param table        关联的表名
-     * @param tableKeyword 关联的表关键字段
-     * @param mainKeyword  主表关键字段
+     * @param tableKeyword 关联的表关键列字段
+     * @param mainKeyword  主表关键列字段
      * @author Jovi
      * @date 2019年6月21日上午10:27:50
      */
@@ -157,8 +156,8 @@ public class Select extends Condition implements Serializable {
      *
      * @param joinType     连接类型
      * @param table        关联的表名
-     * @param tableKeyword 关联的表关键字段
-     * @param mainKeyword  主表关键字段
+     * @param tableKeyword 关联的表关键列字段
+     * @param mainKeyword  主表关键列字段
      * @author Jovi
      * @date 2019年6月21日上午10:27:50
      */
@@ -170,8 +169,8 @@ public class Select extends Condition implements Serializable {
      * 添加表连接
      *
      * @param table        关联的表名
-     * @param tableKeyword 关联的表关键字段
-     * @param mainKeyword  主表关键字段
+     * @param tableKeyword 关联的表关键列字段
+     * @param mainKeyword  主表关键列字段
      * @author Jovi
      * @date 2019年6月21日上午10:27:50
      */
@@ -184,8 +183,8 @@ public class Select extends Condition implements Serializable {
      *
      * @param joinType     连接类型
      * @param table        关联的表名
-     * @param tableKeyword 关联的表关键字段
-     * @param mainKeyword  主表关键字段
+     * @param tableKeyword 关联的表关键列字段
+     * @param mainKeyword  主表关键列字段
      * @author Jovi
      * @date 2019年6月21日上午10:27:50
      */
@@ -195,26 +194,39 @@ public class Select extends Condition implements Serializable {
     }
 
     /**
-     * 获取groupBy分组字段
+     * 获取groupBy分组列字段
      *
      * @return
      * @author Jovi
      * @date 2017年8月18日下午4:19:36
      */
-    public List<String> getGroupBy() {
+    public List<Group> getGroupBy() {
         return groupByList;
     }
 
     /**
      * 添加groupBy分组
      *
-     * @param field 字段名
+     * @param columNname 列字段名
      * @return
      * @author Jovi
      * @date 2017年8月18日下午3:32:56
      */
-    public Select groupBy(String field) {
-        groupByList.add(field);
+    public Select groupBy(String columNname) {
+        return groupBy("", columNname);
+    }
+
+    /**
+     * 添加groupBy分组
+     *
+     * @param tableAlias 表别名
+     * @param columNname 列字段名
+     * @return
+     * @author Jovi
+     * @date 2017年8月18日下午3:32:56
+     */
+    public Select groupBy(String tableAlias, String columNname) {
+        groupByList.add(new Group(tableAlias, columNname));
         return this;
     }
 
@@ -283,40 +295,40 @@ public class Select extends Condition implements Serializable {
     }
 
     /**
-     * 获取orderBy排序字段
+     * 获取orderBy排序列字段
      *
      * @return
      * @author Jovi
      * @date 2017年8月18日下午4:18:45
      */
-    public List<String> getOrderBy() {
+    public List<Order> getOrderBy() {
         return orderByList;
     }
 
     /**
-     * 添加字段排序
+     * 添加列字段排序
      *
-     * @param field 字段名
-     * @param sort  排序方式
+     * @param columNname 列字段名
+     * @param sqlSort    排序方式
      * @author Jovi
      * @date 2017年8月18日上午11:10:11
      */
-    public Select orderBy(String field, String sort) {
-        orderByList.add(field + " " + sort);
-        return this;
+    public Select orderBy(String columNname, SqlSort sqlSort) {
+        return orderBy("", columNname, sqlSort);
     }
 
     /**
-     * 添加字段排序
+     * 添加列字段排序
      *
-     * @param field   字段名
-     * @param sqlSort 排序方式
+     * @param tableAlias 表别名
+     * @param columNname 列字段名
+     * @param sqlSort    排序方式
      * @return
      * @author Jovi
      * @date 2018年4月16日下午6:31:18
      */
-    public Select orderBy(String field, SqlSort sqlSort) {
-        orderByList.add(field + " " + sqlSort.name().toUpperCase());
+    public Select orderBy(String tableAlias, String columNname, SqlSort sqlSort) {
+        orderByList.add(new Order(tableAlias, columNname, sqlSort));
         return this;
     }
 
@@ -353,8 +365,8 @@ public class Select extends Condition implements Serializable {
     /**
      * 添加having条件
      *
-     * @param field 字段
-     * @param value 字段值
+     * @param field 列字段
+     * @param value 列字段值
      * @author Jovi
      * @date 2017年8月18日上午8:53:11
      */
@@ -366,8 +378,8 @@ public class Select extends Condition implements Serializable {
     /**
      * 添加having条件
      *
-     * @param field       字段
-     * @param value       字段值
+     * @param field       列字段
+     * @param value       列字段值
      * @param sqlOperator 操作符
      * @return
      * @author Jovi
@@ -380,8 +392,8 @@ public class Select extends Condition implements Serializable {
     /**
      * @param sqlLogic   该条件与下一条件之间的逻辑关系
      * @param tableAlias 表别名
-     * @param field      字段
-     * @param value      字段值
+     * @param field      列字段
+     * @param value      列字段值
      * @return
      * @author Jovi
      * @date 2017年8月18日下午4:08:28
@@ -396,8 +408,8 @@ public class Select extends Condition implements Serializable {
      * 添加having条件
      *
      * @param tableAlias  表别名
-     * @param field       字段
-     * @param value       字段值
+     * @param field       列字段
+     * @param value       列字段值
      * @param sqlOperator 操作符
      * @return
      * @author Jovi
@@ -412,8 +424,8 @@ public class Select extends Condition implements Serializable {
      *
      * @param sqlLogic    该条件与下一条件之间的逻辑关系
      * @param tableAlias  表别名
-     * @param field       字段
-     * @param value       字段值
+     * @param field       列字段
+     * @param value       列字段值
      * @param sqlOperator 操作符
      * @return
      * @author Jovi
@@ -425,7 +437,7 @@ public class Select extends Condition implements Serializable {
     }
 
     /**
-     * 获取过滤的字段
+     * 获取过滤的列字段
      *
      * @return
      * @author Jovi
@@ -436,7 +448,7 @@ public class Select extends Condition implements Serializable {
     }
 
     /**
-     * 设置过滤的字段
+     * 设置过滤的列字段
      *
      * @param filterField
      * @author Jovi

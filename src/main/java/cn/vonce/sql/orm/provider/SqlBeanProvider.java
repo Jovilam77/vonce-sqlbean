@@ -7,6 +7,7 @@ import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.SqlOperator;
+import cn.vonce.sql.enumerate.SqlSort;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.uitls.SqlBeanUtil;
@@ -127,7 +128,7 @@ public class SqlBeanProvider {
         }
         if (select.getColumnList().isEmpty()) {
             try {
-                select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getTable(), select.getFilterFields()));
+                select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
                 if (select.getPage() != null && select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
                     select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)));
                 }
@@ -461,7 +462,7 @@ public class SqlBeanProvider {
             if (isCount) {
                 select.column(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET);
             } else {
-                select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getTable(), select.getFilterFields()));
+                select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
             }
             SqlBeanUtil.setJoin(select, clazz);
         } catch (SqlBeanException e) {
@@ -548,7 +549,7 @@ public class SqlBeanProvider {
             }
             if (paging.getSortdatafield() != null && paging.getSortorder() != null && paging.getSortdatafield().length > 0 && paging.getSortdatafield().length == paging.getSortorder().length) {
                 for (int i = 0; i < paging.getSortdatafield().length; i++) {
-                    select.orderBy(paging.getSortdatafield()[i], paging.getSortorder()[i]);
+                    select.orderBy(paging.getSortdatafield()[i], SqlSort.get(paging.getSortorder()[i]));
                 }
             }
         }

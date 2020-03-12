@@ -13,7 +13,7 @@ import java.io.Serializable;
  * @email 766255988@qq.com
  * @date 2018年4月16日下午7:15:10
  */
-public class SqlCondition implements Serializable {
+public class SqlCondition extends Field implements Serializable {
 
     /**
      *
@@ -25,55 +25,28 @@ public class SqlCondition implements Serializable {
     }
 
     public SqlCondition(String field, Object value) {
-        super();
-        this.tableAlias = "";
-        this.field = field;
-        this.value = value;
+        this(null, "", field, value, null);
     }
 
     public SqlCondition(String tableAlias, String field, Object value) {
-        super();
-        this.field = field;
-        this.value = value;
+        this(null, tableAlias, field, value, null);
     }
 
     public SqlCondition(String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        super();
-        this.field = field;
-        this.value = value;
-        this.sqlOperator = sqlOperator;
+        this(null, tableAlias, field, value, sqlOperator);
     }
 
     public SqlCondition(SqlLogic sqlLogic, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        super();
+        super(tableAlias, field);
         this.sqlLogic = sqlLogic;
-        this.tableAlias = tableAlias;
-        this.field = field;
         this.value = value;
         this.sqlOperator = sqlOperator;
     }
 
-    private String tableAlias;
-    private String field;
+    private SqlLogic sqlLogic;
     private Object value;
     private SqlOperator sqlOperator;
-    private SqlLogic sqlLogic;
 
-    public String getTableAlias() {
-        return tableAlias;
-    }
-
-    public void setTableAlias(String tableAlias) {
-        this.tableAlias = tableAlias;
-    }
-
-    public String getField() {
-        return field;
-    }
-
-    public void setField(String field) {
-        this.field = field;
-    }
 
     public Object getValue() {
         return value;

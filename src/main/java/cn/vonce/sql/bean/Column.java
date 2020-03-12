@@ -10,47 +10,25 @@ import java.io.Serializable;
  * @email 766255988@qq.com
  * @date 2020年3月1日上午10:00:00
  */
-public class Column implements Serializable {
+public class Column extends Field implements Serializable {
     public Column() {
+        super();
     }
 
     public Column(String name) {
-        this.name = name;
-        this.alias = "";
+        this("", name, "");
     }
 
     public Column(String name, String alias) {
-        this.name = name;
-        this.alias = alias;
+        this("", name, alias);
     }
 
     public Column(String tableAlias, String name, String alias) {
-        this.tableAlias = tableAlias;
-        this.name = name;
+        super(tableAlias, name);
         this.alias = alias;
     }
 
-    private String tableAlias = "";
-
-    private String name = "";
-
     private String alias = "";
-
-    public String getTableAlias() {
-        return tableAlias;
-    }
-
-    public void setTableAlias(String tableAlias) {
-        this.tableAlias = tableAlias;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getAlias() {
         return alias;
