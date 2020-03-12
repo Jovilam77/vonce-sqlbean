@@ -309,7 +309,8 @@ public class SqlBeanUtil {
                         throw new SqlBeanException("该类的表连接查询字段未与java字段关联：");
                     }
                     //可能会连同一个表，但连接条件不一样（这时表需要区分别名），所以查询的字段可能是同一个，但属于不同表别名下，所以用java字段名当sql字段别名不会出错
-                    columnSet.add(new Column(StringUtil.isEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.table() : sqlBeanJoin.tableAlias(), tableFieldName, getColumnAlias(tableAlias, field.getName())));
+                    String subTableAlias = StringUtil.isEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.table() : sqlBeanJoin.tableAlias();
+                    columnSet.add(new Column(subTableAlias, tableFieldName, getColumnAlias(subTableAlias, field.getName())));
                 }
             } else {
                 columnSet.add(new Column(tableAlias, getTableFieldName(field), getColumnAlias(tableAlias, field.getName())));
