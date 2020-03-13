@@ -7,6 +7,7 @@ import cn.vonce.sql.annotation.SqlBeanTable;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
@@ -59,17 +60,18 @@ public class SqlBeanConsProcessor extends AbstractProcessor {
                     try {
                         PrintWriter printWriter = new PrintWriter(fos);
                         printWriter.println("package " + packageName + ";");
+                        printWriter.println("import cn.vonce.sql.bean.ColumnInfo;");
                         printWriter.println("\npublic class " + className + " { ");
                         printWriter.println("    public static final String tableName = \"" + tableName + "\";");
                         printWriter.println("    public static final String tableAlias = \"" + tableAlias + "\";");
                         for (Element subElement : element.getEnclosedElements()) {
-                            if (subElement.getKind().isField()) {
+                            if (subElement.getKind().isField() && !subElement.getModifiers().contains(Modifier.STATIC)) {
                                 String sqlFieldName = subElement.getSimpleName().toString();
                                 SqlBeanField sqlBeanField = subElement.getAnnotation(SqlBeanField.class);
                                 if (sqlBeanField != null && StringUtil.isNotEmpty(sqlBeanField.value())) {
                                     sqlFieldName = sqlBeanField.value();
                                 }
-                                printWriter.println("    public static final String " + sqlFieldName + " = \"" + sqlFieldName + "\";");
+                                printWriter.println("    public static final ColumnInfo " + sqlFieldName + " = new ColumnInfo(\"" + tableAlias + "\",\"" + sqlFieldName + "\");");
                             }
                         }
                         printWriter.println("}");
