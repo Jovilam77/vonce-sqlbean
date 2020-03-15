@@ -114,8 +114,6 @@ public class PageHelper<T> {
      * 获取当前页
      *
      * @return
-     * @author jovi
-     * @date 2017年3月14日上午11:57:50
      */
     public Integer getPagenum() {
         return pagenum;
@@ -125,8 +123,6 @@ public class PageHelper<T> {
      * 设置当前页
      *
      * @param pagenum
-     * @author Jovi
-     * @date 2017年7月19日下午5:32:19
      */
     private void setPagenum(Integer pagenum) {
         this.pagenum = pagenum;
@@ -136,8 +132,6 @@ public class PageHelper<T> {
      * 获取每页数量
      *
      * @return
-     * @author jovi
-     * @date 2017年3月14日上午11:57:55
      */
     public Integer getPagesize() {
         return pagesize;
@@ -147,8 +141,6 @@ public class PageHelper<T> {
      * 设置每页数量
      *
      * @param pagesize
-     * @author Jovi
-     * @date 2017年7月19日下午5:32:58
      */
     private void setPagesize(Integer pagesize) {
         this.pagesize = pagesize;
@@ -158,8 +150,6 @@ public class PageHelper<T> {
      * 获取总数量
      *
      * @return
-     * @author jovi
-     * @date 2017年3月14日上午11:59:27
      */
     public Integer getTotalRecords() {
         return totalRecords;
@@ -169,8 +159,6 @@ public class PageHelper<T> {
      * 获取总页数
      *
      * @return
-     * @author jovi
-     * @date 2017年3月14日上午11:58:01
      */
     public Integer getTotalPage() {
         return totalPage;
@@ -180,8 +168,6 @@ public class PageHelper<T> {
      * 获取排序的字段
      *
      * @return
-     * @author jovi
-     * @date 2017年5月23日上午11:49:57
      */
     public String[] getSortdatafield() {
         return sortdatafield;
@@ -191,8 +177,6 @@ public class PageHelper<T> {
      * 设置排序的字段
      *
      * @param sortdatafield
-     * @author Jovi
-     * @date 2017年7月19日下午5:34:23
      */
     private void setSortdatafield(String[] sortdatafield) {
         this.sortdatafield = sortdatafield;
@@ -202,8 +186,6 @@ public class PageHelper<T> {
      * 获取排序的类型
      *
      * @return
-     * @author jovi
-     * @date 2017年5月23日上午11:50:28
      */
     public String[] getSortorder() {
         return sortorder;
@@ -213,8 +195,6 @@ public class PageHelper<T> {
      * 设置排序类型
      *
      * @param sortorder
-     * @author Jovi
-     * @date 2017年7月19日下午5:35:02
      */
     private void setSortorder(String[] sortorder) {
         this.sortorder = sortorder;
@@ -224,8 +204,6 @@ public class PageHelper<T> {
      * 获取分页时间戳
      *
      * @return
-     * @author Jovi
-     * @date 2017年7月19日下午4:10:04
      */
     public String getTimestamp() {
         return timestamp;
@@ -235,8 +213,6 @@ public class PageHelper<T> {
      * 设置分页时间戳(格式必须为："yyyy-MM-dd HH:mm:ss"， 不正确则设置为空)
      *
      * @param timestamp
-     * @author Jovi
-     * @date 2017年7月19日下午5:25:54
      */
     private void setTimestamp(String timestamp) {
         boolean convertSuccess = true;
@@ -265,8 +241,6 @@ public class PageHelper<T> {
      * 获取分页列表数据
      *
      * @return
-     * @author jovi
-     * @date 2017年3月14日上午11:58:09
      */
     public List<T> getDataList() {
         return dataList;
@@ -276,8 +250,6 @@ public class PageHelper<T> {
      * 设置分页列表数据
      *
      * @param dataList
-     * @author jovi
-     * @date 2017年3月14日上午11:58:15
      */
     public void setDataList(List<T> dataList) {
         this.dataList = dataList;
@@ -288,8 +260,6 @@ public class PageHelper<T> {
      * 如果pagingMethod为空 默认 count 方法名为"count",select方法名为"select"
      *
      * @return
-     * @author jovi
-     * @date 2017年3月10日下午7:10:59
      */
     public PagingMethod getPagingMethod() {
         if (pagingMethod == null) {
@@ -302,8 +272,6 @@ public class PageHelper<T> {
      * 设置pagingMethod，count(统计),select(查询)方法的名称
      *
      * @param pagingMethod
-     * @author jovi
-     * @date 2017年3月10日下午7:12:00
      */
     public void setPagingMethod(PagingMethod pagingMethod) {
         this.pagingMethod = pagingMethod;
@@ -313,8 +281,6 @@ public class PageHelper<T> {
      * 总数量、总页数处理
      *
      * @param count
-     * @author Jovi
-     * @date 2018年4月21日下午6:49:45
      */
     public void dispose(long count) {
         // 保存总数
@@ -334,8 +300,7 @@ public class PageHelper<T> {
      *
      * @param select      查询条件拓展
      * @param pageService 分页接口
-     * @author jovi
-     * @date 2017年3月14日上午11:58:41
+     * @return
      */
     public PageHelper<T> paging(Select select, PagingService pageService) {
         return paging(null, select, pageService);
@@ -347,8 +312,7 @@ public class PageHelper<T> {
      * @param tClazz
      * @param select      SqlBean
      * @param pageService 分页接口
-     * @author jovi
-     * @date 2017年3月14日上午11:58:41
+     * @return
      */
     public PageHelper<T> paging(Class<T> tClazz, Select select, PagingService pageService) {
         try {
@@ -391,8 +355,6 @@ public class PageHelper<T> {
      * 排序处理
      *
      * @param select
-     * @author Jovi
-     * @date 2018年4月21日下午5:46:50
      */
     private void addOrderBy(Select select) {
         if (sortdatafield != null && sortdatafield.length > 0) {
@@ -419,8 +381,6 @@ public class PageHelper<T> {
      *
      * @param message
      * @return
-     * @author jovi
-     * @date 2017年3月14日上午11:59:06
      */
     public PagingRS toResult(String message) {
         PagingRS result = new PagingRS();
@@ -449,8 +409,6 @@ public class PageHelper<T> {
      *
      * @author jovi
      * @version 1.0
-     * @email 766255988@qq.com
-     * @date 2017年3月10日下午6:53:04
      */
     public static class PagingMethod {
         private String count;

@@ -50,9 +50,6 @@ public class SqlHelper {
      *
      * @param select
      * @return
-     * @throws SqlBeanException
-     * @author jovi
-     * @date 2017年6月2日下午5:41:45
      */
     public static String buildSelectSql(Select select) {
         StringBuffer sqlSb = new StringBuffer();
@@ -136,8 +133,6 @@ public class SqlHelper {
      * @param update
      * @return
      * @throws SqlBeanException
-     * @author Jovi
-     * @date 2017年6月21日下午6:44:57
      */
     public static String buildUpdateSql(Update update) {
         StringBuffer sqlSb = new StringBuffer();
@@ -154,8 +149,6 @@ public class SqlHelper {
      *
      * @param insert
      * @return
-     * @author Jovi
-     * @date 2017年6月28日下午5:01:35
      */
     @SuppressWarnings("unchecked")
     public static String buildInsertSql(Insert insert) {
@@ -183,8 +176,6 @@ public class SqlHelper {
      *
      * @param delete
      * @return
-     * @author Jovi
-     * @date 2017年6月28日下午4:58:27
      */
     public static String buildDeleteSql(Delete delete) {
         StringBuffer sqlSb = new StringBuffer();
@@ -200,8 +191,6 @@ public class SqlHelper {
      * @param common
      * @param bean
      * @return
-     * @author Jovi
-     * @date 2017年8月17日下午5:24:25
      */
     private static String getTableName(Common common, Object bean) {
         String tableName = "";
@@ -224,8 +213,6 @@ public class SqlHelper {
      *
      * @param select
      * @return
-     * @author Jovi
-     * @date 2017年8月22日上午9:46:05
      */
     private static String column(Select select) {
         StringBuffer columnSql = new StringBuffer();
@@ -257,8 +244,6 @@ public class SqlHelper {
      *
      * @param select
      * @return
-     * @author Jovi
-     * @date 2017年8月22日上午9:46:05
      */
     private static String tableName(Select select) {
         return SqlBeanUtil.isToUpperCase(select) ? select.getTable().getName().toUpperCase() : select.getTable().getName();
@@ -269,8 +254,6 @@ public class SqlHelper {
      *
      * @param select
      * @return
-     * @author Jovi
-     * @date 2017年8月22日上午9:46:05
      */
     private static String tableAlias(Select select) {
         return SqlBeanUtil.isToUpperCase(select) ? select.getTable().getAlias().toUpperCase() : select.getTable().getAlias();
@@ -296,8 +279,6 @@ public class SqlHelper {
      *
      * @param select
      * @return
-     * @author Jovi
-     * @date 2017年8月18日下午12:45:39
      */
     private static String joinSql(Select select) {
         StringBuffer joinSql = new StringBuffer();
@@ -342,10 +323,7 @@ public class SqlHelper {
      * @param common
      * @param objects
      * @return
-     * @throws IllegalAccessException
      * @throws IllegalArgumentException
-     * @author Jovi
-     * @date 2017年8月17日下午6:28:57
      */
     private static String fieldAndValuesSql(Common common, Object[] objects) throws IllegalArgumentException {
         String tableName = getTableName(common, objects[0]);
@@ -460,8 +438,6 @@ public class SqlHelper {
      *
      * @param update
      * @return
-     * @author Jovi
-     * @date 2017年8月17日下午5:28:26
      */
     private static String setSql(Update update) {
         StringBuffer setSql = new StringBuffer();
@@ -516,9 +492,6 @@ public class SqlHelper {
      * @param condition
      * @param bean
      * @return
-     * @throws Exception
-     * @author Jovi
-     * @date 2017年8月17日下午4:29:30
      */
     @SuppressWarnings("unchecked")
     private static String whereSql(Condition condition, Object bean) {
@@ -530,8 +503,6 @@ public class SqlHelper {
      *
      * @param select
      * @return
-     * @author Jovi
-     * @date 2017年8月17日下午5:24:04
      */
     private static String groupBySql(Select select) {
         return groupByAndOrderBySql(SqlHelperCons.GROUP_BY, select);
@@ -540,8 +511,6 @@ public class SqlHelper {
     /**
      * @param select
      * @return
-     * @author Jovi
-     * @date 2017年8月18日下午9:38:55
      */
     private static String havingSql(Select select) {
         return conditionHandle(ConditionType.HAVING, select, select.getHaving(), select.getHavingArgs(), null, select.getHavingMap());
@@ -552,8 +521,6 @@ public class SqlHelper {
      *
      * @param select
      * @return
-     * @author Jovi
-     * @date 2017年8月17日下午5:24:04
      */
     private static String orderBySql(Select select) {
         return groupByAndOrderBySql(SqlHelperCons.ORDER_BY, select);
@@ -565,8 +532,6 @@ public class SqlHelper {
      * @param type   SqlHelperCons.ORDER_BY or SqlHelperCons.GROUP_BY
      * @param select
      * @return
-     * @author Jovi
-     * @date 2019年9月30日下午11:21:20
      */
     private static String groupByAndOrderBySql(String type, Select select) {
         StringBuffer groupByAndOrderBySql = new StringBuffer();
@@ -865,8 +830,6 @@ public class SqlHelper {
      *
      * @param select
      * @return
-     * @author Jovi
-     * @date 2017年8月17日下午5:23:46
      */
     private static void mysqlPageDispose(Select select, StringBuffer sqlSb) {
         if (SqlBeanUtil.isUsePage(select)) {
@@ -899,8 +862,6 @@ public class SqlHelper {
      *
      * @param select
      * @param sqlSb
-     * @author Jovi
-     * @date 2019年4月1日下午6:18:20
      */
     private static void oraclePageDispose(Select select, StringBuffer sqlSb) {
         //oracle 分页语句前缀
@@ -924,8 +885,6 @@ public class SqlHelper {
      *
      * @param select
      * @param sqlSb
-     * @author Jovi
-     * @date 2019年8月22日下午20:14:10
      */
     private static void db2PageDispose(Select select, StringBuffer sqlSb) {
         //db2 分页语句前缀
@@ -950,8 +909,6 @@ public class SqlHelper {
      *
      * @param select
      * @return
-     * @author Jovi
-     * @date 2020年2月21日下午5:40:20
      */
     private static void derbyPageDispose(Select select, StringBuffer sqlSb) {
         if (SqlBeanUtil.isUsePage(select)) {

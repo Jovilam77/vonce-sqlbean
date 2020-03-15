@@ -81,8 +81,6 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
      * @param resultSet
      * @param mapParam
      * @return
-     * @author Jovi
-     * @date 2018年5月15日上午9:21:22
      */
     private Object handleResultSet(ResultSet resultSet, Map<String, Object> mapParam, Class<?> resultType) {
         if (null != resultSet) {
@@ -185,8 +183,6 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
      * 关闭ResultSet
      *
      * @param resultSet
-     * @author Jovi
-     * @date 2018年5月15日上午9:20:51
      */
     private void closeResultSet(ResultSet resultSet) {
         try {

@@ -24,8 +24,6 @@ public abstract class Common implements Serializable {
      * 获取table sql 内容
      *
      * @return
-     * @author Jovi
-     * @date 2017年8月18日上午8:59:49
      */
     public Table getTable() {
         return table;
@@ -35,8 +33,6 @@ public abstract class Common implements Serializable {
      * 设置table sql 内容
      *
      * @param name
-     * @author Jovi
-     * @date 2017年8月18日上午8:59:38
      */
     public void setTable(String name) {
         this.table.setName(name);
@@ -48,8 +44,6 @@ public abstract class Common implements Serializable {
      *
      * @param name
      * @param aliasName
-     * @author Jovi
-     * @date 2017年8月18日上午8:59:38
      */
     public void setTable(String name, String aliasName) {
         this.table.setName(name);
@@ -60,8 +54,6 @@ public abstract class Common implements Serializable {
      * 设置table sql 内容
      *
      * @param table
-     * @author Jovi
-     * @date 2017年8月18日上午8:59:38
      */
     public void setTable(Table table) {
         this.table = table;
@@ -71,8 +63,6 @@ public abstract class Common implements Serializable {
      * 设置table sql 内容
      *
      * @param clazz 表对应的实体类
-     * @author Jovi
-     * @date 2018年5月14日下午11:54:45
      */
     public void setTable(Class<?> clazz) {
         this.table = SqlBeanUtil.getTable(clazz);

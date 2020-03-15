@@ -23,8 +23,6 @@ public class Condition extends Common {
      * 获取where sql 内容
      *
      * @return
-     * @author Jovi
-     * @date 2017年8月18日上午8:58:33
      */
     public String getWhere() {
         return where;
@@ -34,8 +32,6 @@ public class Condition extends Common {
      * 设置where sql 内容
      *
      * @param where
-     * @author Jovi
-     * @date 2017年8月18日上午8:58:11
      */
     public void setWhere(String where) {
         this.where = where;
@@ -46,8 +42,6 @@ public class Condition extends Common {
      *
      * @param where
      * @param args
-     * @author Jovi
-     * @date 2018年9月13日下午15:34:45
      */
     public void setWhere(String where, Object... args) {
         this.where = where;
@@ -76,8 +70,6 @@ public class Condition extends Common {
      * 获取where条件map
      *
      * @return
-     * @author Jovi
-     * @date 2017年8月18日上午8:54:32
      */
     public ListMultimap<String, SqlCondition> getWhereMap() {
         return whereMap;
@@ -88,11 +80,20 @@ public class Condition extends Common {
      *
      * @param field 字段
      * @param value 字段值
-     * @author Jovi
-     * @date 2017年8月18日上午8:53:11
      */
     public Condition where(String field, Object value) {
         return where(field, value, SqlOperator.EQUAL_TO);
+    }
+
+    /**
+     * 添加where条件
+     *
+     * @param columnInfo 字段信息
+     * @param value      字段值
+     * @author Jovi
+     */
+    public Condition where(ColumnInfo columnInfo, Object value) {
+        return where(columnInfo.tableAlias(), columnInfo.name(), value, SqlOperator.EQUAL_TO);
     }
 
 
@@ -103,8 +104,6 @@ public class Condition extends Common {
      * @param value       字段值
      * @param sqlOperator 操作符
      * @return
-     * @author Jovi
-     * @date 2017年8月30日上午11:37:56
      */
     public Condition where(String field, Object value, SqlOperator sqlOperator) {
         return where(SqlLogic.AND, "", field, value, sqlOperator);
@@ -116,10 +115,6 @@ public class Condition extends Common {
      * @param field      字段
      * @param value      字段值
      * @return
-     * @author Jovi
-     * @date 2017年8月18日下午4:08:28
-     * @author Jovi
-     * @date 2017年8月18日上午8:53:13
      */
     public Condition where(SqlLogic sqlLogic, String tableAlias, String field, Object value) {
         return where(sqlLogic, tableAlias, field, value, SqlOperator.EQUAL_TO);
@@ -133,11 +128,36 @@ public class Condition extends Common {
      * @param value       字段值
      * @param sqlOperator 操作符
      * @return
-     * @author Jovi
-     * @date 2017年8月30日上午11:37:56
      */
     public Condition where(String tableAlias, String field, Object value, SqlOperator sqlOperator) {
         return where(SqlLogic.AND, tableAlias, field, value, sqlOperator);
+    }
+
+    /**
+     * 添加where条件
+     *
+     * @param columnInfo  字段信息
+     * @param value       字段值
+     * @param sqlOperator 操作符
+     * @return
+     * @author Jovi
+     */
+    public Condition where(ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
+        return where(SqlLogic.AND, columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
+    }
+
+    /**
+     * 添加where条件
+     *
+     * @param sqlLogic    该条件与下一条件之间的逻辑关系
+     * @param columnInfo  字段信息
+     * @param value       字段值
+     * @param sqlOperator 操作符
+     * @return
+     * @author Jovi
+     */
+    public Condition where(SqlLogic sqlLogic, ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
+        return where(sqlLogic, columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
     }
 
     /**
@@ -149,26 +169,33 @@ public class Condition extends Common {
      * @param value       字段值
      * @param sqlOperator 操作符
      * @return
-     * @author Jovi
-     * @date 2017年8月30日上午11:43:15
      */
     public Condition where(SqlLogic sqlLogic, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
         whereMap.put(tableAlias + field, new SqlCondition(sqlLogic, tableAlias, field, value, sqlOperator));
         return this;
     }
 
+
     /**
      * where 条件 and 方法
      *
      * @param field
      * @param value
      * @return
-     * @author Jovi
-     * @date 2018年4月16日上午11:33:56
      */
     public Condition wAND(String field, Object value) {
-        where(SqlLogic.AND, "", field, value, SqlOperator.EQUAL_TO);
-        return this;
+        return wAND("", field, value, SqlOperator.EQUAL_TO);
+    }
+
+    /**
+     * where 条件 and 方法
+     *
+     * @param value
+     * @return
+     * @author Jovi
+     */
+    public Condition wAND(ColumnInfo columnInfo, Object value) {
+        return wAND(columnInfo.tableAlias(), columnInfo.name(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -178,12 +205,22 @@ public class Condition extends Common {
      * @param value
      * @param sqlOperator
      * @return
-     * @author Jovi
-     * @date 2018年4月16日上午11:34:03
      */
     public Condition wAND(String field, Object value, SqlOperator sqlOperator) {
-        where(SqlLogic.AND, "", field, value, sqlOperator);
-        return this;
+        return wAND("", field, value, sqlOperator);
+    }
+
+    /**
+     * where 条件 and 方法
+     *
+     * @param columnInfo
+     * @param value
+     * @param sqlOperator
+     * @return
+     * @author Jovi
+     */
+    public Condition wAND(ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
+        return wAND(columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
     }
 
     /**
@@ -193,12 +230,9 @@ public class Condition extends Common {
      * @param value
      * @param sqlOperator
      * @return
-     * @author Jovi
-     * @date 2018年4月16日上午11:34:03
      */
     public Condition wAND(String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        where(SqlLogic.AND, tableAlias, field, value, sqlOperator);
-        return this;
+        return where(SqlLogic.AND, tableAlias, field, value, sqlOperator);
     }
 
     /**
@@ -207,12 +241,21 @@ public class Condition extends Common {
      * @param field
      * @param value
      * @return
-     * @author Jovi
-     * @date 2018年4月16日上午11:34:29
      */
     public Condition wOR(String field, Object value) {
-        where(SqlLogic.OR, "", field, value, SqlOperator.EQUAL_TO);
-        return this;
+        return wOR(field, value, SqlOperator.EQUAL_TO);
+    }
+
+    /**
+     * where 条件 or 方法
+     *
+     * @param columnInfo
+     * @param value
+     * @return
+     * @author Jovi
+     */
+    public Condition wOR(ColumnInfo columnInfo, Object value) {
+        return wOR(columnInfo.tableAlias(), columnInfo.name(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -222,12 +265,21 @@ public class Condition extends Common {
      * @param value
      * @param sqlOperator
      * @return
-     * @author Jovi
-     * @date 2018年4月16日上午11:34:40
      */
     public Condition wOR(String field, Object value, SqlOperator sqlOperator) {
-        where(SqlLogic.OR, "", field, value, sqlOperator);
-        return this;
+        return wOR("", field, value, sqlOperator);
+    }
+
+    /**
+     * where 条件 or 方法
+     *
+     * @param columnInfo
+     * @param value
+     * @param sqlOperator
+     * @return
+     */
+    public Condition wOR(ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
+        return wOR(columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
     }
 
     /**
@@ -240,8 +292,7 @@ public class Condition extends Common {
      * @return
      */
     public Condition wOR(String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        where(SqlLogic.OR, tableAlias, field, value, sqlOperator);
-        return this;
+        return where(SqlLogic.OR, tableAlias, field, value, sqlOperator);
     }
 
     /**
@@ -250,12 +301,21 @@ public class Condition extends Common {
      * @param field
      * @param value
      * @return
-     * @author Jovi
-     * @date 2018年4月16日上午11:35:03
      */
     public Condition wANDBracket(String field, Object value) {
-        where(SqlLogic.ANDBracket, "", field, value, SqlOperator.EQUAL_TO);
-        return this;
+        return wANDBracket("", field, value, SqlOperator.EQUAL_TO);
+    }
+
+    /**
+     * where 条件 andBracket 方法
+     *
+     * @param columnInfo
+     * @param value
+     * @return
+     * @author Jovi
+     */
+    public Condition wANDBracket(ColumnInfo columnInfo, Object value) {
+        return wANDBracket(columnInfo.tableAlias(), columnInfo.name(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -265,12 +325,21 @@ public class Condition extends Common {
      * @param value
      * @param sqlOperator
      * @return
-     * @author Jovi
-     * @date 2018年4月16日上午11:35:20
      */
     public Condition wANDBracket(String field, Object value, SqlOperator sqlOperator) {
-        where(SqlLogic.ANDBracket, "", field, value, sqlOperator);
-        return this;
+        return wANDBracket("", field, value, sqlOperator);
+    }
+
+    /**
+     * where 条件 andBracket 方法
+     *
+     * @param columnInfo
+     * @param value
+     * @param sqlOperator
+     * @return
+     */
+    public Condition wANDBracket(ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
+        return wANDBracket(columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
     }
 
     /**
@@ -283,8 +352,7 @@ public class Condition extends Common {
      * @return
      */
     public Condition wANDBracket(String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        where(SqlLogic.ANDBracket, tableAlias, field, value, sqlOperator);
-        return this;
+        return where(SqlLogic.ANDBracket, tableAlias, field, value, sqlOperator);
     }
 
     /**
@@ -293,12 +361,21 @@ public class Condition extends Common {
      * @param field
      * @param value
      * @return
-     * @author Jovi
-     * @date 2018年4月16日上午11:34:44
      */
     public Condition wORBracket(String field, Object value) {
-        where(SqlLogic.ORBracket, "", field, value, SqlOperator.EQUAL_TO);
-        return this;
+        return wORBracket("", field, value, SqlOperator.EQUAL_TO);
+    }
+
+    /**
+     * where 条件 orBracket 方法
+     *
+     * @param columnInfo
+     * @param value
+     * @return
+     * @author Jovi
+     */
+    public Condition wORBracket(ColumnInfo columnInfo, Object value) {
+        return wORBracket(columnInfo.tableAlias(), columnInfo.name(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -308,12 +385,21 @@ public class Condition extends Common {
      * @param value
      * @param sqlOperator
      * @return
-     * @author Jovi
-     * @date 2018年4月16日上午11:35:00
      */
     public Condition wORBracket(String field, Object value, SqlOperator sqlOperator) {
-        where(SqlLogic.ORBracket, "", field, value, sqlOperator);
-        return this;
+        return wORBracket("", field, value, sqlOperator);
+    }
+
+    /**
+     * where 条件 orBracket 方法
+     *
+     * @param columnInfo
+     * @param value
+     * @param sqlOperator
+     * @return
+     */
+    public Condition wORBracket(ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
+        return wORBracket(columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
     }
 
     /**
@@ -326,8 +412,7 @@ public class Condition extends Common {
      * @return
      */
     public Condition wORBracket(String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        where(SqlLogic.ORBracket, tableAlias, field, value, sqlOperator);
-        return this;
+        return where(SqlLogic.ORBracket, tableAlias, field, value, sqlOperator);
     }
 
 }

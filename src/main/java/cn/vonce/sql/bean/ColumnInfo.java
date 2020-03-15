@@ -19,6 +19,10 @@ public class ColumnInfo {
     private String tableAlias;
     private String name;
 
+    public String tableAlias() {
+        return tableAlias;
+    }
+
     public String fullName() {
         if (StringUtil.isNotEmpty(tableAlias)) {
             return tableAlias + SqlHelperCons.POINT + name;
@@ -52,8 +56,28 @@ public class ColumnInfo {
         return SqlHelperCons.DOUBLE_ESCAPE_CHARACTER + name + SqlHelperCons.DOUBLE_ESCAPE_CHARACTER;
     }
 
+    public String count() {
+        return "COUNT(" + fullName() + ")";
+    }
+
+    public String avg() {
+        return "AVG(" + fullName() + ")";
+    }
+
+    public String max() {
+        return "MAX(" + fullName() + ")";
+    }
+
+    public String min() {
+        return "MIN(" + fullName() + ")";
+    }
+
+    public String sum() {
+        return "SUM(" + fullName() + ")";
+    }
+
     @Override
     public String toString() {
-        return name();
+        return fullName();
     }
 }

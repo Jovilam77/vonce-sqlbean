@@ -20,8 +20,6 @@ public interface InsertService<T> {
      *
      * @param bean
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:05:03
      */
     @SuppressWarnings("unchecked")
     long insert(T... bean);
@@ -31,8 +29,6 @@ public interface InsertService<T> {
      *
      * @param beanList
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:05:03
      */
     @SuppressWarnings("unchecked")
     long insert(List<T> beanList);
@@ -42,8 +38,6 @@ public interface InsertService<T> {
      *
      * @param insert
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:05:03
      */
     long inset(Insert insert);
 

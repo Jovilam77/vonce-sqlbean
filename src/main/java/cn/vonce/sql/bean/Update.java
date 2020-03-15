@@ -20,8 +20,6 @@ public class Update extends Condition implements Serializable {
      * 设置是否只更新不为null的字段
      *
      * @return
-     * @author Jovi
-     * @date 2017年9月6日下午12:50:54
      */
     public boolean isUpdateNotNull() {
         return updateNotNull;
@@ -31,8 +29,6 @@ public class Update extends Condition implements Serializable {
      * 设置是否只更新不为null的字段
      *
      * @param updateNotNull
-     * @author Jovi
-     * @date 2017年9月6日下午12:51:19
      */
     public void setUpdateNotNull(boolean updateNotNull) {
         this.updateNotNull = updateNotNull;
@@ -42,8 +38,6 @@ public class Update extends Condition implements Serializable {
      * 获取更新实体类
      *
      * @return
-     * @author Jovi
-     * @date 2017年8月18日上午8:56:05
      */
     public Object getUpdateBean() {
         return updateBean;
@@ -53,8 +47,6 @@ public class Update extends Condition implements Serializable {
      * 设置更新实体类
      *
      * @param updateBean
-     * @author Jovi
-     * @date 2017年8月18日上午8:55:58
      */
     public void setUpdateBean(Object updateBean) {
         this.updateBean = updateBean;
@@ -64,8 +56,6 @@ public class Update extends Condition implements Serializable {
      * 获取过滤的字段
      *
      * @return
-     * @author Jovi
-     * @date 2017年8月18日上午8:59:26
      */
     public String[] getFilterFields() {
         return filterFields;
@@ -75,8 +65,6 @@ public class Update extends Condition implements Serializable {
      * 设置过滤的字段
      *
      * @param filterField
-     * @author Jovi
-     * @date 2017年8月18日上午8:59:14
      */
     public void setFilterFields(String... filterField) {
         this.filterFields = filterField;

@@ -18,8 +18,6 @@ public interface DeleteService<ID> {
      *
      * @param id
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:04:39
      */
     long deleteById(ID... id);
 
@@ -29,8 +27,7 @@ public interface DeleteService<ID> {
      * @param where
      * @param args
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:04:43
+     *
      */
     long deleteByCondition(String where, Object... args);
 
@@ -39,8 +36,6 @@ public interface DeleteService<ID> {
      *
      * @param delete
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:04:43
      */
     long delete(Delete delete);
 
@@ -48,10 +43,8 @@ public interface DeleteService<ID> {
      * 删除
      *
      * @param delete
-     * @param ignore  如果为true则不指定where条件也能执行，false则抛异常
+     * @param ignore 如果为true则不指定where条件也能执行，false则抛异常
      * @return
-     * @author Jovi
-     * @date 2018年1月12日下午4:19:43
      */
     long delete(Delete delete, boolean ignore);
 
@@ -60,8 +53,6 @@ public interface DeleteService<ID> {
      *
      * @param id
      * @return
-     * @author Jovi
-     * @date 2019年6月6日下午16:41:20
      */
     long logicallyDeleteById(ID id);
 
@@ -71,8 +62,6 @@ public interface DeleteService<ID> {
      * @param where
      * @param args
      * @return
-     * @author Jovi
-     * @date 2019年6月6日下午16:41:20
      */
     long logicallyDeleteByCondition(String where, Object... args);
 

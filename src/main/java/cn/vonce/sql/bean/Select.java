@@ -38,8 +38,6 @@ public class Select extends Condition implements Serializable {
      * 获取useDistinct是否过滤重复
      *
      * @return
-     * @author Jovi
-     * @date 2017年8月18日下午4:21:19
      */
     public boolean isUseDistinct() {
         return useDistinct;
@@ -49,8 +47,6 @@ public class Select extends Condition implements Serializable {
      * 设置useDistinct是否过滤重复
      *
      * @param useDistinct 是否过滤
-     * @author Jovi
-     * @date 2017年8月18日下午4:21:05
      */
     public void setUseDistinct(boolean useDistinct) {
         this.useDistinct = useDistinct;
@@ -60,8 +56,6 @@ public class Select extends Condition implements Serializable {
      * 获取column sql 内容
      *
      * @return
-     * @author Jovi
-     * @date 2017年8月18日上午9:00:05
      */
     public List<Column> getColumnList() {
         return columnList;
@@ -77,11 +71,9 @@ public class Select extends Condition implements Serializable {
     }
 
     /**
-     * 设置column（追加）
+     * 设置column
      *
      * @param columnNames
-     * @author Jovi
-     * @date 2017年8月18日上午8:59:56
      */
     public void setColumn(String... columnNames) {
         for (String columnName : columnNames) {
@@ -90,16 +82,37 @@ public class Select extends Condition implements Serializable {
     }
 
     /**
+     * 设置column
+     *
+     * @param columnInfos
+     */
+    public void setColumn(ColumnInfo... columnInfos) {
+        if (columnInfos == null || columnInfos.length == 0) {
+            return;
+        }
+        for (ColumnInfo columnInfo : columnInfos) {
+            this.columnList.add(new Column(columnInfo.tableAlias(), columnInfo.name(), ""));
+        }
+    }
+
+    /**
+     * 添加column列字段
+     *
+     * @param columnInfo
+     * @return
+     */
+    public Select column(ColumnInfo columnInfo) {
+        return column(columnInfo.tableAlias(), columnInfo.name(), "");
+    }
+
+    /**
      * 添加column列字段
      *
      * @param columnName
      * @return
-     * @author Jovi
-     * @date 2017年8月18日下午4:18:18
      */
     public Select column(String columnName) {
-        columnList.add(new Column(columnName));
-        return this;
+        return column("", columnName, "");
     }
 
     /**
@@ -108,12 +121,19 @@ public class Select extends Condition implements Serializable {
      * @param columnName  列列字段名
      * @param columnAlias 别名
      * @return
-     * @author Jovi
-     * @date 2017年8月18日下午4:18:18
      */
     public Select column(String columnName, String columnAlias) {
-        columnList.add(new Column(columnName, columnAlias));
-        return this;
+        return column("", columnName, columnAlias);
+    }
+
+    /**
+     * 添加column列字段
+     *
+     * @param columnInfo
+     * @return
+     */
+    public Select column(ColumnInfo columnInfo, String columnAlias) {
+        return column(columnInfo.tableAlias(), columnInfo.name(), columnAlias);
     }
 
     /**
@@ -123,8 +143,6 @@ public class Select extends Condition implements Serializable {
      * @param columnName  列列字段名
      * @param columnAlias 别名
      * @return
-     * @author Jovi
-     * @date 2017年8月18日下午4:18:18
      */
     public Select column(String tableAlias, String columnName, String columnAlias) {
         columnList.add(new Column(tableAlias, columnName, columnAlias));
@@ -144,8 +162,6 @@ public class Select extends Condition implements Serializable {
      * @param table        关联的表名
      * @param tableKeyword 关联的表关键列字段
      * @param mainKeyword  主表关键列字段
-     * @author Jovi
-     * @date 2019年6月21日上午10:27:50
      */
     public Select join(String table, String tableKeyword, String mainKeyword) {
         return join(JoinType.INNER_JOIN, table, table, tableKeyword, mainKeyword);
@@ -158,8 +174,6 @@ public class Select extends Condition implements Serializable {
      * @param table        关联的表名
      * @param tableKeyword 关联的表关键列字段
      * @param mainKeyword  主表关键列字段
-     * @author Jovi
-     * @date 2019年6月21日上午10:27:50
      */
     public Select join(JoinType joinType, String table, String tableKeyword, String mainKeyword) {
         return join(joinType, table, table, tableKeyword, mainKeyword);
@@ -171,8 +185,6 @@ public class Select extends Condition implements Serializable {
      * @param table        关联的表名
      * @param tableKeyword 关联的表关键列字段
      * @param mainKeyword  主表关键列字段
-     * @author Jovi
-     * @date 2019年6月21日上午10:27:50
      */
     public Select join(String table, String tableAlias, String tableKeyword, String mainKeyword) {
         return join(JoinType.INNER_JOIN, table, tableAlias, tableKeyword, mainKeyword);
@@ -185,8 +197,6 @@ public class Select extends Condition implements Serializable {
      * @param table        关联的表名
      * @param tableKeyword 关联的表关键列字段
      * @param mainKeyword  主表关键列字段
-     * @author Jovi
-     * @date 2019年6月21日上午10:27:50
      */
     public Select join(JoinType joinType, String table, String tableAlias, String tableKeyword, String mainKeyword) {
         joinList.add(new Join(joinType, table, tableAlias, tableKeyword, mainKeyword));
@@ -197,8 +207,6 @@ public class Select extends Condition implements Serializable {
      * 获取groupBy分组列字段
      *
      * @return
-     * @author Jovi
-     * @date 2017年8月18日下午4:19:36
      */
     public List<Group> getGroupBy() {
         return groupByList;
@@ -209,8 +217,6 @@ public class Select extends Condition implements Serializable {
      *
      * @param columNname 列字段名
      * @return
-     * @author Jovi
-     * @date 2017年8月18日下午3:32:56
      */
     public Select groupBy(String columNname) {
         return groupBy("", columNname);
@@ -219,11 +225,19 @@ public class Select extends Condition implements Serializable {
     /**
      * 添加groupBy分组
      *
+     * @param columnInfo 列字段信息
+     * @return
+     */
+    public Select groupBy(ColumnInfo columnInfo) {
+        return groupBy(columnInfo.tableAlias(), columnInfo.name());
+    }
+
+    /**
+     * 添加groupBy分组
+     *
      * @param tableAlias 表别名
      * @param columNname 列字段名
      * @return
-     * @author Jovi
-     * @date 2017年8月18日下午3:32:56
      */
     public Select groupBy(String tableAlias, String columNname) {
         groupByList.add(new Group(tableAlias, columNname));
@@ -234,8 +248,6 @@ public class Select extends Condition implements Serializable {
      * 获取where sql 内容
      *
      * @return
-     * @author Jovi
-     * @date 2017年8月18日上午8:58:33
      */
     public String getHaving() {
         return having;
@@ -245,8 +257,6 @@ public class Select extends Condition implements Serializable {
      * 设置having sql 内容
      *
      * @param having
-     * @author Jovi
-     * @date 2017年8月18日上午8:58:11
      */
     public void setHaving(String having) {
         this.having = having;
@@ -257,8 +267,6 @@ public class Select extends Condition implements Serializable {
      *
      * @param having
      * @param args
-     * @author Jovi
-     * @date 2018年9月13日下午15:34:45
      */
     public void setHaving(String having, Object... args) {
         this.having = having;
@@ -287,8 +295,6 @@ public class Select extends Condition implements Serializable {
      * 获取having条件值映射
      *
      * @return
-     * @author Jovi
-     * @date 2017年8月18日下午4:19:25
      */
     public ListMultimap<String, SqlCondition> getHavingMap() {
         return havingMap;
@@ -298,8 +304,6 @@ public class Select extends Condition implements Serializable {
      * 获取orderBy排序列字段
      *
      * @return
-     * @author Jovi
-     * @date 2017年8月18日下午4:18:45
      */
     public List<Order> getOrderBy() {
         return orderByList;
@@ -310,11 +314,20 @@ public class Select extends Condition implements Serializable {
      *
      * @param columNname 列字段名
      * @param sqlSort    排序方式
-     * @author Jovi
-     * @date 2017年8月18日上午11:10:11
      */
     public Select orderBy(String columNname, SqlSort sqlSort) {
         return orderBy("", columNname, sqlSort);
+    }
+
+    /**
+     * 添加列字段排序
+     *
+     * @param columnInfo 列字段信息
+     * @param sqlSort    排序方式
+     * @return
+     */
+    public Select orderBy(ColumnInfo columnInfo, SqlSort sqlSort) {
+        return orderBy(columnInfo.tableAlias(), columnInfo.name(), sqlSort);
     }
 
     /**
@@ -324,8 +337,6 @@ public class Select extends Condition implements Serializable {
      * @param columNname 列字段名
      * @param sqlSort    排序方式
      * @return
-     * @author Jovi
-     * @date 2018年4月16日下午6:31:18
      */
     public Select orderBy(String tableAlias, String columNname, SqlSort sqlSort) {
         orderByList.add(new Order(tableAlias, columNname, sqlSort));
@@ -367,11 +378,21 @@ public class Select extends Condition implements Serializable {
      *
      * @param field 列字段
      * @param value 列字段值
-     * @author Jovi
-     * @date 2017年8月18日上午8:53:11
+     * @return
      */
     public Select having(String field, Object value) {
         return having(field, value, SqlOperator.EQUAL_TO);
+    }
+
+    /**
+     * 添加having条件
+     *
+     * @param columnInfo 列字段信息
+     * @param value      列字段值
+     * @return
+     */
+    public Select having(ColumnInfo columnInfo, Object value) {
+        return having(columnInfo.tableAlias(), columnInfo.name(), value, SqlOperator.EQUAL_TO);
     }
 
 
@@ -382,8 +403,6 @@ public class Select extends Condition implements Serializable {
      * @param value       列字段值
      * @param sqlOperator 操作符
      * @return
-     * @author Jovi
-     * @date 2017年8月30日上午11:37:56
      */
     public Select having(String field, Object value, SqlOperator sqlOperator) {
         return having(SqlLogic.AND, "", field, value, sqlOperator);
@@ -395,13 +414,21 @@ public class Select extends Condition implements Serializable {
      * @param field      列字段
      * @param value      列字段值
      * @return
-     * @author Jovi
-     * @date 2017年8月18日下午4:08:28
-     * @author Jovi
-     * @date 2017年8月18日上午8:53:13
      */
     public Select having(SqlLogic sqlLogic, String tableAlias, String field, Object value) {
         return having(sqlLogic, tableAlias, field, value, SqlOperator.EQUAL_TO);
+    }
+
+    /**
+     * 添加having条件
+     *
+     * @param columnInfo  列字段信息
+     * @param value       列字段值
+     * @param sqlOperator 操作符
+     * @return
+     */
+    public Select having(ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
+        return having(columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
     }
 
     /**
@@ -412,11 +439,22 @@ public class Select extends Condition implements Serializable {
      * @param value       列字段值
      * @param sqlOperator 操作符
      * @return
-     * @author Jovi
-     * @date 2017年8月30日上午11:37:56
      */
     public Select having(String tableAlias, String field, Object value, SqlOperator sqlOperator) {
         return having(SqlLogic.AND, tableAlias, field, value, sqlOperator);
+    }
+
+    /**
+     * 添加having条件
+     *
+     * @param sqlLogic    该条件与下一条件之间的逻辑关系
+     * @param columnInfo  列字段信息
+     * @param value       列字段值
+     * @param sqlOperator 操作符
+     * @return
+     */
+    public Select having(SqlLogic sqlLogic, ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
+        return having(sqlLogic, columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
     }
 
     /**
@@ -428,8 +466,6 @@ public class Select extends Condition implements Serializable {
      * @param value       列字段值
      * @param sqlOperator 操作符
      * @return
-     * @author Jovi
-     * @date 2017年8月30日上午11:43:15
      */
     public Select having(SqlLogic sqlLogic, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
         havingMap.put(tableAlias + field, new SqlCondition(sqlLogic, tableAlias, field, value, sqlOperator));
@@ -440,8 +476,6 @@ public class Select extends Condition implements Serializable {
      * 获取过滤的列字段
      *
      * @return
-     * @author Jovi
-     * @date 2017年8月18日上午8:59:26
      */
     public String[] getFilterFields() {
         return filterFields;
@@ -451,8 +485,6 @@ public class Select extends Condition implements Serializable {
      * 设置过滤的列字段
      *
      * @param filterField
-     * @author Jovi
-     * @date 2017年8月18日上午8:59:14
      */
     public void setFilterFields(String... filterField) {
         this.filterFields = filterField;
@@ -464,8 +496,6 @@ public class Select extends Condition implements Serializable {
      * @return
      * @throws IOException
      * @throws ClassNotFoundException
-     * @author Jovi
-     * @date 2017年8月18日上午8:53:55
      */
     public Object copy() throws IOException, ClassNotFoundException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

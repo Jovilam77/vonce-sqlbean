@@ -79,8 +79,6 @@ public class SqlBeanUtil {
      *
      * @param field
      * @return
-     * @author Jovi
-     * @date 2018年6月14日下午6:12:50
      */
     public static String getTableFieldName(Field field) {
         SqlBeanField sqlBeanField = field.getAnnotation(SqlBeanField.class);
@@ -96,8 +94,6 @@ public class SqlBeanUtil {
      *
      * @param clazz
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:15:58
      */
     public static Field getIdField(Class<?> clazz) throws SqlBeanException {
         return getIdField(getBeanAllField(clazz));
@@ -133,8 +129,6 @@ public class SqlBeanUtil {
      *
      * @param clazz
      * @return
-     * @author Jovi
-     * @date 2019年5月29日下午4:40:20
      */
     public static Field getLogicallyField(Class<?> clazz) throws SqlBeanException {
         List<Field> fieldList = getBeanAllField(clazz);
@@ -152,8 +146,6 @@ public class SqlBeanUtil {
      *
      * @param field
      * @return
-     * @author Jovi
-     * @date 2018年6月14日下午6:21:13
      */
     public static boolean isIgnore(Field field) {
         SqlBeanField sqlBeanField = field.getAnnotation(SqlBeanField.class);
@@ -169,8 +161,6 @@ public class SqlBeanUtil {
      * @param filterTableFields
      * @param tableFieldName
      * @return
-     * @author Jovi
-     * @date 2018年6月14日下午6:21:13
      */
     public static boolean isFilter(String[] filterTableFields, String tableFieldName) {
         if (filterTableFields != null) {
@@ -250,8 +240,6 @@ public class SqlBeanUtil {
      * @param clazz
      * @param filterTableFields
      * @return
-     * @author Jovi
-     * @date 2018年6月15日下午3:29:15
      */
     public static List<Column> getSelectColumns(Class<?> clazz, String[] filterTableFields) throws SqlBeanException {
         if (clazz == null) {
@@ -419,8 +407,6 @@ public class SqlBeanUtil {
      * @param where
      * @param args
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:15:37
      */
     public static String getCondition(Common common, String where, Object[] args) {
         if (where == null || where.equals("")) {
@@ -467,8 +453,6 @@ public class SqlBeanUtil {
      * @param where
      * @param bean
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午3:25:57
      */
     public static String getCondition(Common common, String where, Object bean) {
         String prefix = "${";
@@ -518,8 +502,6 @@ public class SqlBeanUtil {
      *
      * @param typeName
      * @return
-     * @author Jovi
-     * @date 2017年6月22日下午7:08:13
      */
     public static WhatType whatType(String typeName) {
         WhatType whatType;
@@ -634,8 +616,6 @@ public class SqlBeanUtil {
      *
      * @param value
      * @return
-     * @author Jovi
-     * @date 2018年3月1日下午12:01:05
      */
     public static String getSqlValue(Common common, Object value) {
         if (value == null) {
@@ -698,8 +678,6 @@ public class SqlBeanUtil {
      *
      * @param str
      * @return
-     * @author Jovi
-     * @date 2018年3月1日上午11:30:41
      */
     public static String filterSQLInject(String str) {
         return str.replaceAll("([';])+|(--)+", "");

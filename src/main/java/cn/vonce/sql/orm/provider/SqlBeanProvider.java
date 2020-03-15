@@ -30,8 +30,6 @@ public class SqlBeanProvider {
      * @param clazz
      * @param id
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:22:05
      */
     public String selectByIdSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object id) {
         return selectByIdsSql(sqlBeanConfig, clazz, new Object[]{id});
@@ -43,8 +41,6 @@ public class SqlBeanProvider {
      * @param clazz
      * @param ids
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:22:05
      */
     public String selectByIdsSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object... ids) {
         Select select;
@@ -72,8 +68,6 @@ public class SqlBeanProvider {
      * @param where
      * @param args
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:21:33
      */
     public String selectByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Paging paging, String where, Object... args) {
         Select select = newSelect(sqlBeanConfig, clazz, false);
@@ -89,8 +83,6 @@ public class SqlBeanProvider {
      * @param where
      * @param args
      * @return
-     * @author Jovi
-     * @date 2018年7月5日下午4:09:45
      */
     public String selectCountByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String where, Object[] args) {
         Select select = newSelect(sqlBeanConfig, clazz, true);
@@ -103,8 +95,6 @@ public class SqlBeanProvider {
      *
      * @param clazz
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:21:27
      */
     public String selectAllSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Paging paging) {
         Select select = newSelect(sqlBeanConfig, clazz, false);
@@ -119,8 +109,6 @@ public class SqlBeanProvider {
      * @param clazz
      * @param select
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:21:05
      */
     public String selectSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Select select) {
         if (select.getSqlBeanConfig() == null) {
@@ -147,8 +135,6 @@ public class SqlBeanProvider {
      * @param clazz
      * @param select
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:20:22
      */
     public String countSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Select select) {
         if (select.getSqlBeanConfig() == null) {
@@ -166,8 +152,6 @@ public class SqlBeanProvider {
      * @param clazz
      * @param id
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:20:10
      */
     public String deleteByIdSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object id) {
         if (StringUtil.isEmpty(id)) {
@@ -199,8 +183,6 @@ public class SqlBeanProvider {
      * @param where
      * @param args
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:19:59
      */
     public String deleteByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String where, Object[] args) {
         Delete delete = new Delete();
@@ -217,8 +199,6 @@ public class SqlBeanProvider {
      * @param delete
      * @param ignore
      * @return
-     * @author Jovi
-     * @date 2019年1月12日下午2:19:59
      */
     public String deleteSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Delete delete, boolean ignore) {
         if (delete.getSqlBeanConfig() == null) {
@@ -245,8 +225,6 @@ public class SqlBeanProvider {
      * @param clazz
      * @param id
      * @return
-     * @author Jovi
-     * @date 2019年6月12日下午2:19:59
      */
     public String logicallyDeleteByIdSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object id) {
         Update update = new Update();
@@ -271,8 +249,6 @@ public class SqlBeanProvider {
      * @param where
      * @param args
      * @return
-     * @author Jovi
-     * @date 2019年6月12日下午2:19:59
      */
     public String logicallyDeleteByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String where, Object[] args) {
         Update update = new Update();
@@ -294,8 +270,6 @@ public class SqlBeanProvider {
      * @param update
      * @param ignore
      * @return
-     * @author Jovi
-     * @date 2019年1月12日下午4:16:24
      */
     public String updateSql(SqlBeanConfig sqlBeanConfig, Update update, boolean ignore) {
         if (update.getSqlBeanConfig() == null) {
@@ -320,8 +294,6 @@ public class SqlBeanProvider {
      * @param updateNotNull
      * @param filterFields
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:19:24
      */
     public String updateByIdSql(SqlBeanConfig sqlBeanConfig, Object bean, Object id, boolean updateNotNull, String[] filterFields) {
         if (StringUtil.isEmpty(id)) {
@@ -352,8 +324,6 @@ public class SqlBeanProvider {
      * @param updateNotNull
      * @param filterFields
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:19:24
      */
     public String updateByBeanIdSql(SqlBeanConfig sqlBeanConfig, Object bean, boolean updateNotNull, String[] filterFields) {
         Update update = newUpdate(sqlBeanConfig, bean, updateNotNull);
@@ -387,8 +357,6 @@ public class SqlBeanProvider {
      * @param where
      * @param args
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:18:03
      */
     public String updateByConditionSql(SqlBeanConfig sqlBeanConfig, Object bean, boolean updateNotNull, String[] filterFields, String where, Object[] args) {
         Update update = newUpdate(sqlBeanConfig, bean, updateNotNull);
@@ -405,8 +373,6 @@ public class SqlBeanProvider {
      * @param filterFields
      * @param where
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:16:36
      */
     public String updateByBeanConditionSql(SqlBeanConfig sqlBeanConfig, Object bean, boolean updateNotNull, String[] filterFields, String where) {
         Update update = newUpdate(sqlBeanConfig, bean, updateNotNull);
@@ -420,8 +386,6 @@ public class SqlBeanProvider {
      *
      * @param bean
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:16:30
      */
     public String insertBeanSql(SqlBeanConfig sqlBeanConfig, Object bean) {
         Insert insert = new Insert();
@@ -436,8 +400,6 @@ public class SqlBeanProvider {
      * @param sqlBeanConfig
      * @param insert
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:16:30
      */
     public String insertSql(SqlBeanConfig sqlBeanConfig, Insert insert) {
         if (insert.getSqlBeanConfig() == null) {

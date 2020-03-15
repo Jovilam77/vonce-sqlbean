@@ -23,8 +23,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:22:05
      */
     public String selectById(Map<String, Object> map) {
         return super.selectByIdSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), map.get("id"));
@@ -35,8 +33,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:22:05
      */
     public String selectByIds(Map<String, Object> map) {
         return super.selectByIdsSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), (Object[]) map.get("ids"));
@@ -47,8 +43,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:21:33
      */
     public String selectByCondition(Map<String, Object> map) {
         Paging paging = null;
@@ -67,8 +61,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2018年7月5日下午4:09:45
      */
     public String selectCountByCondition(Map<String, Object> map) {
         Object[] args = null;
@@ -83,8 +75,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:21:27
      */
     public String selectAll(Map<String, Object> map) {
         Paging paging = null;
@@ -99,8 +89,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:21:05
      */
     public String select(Map<String, Object> map) {
         return super.selectSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), (Select) map.get("select"));
@@ -111,8 +99,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:20:22
      */
     public String count(Map<String, Object> map) {
         return super.countSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), (Select) map.get("select"));
@@ -123,8 +109,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:20:10
      */
     public String deleteById(Map<String, Object> map) {
         return super.deleteByIdSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), map.get("id"));
@@ -135,8 +119,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:19:59
      */
     public String deleteByCondition(Map<String, Object> map) {
         Object[] args = null;
@@ -151,8 +133,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2019年1月12日下午2:19:59
      */
     public String delete(Map<String, Object> map) {
         return super.deleteSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), (Delete) map.get("delete"), (boolean) map.get("ignore"));
@@ -163,8 +143,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2019年6月6日下午16:41:20
      */
     public String logicallyDeleteById(Map<String, Object> map) {
         return super.logicallyDeleteByIdSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), map.get("id"));
@@ -175,8 +153,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2019年6月6日下午16:41:20
      */
     public String logicallyDeleteByCondition(Map<String, Object> map) {
         Object[] args = null;
@@ -191,8 +167,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2019年1月12日下午4:16:24
      */
     public String update(Map<String, Object> map) {
         return super.updateSql((SqlBeanConfig) map.get("sqlBeanConfig"),(Update) map.get("update"), (boolean) map.get("ignore"));
@@ -203,8 +177,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:19:24
      */
     public String updateById(Map<String, Object> map) {
         return super.updateByIdSql((SqlBeanConfig) map.get("sqlBeanConfig"), map.get("bean"), map.get("id"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"));
@@ -215,8 +187,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:19:24
      */
     public String updateByBeanId(Map<String, Object> map) {
         return super.updateByBeanIdSql((SqlBeanConfig) map.get("sqlBeanConfig"), map.get("bean"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"));
@@ -227,8 +197,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:18:03
      */
     public String updateByCondition(Map<String, Object> map) {
         Object[] args = null;
@@ -243,8 +211,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:16:36
      */
     public String updateByBeanCondition(Map<String, Object> map) {
         return super.updateByBeanConditionSql((SqlBeanConfig) map.get("sqlBeanConfig"), map.get("bean"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"), (String) map.get("where"));
@@ -255,8 +221,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:16:30
      */
     public String insertBean(Map<String, Object> map) {
         return super.insertBeanSql((SqlBeanConfig) map.get("sqlBeanConfig"), map.get("beanList"));
@@ -267,8 +231,6 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      *
      * @param map
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午2:16:30
      */
     public String insert(Map<String, Object> map) {
         return super.insertBeanSql((SqlBeanConfig) map.get("sqlBeanConfig"), map.get("insert"));

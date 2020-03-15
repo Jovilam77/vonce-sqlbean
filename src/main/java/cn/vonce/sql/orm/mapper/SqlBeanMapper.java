@@ -179,8 +179,6 @@ public class SqlBeanMapper {
      * @param fieldName
      * @param resultSet
      * @return
-     * @author Jovi
-     * @date 2018年5月15日上午9:21:04
      */
     public Object getValue(String fieldType, String fieldName, ResultSet resultSet) {
         Object value = null;
@@ -254,8 +252,6 @@ public class SqlBeanMapper {
      * @param index
      * @param resultSet
      * @return
-     * @author Jovi
-     * @date 2018年7月30日上午20:55:35
      */
     public Object getValue(String jdbcType, int index, ResultSet resultSet) {
         Object value = null;

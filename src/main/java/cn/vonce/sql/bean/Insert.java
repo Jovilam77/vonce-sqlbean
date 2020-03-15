@@ -18,8 +18,6 @@ public class Insert extends Common implements Serializable {
      * 获取插入实体类
      *
      * @return
-     * @author Jovi
-     * @date 2017年8月18日上午8:55:19
      */
     public Object getInsertBean() {
         return insertBean;
@@ -29,8 +27,6 @@ public class Insert extends Common implements Serializable {
      * 设置插入实体类
      *
      * @param insertBean
-     * @author Jovi
-     * @date 2017年8月18日上午8:55:06
      */
     public void setInsertBean(Object insertBean) {
         this.insertBean = insertBean;

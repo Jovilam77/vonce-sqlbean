@@ -23,8 +23,6 @@ public interface SelectService<T, ID> extends PagingService {
      *
      * @param id
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:03:28
      */
     T selectById(ID id);
 
@@ -34,8 +32,6 @@ public interface SelectService<T, ID> extends PagingService {
      * @param returnType
      * @param id
      * @return
-     * @author Jovi
-     * @date 2018年6月15日下午6:36:38
      */
     <O> O selectById(Class<O> returnType, ID id);
 
@@ -44,8 +40,6 @@ public interface SelectService<T, ID> extends PagingService {
      *
      * @param ids
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午3:58:28
      */
     List<T> selectByIds(ID... ids);
 
@@ -55,8 +49,6 @@ public interface SelectService<T, ID> extends PagingService {
      * @param returnType
      * @param ids
      * @return
-     * @author Jovi
-     * @date 2018年6月15日下午6:36:38
      */
     <O> List<O> selectByIds(Class<O> returnType, ID... ids);
 
@@ -65,8 +57,6 @@ public interface SelectService<T, ID> extends PagingService {
      *
      * @param select
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:03:42
      */
     T selectOne(Select select);
 
@@ -76,8 +66,6 @@ public interface SelectService<T, ID> extends PagingService {
      * @param returnType
      * @param select
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午3:58:46
      */
     <O> O selectOne(Class<O> returnType, Select select);
 
@@ -86,8 +74,6 @@ public interface SelectService<T, ID> extends PagingService {
      *
      * @param select
      * @return
-     * @author Jovi
-     * @date 2019年5月17日下午5:11:22
      */
     Map<String, Object> selectMap(Select select);
 
@@ -97,8 +83,6 @@ public interface SelectService<T, ID> extends PagingService {
      * @param where
      * @param args
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:03:56
      */
     T selectOneByCondition(String where, Object... args);
 
@@ -109,8 +93,6 @@ public interface SelectService<T, ID> extends PagingService {
      * @param where
      * @param args
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:03:56
      */
     <O> O selectOneByCondition(Class<O> returnType, String where, Object... args);
 
@@ -120,8 +102,6 @@ public interface SelectService<T, ID> extends PagingService {
      * @param where
      * @param args
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:03:56
      */
     List<T> selectByCondition(String where, Object... args);
 
@@ -132,8 +112,6 @@ public interface SelectService<T, ID> extends PagingService {
      * @param where
      * @param args
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:03:56
      */
     List<T> selectByCondition(Paging paging, String where, Object... args);
 
@@ -144,8 +122,6 @@ public interface SelectService<T, ID> extends PagingService {
      * @param where
      * @param args
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:03:56
      */
     <O> List<O> selectByCondition(Class<O> returnType, String where, Object... args);
 
@@ -157,8 +133,6 @@ public interface SelectService<T, ID> extends PagingService {
      * @param where
      * @param args
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:03:56
      */
     <O> List<O> selectByCondition(Class<O> returnType, Paging paging, String where, Object... args);
 
@@ -168,8 +142,6 @@ public interface SelectService<T, ID> extends PagingService {
      * @param where
      * @param args
      * @return
-     * @author Jovi
-     * @date 2018年7月5日下午4:09:45
      */
     long selectCountByCondition(String where, Object... args);
 
@@ -177,8 +149,6 @@ public interface SelectService<T, ID> extends PagingService {
      * 统计全部
      *
      * @return
-     * @author Jovi
-     * @date 2019年6月24日下午3:20:21
      */
     long countAll();
 
@@ -186,8 +156,6 @@ public interface SelectService<T, ID> extends PagingService {
      * 查询全部
      *
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:03:59
      */
     List<T> selectAll();
 
@@ -196,8 +164,6 @@ public interface SelectService<T, ID> extends PagingService {
      *
      * @param returnType
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:03:59
      */
     <O> List<O> selectAll(Class<O> returnType);
 
@@ -206,8 +172,6 @@ public interface SelectService<T, ID> extends PagingService {
      *
      * @param paging
      * @return
-     * @author Jovi
-     * @date 2019年6月23日下午11:59:49
      */
     List<T> selectAll(Paging paging);
 
@@ -217,8 +181,6 @@ public interface SelectService<T, ID> extends PagingService {
      * @param returnType
      * @param paging
      * @return
-     * @author Jovi
-     * @date 2019年6月23日下午11:59:49
      */
     <O> List<O> selectAll(Class<O> returnType, Paging paging);
 
@@ -227,8 +189,6 @@ public interface SelectService<T, ID> extends PagingService {
      *
      * @param select
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:04:15
      */
     List<Map<String, Object>> selectMapList(Select select);
 
@@ -237,8 +197,6 @@ public interface SelectService<T, ID> extends PagingService {
      *
      * @param select
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:04:15
      */
     List<T> select(Select select);
 
@@ -248,8 +206,6 @@ public interface SelectService<T, ID> extends PagingService {
      * @param returnType
      * @param select
      * @return
-     * @author Jovi
-     * @date 2018年6月13日下午2:39:08
      */
     <O> List<O> select(Class<O> returnType, Select select);
 
@@ -258,8 +214,6 @@ public interface SelectService<T, ID> extends PagingService {
      *
      * @param select
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:04:34
      */
     long count(Select select);
 
@@ -269,8 +223,6 @@ public interface SelectService<T, ID> extends PagingService {
      * @param clazz
      * @param select
      * @return
-     * @author Jovi
-     * @date 2018年5月15日下午4:04:34
      */
     long count(Class<?> clazz, Select select);
 
