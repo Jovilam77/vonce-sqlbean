@@ -32,14 +32,14 @@ public class ColumnInfo {
 
     public String secFullName() {
         if (StringUtil.isNotEmpty(tableAlias)) {
-            return SqlHelperCons.SINGLE_ESCAPE_CHARACTER + tableAlias + SqlHelperCons.POINT + name + SqlHelperCons.SINGLE_ESCAPE_CHARACTER;
+            return SqlHelperCons.SINGLE_ESCAPE_CHARACTER + tableAlias + SqlHelperCons.SINGLE_ESCAPE_CHARACTER + SqlHelperCons.POINT + SqlHelperCons.SINGLE_ESCAPE_CHARACTER + name + SqlHelperCons.SINGLE_ESCAPE_CHARACTER;
         }
         return SqlHelperCons.SINGLE_ESCAPE_CHARACTER + name + SqlHelperCons.SINGLE_ESCAPE_CHARACTER;
     }
 
     public String decFullName() {
         if (StringUtil.isNotEmpty(tableAlias)) {
-            return SqlHelperCons.DOUBLE_ESCAPE_CHARACTER + tableAlias + SqlHelperCons.POINT + name + SqlHelperCons.DOUBLE_ESCAPE_CHARACTER;
+            return SqlHelperCons.DOUBLE_ESCAPE_CHARACTER + tableAlias + SqlHelperCons.DOUBLE_ESCAPE_CHARACTER + SqlHelperCons.POINT + SqlHelperCons.DOUBLE_ESCAPE_CHARACTER + name + SqlHelperCons.DOUBLE_ESCAPE_CHARACTER;
         }
         return SqlHelperCons.DOUBLE_ESCAPE_CHARACTER + name + SqlHelperCons.DOUBLE_ESCAPE_CHARACTER;
     }
