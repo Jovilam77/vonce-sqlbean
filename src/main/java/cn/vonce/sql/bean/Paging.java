@@ -21,39 +21,38 @@ public class Paging {
         this.pagesize = pagesize;
     }
 
-    public Paging(Integer pagenum, Integer pagesize, String sortfield, String sortorder) {
-        this.pagenum = pagenum;
-        this.pagesize = pagesize;
-        this.sortdatafield = new String[1];
-        this.sortorder = new String[1];
-        this.sortdatafield[0] = sortfield;
-        this.sortorder[0] = sortorder;
-    }
-
     public Paging(Integer pagenum, Integer pagesize, String sortfield, SqlSort sqlSort) {
         this.pagenum = pagenum;
         this.pagesize = pagesize;
         this.sortdatafield = new String[1];
-        this.sortorder = new String[1];
+        this.sortorder = new SqlSort[1];
         this.sortdatafield[0] = sortfield;
-        if (sqlSort == SqlSort.ASC) {
-            this.sortorder[0] = SqlSort.ASC.name();
-        } else {
-            this.sortorder[0] = SqlSort.DESC.name();
-        }
+        this.sortorder[0] = sqlSort;
     }
 
-    public Paging(Integer pagenum, Integer pagesize, String[] sortfield, String[] sortorder) {
+    public Paging(Integer pagenum, Integer pagesize, String[] sortfield, SqlSort[] sortorder) {
         this.pagenum = pagenum;
         this.pagesize = pagesize;
         this.sortdatafield = sortfield;
         this.sortorder = sortorder;
     }
 
+    public Paging(Integer pagenum, Integer pagesize, String[] sortfield, String[] sortorder) {
+        this.pagenum = pagenum;
+        this.pagesize = pagesize;
+        this.sortdatafield = sortfield;
+        if (sortorder != null && sortorder.length > 0) {
+            this.sortorder = new SqlSort[sortorder.length];
+            for (int i = 0; i < sortorder.length; i++) {
+                this.sortorder[i] = SqlSort.get(sortorder[i]);
+            }
+        }
+    }
+
     private Integer pagenum;
     private Integer pagesize;
     private String[] sortdatafield;
-    private String[] sortorder;
+    private SqlSort[] sortorder;
 
 
     public Integer getPagenum() {
@@ -80,11 +79,11 @@ public class Paging {
         this.sortdatafield = sortdatafield;
     }
 
-    public String[] getSortorder() {
+    public SqlSort[] getSortorder() {
         return sortorder;
     }
 
-    public void setSortorder(String[] sortorder) {
+    public void setSortorder(SqlSort[] sortorder) {
         this.sortorder = sortorder;
     }
 }

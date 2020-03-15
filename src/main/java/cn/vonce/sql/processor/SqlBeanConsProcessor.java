@@ -65,7 +65,7 @@ public class SqlBeanConsProcessor extends AbstractProcessor {
                         printWriter.println("    public static final String _tableName = \"" + tableName + "\";");
                         printWriter.println("    public static final String _tableAlias = \"" + tableAlias + "\";");
                         printWriter.println("    public static final String _all = \"" + tableAlias + ".*\";");
-                        printWriter.println("    public static final String _count = \"count(*)\";");
+                        printWriter.println("    public static final String _count = \"COUNT(*)\";");
                         for (Element subElement : element.getEnclosedElements()) {
                             if (subElement.getKind().isField() && !subElement.getModifiers().contains(Modifier.STATIC)) {
                                 String sqlFieldName = subElement.getSimpleName().toString();

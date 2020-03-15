@@ -511,7 +511,7 @@ public class SqlBeanProvider {
             }
             if (paging.getSortdatafield() != null && paging.getSortorder() != null && paging.getSortdatafield().length > 0 && paging.getSortdatafield().length == paging.getSortorder().length) {
                 for (int i = 0; i < paging.getSortdatafield().length; i++) {
-                    select.orderBy(paging.getSortdatafield()[i], SqlSort.get(paging.getSortorder()[i]));
+                    select.orderBy(paging.getSortdatafield()[i], paging.getSortorder()[i]);
                 }
             }
         }
