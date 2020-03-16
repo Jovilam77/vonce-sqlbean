@@ -1,5 +1,7 @@
 package cn.vonce.sql.bean;
 
+import java.io.Serializable;
+
 /**
  * SqlBean 分页
  *
@@ -8,7 +10,7 @@ package cn.vonce.sql.bean;
  * @email imjovi@qq.com
  * @date 2019/8/13 18:33
  */
-public class Page {
+public class Page implements Serializable {
 
     public Page() {
 

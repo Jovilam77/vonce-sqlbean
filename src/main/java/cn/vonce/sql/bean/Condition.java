@@ -88,12 +88,12 @@ public class Condition extends Common {
     /**
      * 添加where条件
      *
-     * @param columnInfo 字段信息
+     * @param column 字段信息
      * @param value      字段值
      * @author Jovi
      */
-    public Condition where(ColumnInfo columnInfo, Object value) {
-        return where(columnInfo.tableAlias(), columnInfo.name(), value, SqlOperator.EQUAL_TO);
+    public Condition where(Column column, Object value) {
+        return where(column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
     }
 
 
@@ -136,28 +136,28 @@ public class Condition extends Common {
     /**
      * 添加where条件
      *
-     * @param columnInfo  字段信息
+     * @param column  字段信息
      * @param value       字段值
      * @param sqlOperator 操作符
      * @return
      * @author Jovi
      */
-    public Condition where(ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
-        return where(SqlLogic.AND, columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
+    public Condition where(Column column, Object value, SqlOperator sqlOperator) {
+        return where(SqlLogic.AND, column.getTableAlias(), column.name(), value, sqlOperator);
     }
 
     /**
      * 添加where条件
      *
      * @param sqlLogic    该条件与下一条件之间的逻辑关系
-     * @param columnInfo  字段信息
+     * @param column  字段信息
      * @param value       字段值
      * @param sqlOperator 操作符
      * @return
      * @author Jovi
      */
-    public Condition where(SqlLogic sqlLogic, ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
-        return where(sqlLogic, columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
+    public Condition where(SqlLogic sqlLogic, Column column, Object value, SqlOperator sqlOperator) {
+        return where(sqlLogic, column.getTableAlias(), column.name(), value, sqlOperator);
     }
 
     /**
@@ -194,8 +194,8 @@ public class Condition extends Common {
      * @return
      * @author Jovi
      */
-    public Condition wAND(ColumnInfo columnInfo, Object value) {
-        return wAND(columnInfo.tableAlias(), columnInfo.name(), value, SqlOperator.EQUAL_TO);
+    public Condition wAND(Column column, Object value) {
+        return wAND(column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -213,14 +213,14 @@ public class Condition extends Common {
     /**
      * where 条件 and 方法
      *
-     * @param columnInfo
+     * @param column
      * @param value
      * @param sqlOperator
      * @return
      * @author Jovi
      */
-    public Condition wAND(ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
-        return wAND(columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
+    public Condition wAND(Column column, Object value, SqlOperator sqlOperator) {
+        return wAND(column.getTableAlias(), column.name(), value, sqlOperator);
     }
 
     /**
@@ -249,13 +249,13 @@ public class Condition extends Common {
     /**
      * where 条件 or 方法
      *
-     * @param columnInfo
+     * @param column
      * @param value
      * @return
      * @author Jovi
      */
-    public Condition wOR(ColumnInfo columnInfo, Object value) {
-        return wOR(columnInfo.tableAlias(), columnInfo.name(), value, SqlOperator.EQUAL_TO);
+    public Condition wOR(Column column, Object value) {
+        return wOR(column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -273,13 +273,13 @@ public class Condition extends Common {
     /**
      * where 条件 or 方法
      *
-     * @param columnInfo
+     * @param column
      * @param value
      * @param sqlOperator
      * @return
      */
-    public Condition wOR(ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
-        return wOR(columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
+    public Condition wOR(Column column, Object value, SqlOperator sqlOperator) {
+        return wOR(column.getTableAlias(), column.name(), value, sqlOperator);
     }
 
     /**
@@ -309,13 +309,13 @@ public class Condition extends Common {
     /**
      * where 条件 andBracket 方法
      *
-     * @param columnInfo
+     * @param column
      * @param value
      * @return
      * @author Jovi
      */
-    public Condition wANDBracket(ColumnInfo columnInfo, Object value) {
-        return wANDBracket(columnInfo.tableAlias(), columnInfo.name(), value, SqlOperator.EQUAL_TO);
+    public Condition wANDBracket(Column column, Object value) {
+        return wANDBracket(column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -333,13 +333,13 @@ public class Condition extends Common {
     /**
      * where 条件 andBracket 方法
      *
-     * @param columnInfo
+     * @param column
      * @param value
      * @param sqlOperator
      * @return
      */
-    public Condition wANDBracket(ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
-        return wANDBracket(columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
+    public Condition wANDBracket(Column column, Object value, SqlOperator sqlOperator) {
+        return wANDBracket(column.getTableAlias(), column.name(), value, sqlOperator);
     }
 
     /**
@@ -369,13 +369,13 @@ public class Condition extends Common {
     /**
      * where 条件 orBracket 方法
      *
-     * @param columnInfo
+     * @param column
      * @param value
      * @return
      * @author Jovi
      */
-    public Condition wORBracket(ColumnInfo columnInfo, Object value) {
-        return wORBracket(columnInfo.tableAlias(), columnInfo.name(), value, SqlOperator.EQUAL_TO);
+    public Condition wORBracket(Column column, Object value) {
+        return wORBracket(column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -393,13 +393,13 @@ public class Condition extends Common {
     /**
      * where 条件 orBracket 方法
      *
-     * @param columnInfo
+     * @param column
      * @param value
      * @param sqlOperator
      * @return
      */
-    public Condition wORBracket(ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
-        return wORBracket(columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
+    public Condition wORBracket(Column column, Object value, SqlOperator sqlOperator) {
+        return wORBracket(column.getTableAlias(), column.name(), value, sqlOperator);
     }
 
     /**

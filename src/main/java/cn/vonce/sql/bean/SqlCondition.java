@@ -13,7 +13,7 @@ import java.io.Serializable;
  * @email 766255988@qq.com
  * @date 2018年4月16日下午7:15:10
  */
-public class SqlCondition extends Field implements Serializable {
+public class SqlCondition extends SqlField implements Serializable {
 
     /**
      *

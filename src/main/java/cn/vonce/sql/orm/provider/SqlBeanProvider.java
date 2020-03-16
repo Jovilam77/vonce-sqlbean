@@ -7,7 +7,6 @@ import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.SqlOperator;
-import cn.vonce.sql.enumerate.SqlSort;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.uitls.SqlBeanUtil;
@@ -509,11 +508,7 @@ public class SqlBeanProvider {
             } else {
                 select.setPage(null, paging.getPagenum(), paging.getPagesize());
             }
-            if (paging.getSortdatafield() != null && paging.getSortorder() != null && paging.getSortdatafield().length > 0 && paging.getSortdatafield().length == paging.getSortorder().length) {
-                for (int i = 0; i < paging.getSortdatafield().length; i++) {
-                    select.orderBy(paging.getSortdatafield()[i], paging.getSortorder()[i]);
-                }
-            }
+            select.orderBy(paging.getOrders());
         }
     }
 

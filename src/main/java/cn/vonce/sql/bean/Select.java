@@ -9,6 +9,7 @@ import com.google.common.collect.ListMultimap;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -84,25 +85,25 @@ public class Select extends Condition implements Serializable {
     /**
      * 设置column
      *
-     * @param columnInfos
+     * @param columns
      */
-    public void setColumn(ColumnInfo... columnInfos) {
-        if (columnInfos == null || columnInfos.length == 0) {
+    public void setColumn(Column... columns) {
+        if (columns == null || columns.length == 0) {
             return;
         }
-        for (ColumnInfo columnInfo : columnInfos) {
-            this.columnList.add(new Column(columnInfo.tableAlias(), columnInfo.name(), ""));
+        for (Column column : columns) {
+            this.columnList.add(new Column(column.getTableAlias(), column.name(), ""));
         }
     }
 
     /**
      * 添加column列字段
      *
-     * @param columnInfo
+     * @param column
      * @return
      */
-    public Select column(ColumnInfo columnInfo) {
-        return column(columnInfo.tableAlias(), columnInfo.name(), "");
+    public Select column(Column column) {
+        return column(column.getTableAlias(), column.name(), "");
     }
 
     /**
@@ -129,11 +130,11 @@ public class Select extends Condition implements Serializable {
     /**
      * 添加column列字段
      *
-     * @param columnInfo
+     * @param column
      * @return
      */
-    public Select column(ColumnInfo columnInfo, String columnAlias) {
-        return column(columnInfo.tableAlias(), columnInfo.name(), columnAlias);
+    public Select column(Column column, String columnAlias) {
+        return column(column.getTableAlias(), column.name(), columnAlias);
     }
 
     /**
@@ -225,11 +226,11 @@ public class Select extends Condition implements Serializable {
     /**
      * 添加groupBy分组
      *
-     * @param columnInfo 列字段信息
+     * @param column 列字段信息
      * @return
      */
-    public Select groupBy(ColumnInfo columnInfo) {
-        return groupBy(columnInfo.tableAlias(), columnInfo.name());
+    public Select groupBy(Column column) {
+        return groupBy(column.getTableAlias(), column.name());
     }
 
     /**
@@ -322,12 +323,12 @@ public class Select extends Condition implements Serializable {
     /**
      * 添加列字段排序
      *
-     * @param columnInfo 列字段信息
+     * @param column 列字段信息
      * @param sqlSort    排序方式
      * @return
      */
-    public Select orderBy(ColumnInfo columnInfo, SqlSort sqlSort) {
-        return orderBy(columnInfo.tableAlias(), columnInfo.name(), sqlSort);
+    public Select orderBy(Column column, SqlSort sqlSort) {
+        return orderBy(column.getTableAlias(), column.name(), sqlSort);
     }
 
     /**
@@ -340,6 +341,19 @@ public class Select extends Condition implements Serializable {
      */
     public Select orderBy(String tableAlias, String columNname, SqlSort sqlSort) {
         orderByList.add(new Order(tableAlias, columNname, sqlSort));
+        return this;
+    }
+
+    /**
+     * 添加列字段排序
+     *
+     * @param orders 排序
+     * @return
+     */
+    public Select orderBy(Order[] orders) {
+        if (orders != null && orders.length > 0) {
+            orderByList.addAll(Arrays.asList(orders));
+        }
         return this;
     }
 
@@ -387,12 +401,12 @@ public class Select extends Condition implements Serializable {
     /**
      * 添加having条件
      *
-     * @param columnInfo 列字段信息
+     * @param column 列字段信息
      * @param value      列字段值
      * @return
      */
-    public Select having(ColumnInfo columnInfo, Object value) {
-        return having(columnInfo.tableAlias(), columnInfo.name(), value, SqlOperator.EQUAL_TO);
+    public Select having(Column column, Object value) {
+        return having(column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
     }
 
 
@@ -422,13 +436,13 @@ public class Select extends Condition implements Serializable {
     /**
      * 添加having条件
      *
-     * @param columnInfo  列字段信息
+     * @param column  列字段信息
      * @param value       列字段值
      * @param sqlOperator 操作符
      * @return
      */
-    public Select having(ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
-        return having(columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
+    public Select having(Column column, Object value, SqlOperator sqlOperator) {
+        return having(column.getTableAlias(), column.name(), value, sqlOperator);
     }
 
     /**
@@ -448,13 +462,13 @@ public class Select extends Condition implements Serializable {
      * 添加having条件
      *
      * @param sqlLogic    该条件与下一条件之间的逻辑关系
-     * @param columnInfo  列字段信息
+     * @param column  列字段信息
      * @param value       列字段值
      * @param sqlOperator 操作符
      * @return
      */
-    public Select having(SqlLogic sqlLogic, ColumnInfo columnInfo, Object value, SqlOperator sqlOperator) {
-        return having(sqlLogic, columnInfo.tableAlias(), columnInfo.name(), value, sqlOperator);
+    public Select having(SqlLogic sqlLogic, Column column, Object value, SqlOperator sqlOperator) {
+        return having(sqlLogic, column.getTableAlias(), column.name(), value, sqlOperator);
     }
 
     /**

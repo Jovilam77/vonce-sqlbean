@@ -2,12 +2,12 @@ package cn.vonce.sql.bean;
 
 import java.io.Serializable;
 
-public class Field implements Serializable {
+public class SqlField implements Serializable {
 
-    public Field() {
+    public SqlField() {
     }
 
-    public Field(String tableAlias, String name) {
+    public SqlField(String tableAlias, String name) {
         this.tableAlias = tableAlias;
         this.name = name;
     }

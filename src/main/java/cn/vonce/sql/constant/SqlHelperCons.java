@@ -44,7 +44,7 @@ public class SqlHelperCons {
     public static final String ALL = " * ";
     public static final String SINGLE_ESCAPE_CHARACTER = "`";
     public static final String POINT = ".";
-    public static final String WELL_NUMBER = "#";
+//    public static final String WELL_NUMBER = "#";
     public static final String AS = " AS ";
     public static final String SINGLE_QUOTATION_MARK = "'";
     public static final String INNER_JOIN = " INNER JOIN ";

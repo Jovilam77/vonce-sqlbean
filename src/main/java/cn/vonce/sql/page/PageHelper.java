@@ -4,6 +4,7 @@ package cn.vonce.sql.page;
 import cn.vonce.common.bean.PagingRS;
 import cn.vonce.common.enumerate.ResultCode;
 import cn.vonce.common.utils.StringUtil;
+import cn.vonce.sql.bean.Order;
 import cn.vonce.sql.bean.Paging;
 import cn.vonce.sql.bean.Select;
 import cn.vonce.sql.constant.SqlHelperCons;
@@ -11,7 +12,6 @@ import cn.vonce.sql.enumerate.SqlSort;
 import com.esotericsoftware.reflectasm.MethodAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,19 +42,18 @@ public class PageHelper<T> {
      * @param timestamp 时间戳
      */
     public PageHelper(Integer pagenum, Integer pagesize, String timestamp) {
-        this(pagenum, pagesize, null, null, timestamp);
+        this(pagenum, pagesize, null, timestamp);
     }
 
     /**
      * 实例化分页助手 - 手动设置参数
      *
-     * @param pagenum       当前页
-     * @param pagesize      每页数量
-     * @param sortdatafield 排序字段
-     * @param sortorder     排序方式
-     * @param timestamp     时间戳
+     * @param pagenum   当前页
+     * @param pagesize  每页数量
+     * @param orders    排序
+     * @param timestamp 时间戳
      */
-    public PageHelper(Integer pagenum, Integer pagesize, String[] sortdatafield, String[] sortorder, String timestamp) {
+    public PageHelper(Integer pagenum, Integer pagesize, Order[] orders, String timestamp) {
         if (pagenum == null) {
             pagenum = 0;
         }
@@ -63,8 +62,7 @@ public class PageHelper<T> {
         }
         this.setPagenum(pagenum);
         this.setPagesize(pagesize);
-        this.setSortdatafield(sortdatafield);
-        this.setSortorder(sortorder);
+        this.setOrders(orders);
         this.setTimestamp(timestamp);
     }
 
@@ -80,8 +78,7 @@ public class PageHelper<T> {
         try {
             pagenum = request.getParameter("pagenum") == null ? 0 : Integer.parseInt(request.getParameter("pagenum"));
             pagesize = request.getParameter("pagesize") == null ? 10 : Integer.parseInt(request.getParameter("pagesize"));
-            this.setSortdatafield(request.getParameterValues("sortdatafield"));
-            this.setSortorder(request.getParameterValues("sortorder"));
+            this.setOrders(getOrder(request.getParameterValues("sortdatafield"), request.getParameterValues("sortdatafield")));
             this.setTimestamp(request.getParameter("timestamp"));
         } catch (NumberFormatException nfe) {
             try {
@@ -104,8 +101,7 @@ public class PageHelper<T> {
     private Integer pagesize;
     private Integer totalRecords;
     private Integer totalPage;
-    private String[] sortdatafield;
-    private String[] sortorder;
+    private Order[] orders;
     private String timestamp;
     private List<T> dataList;
     private PagingMethod pagingMethod;
@@ -164,40 +160,12 @@ public class PageHelper<T> {
         return totalPage;
     }
 
-    /**
-     * 获取排序的字段
-     *
-     * @return
-     */
-    public String[] getSortdatafield() {
-        return sortdatafield;
+    public Order[] getOrders() {
+        return orders;
     }
 
-    /**
-     * 设置排序的字段
-     *
-     * @param sortdatafield
-     */
-    private void setSortdatafield(String[] sortdatafield) {
-        this.sortdatafield = sortdatafield;
-    }
-
-    /**
-     * 获取排序的类型
-     *
-     * @return
-     */
-    public String[] getSortorder() {
-        return sortorder;
-    }
-
-    /**
-     * 设置排序类型
-     *
-     * @param sortorder
-     */
-    private void setSortorder(String[] sortorder) {
-        this.sortorder = sortorder;
+    public void setOrders(Order[] orders) {
+        this.orders = orders;
     }
 
     /**
@@ -334,9 +302,8 @@ public class PageHelper<T> {
             this.dispose(count);
             //设置分页
             sqlBeanSelect.setPage(pagenum, pagesize);
-            // controller可传递排序语句
-            addOrderBy(sqlBeanSelect);
-            Object obj = null;
+            sqlBeanSelect.orderBy(orders);
+            Object obj;
             if (tClazz != null) {
                 obj = methodAccess.invoke(pageService, this.getPagingMethod().getSelect(), tClazz, sqlBeanSelect);
             } else {
@@ -352,28 +319,34 @@ public class PageHelper<T> {
     }
 
     /**
-     * 排序处理
+     * 获取排序对象
      *
-     * @param select
+     * @param sortdatafields
+     * @param sortorders
+     * @return
      */
-    private void addOrderBy(Select select) {
-        if (sortdatafield != null && sortdatafield.length > 0) {
-            for (int i = 0; i < sortdatafield.length; i++) {
-                String field = sortdatafield[i];
+    private Order[] getOrder(String[] sortdatafields, String[] sortorders) {
+        Order[] orders = null;
+        if (sortdatafields != null && sortdatafields.length > 0) {
+            orders = new Order[sortdatafields.length];
+            for (int i = 0; i < sortdatafields.length; i++) {
+                Order order = null;
+                String field = sortdatafields[i];
                 String sort = null;
                 try {
-                    sort = sortorder[i];
+                    sort = sortorders[i];
                 } catch (Exception e) {
-                    //e.printStackTrace();
                 }
                 if (StringUtil.isNotEmpty(field) && field.indexOf(SqlHelperCons.POINT) > -1) {
                     String[] tableNameAndField = field.split("\\" + SqlHelperCons.POINT);
-                    select.orderBy(tableNameAndField[0], tableNameAndField[1], SqlSort.get(sort));
+                    order = new Order(tableNameAndField[0], tableNameAndField[1], SqlSort.get(sort));
                 } else {
-                    select.orderBy(field, SqlSort.get(sort));
+                    order = new Order(field, SqlSort.get(sort));
                 }
+                orders[i] = order;
             }
         }
+        return orders;
     }
 
     /**
@@ -401,7 +374,7 @@ public class PageHelper<T> {
      * @return
      */
     public Paging getPaging() {
-        return new Paging(this.pagenum, this.pagesize, this.sortdatafield, this.sortorder);
+        return new Paging(this.pagenum, this.pagesize, this.orders);
     }
 
     /**

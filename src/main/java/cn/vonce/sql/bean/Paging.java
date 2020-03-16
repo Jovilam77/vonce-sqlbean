@@ -1,6 +1,9 @@
 package cn.vonce.sql.bean;
 
+
 import cn.vonce.sql.enumerate.SqlSort;
+
+import java.io.Serializable;
 
 /**
  * 分页
@@ -10,7 +13,7 @@ import cn.vonce.sql.enumerate.SqlSort;
  * @email imjovi@qq.com
  * @date 2017年3月14日上午11:57:50
  */
-public class Paging {
+public class Paging implements Serializable {
 
     public Paging() {
 
@@ -21,38 +24,28 @@ public class Paging {
         this.pagesize = pagesize;
     }
 
-    public Paging(Integer pagenum, Integer pagesize, String sortfield, SqlSort sqlSort) {
-        this.pagenum = pagenum;
-        this.pagesize = pagesize;
-        this.sortdatafield = new String[1];
-        this.sortorder = new SqlSort[1];
-        this.sortdatafield[0] = sortfield;
-        this.sortorder[0] = sqlSort;
+    public Paging(Integer pagenum, Integer pagesize, Order order) {
+        this(pagenum, pagesize, new Order[]{order});
     }
 
-    public Paging(Integer pagenum, Integer pagesize, String[] sortfield, SqlSort[] sortorder) {
-        this.pagenum = pagenum;
-        this.pagesize = pagesize;
-        this.sortdatafield = sortfield;
-        this.sortorder = sortorder;
+    public Paging(Integer pagenum, Integer pagesize, String field, SqlSort sqlSort) {
+        this(pagenum, pagesize, new Order[]{new Order(field, sqlSort)});
     }
 
-    public Paging(Integer pagenum, Integer pagesize, String[] sortfield, String[] sortorder) {
+    public Paging(Integer pagenum, Integer pagesize, SqlField sqlField, SqlSort sqlSort) {
+        this(pagenum, pagesize, new Order[]{new Order(sqlField, sqlSort)});
+    }
+
+    public Paging(Integer pagenum, Integer pagesize, Order[] orders) {
         this.pagenum = pagenum;
         this.pagesize = pagesize;
-        this.sortdatafield = sortfield;
-        if (sortorder != null && sortorder.length > 0) {
-            this.sortorder = new SqlSort[sortorder.length];
-            for (int i = 0; i < sortorder.length; i++) {
-                this.sortorder[i] = SqlSort.get(sortorder[i]);
-            }
-        }
+        this.orders = orders;
     }
+
 
     private Integer pagenum;
     private Integer pagesize;
-    private String[] sortdatafield;
-    private SqlSort[] sortorder;
+    private Order[] orders;
 
 
     public Integer getPagenum() {
@@ -71,19 +64,13 @@ public class Paging {
         this.pagesize = pagesize;
     }
 
-    public String[] getSortdatafield() {
-        return sortdatafield;
+    public Order[] getOrders() {
+        return orders;
     }
 
-    public void setSortdatafield(String[] sortdatafield) {
-        this.sortdatafield = sortdatafield;
+    public Paging setOrders(Order[] orders) {
+        this.orders = orders;
+        return this;
     }
 
-    public SqlSort[] getSortorder() {
-        return sortorder;
-    }
-
-    public void setSortorder(SqlSort[] sortorder) {
-        this.sortorder = sortorder;
-    }
 }

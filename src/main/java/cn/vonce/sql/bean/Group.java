@@ -3,7 +3,7 @@ package cn.vonce.sql.bean;
 /**
  * Group By
  */
-public class Group extends Field {
+public class Group extends SqlField {
 
     public Group() {
         super();

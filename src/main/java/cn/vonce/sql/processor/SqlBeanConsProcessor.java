@@ -60,7 +60,7 @@ public class SqlBeanConsProcessor extends AbstractProcessor {
                     try {
                         PrintWriter printWriter = new PrintWriter(fos);
                         printWriter.println("package " + packageName + ";");
-                        printWriter.println("import cn.vonce.sql.bean.ColumnInfo;");
+                        printWriter.println("import cn.vonce.sql.bean.Column;");
                         printWriter.println("\npublic class " + className + " { ");
                         printWriter.println("    public static final String _tableName = \"" + tableName + "\";");
                         printWriter.println("    public static final String _tableAlias = \"" + tableAlias + "\";");
@@ -73,7 +73,7 @@ public class SqlBeanConsProcessor extends AbstractProcessor {
                                 if (sqlBeanField != null && StringUtil.isNotEmpty(sqlBeanField.value())) {
                                     sqlFieldName = sqlBeanField.value();
                                 }
-                                printWriter.println("    public static final ColumnInfo " + sqlFieldName + " = new ColumnInfo(\"" + tableAlias + "\",\"" + sqlFieldName + "\");");
+                                printWriter.println("    public static final Column " + sqlFieldName + " = new Column(_tableAlias" + ",\"" + sqlFieldName + "\",\"\");");
                             }
                         }
                         printWriter.println("}");
