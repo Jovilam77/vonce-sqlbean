@@ -13,7 +13,6 @@ import cn.vonce.sql.uitls.SqlBeanUtil;
 import com.google.common.collect.ListMultimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -206,10 +205,13 @@ public class SqlHelper {
         StringBuffer columnSql = new StringBuffer();
         if (select.getColumnList() != null && select.getColumnList().size() != 0) {
             for (int i = 0; i < select.getColumnList().size(); i++) {
-                columnSql.append(SqlHelperCons.BEGIN_BRACKET);
                 String tableAlias = select.getColumnList().get(i).getTableAlias();
                 String columnName = select.getColumnList().get(i).getName();
                 String transferred = SqlBeanUtil.getTransferred(select);
+                boolean existAlias = StringUtil.isNotEmpty(select.getColumnList().get(i).getAlias());
+                if (existAlias) {
+                    columnSql.append(SqlHelperCons.BEGIN_BRACKET);
+                }
                 if (StringUtil.isNotEmpty(select.getColumnList().get(i).getTableAlias())) {
                     columnSql.append(transferred);
                     columnSql.append(SqlBeanUtil.isToUpperCase(select) ? tableAlias.toUpperCase() : tableAlias);
@@ -217,8 +219,8 @@ public class SqlHelper {
                     columnSql.append(SqlHelperCons.POINT);
                 }
                 columnSql.append(columnName);
-                columnSql.append(SqlHelperCons.END_BRACKET);
-                if (StringUtil.isNotEmpty(select.getColumnList().get(i).getAlias())) {
+                if (existAlias) {
+                    columnSql.append(SqlHelperCons.END_BRACKET);
                     columnSql.append(SqlHelperCons.AS);
                     columnSql.append(transferred);
                     columnSql.append(select.getColumnList().get(i).getAlias());
@@ -615,18 +617,6 @@ public class SqlHelper {
                 Collection<Map.Entry<String, SqlCondition>> sqlConditionEntryCollection = whereMap.entries();
                 for (Map.Entry<String, SqlCondition> sqlConditionEntry : sqlConditionEntryCollection) {
                     SqlCondition sqlCondition = sqlConditionEntry.getValue();
-                    Object value = sqlCondition.getValue();
-                    if (value instanceof Original) {
-                        Original original = (Original) sqlCondition.getValue();
-                        value = original.getValue();
-                    } else {
-                        // 如果值不为数组则做处理
-                        if (!value.getClass().isArray() && !(value instanceof Collection)) {
-                            value = SqlBeanUtil.getSqlValue(common, value);
-                        }
-                    }
-                    boolean needEndBracket = isNeedEndBracket(sqlCondition.getSqlOperator());
-                    String operator = getOperator(sqlCondition);
                     // 遍历sql逻辑处理
                     if (i != 0 && i < sqlConditionEntryCollection.size()) {
                         conditioneSql.append(getLogic(sqlCondition.getSqlLogic()));
@@ -634,7 +624,7 @@ public class SqlHelper {
                     if (SqlBeanUtil.isToUpperCase(common)) {
                         sqlCondition.setName(sqlCondition.getName().toUpperCase());
                     }
-                    conditioneSql.append(valueOperator(common, operator, sqlCondition, value, needEndBracket));
+                    conditioneSql.append(valueOperator(common, sqlCondition));
                     i++;
                 }
                 conditioneSql.append(SqlHelperCons.END_BRACKET);
@@ -671,9 +661,9 @@ public class SqlHelper {
                             } else if (sqlOperator == MySqlOperator.NOT_EXISTS) {
                                 operator = NOT_EXISTS;
                                 needEndBracket = true;
-                            }*/ else if (sqlOperator == SqlOperator.LIKE) {
+                            }*/ else if (sqlOperator == SqlOperator.LIKE || sqlOperator == SqlOperator.LIKE_L || sqlOperator == SqlOperator.LIKE_R) {
                 operator = SqlHelperCons.LIKE;
-            } else if (sqlOperator == SqlOperator.NOT_LIKE) {
+            } else if (sqlOperator == SqlOperator.NOT_LIKE || sqlOperator == SqlOperator.NOT_LIKE_L || sqlOperator == SqlOperator.NOT_LIKE_R) {
                 operator = SqlHelperCons.NOT_LIKE;
             } else if (sqlOperator == SqlOperator.BETWEEN) {
                 operator = SqlHelperCons.BETWEEN;
@@ -726,39 +716,21 @@ public class SqlHelper {
     }
 
     /**
-     * 需要额外包裹括号
-     *
-     * @param sqlOperator
-     * @return
-     */
-    private static boolean isNeedEndBracket(SqlOperator sqlOperator) {
-        if (sqlOperator == SqlOperator.IN || sqlOperator == SqlOperator.NOT_IN) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * 值操作
      *
      * @param common
-     * @param operator
-     * @param sqlField
-     * @param value
-     * @param needEndBracket
+     * @param sqlCondition
      * @return
      */
-    private static StringBuffer valueOperator(Common common, String operator, SqlField sqlField, Object value, boolean needEndBracket) {
+    private static StringBuffer valueOperator(Common common, SqlCondition sqlCondition) {
         StringBuffer sql = new StringBuffer();
+        String operator = getOperator(sqlCondition);
+        boolean needEndBracket = false;
+        Object value = sqlCondition.getValue();
         // 如果操作符为BETWEEN ，IN、NOT IN 则需额外处理
-        if (operator.indexOf(SqlHelperCons.BETWEEN) > -1) {
-            Object[] betweenValues;
-            if (value.getClass().isArray()) {
-                betweenValues = (Object[]) value;
-            } else if (value instanceof Collection) {
-                Collection<Object> list = ((Collection<Object>) value);
-                betweenValues = list.toArray();
-            } else {
+        if (sqlCondition.getSqlOperator() == SqlOperator.BETWEEN) {
+            Object[] betweenValues = getObjects(value);
+            if(betweenValues == null){
                 try {
                     throw new SqlBeanException("between 条件的值必须为Array或ArrayList");
                 } catch (SqlBeanException e) {
@@ -767,18 +739,22 @@ public class SqlHelper {
                     return null;
                 }
             }
-            if (StringUtil.isNotEmpty(sqlField.getTableAlias())) {
-                sql.append(sqlField.getTableAlias());
+            if (StringUtil.isNotEmpty(sqlCondition.getTableAlias())) {
+                sql.append(sqlCondition.getTableAlias());
                 sql.append(SqlHelperCons.POINT);
             }
-            sql.append(SqlBeanUtil.isToUpperCase(common) ? sqlField.getName().toUpperCase() : sqlField.getName());
+            sql.append(SqlBeanUtil.isToUpperCase(common) ? sqlCondition.getName().toUpperCase() : sqlCondition.getName());
             sql.append(operator);
             sql.append(SqlBeanUtil.getSqlValue(common, betweenValues[0]));
             sql.append(SqlHelperCons.AND);
             sql.append(SqlBeanUtil.getSqlValue(common, betweenValues[1]));
         } else {
-            if (operator.indexOf(SqlHelperCons.IN) > -1) {
+            if (sqlCondition.getSqlOperator() == SqlOperator.IN || sqlCondition.getSqlOperator() == SqlOperator.NOT_IN) {
+                needEndBracket = true;
                 Object[] in_notInValues = getObjects(value);
+                if(in_notInValues == null){
+                    in_notInValues = new Object[]{value};
+                }
                 StringBuffer in_notIn = new StringBuffer();
                 if (in_notInValues != null && in_notInValues.length > 0) {
                     for (int k = 0; k < in_notInValues.length; k++) {
@@ -788,12 +764,28 @@ public class SqlHelper {
                     in_notIn.deleteCharAt(in_notIn.length() - SqlHelperCons.COMMA.length());
                     value = in_notIn.toString();
                 }
+            } else {
+                value = sqlCondition.getValue();
+                if (operator.indexOf(SqlHelperCons.LIKE) > -1) {
+                    if (sqlCondition.getSqlOperator() == SqlOperator.LIKE || sqlCondition.getSqlOperator() == SqlOperator.LIKE_L || sqlCondition.getSqlOperator() == SqlOperator.NOT_LIKE || sqlCondition.getSqlOperator() == SqlOperator.NOT_LIKE_L) {
+                        value = SqlHelperCons.PERCENT + value;
+                    }
+                    if (sqlCondition.getSqlOperator() == SqlOperator.LIKE || sqlCondition.getSqlOperator() == SqlOperator.LIKE_R || sqlCondition.getSqlOperator() == SqlOperator.NOT_LIKE || sqlCondition.getSqlOperator() == SqlOperator.NOT_LIKE_R) {
+                        value = value + SqlHelperCons.PERCENT;
+                    }
+                    value = SqlHelperCons.SINGLE_QUOTATION_MARK + value + SqlHelperCons.SINGLE_QUOTATION_MARK;
+                } else if (value instanceof Original) {
+                    Original original = (Original) sqlCondition.getValue();
+                    value = original.getValue();
+                } else {
+                    value = SqlBeanUtil.getSqlValue(common, value);
+                }
             }
-            if (StringUtil.isNotEmpty(sqlField.getTableAlias())) {
-                sql.append(sqlField.getTableAlias());
+            if (StringUtil.isNotEmpty(sqlCondition.getTableAlias())) {
+                sql.append(sqlCondition.getTableAlias());
                 sql.append(SqlHelperCons.POINT);
             }
-            sql.append(sqlField.getName());
+            sql.append(sqlCondition.getName());
             sql.append(operator);
             sql.append(value);
         }
@@ -814,14 +806,12 @@ public class SqlHelper {
         if (value == null) {
             return null;
         }
-        Object[] objects;
+        Object[] objects = null;
         if (value.getClass().isArray()) {
             objects = (Object[]) value;
         } else if (value instanceof Collection) {
             Collection<Object> list = ((Collection<Object>) value);
             objects = list.toArray();
-        } else {
-            objects = new Object[]{value};
         }
         return objects;
     }

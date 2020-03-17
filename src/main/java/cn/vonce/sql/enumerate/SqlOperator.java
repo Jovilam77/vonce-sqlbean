@@ -10,6 +10,23 @@ package cn.vonce.sql.enumerate;
  */
 public enum SqlOperator {
 
-    IS, IS_NOT, IN, NOT_IN, LIKE, NOT_LIKE, BETWEEN, GREATER_THAN, GREAT_THAN_OR_EQUAL_TO, LESS_THAN, LESS_THAN_OR_EQUAL_TO, EQUAL_TO, NOT_EQUAL_TO/*, EXISTS, NOT_EXISTS*/
+    IS,
+    IS_NOT,
+    IN,
+    NOT_IN,
+    LIKE,
+    LIKE_L,
+    LIKE_R,
+    NOT_LIKE,
+    NOT_LIKE_L,
+    NOT_LIKE_R,
+    BETWEEN,
+    GREATER_THAN,
+    GREAT_THAN_OR_EQUAL_TO,
+    LESS_THAN,
+    LESS_THAN_OR_EQUAL_TO,
+    EQUAL_TO,
+    NOT_EQUAL_TO
+    /*, EXISTS, NOT_EXISTS*/
 
 }

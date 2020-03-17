@@ -455,11 +455,11 @@ public class SqlBeanUtil {
      * @return
      */
     public static String getCondition(Common common, String where, Object bean) {
-        String prefix = "${";
-        String suffix = "}";
         if (where == null || bean == null) {
             return "";
         }
+        String prefix = "${";
+        String suffix = "}";
         StringBuffer conditionSql = new StringBuffer(where);
         int startIndex = conditionSql.indexOf(prefix);
         while (startIndex != -1) {

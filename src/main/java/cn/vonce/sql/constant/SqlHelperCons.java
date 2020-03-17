@@ -32,6 +32,7 @@ public class SqlHelperCons {
 //    public static final String NOT_EXISTS = " NOT EXISTS (";
     public static final String LIKE = " LIKE ";
     public static final String NOT_LIKE = " NOT LIKE ";
+    public static final String PERCENT = "%";
     public static final String BETWEEN = " BETWEEN ";
     public static final String GREATER_THAN = " > ";
     public static final String GREAT_THAN_OR_EQUAL_TO = " >= ";
@@ -44,7 +45,7 @@ public class SqlHelperCons {
     public static final String ALL = " * ";
     public static final String SINGLE_ESCAPE_CHARACTER = "`";
     public static final String POINT = ".";
-//    public static final String WELL_NUMBER = "#";
+    //    public static final String WELL_NUMBER = "#";
     public static final String AS = " AS ";
     public static final String SINGLE_QUOTATION_MARK = "'";
     public static final String INNER_JOIN = " INNER JOIN ";
