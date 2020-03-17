@@ -2,7 +2,6 @@ package cn.vonce.sql.bean;
 
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.uitls.SqlBeanUtil;
-
 import java.io.Serializable;
 
 /**
@@ -13,7 +12,7 @@ import java.io.Serializable;
  * @email 766255988@qq.com
  * @date 2017年8月18日上午9:00:19
  */
-public abstract class Common implements Serializable {
+public class Common implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -21,7 +20,7 @@ public abstract class Common implements Serializable {
     private SqlBeanConfig sqlBeanConfig = null;
 
     /**
-     * 获取table sql 内容
+     * 获取table
      *
      * @return
      */
@@ -30,7 +29,7 @@ public abstract class Common implements Serializable {
     }
 
     /**
-     * 设置table sql 内容
+     * 设置table
      *
      * @param name
      */
@@ -40,7 +39,7 @@ public abstract class Common implements Serializable {
     }
 
     /**
-     * 设置table sql 内容
+     * 设置table
      *
      * @param name
      * @param aliasName
@@ -51,7 +50,19 @@ public abstract class Common implements Serializable {
     }
 
     /**
-     * 设置table sql 内容
+     * 设置table
+     *
+     * @param name
+     * @param aliasName
+     */
+    public void setTable(String schema, String name, String aliasName) {
+        this.table.setSchema(schema);
+        this.table.setName(name);
+        this.table.setAlias(aliasName);
+    }
+
+    /**
+     * 设置table
      *
      * @param table
      */
@@ -75,4 +86,5 @@ public abstract class Common implements Serializable {
     public void setSqlBeanConfig(SqlBeanConfig sqlBeanConfig) {
         this.sqlBeanConfig = sqlBeanConfig;
     }
+
 }

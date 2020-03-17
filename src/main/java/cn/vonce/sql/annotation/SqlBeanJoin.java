@@ -40,6 +40,13 @@ public @interface SqlBeanJoin {
     JoinType type() default JoinType.INNER_JOIN;
 
     /**
+     * 连接的schema
+     *
+     * @return
+     */
+    String schema() default "";
+
+    /**
      * 连接的表名
      *
      * @return

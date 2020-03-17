@@ -12,9 +12,23 @@ public class SqlField implements Serializable {
         this.name = name;
     }
 
-    private String tableAlias = "";
+    public SqlField(String schema, String tableAlias, String name) {
+        this.schema = schema;
+        this.tableAlias = tableAlias;
+        this.name = name;
+    }
 
+    private String schema = "";
+    private String tableAlias = "";
     private String name = "";
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
+    }
 
     public String getTableAlias() {
         return tableAlias;
@@ -34,9 +48,11 @@ public class SqlField implements Serializable {
 
     @Override
     public String toString() {
-        return "Field{" +
-                "tableAlias='" + tableAlias + '\'' +
+        return "SqlField{" +
+                "schema='" + schema + '\'' +
+                ", tableAlias='" + tableAlias + '\'' +
                 ", name='" + name + '\'' +
                 '}';
     }
+
 }

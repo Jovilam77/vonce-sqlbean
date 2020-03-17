@@ -28,7 +28,11 @@ public class Column extends SqlField implements Serializable {
     }
 
     public Column(String tableAlias, String name, String alias) {
-        super(tableAlias, name);
+        this("", tableAlias, name, alias);
+    }
+
+    public Column(String schema, String tableAlias, String name, String alias) {
+        super(schema, tableAlias, name);
         this.alias = alias;
     }
 

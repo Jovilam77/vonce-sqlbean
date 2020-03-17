@@ -21,14 +21,26 @@ public class Table implements Serializable {
     }
 
     public Table(String name, String alias) {
+        this("", name, alias);
+    }
+
+    public Table(String schema, String name, String alias) {
+        this.schema = schema;
         this.name = name;
         this.alias = alias;
     }
 
+    private String schema = "";
     private String name = "";
-
     private String alias = "";
 
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
+    }
 
     public String getName() {
         return name;
@@ -44,5 +56,14 @@ public class Table implements Serializable {
 
     public void setAlias(String alias) {
         this.alias = alias;
+    }
+
+    @Override
+    public String toString() {
+        return "Table{" +
+                "schema='" + schema + '\'' +
+                ", name='" + name + '\'' +
+                ", alias='" + alias + '\'' +
+                '}';
     }
 }

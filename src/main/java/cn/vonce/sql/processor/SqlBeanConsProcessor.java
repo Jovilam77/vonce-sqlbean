@@ -31,15 +31,16 @@ public class SqlBeanConsProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         for (TypeElement typeElement : annotations) {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
-                //包裹注解元素的元素, 也就是其父元素, 比如注解了成员变量或者成员函数, 其上层就是该类
                 Element enclosingElement = element.getEnclosingElement();
-                //获取父元素的全类名,用来生成报名
+                //获取父元素的全类名,用来生成包名
                 String packageName = ((PackageElement) enclosingElement).getQualifiedName().toString() + ".sql";
                 String className = PREFIX + element.getSimpleName();
+                String schema = "";
                 String tableName = element.getSimpleName().toString();
                 String tableAlias = "";
                 SqlBeanTable sqlBeanTable = element.getAnnotation(SqlBeanTable.class);
                 if (sqlBeanTable != null) {
+                    schema = sqlBeanTable.schema();
                     tableName = sqlBeanTable.value();
                     tableAlias = sqlBeanTable.alias();
                 }
@@ -62,6 +63,7 @@ public class SqlBeanConsProcessor extends AbstractProcessor {
                         printWriter.println("package " + packageName + ";");
                         printWriter.println("import cn.vonce.sql.bean.Column;");
                         printWriter.println("\npublic class " + className + " { ");
+                        printWriter.println("    public static final String _schema = \"" + schema + "\";");
                         printWriter.println("    public static final String _tableName = \"" + tableName + "\";");
                         printWriter.println("    public static final String _tableAlias = \"" + tableAlias + "\";");
                         printWriter.println("    public static final String _all = \"" + tableAlias + ".*\";");
@@ -73,7 +75,7 @@ public class SqlBeanConsProcessor extends AbstractProcessor {
                                 if (sqlBeanField != null && StringUtil.isNotEmpty(sqlBeanField.value())) {
                                     sqlFieldName = sqlBeanField.value();
                                 }
-                                printWriter.println("    public static final Column " + sqlFieldName + " = new Column(_tableAlias" + ",\"" + sqlFieldName + "\",\"\");");
+                                printWriter.println("    public static final Column " + sqlFieldName + " = new Column(_schema,_tableAlias" + ",\"" + sqlFieldName + "\",\"\");");
                             }
                         }
                         printWriter.println("}");

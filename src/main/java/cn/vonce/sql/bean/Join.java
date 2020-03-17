@@ -17,8 +17,9 @@ public class Join implements Serializable {
     public Join() {
     }
 
-    public Join(JoinType joinType, String tableName, String tableAlias, String tableKeyword, String mainKeyword) {
+    public Join(JoinType joinType, String schema, String tableName, String tableAlias, String tableKeyword, String mainKeyword) {
         this.joinType = joinType;
+        this.schema = schema;
         this.tableName = tableName;
         this.tableAlias = tableAlias;
         this.tableKeyword = tableKeyword;
@@ -26,13 +27,10 @@ public class Join implements Serializable {
     }
 
     private JoinType joinType;
-
+    private String schema;
     private String tableName;
-
     private String tableAlias;
-
     private String tableKeyword;
-
     private String mainKeyword;
 
     public JoinType getJoinType() {
@@ -41,6 +39,14 @@ public class Join implements Serializable {
 
     public void setJoinType(JoinType joinType) {
         this.joinType = joinType;
+    }
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
     }
 
     public String getTableName() {
@@ -75,4 +81,15 @@ public class Join implements Serializable {
         this.mainKeyword = mainKeyword;
     }
 
+    @Override
+    public String toString() {
+        return "Join{" +
+                "joinType=" + joinType +
+                ", schema='" + schema + '\'' +
+                ", tableName='" + tableName + '\'' +
+                ", tableAlias='" + tableAlias + '\'' +
+                ", tableKeyword='" + tableKeyword + '\'' +
+                ", mainKeyword='" + mainKeyword + '\'' +
+                '}';
+    }
 }

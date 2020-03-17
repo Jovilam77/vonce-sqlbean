@@ -30,4 +30,11 @@ public @interface SqlBeanTable {
      */
     String alias() default "";
 
+    /**
+     * schema
+     *
+     * @return
+     */
+    String schema() default "";
+
 }

@@ -29,6 +29,7 @@ public class SqlBeanUtil {
         SqlBeanUnion sqlBeanUnion = clazz.getAnnotation(SqlBeanUnion.class);
         SqlBeanTable sqlBeanTable;
         String className = "";
+        String schema = "";
         String tableName = "";
         String tableAlias = "";
         if (sqlBeanUnion != null) {
@@ -37,6 +38,7 @@ public class SqlBeanUtil {
             sqlBeanTable = clazz.getAnnotation(SqlBeanTable.class);
         }
         if (sqlBeanTable != null) {
+            schema = sqlBeanTable.schema();
             tableName = sqlBeanTable.value();
             tableAlias = sqlBeanTable.alias();
         } else {
@@ -46,7 +48,7 @@ public class SqlBeanUtil {
         if (StringUtil.isEmpty(tableAlias)) {
             tableAlias = tableName;
         }
-        return new Table(tableName, tableAlias);
+        return new Table(schema, tableName, tableAlias);
     }
 
     /**
@@ -58,6 +60,7 @@ public class SqlBeanUtil {
     public static Table getTable(Class<?> clazz, SqlBeanJoin sqlBeanJoin) {
         Table table = new Table();
         if (sqlBeanJoin != null) {
+            table.setSchema(sqlBeanJoin.schema());
             table.setName(sqlBeanJoin.table());
             table.setAlias(sqlBeanJoin.tableAlias());
             if (StringUtil.isEmpty(table.getAlias())) {
@@ -66,6 +69,7 @@ public class SqlBeanUtil {
         }
         Table classTable = getTable(clazz);
         if (StringUtil.isEmpty(table.getName())) {
+            table.setSchema(classTable.getSchema());
             table.setName(classTable.getName());
         }
         if (StringUtil.isEmpty(table.getAlias())) {
@@ -358,17 +362,12 @@ public class SqlBeanUtil {
     public static void setJoin(Select select, Class<?> clazz) throws SqlBeanException {
         Map<String, Join> joinFieldMap = getJoin(clazz);
         for (Join join : joinFieldMap.values()) {
+            String schema = join.getSchema();
             String tableName = join.getTableName();
             String tableAlias = join.getTableAlias();
             String tableKeyword = join.getTableKeyword();
             String mainKeyword = join.getMainKeyword();
-            if (isToUpperCase(select)) {
-                tableName = tableName.toUpperCase();
-                tableAlias = tableAlias.toUpperCase();
-                tableKeyword = tableKeyword.toUpperCase();
-                mainKeyword = mainKeyword.toUpperCase();
-            }
-            select.join(join.getJoinType(), tableName, tableAlias, tableKeyword, mainKeyword);
+            select.join(join.getJoinType(), schema, tableName, tableAlias, tableKeyword, mainKeyword);
         }
     }
 
@@ -387,17 +386,24 @@ public class SqlBeanUtil {
      * 获得新的表字段名
      *
      * @param common
+     * @param schema
      * @param tableAlias
      * @param tableFieldName
      * @return
      */
-    public static String getTableFieldFullName(Common common, String tableAlias, String tableFieldName) {
+    public static String getTableFieldFullName(Common common, String schema, String tableAlias, String tableFieldName) {
         String transferred = getTransferred(common);
-        if (isToUpperCase(common)) {
-            tableAlias = tableAlias.toUpperCase();
-            tableFieldName = tableFieldName.toUpperCase();
+        StringBuffer fullName = new StringBuffer();
+        if (StringUtil.isNotEmpty(schema)) {
+            fullName.append(schema);
+            fullName.append(SqlHelperCons.POINT);
         }
-        return transferred + tableAlias + transferred + SqlHelperCons.POINT + transferred + tableFieldName + transferred;
+        fullName.append(transferred);
+        fullName.append(tableAlias);
+        fullName.append(transferred);
+        fullName.append(SqlHelperCons.POINT);
+        fullName.append(tableFieldName);
+        return fullName.toString();
     }
 
     /**
@@ -476,25 +482,6 @@ public class SqlBeanUtil {
             }
         }
         return conditionSql.toString();
-    }
-
-
-    /**
-     * 获取模糊查询的值
-     *
-     * @param value    值
-     * @param likeType 模糊类型
-     * @return
-     */
-    public static Object getLikeValue(Object value, String likeType) {
-        if (likeType != null && likeType.trim().equals("left")) {
-            value = "%" + value;
-        } else if (likeType != null && likeType.trim().equals("right")) {
-            value = value + "%";
-        } else {
-            value = "%" + value + "%";
-        }
-        return value;
     }
 
     /**

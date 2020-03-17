@@ -12,6 +12,7 @@ import cn.vonce.sql.enumerate.SqlSort;
 import com.esotericsoftware.reflectasm.MethodAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -339,7 +340,7 @@ public class PageHelper<T> {
                 }
                 if (StringUtil.isNotEmpty(field) && field.indexOf(SqlHelperCons.POINT) > -1) {
                     String[] tableNameAndField = field.split("\\" + SqlHelperCons.POINT);
-                    order = new Order(tableNameAndField[0], tableNameAndField[1], SqlSort.get(sort));
+                    order = new Order("", tableNameAndField[0], tableNameAndField[1], SqlSort.get(sort));
                 } else {
                     order = new Order(field, SqlSort.get(sort));
                 }
