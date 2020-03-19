@@ -3,6 +3,8 @@ package cn.vonce.sql.processor;
 import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.annotation.SqlBeanField;
 import cn.vonce.sql.annotation.SqlBeanTable;
+import cn.vonce.sql.bean.Column;
+import com.squareup.javapoet.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -25,70 +27,94 @@ import java.util.Set;
 @SupportedAnnotationTypes({"cn.vonce.sql.annotation.SqlBeanCons"})
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class SqlBeanConsProcessor extends AbstractProcessor {
+    private Messager messager; //有点像Logger,用于输出信息
+    private Filer filer; //可以获得Build Path，用于生成文件
     public static final String PREFIX = "Sql";
+
+    // init做一些初始化操作
+    @Override
+    public synchronized void init(ProcessingEnvironment processingEnv) {
+        super.init(processingEnv);
+        messager = processingEnv.getMessager();
+        this.filer = processingEnv.getFiler();
+    }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
-        for (TypeElement typeElement : annotations) {
-            for (Element element : env.getElementsAnnotatedWith(typeElement)) {
-                Element enclosingElement = element.getEnclosingElement();
-                //获取父元素的全类名,用来生成包名
-                String packageName = ((PackageElement) enclosingElement).getQualifiedName().toString() + ".sql";
-                String className = PREFIX + element.getSimpleName();
-                String schema = "";
-                String tableName = element.getSimpleName().toString();
-                String tableAlias = "";
-                SqlBeanTable sqlBeanTable = element.getAnnotation(SqlBeanTable.class);
-                if (sqlBeanTable != null) {
-                    schema = sqlBeanTable.schema();
-                    tableName = sqlBeanTable.value();
-                    tableAlias = sqlBeanTable.alias();
-                }
-                if (StringUtil.isEmpty(tableAlias)) {
-                    tableAlias = tableName;
-                }
-                String projectPath = System.getProperty("user.dir");
-                String resPath = projectPath + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + packageName.replace(".", File.separator) + File.separator;
-                try {
-                    File file = new File(resPath);
-                    if (!file.exists()) {
-                        file.mkdir();
+        try {
+            for (TypeElement typeElement : annotations) {
+                for (Element element : env.getElementsAnnotatedWith(typeElement)) {
+                    Element enclosingElement = element.getEnclosingElement();
+                    //获取父元素的全类名,用来生成包名
+                    String packageName = ((PackageElement) enclosingElement).getQualifiedName().toString() + ".sql";
+                    String className = PREFIX + element.getSimpleName();
+                    String schema = "";
+                    String tableName = element.getSimpleName().toString();
+                    String tableAlias = "";
+                    SqlBeanTable sqlBeanTable = element.getAnnotation(SqlBeanTable.class);
+                    if (sqlBeanTable != null) {
+                        schema = sqlBeanTable.schema();
+                        tableName = sqlBeanTable.value();
+                        tableAlias = sqlBeanTable.alias();
                     }
-                    //创建Java 文件
-//                    JavaFileObject javaFileObject = processingEnv.getFiler().createSourceFile(resPath + className);
-//                    Writer writer = javaFileObject.openWriter();
-                    FileOutputStream fos = new FileOutputStream(resPath + className + ".java");
-                    try {
-                        PrintWriter printWriter = new PrintWriter(fos);
-                        printWriter.println("package " + packageName + ";");
-                        printWriter.println("import cn.vonce.sql.bean.Column;");
-                        printWriter.println("\npublic class " + className + " { ");
-                        printWriter.println("    public static final String _schema = \"" + schema + "\";");
-                        printWriter.println("    public static final String _tableName = \"" + tableName + "\";");
-                        printWriter.println("    public static final String _tableAlias = \"" + tableAlias + "\";");
-                        printWriter.println("    public static final String _all = \"" + tableAlias + ".*\";");
-                        printWriter.println("    public static final String _count = \"COUNT(*)\";");
-                        for (Element subElement : element.getEnclosedElements()) {
-                            if (subElement.getKind().isField() && !subElement.getModifiers().contains(Modifier.STATIC)) {
-                                String sqlFieldName = subElement.getSimpleName().toString();
-                                SqlBeanField sqlBeanField = subElement.getAnnotation(SqlBeanField.class);
-                                if (sqlBeanField != null && StringUtil.isNotEmpty(sqlBeanField.value())) {
-                                    sqlFieldName = sqlBeanField.value();
-                                }
-                                printWriter.println("    public static final Column " + sqlFieldName + " = new Column(_schema,_tableAlias" + ",\"" + sqlFieldName + "\",\"\");");
+                    if (StringUtil.isEmpty(tableAlias)) {
+                        tableAlias = tableName;
+                    }
+                    FieldSpec _schemaField = FieldSpec.builder(String.class, "_schema")
+                            .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                            .initializer("$S", schema)
+                            .build();
+                    FieldSpec _tableNameField = FieldSpec.builder(String.class, "_tableName")
+                            .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                            .initializer("$S", tableName)
+                            .build();
+                    FieldSpec _tableAliasField = FieldSpec.builder(String.class, "_tableAlias")
+                            .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                            .initializer("$S", tableAlias)
+                            .build();
+                    FieldSpec _allField = FieldSpec.builder(String.class, "_all")
+                            .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                            .initializer("$S", tableAlias + ".*")
+                            .build();
+                    FieldSpec _countField = FieldSpec.builder(String.class, "_count")
+                            .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                            .initializer("$S", "COUNT(*)")
+                            .build();
+                    TypeSpec.Builder sqlBeanConsBuilder = TypeSpec.classBuilder(className)
+                            .addModifiers(Modifier.PUBLIC)
+                            .addField(_schemaField)
+                            .addField(_tableNameField)
+                            .addField(_tableAliasField)
+                            .addField(_allField)
+                            .addField(_countField);
+                    for (Element subElement : element.getEnclosedElements()) {
+                        if (subElement.getKind().isField() && !subElement.getModifiers().contains(Modifier.STATIC)) {
+                            String sqlFieldName = subElement.getSimpleName().toString();
+                            SqlBeanField sqlBeanField = subElement.getAnnotation(SqlBeanField.class);
+                            if (sqlBeanField != null && StringUtil.isNotEmpty(sqlBeanField.value())) {
+                                sqlFieldName = sqlBeanField.value();
                             }
+                            FieldSpec sqlField = FieldSpec.builder(Column.class, sqlFieldName)
+                                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                                    .initializer(CodeBlock.builder().add("new $T($L,$L,$S,\"\")", Column.class, "_schema", "_tableAlias", sqlFieldName).build())
+                                    .build();
+                            sqlBeanConsBuilder.addField(sqlField);
                         }
-                        printWriter.println("}");
-                        printWriter.flush();
-                    } finally {
-                        fos.close();
                     }
-                } catch (IOException e1) {
-                    processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR,
-                            e1.toString());
+                    JavaFile javaFile = JavaFile.builder(packageName, sqlBeanConsBuilder.build())
+                            .addFileComment(" This codes are generated automatically. Do not modify!")
+                            .build();
+                    try {
+                        javaFile.writeTo(filer);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
+        } catch (Exception e) {
+            messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
         }
         return true;
     }
+
 }
