@@ -3,6 +3,7 @@ package cn.vonce.sql.uitls;
 import cn.vonce.common.utils.ReflectAsmUtil;
 import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.annotation.*;
+import cn.vonce.sql.annotation.SqlField;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.DbType;
@@ -26,21 +27,21 @@ public class SqlBeanUtil {
      * @return
      */
     public static Table getTable(Class<?> clazz) {
-        SqlBeanUnion sqlBeanUnion = clazz.getAnnotation(SqlBeanUnion.class);
-        SqlBeanTable sqlBeanTable;
+        SqlUnion sqlUnion = clazz.getAnnotation(SqlUnion.class);
+        SqlTable sqlTable;
         String className = "";
         String schema = "";
         String tableName = "";
         String tableAlias = "";
-        if (sqlBeanUnion != null) {
-            sqlBeanTable = clazz.getSuperclass().getAnnotation(SqlBeanTable.class);
+        if (sqlUnion != null) {
+            sqlTable = clazz.getSuperclass().getAnnotation(SqlTable.class);
         } else {
-            sqlBeanTable = clazz.getAnnotation(SqlBeanTable.class);
+            sqlTable = clazz.getAnnotation(SqlTable.class);
         }
-        if (sqlBeanTable != null) {
-            schema = sqlBeanTable.schema();
-            tableName = sqlBeanTable.value();
-            tableAlias = sqlBeanTable.alias();
+        if (sqlTable != null) {
+            schema = sqlTable.schema();
+            tableName = sqlTable.value();
+            tableAlias = sqlTable.alias();
         } else {
             tableName = className;
             tableAlias = tableName;
@@ -57,12 +58,12 @@ public class SqlBeanUtil {
      * @param clazz
      * @return
      */
-    public static Table getTable(Class<?> clazz, SqlBeanJoin sqlBeanJoin) {
+    public static Table getTable(Class<?> clazz, SqlJoin sqlJoin) {
         Table table = new Table();
-        if (sqlBeanJoin != null) {
-            table.setSchema(sqlBeanJoin.schema());
-            table.setName(sqlBeanJoin.table());
-            table.setAlias(sqlBeanJoin.tableAlias());
+        if (sqlJoin != null) {
+            table.setSchema(sqlJoin.schema());
+            table.setName(sqlJoin.table());
+            table.setAlias(sqlJoin.tableAlias());
             if (StringUtil.isEmpty(table.getAlias())) {
                 table.setAlias(table.getName());
             }
@@ -85,10 +86,10 @@ public class SqlBeanUtil {
      * @return
      */
     public static String getTableFieldName(Field field) {
-        SqlBeanField sqlBeanField = field.getAnnotation(SqlBeanField.class);
+        SqlField sqlField = field.getAnnotation(SqlField.class);
         String name = field.getName();
-        if (sqlBeanField != null) {
-            name = sqlBeanField.value();
+        if (sqlField != null) {
+            name = sqlField.value();
         }
         return name;
     }
@@ -113,7 +114,7 @@ public class SqlBeanUtil {
         Field idField = null;
         int existId = 0;
         for (Field field : fieldList) {
-            SqlBeanId sqlBeanField = field.getAnnotation(SqlBeanId.class);
+            SqlId sqlBeanField = field.getAnnotation(SqlId.class);
             if (sqlBeanField != null) {
                 idField = field;
                 existId++;
@@ -137,8 +138,8 @@ public class SqlBeanUtil {
     public static Field getLogicallyField(Class<?> clazz) throws SqlBeanException {
         List<Field> fieldList = getBeanAllField(clazz);
         for (Field field : fieldList) {
-            SqlBeanField sqlBeanField = field.getAnnotation(SqlBeanField.class);
-            if (sqlBeanField != null && sqlBeanField.logically()) {
+            SqlLogically sqlLogically = field.getAnnotation(SqlLogically.class);
+            if (sqlLogically != null) {
                 return field;
             }
         }
@@ -152,9 +153,9 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean isIgnore(Field field) {
-        SqlBeanField sqlBeanField = field.getAnnotation(SqlBeanField.class);
-        if (sqlBeanField != null) {
-            return sqlBeanField.ignore();
+        SqlField sqlField = field.getAnnotation(SqlField.class);
+        if (sqlField != null) {
+            return sqlField.ignore();
         }
         return false;
     }
@@ -180,11 +181,11 @@ public class SqlBeanUtil {
     /**
      * 判断SqlBeanJoin 是否为空
      *
-     * @param sqlBeanJoin
+     * @param sqlJoin
      * @return
      */
-    public static boolean sqlBeanJoinIsNotEmpty(SqlBeanJoin sqlBeanJoin) {
-        return joinIsNotEmpty(sqlBeanJoin.table(), sqlBeanJoin.tableKeyword(), sqlBeanJoin.mainKeyword());
+    public static boolean sqlBeanJoinIsNotEmpty(SqlJoin sqlJoin) {
+        return joinIsNotEmpty(sqlJoin.table(), sqlJoin.tableKeyword(), sqlJoin.mainKeyword());
     }
 
     /**
@@ -211,8 +212,8 @@ public class SqlBeanUtil {
     public static List<Field> getBeanAllField(Class<?> clazz) {
         List<Field> fieldList = new ArrayList<>();
         fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
-        SqlBeanUnion sqlBeanUnion = clazz.getAnnotation(SqlBeanUnion.class);
-        if (sqlBeanUnion != null) {
+        SqlUnion sqlUnion = clazz.getAnnotation(SqlUnion.class);
+        if (sqlUnion != null) {
             fieldList.addAll(Arrays.asList(clazz.getSuperclass().getDeclaredFields()));
         }
         return fieldList;
@@ -228,8 +229,8 @@ public class SqlBeanUtil {
     public static Field getFieldByTableFieldName(List<Field> fieldList, String tableFieldName) {
         Field thisField = null;
         for (Field field : fieldList) {
-            SqlBeanField sqlBeanField = field.getAnnotation(SqlBeanField.class);
-            if (sqlBeanField != null && sqlBeanField.value().equals(tableFieldName)) {
+            SqlField sqlField = field.getAnnotation(SqlField.class);
+            if (sqlField != null && sqlField.value().equals(tableFieldName)) {
                 thisField = field;
             } else if (field.getName().equals(tableFieldName)) {
                 thisField = field;
@@ -262,27 +263,27 @@ public class SqlBeanUtil {
             if (isFilter(filterTableFields, getTableFieldName(field))) {
                 continue;
             }
-            SqlBeanJoin sqlBeanJoin = field.getAnnotation(SqlBeanJoin.class);
-            if (sqlBeanJoin != null && sqlBeanJoin.isBean()) {
+            SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
+            if (sqlJoin != null && sqlJoin.isBean()) {
                 Class<?> subBeanClazz = field.getType();
                 //如果有指定查询的字段
-                if (sqlBeanJoinIsNotEmpty(sqlBeanJoin) && sqlBeanJoin.value().length > 0 && !sqlBeanJoin.value()[0].equals("")) {
+                if (sqlBeanJoinIsNotEmpty(sqlJoin) && sqlJoin.value().length > 0 && !sqlJoin.value()[0].equals("")) {
                     List<Field> subBeanFieldList = getBeanAllField(subBeanClazz);
-                    for (String fieldName : sqlBeanJoin.value()) {
+                    for (String fieldName : sqlJoin.value()) {
                         Field javaField = getFieldByTableFieldName(subBeanFieldList, fieldName);
                         if (javaField == null) {
                             throw new SqlBeanException("该类的表连接查询字段未与java字段关联：" + clazz.getName() + ">" + field.getName() + ">" + fieldName);
                         }
                         //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
-                        Table subTable = getTable(subBeanClazz, sqlBeanJoin);
-                        columnSet.add(new Column(sqlBeanJoin.table(), fieldName, getColumnAlias(subTable.getAlias(), javaField.getName())));
+                        Table subTable = getTable(subBeanClazz, sqlJoin);
+                        columnSet.add(new Column(sqlJoin.table(), fieldName, getColumnAlias(subTable.getAlias(), javaField.getName())));
                     }
                 }
                 //没有指定查询的字段则查询所有字段
                 else {
                     Field[] subBeanFields = subBeanClazz.getDeclaredFields();
                     //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
-                    Table subTable = getTable(subBeanClazz, sqlBeanJoin);
+                    Table subTable = getTable(subBeanClazz, sqlJoin);
                     for (Field subBeanField : subBeanFields) {
                         if (Modifier.isStatic(subBeanField.getModifiers())) {
                             continue;
@@ -293,15 +294,15 @@ public class SqlBeanUtil {
                         columnSet.add(new Column(subTable.getAlias(), getTableFieldName(subBeanField), getColumnAlias(subTable.getAlias(), subBeanField.getName())));
                     }
                 }
-            } else if (sqlBeanJoin != null) {
-                if (sqlBeanJoinIsNotEmpty(sqlBeanJoin)) {
+            } else if (sqlJoin != null) {
+                if (sqlBeanJoinIsNotEmpty(sqlJoin)) {
                     //获取SqlBeanJoin 注解中的查询字段
-                    String tableFieldName = sqlBeanJoin.value()[0];
+                    String tableFieldName = sqlJoin.value()[0];
                     if (StringUtil.isEmpty(tableFieldName)) {
                         throw new SqlBeanException("该类的表连接查询字段未与java字段关联：");
                     }
                     //可能会连同一个表，但连接条件不一样（这时表需要区分别名），所以查询的字段可能是同一个，但属于不同表别名下，所以用java字段名当sql字段别名不会出错
-                    String subTableAlias = StringUtil.isEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.table() : sqlBeanJoin.tableAlias();
+                    String subTableAlias = StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias();
                     columnSet.add(new Column(subTableAlias, tableFieldName, getColumnAlias(subTableAlias, field.getName())));
                 }
             } else {
@@ -325,28 +326,28 @@ public class SqlBeanUtil {
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
-            SqlBeanJoin sqlBeanJoin = field.getAnnotation(SqlBeanJoin.class);
+            SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
             Join join = new Join();
-            if (sqlBeanJoin != null && sqlBeanJoinIsNotEmpty(sqlBeanJoin)) {
-                join.setJoinType(sqlBeanJoin.type());
-                join.setTableName(sqlBeanJoin.table());
-                join.setTableAlias(StringUtil.isEmpty(sqlBeanJoin.tableAlias()) ? sqlBeanJoin.table() : sqlBeanJoin.tableAlias());
-                join.setTableKeyword(sqlBeanJoin.tableKeyword());
-                join.setMainKeyword(sqlBeanJoin.mainKeyword());
+            if (sqlJoin != null && sqlBeanJoinIsNotEmpty(sqlJoin)) {
+                join.setJoinType(sqlJoin.type());
+                join.setTableName(sqlJoin.table());
+                join.setTableAlias(StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias());
+                join.setTableKeyword(sqlJoin.tableKeyword());
+                join.setMainKeyword(sqlJoin.mainKeyword());
                 //key是唯一的，作用是为了去重复，因为可能连接相同的表取不同的字段，但连接相同的表，连接条件不同是可以允许的
-                joinFieldMap.put(sqlBeanJoin.table().toLowerCase() + sqlBeanJoin.tableKeyword().toLowerCase() + sqlBeanJoin.mainKeyword().toLowerCase(), join);
-            } else if (sqlBeanJoin != null && sqlBeanJoin.isBean()) {
+                joinFieldMap.put(sqlJoin.table().toLowerCase() + sqlJoin.tableKeyword().toLowerCase() + sqlJoin.mainKeyword().toLowerCase(), join);
+            } else if (sqlJoin != null && sqlJoin.isBean()) {
                 Class<?> subClazz = field.getType();
                 //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
-                Table table = getTable(subClazz, sqlBeanJoin);
+                Table table = getTable(subClazz, sqlJoin);
                 String tableKeyword = getTableFieldName(getIdField(subClazz));
-                join.setJoinType(sqlBeanJoin.type());
+                join.setJoinType(sqlJoin.type());
                 join.setTableName(table.getName());
                 join.setTableAlias(table.getAlias());
                 join.setTableKeyword(tableKeyword);
-                join.setMainKeyword(sqlBeanJoin.mainKeyword());
+                join.setMainKeyword(sqlJoin.mainKeyword());
                 //key是唯一的，作用是为了去重复，因为可能连接相同的表取不同的字段，但连接相同的表，连接条件不同是可以允许的
-                joinFieldMap.put(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlBeanJoin.mainKeyword().toLowerCase(), join);
+                joinFieldMap.put(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlJoin.mainKeyword().toLowerCase(), join);
             }
         }
         return joinFieldMap;
@@ -606,7 +607,7 @@ public class SqlBeanUtil {
      */
     public static String getSqlValue(Common common, Object value) {
         if (value == null) {
-            return null;
+            return SqlHelperCons.NULL_VALUE;
         }
         String single_quotation_mark = SqlHelperCons.SINGLE_QUOTATION_MARK;
         String sqlValue = "";
@@ -696,6 +697,33 @@ public class SqlBeanUtil {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 更新乐观锁版本
+     *
+     * @param typeName
+     * @param value
+     * @return
+     */
+    public static Object updateVersion(String typeName, Object value) {
+        switch (typeName) {
+            case "int":
+            case "Integer":
+            case "long":
+            case "Long":
+                long val = 0;
+                if (value != null) {
+                    val = (long) value;
+                }
+                value = val + 1;
+                break;
+            case "Date":
+            case "Timestamp":
+                value = new Date();
+                break;
+        }
+        return value;
     }
 
 }

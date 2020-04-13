@@ -6,7 +6,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Documented
 @Inherited
-public @interface SqlBeanUnion {
+public @interface SqlUnion {
 
 
 

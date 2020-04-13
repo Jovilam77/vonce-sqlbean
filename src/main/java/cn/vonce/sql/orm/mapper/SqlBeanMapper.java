@@ -3,7 +3,7 @@ package cn.vonce.sql.orm.mapper;
 
 import cn.vonce.common.utils.ReflectAsmUtil;
 import cn.vonce.common.utils.StringUtil;
-import cn.vonce.sql.annotation.SqlBeanJoin;
+import cn.vonce.sql.annotation.SqlJoin;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.slf4j.Logger;
@@ -88,21 +88,21 @@ public class SqlBeanMapper {
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
-            SqlBeanJoin sqlBeanJoin = field.getAnnotation(SqlBeanJoin.class);
+            SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
             String fieldName = field.getName();
-            if (sqlBeanJoin != null) {
-                if (sqlBeanJoin.isBean()) {
+            if (sqlJoin != null) {
+                if (sqlJoin.isBean()) {
                     Class<?> subClazz = field.getType();
                     Object subBean = ReflectAsmUtil.getInstance(subClazz);
                     //获取表的别名，先是获取别名，获取不到就会获取表名
                     String subTableAlias = SqlBeanUtil.getTable(subClazz).getAlias();
                     //如果在SqlBeanJoin中设置了表名，那么优先使用该表名，如果有多个联表查询的对象需要连接同一张表的，那么需要保证表名一致
-                    if (StringUtil.isNotEmpty(sqlBeanJoin.table())) {
-                        subTableAlias = sqlBeanJoin.table();
+                    if (StringUtil.isNotEmpty(sqlJoin.table())) {
+                        subTableAlias = sqlJoin.table();
                     }
                     //如果在SqlBeanJoin中设置了别名，那么优先使用该别名，如果有多个联表查询的对象需要连接同一张表的，那么需要保证别名一致
-                    if (StringUtil.isNotEmpty(sqlBeanJoin.tableAlias())) {
-                        subTableAlias = sqlBeanJoin.tableAlias();
+                    if (StringUtil.isNotEmpty(sqlJoin.tableAlias())) {
+                        subTableAlias = sqlJoin.tableAlias();
                     }
                     Field[] subFields = subClazz.getDeclaredFields();
                     for (Field subField : subFields) {
@@ -116,9 +116,9 @@ public class SqlBeanMapper {
                     ReflectAsmUtil.set(bean.getClass(), bean, fieldName, subBean);
                     continue;
                 } else {
-                    String subTableAlias = sqlBeanJoin.table();
-                    if (StringUtil.isNotEmpty(sqlBeanJoin.tableAlias())) {
-                        subTableAlias = sqlBeanJoin.tableAlias();
+                    String subTableAlias = sqlJoin.table();
+                    if (StringUtil.isNotEmpty(sqlJoin.tableAlias())) {
+                        subTableAlias = sqlJoin.tableAlias();
                     }
                     setFieldValue(bean, field, subTableAlias + SqlHelperCons.POINT + fieldName, resultSet);
                 }

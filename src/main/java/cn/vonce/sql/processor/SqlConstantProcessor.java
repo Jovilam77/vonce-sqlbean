@@ -1,8 +1,8 @@
 package cn.vonce.sql.processor;
 
 import cn.vonce.common.utils.StringUtil;
-import cn.vonce.sql.annotation.SqlBeanField;
-import cn.vonce.sql.annotation.SqlBeanTable;
+import cn.vonce.sql.annotation.SqlField;
+import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.Column;
 import com.squareup.javapoet.*;
 
@@ -24,9 +24,9 @@ import java.util.Set;
  * @email imjovi@qq.com
  * @date 2020/2/26 14:21
  */
-@SupportedAnnotationTypes({"cn.vonce.sql.annotation.SqlBeanCons"})
+@SupportedAnnotationTypes({"cn.vonce.sql.annotation.SqlConstant"})
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
-public class SqlBeanConsProcessor extends AbstractProcessor {
+public class SqlConstantProcessor extends AbstractProcessor {
     private Messager messager; //有点像Logger,用于输出信息
     private Filer filer; //可以获得Build Path，用于生成文件
     public static final String PREFIX = "Sql";
@@ -51,11 +51,11 @@ public class SqlBeanConsProcessor extends AbstractProcessor {
                     String schema = "";
                     String tableName = element.getSimpleName().toString();
                     String tableAlias = "";
-                    SqlBeanTable sqlBeanTable = element.getAnnotation(SqlBeanTable.class);
-                    if (sqlBeanTable != null) {
-                        schema = sqlBeanTable.schema();
-                        tableName = sqlBeanTable.value();
-                        tableAlias = sqlBeanTable.alias();
+                    SqlTable sqlTable = element.getAnnotation(SqlTable.class);
+                    if (sqlTable != null) {
+                        schema = sqlTable.schema();
+                        tableName = sqlTable.value();
+                        tableAlias = sqlTable.alias();
                     }
                     if (StringUtil.isEmpty(tableAlias)) {
                         tableAlias = tableName;
@@ -90,7 +90,7 @@ public class SqlBeanConsProcessor extends AbstractProcessor {
                     for (Element subElement : element.getEnclosedElements()) {
                         if (subElement.getKind().isField() && !subElement.getModifiers().contains(Modifier.STATIC)) {
                             String sqlFieldName = subElement.getSimpleName().toString();
-                            SqlBeanField sqlBeanField = subElement.getAnnotation(SqlBeanField.class);
+                            SqlField sqlBeanField = subElement.getAnnotation(SqlField.class);
                             if (sqlBeanField != null && StringUtil.isNotEmpty(sqlBeanField.value())) {
                                 sqlFieldName = sqlBeanField.value();
                             }

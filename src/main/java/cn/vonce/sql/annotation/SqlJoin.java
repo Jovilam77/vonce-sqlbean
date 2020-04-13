@@ -16,7 +16,7 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 @Documented
 @Inherited
-public @interface SqlBeanJoin {
+public @interface SqlJoin {
 
     /**
      * 字段名称

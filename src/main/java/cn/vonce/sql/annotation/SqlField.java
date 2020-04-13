@@ -3,38 +3,31 @@ package cn.vonce.sql.annotation;
 import java.lang.annotation.*;
 
 /**
- * 标识Bean 实体类对应的表名
+ * 标识Bean 实体类的字段与数据库中对应的字段名
  *
  * @author Jovi
  * @version 1.0
  * @email 766255988@qq.com
- * @date 2018年2月8日下午2:54:20
+ * @date 2018年2月8日下午2:55:04
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target(ElementType.FIELD)
 @Documented
 @Inherited
-public @interface SqlBeanTable {
+public @interface SqlField {
 
     /**
-     * 表名
+     * 字段名称
      *
      * @return
      */
     String value();
 
     /**
-     * 表别名
+     * 是否忽略该字段
      *
      * @return
      */
-    String alias() default "";
-
-    /**
-     * schema
-     *
-     * @return
-     */
-    String schema() default "";
+    boolean ignore() default false;
 
 }

@@ -1,23 +1,20 @@
 package cn.vonce.sql.annotation;
 
-import cn.vonce.sql.enumerate.GenerateType;
-
 import java.lang.annotation.*;
 
 /**
- * 标识实体类对应的id字段
+ * 标记为逻辑删除字段
  *
  * @author Jovi
  * @version 1.0
  * @email imjovi@qq.com
- * @date 2020/2/26 22:22
+ * @date 2020/4/13 17:40
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 @Documented
 @Inherited
-public @interface SqlBeanId {
+public @interface SqlLogically {
 
-    GenerateType generateType() default GenerateType.NORMAL;
 
 }

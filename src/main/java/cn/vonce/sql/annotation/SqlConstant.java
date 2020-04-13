@@ -13,7 +13,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.TYPE})
 @Documented
-public @interface SqlBeanCons {
+public @interface SqlConstant {
+
 
 
 }

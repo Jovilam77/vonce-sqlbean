@@ -2,9 +2,10 @@ package cn.vonce.sql.helper;
 
 import cn.vonce.common.utils.ReflectAsmUtil;
 import cn.vonce.common.utils.StringUtil;
-import cn.vonce.sql.annotation.SqlBeanId;
-import cn.vonce.sql.annotation.SqlBeanUnion;
-import cn.vonce.sql.annotation.SqlBeanTable;
+import cn.vonce.sql.annotation.SqlId;
+import cn.vonce.sql.annotation.SqlUnion;
+import cn.vonce.sql.annotation.SqlTable;
+import cn.vonce.sql.annotation.SqlVersion;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.*;
@@ -184,10 +185,10 @@ public class SqlHelper {
         String schema = common.getTable().getSchema();
         String tableName = common.getTable().getName();
         if ((common.getTable() == null || StringUtil.isEmpty(tableName)) && bean != null) {
-            SqlBeanTable sqlBeanTable = bean.getClass().getAnnotation(SqlBeanTable.class);
-            if (sqlBeanTable != null) {
-                schema = sqlBeanTable.schema();
-                tableName = sqlBeanTable.value();
+            SqlTable sqlTable = bean.getClass().getAnnotation(SqlTable.class);
+            if (sqlTable != null) {
+                schema = sqlTable.schema();
+                tableName = sqlTable.value();
             }
         }
         if (StringUtil.isEmpty(tableName) && bean != null) {
@@ -339,7 +340,7 @@ public class SqlHelper {
         String transferred = SqlBeanUtil.getTransferred(common);
         //获取sqlbean的全部字段
         Field[] fields;
-        if (objects[0].getClass().getAnnotation(SqlBeanUnion.class) != null) {
+        if (objects[0].getClass().getAnnotation(SqlUnion.class) != null) {
             fields = objects[0].getClass().getSuperclass().getDeclaredFields();
         } else {
             fields = objects[0].getClass().getDeclaredFields();
@@ -372,8 +373,8 @@ public class SqlHelper {
                 if (SqlBeanUtil.isIgnore(field)) {
                     continue;
                 }
-                SqlBeanId sqlBeanId = field.getAnnotation(SqlBeanId.class);
-                if (sqlBeanId != null) {
+                SqlId sqlId = field.getAnnotation(SqlId.class);
+                if (sqlId != null) {
                     existId++;
                 }
                 if (existId > 1) {
@@ -383,16 +384,16 @@ public class SqlHelper {
                 if (i == 0) {
                     String tableFieldName = SqlBeanUtil.getTableFieldName(field);
                     //如果此字段非id字段 或者 此字段为id字段但是不是自增的id则生成该字段的insert语句
-                    if (sqlBeanId == null || (sqlBeanId != null && sqlBeanId.generateType() != GenerateType.AUTO)) {
+                    if (sqlId == null || (sqlId != null && sqlId.generateType() != GenerateType.AUTO)) {
                         fieldSql.append(transferred + (SqlBeanUtil.isToUpperCase(common) ? tableFieldName.toUpperCase() : tableFieldName) + transferred);
                         fieldSql.append(SqlHelperCons.COMMA);
                     }
                 }
                 //如果此字段为id且需要生成唯一id
-                if (sqlBeanId != null && sqlBeanId.generateType() != GenerateType.AUTO && sqlBeanId.generateType() != GenerateType.NORMAL) {
+                if (sqlId != null && sqlId.generateType() != GenerateType.AUTO && sqlId.generateType() != GenerateType.NORMAL) {
                     Object value = ReflectAsmUtil.get(objects[i].getClass(), objects[i], field.getName());
                     if (StringUtil.isEmpty(value)) {
-                        value = common.getSqlBeanConfig().getUniqueIdProcessor().uniqueId(sqlBeanId.generateType());
+                        value = common.getSqlBeanConfig().getUniqueIdProcessor().uniqueId(sqlId.generateType());
                     }
                     valueSql.append(SqlBeanUtil.getSqlValue(common, value));
                     valueSql.append(SqlHelperCons.COMMA);
@@ -450,7 +451,7 @@ public class SqlHelper {
         String[] filterFields = update.getFilterFields();
         Object bean = update.getUpdateBean();
         Field[] fields;
-        if (bean.getClass().getAnnotation(SqlBeanUnion.class) != null) {
+        if (bean.getClass().getAnnotation(SqlUnion.class) != null) {
             fields = bean.getClass().getSuperclass().getDeclaredFields();
         } else {
             fields = bean.getClass().getDeclaredFields();
@@ -482,7 +483,11 @@ public class SqlHelper {
             setSql.append(SqlBeanUtil.isToUpperCase(update) ? name.toUpperCase() : name);
             setSql.append(transferred);
             setSql.append(SqlHelperCons.EQUAL_TO);
-            setSql.append(objectValue == null ? SqlHelperCons.NULL_VALUE : SqlBeanUtil.getSqlValue(update, objectValue));
+            if (filterAfterList.get(i).getAnnotation(SqlVersion.class) != null) {
+                setSql.append(SqlBeanUtil.getSqlValue(update, SqlBeanUtil.updateVersion(filterAfterList.get(i).getClass().getSimpleName(), objectValue)));
+            } else {
+                setSql.append(SqlBeanUtil.getSqlValue(update, objectValue));
+            }
             setSql.append(SqlHelperCons.COMMA);
         }
         setSql.deleteCharAt(setSql.length() - SqlHelperCons.COMMA.length());
