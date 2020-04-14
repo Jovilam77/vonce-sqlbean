@@ -165,9 +165,9 @@ public class SqlBeanMapper {
      * @param resultSet
      */
     public void setFieldValue(Object obj, Field field, String fieldName, ResultSet resultSet) {
-        Object value = getValue(field.getType().getSimpleName(), fieldName, resultSet);
+        Object value = getValue(field.getType().getName(), fieldName, resultSet);
         if (value == null || value.equals("null")) {
-            value = getDefaultValue(field.getType().getSimpleName());
+            value = getDefaultValue(field.getType().getName());
         }
         ReflectAsmUtil.set(obj.getClass(), obj, field.getName(), value);
     }
@@ -185,52 +185,48 @@ public class SqlBeanMapper {
         try {
             switch (fieldType) {
                 case "byte":
-                case "Byte":
                 case "java.lang.Byte":
                     value = resultSet.getByte(fieldName);
                     break;
                 case "short":
-                case "Short":
                 case "java.lang.Short":
                     value = resultSet.getShort(fieldName);
                     break;
                 case "int":
-                case "Integer":
                 case "java.lang.Integer":
                     value = resultSet.getInt(fieldName);
                     break;
                 case "float":
-                case "Float":
                 case "java.lang.Float":
                     value = resultSet.getFloat(fieldName);
                     break;
                 case "double":
-                case "Double":
                 case "java.lang.Double":
                     value = resultSet.getDouble(fieldName);
                     break;
                 case "long":
-                case "Long":
                 case "java.lang.Long":
                     value = resultSet.getLong(fieldName);
                     break;
                 case "boolean":
-                case "Boolean":
                 case "java.lang.Boolean":
                     value = resultSet.getBoolean(fieldName);
                     break;
                 case "char":
-                case "Character":
                 case "java.lang.Character":
-                case "String":
                 case "java.lang.String":
                     value = resultSet.getString(fieldName) + "";
                     break;
-                case "Date":
+                case "java.sql.Date":
+                    value = resultSet.getDate(fieldName);
+                    break;
+                case "java.sql.Time":
+                    value = resultSet.getTime(fieldName);
+                    break;
                 case "java.util.Date":
+                case "java.sql.Timestamp":
                     value = resultSet.getTimestamp(fieldName);
                     break;
-                case "BigDecimal":
                 case "java.math.BigDecimal":
                     value = resultSet.getBigDecimal(fieldName);
                     break;

@@ -95,22 +95,13 @@ public class SqlBeanUtil {
     }
 
     /**
-     * 获取id的字段
+     * 获取id标识字段
      *
      * @param clazz
      * @return
      */
     public static Field getIdField(Class<?> clazz) throws SqlBeanException {
-        return getIdField(getBeanAllField(clazz));
-    }
-
-    /**
-     * 获取id的字段
-     *
-     * @param fieldList
-     * @return
-     */
-    public static Field getIdField(List<Field> fieldList) throws SqlBeanException {
+        List<Field> fieldList = getBeanAllField(clazz);
         Field idField = null;
         int existId = 0;
         for (Field field : fieldList) {
@@ -130,20 +121,55 @@ public class SqlBeanUtil {
     }
 
     /**
-     * 获取逻辑删除的字段
+     * 获取逻辑删除标识字段
      *
      * @param clazz
      * @return
      */
     public static Field getLogicallyField(Class<?> clazz) throws SqlBeanException {
         List<Field> fieldList = getBeanAllField(clazz);
+        Field logicallyField = null;
+        int existId = 0;
         for (Field field : fieldList) {
             SqlLogically sqlLogically = field.getAnnotation(SqlLogically.class);
             if (sqlLogically != null) {
-                return field;
+                logicallyField = field;
+                existId++;
+            }
+            if (existId > 1) {
+                throw new SqlBeanException("请正确的标识logically字段，logically字段只能标识一个，但我们在'" + field.getDeclaringClass().getName() + "'此实体类或其父类找到了不止一处");
             }
         }
-        throw new SqlBeanException("请检查SqlBean是否有设置logically");
+        if (existId == 0) {
+            throw new SqlBeanException("请检查实体类是否有标识logically字段");
+        }
+        return logicallyField;
+    }
+
+    /**
+     * 获取乐观锁标识字段
+     *
+     * @param clazz
+     * @return
+     */
+    public static Field getVersionField(Class<?> clazz) throws SqlBeanException {
+        List<Field> fieldList = getBeanAllField(clazz);
+        Field versionField = null;
+        int existId = 0;
+        for (Field field : fieldList) {
+            SqlVersion sqlVersion = field.getAnnotation(SqlVersion.class);
+            if (sqlVersion != null) {
+                versionField = field;
+                existId++;
+            }
+            if (existId > 1) {
+                throw new SqlBeanException("请正确的标识version字段，version字段只能标识一个，但我们在'" + field.getDeclaringClass().getName() + "'此实体类或其父类找到了不止一处");
+            }
+        }
+        if (existId == 0) {
+            throw new SqlBeanException("请检查实体类是否有标识version字段");
+        }
+        return versionField;
     }
 
     /**
@@ -494,40 +520,33 @@ public class SqlBeanUtil {
     public static WhatType whatType(String typeName) {
         WhatType whatType;
         switch (typeName) {
-            case "String":
             case "java.lang.String":
             case "char":
-            case "Character":
             case "java.lang.Character":
                 whatType = WhatType.STRING_TYPE;
                 break;
             case "boolean":
-            case "Boolean":
             case "java.lang.Boolean":
                 whatType = WhatType.BOOL_TYPE;
                 break;
             case "byte":
-            case "Byte":
             case "java.lang.Byte":
             case "short":
-            case "Short":
             case "java.lang.Short":
             case "int":
-            case "Integer":
             case "java.lang.Integer":
             case "long":
-            case "Long":
             case "java.lang.Long":
             case "float":
-            case "Float":
             case "java.lang.Float":
             case "double":
-            case "Double":
             case "java.lang.Double":
                 whatType = WhatType.VALUE_TYPE;
                 break;
-            case "Date":
             case "java.util.Date":
+            case "java.sql.Date":
+            case "java.sql.Timestamp":
+            case "java.sql.Time":
                 whatType = WhatType.DATE_TYPE;
                 break;
             default:
@@ -546,27 +565,16 @@ public class SqlBeanUtil {
     public static boolean isBaseType(String typeName) {
         boolean isTrue;
         switch (typeName) {
-            case "String":
             case "java.lang.String":
-            case "Character":
             case "java.lang.Character":
-            case "Boolean":
             case "java.lang.Boolean":
-            case "Byte":
             case "java.lang.Byte":
-            case "Short":
             case "java.lang.Short":
-            case "Integer":
             case "java.lang.Integer":
-            case "Long":
             case "java.lang.Long":
-            case "Float":
             case "java.lang.Float":
-            case "Double":
             case "java.lang.Double":
-            case "Date":
             case "java.util.Date":
-            case "BigDecimal":
             case "java.math.BigDecimal":
                 isTrue = true;
                 break;
@@ -586,9 +594,7 @@ public class SqlBeanUtil {
     public static boolean isMap(String typeName) {
         boolean isTrue;
         switch (typeName) {
-            case "Map":
             case "java.util.Map":
-            case "HashMap":
             case "java.util.HashMap":
                 isTrue = true;
                 break;
@@ -611,13 +617,13 @@ public class SqlBeanUtil {
         }
         String single_quotation_mark = SqlHelperCons.SINGLE_QUOTATION_MARK;
         String sqlValue = "";
-        switch (whatType(value.getClass().getSimpleName())) {
+        switch (whatType(value.getClass().getName())) {
             case VALUE_TYPE:
             case BOOL_TYPE:
                 sqlValue = value.toString();
                 break;
             case DATE_TYPE:
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
                 switch (common.getSqlBeanConfig().getDbType()) {
                     case Oracle:
                         sqlValue = "to_timestamp(" + single_quotation_mark + sdf.format(value) + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
@@ -709,21 +715,40 @@ public class SqlBeanUtil {
     public static Object updateVersion(String typeName, Object value) {
         switch (typeName) {
             case "int":
-            case "Integer":
+            case "java.lang.Integer":
             case "long":
-            case "Long":
+            case "java.lang.Long":
                 long val = 0;
                 if (value != null) {
-                    val = (long) value;
+                    val = Long.parseLong(value.toString());
                 }
                 value = val + 1;
                 break;
-            case "Date":
-            case "Timestamp":
+            case "java.util.Date":
+            case "java.sql.Timestamp":
                 value = new Date();
                 break;
         }
         return value;
+    }
+
+    /**
+     * 乐观锁字段是否有效
+     *
+     * @param typeName
+     * @return
+     */
+    public static boolean versionEffectiveness(String typeName) {
+        switch (typeName) {
+            case "int":
+            case "java.lang.Integer":
+            case "long":
+            case "java.lang.Long":
+            case "java.util.Date":
+            case "java.sql.Timestamp":
+                return true;
+        }
+        return false;
     }
 
 }

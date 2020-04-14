@@ -484,7 +484,8 @@ public class SqlHelper {
             setSql.append(transferred);
             setSql.append(SqlHelperCons.EQUAL_TO);
             if (filterAfterList.get(i).getAnnotation(SqlVersion.class) != null) {
-                setSql.append(SqlBeanUtil.getSqlValue(update, SqlBeanUtil.updateVersion(filterAfterList.get(i).getClass().getSimpleName(), objectValue)));
+                Object o = SqlBeanUtil.updateVersion(filterAfterList.get(i).getType().getName(), objectValue);
+                setSql.append(SqlBeanUtil.getSqlValue(update, o));
             } else {
                 setSql.append(SqlBeanUtil.getSqlValue(update, objectValue));
             }
@@ -599,22 +600,48 @@ public class SqlHelper {
      * @return
      */
     private static String conditionHandle(ConditionType conditionType, Common common, String where, Object[] args, Object bean, ListMultimap<String, SqlCondition> whereMap) {
-        StringBuffer conditioneSql = new StringBuffer();
+        StringBuffer conditionSql = new StringBuffer();
+        StringBuffer versionConditionSql = null;
+        Field versionField = null;
+        boolean versionEffectiveness = false;
+        //更新时乐观锁处理
+        if (common instanceof Update) {
+            versionConditionSql = new StringBuffer();
+            if (bean != null) {
+                versionField = SqlBeanUtil.getVersionField(bean.getClass());
+            }
+            versionEffectiveness = SqlBeanUtil.versionEffectiveness(versionField.getType().getName());
+            if (versionField != null && versionEffectiveness) {
+                versionConditionSql.append(SqlHelperCons.BEGIN_BRACKET);
+                versionConditionSql.append(SqlBeanUtil.getTableFieldName(versionField));
+                Object versionValue = ReflectAsmUtil.get(bean.getClass(), bean, versionField.getName());
+                versionConditionSql.append(versionValue == null ? SqlHelperCons.IS : SqlHelperCons.EQUAL_TO);
+                versionConditionSql.append(SqlBeanUtil.getSqlValue(common, versionValue));
+                versionConditionSql.append(SqlHelperCons.END_BRACKET);
+                versionConditionSql.append(SqlHelperCons.AND);
+            }
+        }
         // 优先使用条件字符串拼接
         if (where != null && !"".equals(where)) {
-            conditioneSql.append(ConditionType.WHERE == conditionType ? SqlHelperCons.WHERE : SqlHelperCons.HAVING);
-            conditioneSql.append(SqlHelperCons.BEGIN_BRACKET);
-            if (args != null && args.length > 0) {
-                conditioneSql.append(SqlBeanUtil.getCondition(common, where, args));
-            } else if (where.indexOf("${") > -1 && bean != null) {
-                conditioneSql.append(SqlBeanUtil.getCondition(common, where, bean));
-            } else {
-                conditioneSql.append(where);
+            conditionSql.append(ConditionType.WHERE == conditionType ? SqlHelperCons.WHERE : SqlHelperCons.HAVING);
+            if (versionField != null && versionEffectiveness) {
+                conditionSql.append(versionConditionSql);
             }
-            conditioneSql.append(SqlHelperCons.END_BRACKET);
+            conditionSql.append(SqlHelperCons.BEGIN_BRACKET);
+            if (args != null && args.length > 0) {
+                conditionSql.append(SqlBeanUtil.getCondition(common, where, args));
+            } else if (where.indexOf("${") > -1 && bean != null) {
+                conditionSql.append(SqlBeanUtil.getCondition(common, where, bean));
+            } else {
+                conditionSql.append(where);
+            }
+            conditionSql.append(SqlHelperCons.END_BRACKET);
         } else {
             if (whereMap.size() > 0) {
-                conditioneSql.append(SqlHelperCons.BEGIN_BRACKET);
+                if (versionField != null && versionEffectiveness) {
+                    conditionSql.append(versionConditionSql);
+                }
+                conditionSql.append(SqlHelperCons.BEGIN_BRACKET);
                 int i = 0;
                 // 遍历所有条件
                 Collection<Map.Entry<String, SqlCondition>> sqlConditionEntryCollection = whereMap.entries();
@@ -622,21 +649,21 @@ public class SqlHelper {
                     SqlCondition sqlCondition = sqlConditionEntry.getValue();
                     // 遍历sql逻辑处理
                     if (i != 0 && i < sqlConditionEntryCollection.size()) {
-                        conditioneSql.append(getLogic(sqlCondition.getSqlLogic()));
+                        conditionSql.append(getLogic(sqlCondition.getSqlLogic()));
                     }
                     if (SqlBeanUtil.isToUpperCase(common)) {
                         sqlCondition.setName(sqlCondition.getName().toUpperCase());
                     }
-                    conditioneSql.append(valueOperator(common, sqlCondition));
+                    conditionSql.append(valueOperator(common, sqlCondition));
                     i++;
                 }
-                conditioneSql.append(SqlHelperCons.END_BRACKET);
+                conditionSql.append(SqlHelperCons.END_BRACKET);
             }
-            if (conditioneSql.length() != 0) {
-                conditioneSql.insert(0, ConditionType.WHERE == conditionType ? SqlHelperCons.WHERE : SqlHelperCons.HAVING);
+            if (conditionSql.length() != 0) {
+                conditionSql.insert(0, ConditionType.WHERE == conditionType ? SqlHelperCons.WHERE : SqlHelperCons.HAVING);
             }
         }
-        return conditioneSql.toString();
+        return conditionSql.toString();
     }
 
     /**

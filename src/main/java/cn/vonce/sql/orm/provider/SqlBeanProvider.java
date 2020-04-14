@@ -274,7 +274,7 @@ public class SqlBeanProvider {
         if (update.getSqlBeanConfig() == null) {
             update.setSqlBeanConfig(sqlBeanConfig);
         }
-        if (ignore || !update.getWhereMap().isEmpty()) {
+        if (ignore || (!update.getWhereMap().isEmpty() || StringUtil.isNotEmpty(update.getWhere()))) {
             return SqlHelper.buildUpdateSql(update);
         } else {
             try {
