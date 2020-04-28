@@ -51,6 +51,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
                 Class<?> trueTypeClass = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
                 try {
                     clazz = this.getClass().getClassLoader().loadClass(trueTypeClass.getName());
+                    return;
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -78,7 +79,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
     }
 
     @Override
-    public List<T> selectByIds(Object... ids) {
+    public List<T> selectByIds(ID... ids) {
         if (ids == null || ids.length == 0) {
             return null;
         }
@@ -217,7 +218,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
     }
 
     @Override
-    public long deleteById(Object... id) {
+    public long deleteById(ID... id) {
         return mybatisSqlBeanDao.deleteById(sqlBeanConfig, clazz, id);
     }
 
@@ -237,7 +238,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
     }
 
     @Override
-    public long logicallyDeleteById(Object id) {
+    public long logicallyDeleteById(ID id) {
         return mybatisSqlBeanDao.logicallyDeleteById(sqlBeanConfig, clazz, id);
     }
 

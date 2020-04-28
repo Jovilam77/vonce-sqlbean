@@ -56,6 +56,7 @@ public class SpringJdbcSqlBeanServiceImpl<T,ID> extends SqlBeanProvider implemen
                 Class<?> trueTypeClass = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
                 try {
                     clazz = this.getClass().getClassLoader().loadClass(trueTypeClass.getName());
+                    return;
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -64,7 +65,7 @@ public class SpringJdbcSqlBeanServiceImpl<T,ID> extends SqlBeanProvider implemen
     }
 
     @Override
-    public T selectById(Object id) {
+    public T selectById(ID id) {
         if (id == null) {
             return null;
         }
@@ -95,7 +96,7 @@ public class SpringJdbcSqlBeanServiceImpl<T,ID> extends SqlBeanProvider implemen
     }
 
     @Override
-    public List<T> selectByIds(Object... ids) {
+    public List<T> selectByIds(ID... ids) {
         if (ids == null || ids.length == 0) {
             return null;
         }
@@ -347,7 +348,7 @@ public class SpringJdbcSqlBeanServiceImpl<T,ID> extends SqlBeanProvider implemen
     }
 
     @Override
-    public long deleteById(Object... id) {
+    public long deleteById(ID... id) {
         return jdbcTemplate.update(super.deleteByIdSql(sqlBeanConfig, clazz, id));
     }
 
@@ -367,7 +368,7 @@ public class SpringJdbcSqlBeanServiceImpl<T,ID> extends SqlBeanProvider implemen
     }
 
     @Override
-    public long logicallyDeleteById(Object id) {
+    public long logicallyDeleteById(ID id) {
         return jdbcTemplate.update(super.logicallyDeleteByIdSql(sqlBeanConfig, clazz, id));
     }
 
