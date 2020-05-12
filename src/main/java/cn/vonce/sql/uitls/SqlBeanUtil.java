@@ -277,7 +277,8 @@ public class SqlBeanUtil {
             return null;
         }
         Set<Column> columnSet = new LinkedHashSet<>();
-        String tableAlias = getTable(clazz).getAlias();
+        Table table = getTable(clazz);
+        String tableAlias = table.getAlias();
         List<Field> fieldList = getBeanAllField(clazz);
         for (Field field : fieldList) {
             if (Modifier.isStatic(field.getModifiers())) {
@@ -302,7 +303,7 @@ public class SqlBeanUtil {
                         }
                         //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
                         Table subTable = getTable(subBeanClazz, sqlJoin);
-                        columnSet.add(new Column(sqlJoin.table(), fieldName, getColumnAlias(subTable.getAlias(), javaField.getName())));
+                        columnSet.add(new Column(sqlJoin.schema(), sqlJoin.table(), fieldName, getColumnAlias(subTable.getAlias(), javaField.getName())));
                     }
                 }
                 //没有指定查询的字段则查询所有字段
@@ -329,10 +330,10 @@ public class SqlBeanUtil {
                     }
                     //可能会连同一个表，但连接条件不一样（这时表需要区分别名），所以查询的字段可能是同一个，但属于不同表别名下，所以用java字段名当sql字段别名不会出错
                     String subTableAlias = StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias();
-                    columnSet.add(new Column(subTableAlias, tableFieldName, getColumnAlias(subTableAlias, field.getName())));
+                    columnSet.add(new Column(sqlJoin.schema(), subTableAlias, tableFieldName, getColumnAlias(subTableAlias, field.getName())));
                 }
             } else {
-                columnSet.add(new Column(tableAlias, getTableFieldName(field), getColumnAlias(tableAlias, field.getName())));
+                columnSet.add(new Column(table.getSchema(), tableAlias, getTableFieldName(field), getColumnAlias(tableAlias, field.getName())));
             }
         }
         return new ArrayList<>(columnSet);
@@ -356,6 +357,7 @@ public class SqlBeanUtil {
             Join join = new Join();
             if (sqlJoin != null && sqlBeanJoinIsNotEmpty(sqlJoin)) {
                 join.setJoinType(sqlJoin.type());
+                join.setSchema(sqlJoin.schema());
                 join.setTableName(sqlJoin.table());
                 join.setTableAlias(StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias());
                 join.setTableKeyword(sqlJoin.tableKeyword());
@@ -368,6 +370,7 @@ public class SqlBeanUtil {
                 Table table = getTable(subClazz, sqlJoin);
                 String tableKeyword = getTableFieldName(getIdField(subClazz));
                 join.setJoinType(sqlJoin.type());
+                join.setSchema(table.getSchema());
                 join.setTableName(table.getName());
                 join.setTableAlias(table.getAlias());
                 join.setTableKeyword(tableKeyword);
