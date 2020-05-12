@@ -14,7 +14,7 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 @Documented
 @Inherited
-public @interface SqlField {
+public @interface SqlColumn {
 
     /**
      * 字段名称

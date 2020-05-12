@@ -544,17 +544,17 @@ public class SqlHelper {
      */
     private static String groupByAndOrderBySql(String type, Select select) {
         StringBuffer groupByAndOrderBySql = new StringBuffer();
-        SqlField[] sqlField;
+        SqlColumn[] sqlColumn;
         if (SqlHelperCons.ORDER_BY.equals(type)) {
-            sqlField = select.getOrderBy().toArray(new SqlField[]{});
+            sqlColumn = select.getOrderBy().toArray(new SqlColumn[]{});
         } else {
-            sqlField = select.getGroupBy().toArray(new SqlField[]{});
+            sqlColumn = select.getGroupBy().toArray(new SqlColumn[]{});
         }
         String transferred = SqlBeanUtil.getTransferred(select);
-        if (sqlField != null && sqlField.length != 0) {
+        if (sqlColumn != null && sqlColumn.length != 0) {
             groupByAndOrderBySql.append(type);
-            for (int i = 0; i < sqlField.length; i++) {
-                SqlField orderBy = sqlField[i];
+            for (int i = 0; i < sqlColumn.length; i++) {
+                SqlColumn orderBy = sqlColumn[i];
                 groupByAndOrderBySql.append(transferred);
                 String tableAlias;
                 if (StringUtil.isNotEmpty(orderBy.getTableAlias())) {

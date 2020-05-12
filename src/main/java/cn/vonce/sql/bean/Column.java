@@ -14,7 +14,7 @@ import java.io.Serializable;
  * @email 766255988@qq.com
  * @date 2020年3月1日上午10:00:00
  */
-public class Column extends SqlField implements Serializable {
+public class Column extends SqlColumn implements Serializable {
     public Column() {
         super();
     }

@@ -3,7 +3,7 @@ package cn.vonce.sql.uitls;
 import cn.vonce.common.utils.ReflectAsmUtil;
 import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.annotation.*;
-import cn.vonce.sql.annotation.SqlField;
+import cn.vonce.sql.annotation.SqlColumn;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.DbType;
@@ -86,10 +86,10 @@ public class SqlBeanUtil {
      * @return
      */
     public static String getTableFieldName(Field field) {
-        SqlField sqlField = field.getAnnotation(SqlField.class);
+        SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
         String name = field.getName();
-        if (sqlField != null) {
-            name = sqlField.value();
+        if (sqlColumn != null) {
+            name = sqlColumn.value();
         }
         return name;
     }
@@ -179,9 +179,9 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean isIgnore(Field field) {
-        SqlField sqlField = field.getAnnotation(SqlField.class);
-        if (sqlField != null) {
-            return sqlField.ignore();
+        SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
+        if (sqlColumn != null) {
+            return sqlColumn.ignore();
         }
         return false;
     }
@@ -255,8 +255,8 @@ public class SqlBeanUtil {
     public static Field getFieldByTableFieldName(List<Field> fieldList, String tableFieldName) {
         Field thisField = null;
         for (Field field : fieldList) {
-            SqlField sqlField = field.getAnnotation(SqlField.class);
-            if (sqlField != null && sqlField.value().equals(tableFieldName)) {
+            SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
+            if (sqlColumn != null && sqlColumn.value().equals(tableFieldName)) {
                 thisField = field;
             } else if (field.getName().equals(tableFieldName)) {
                 thisField = field;

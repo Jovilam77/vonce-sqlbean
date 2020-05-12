@@ -2,17 +2,17 @@ package cn.vonce.sql.bean;
 
 import java.io.Serializable;
 
-public class SqlField implements Serializable {
+public class SqlColumn implements Serializable {
 
-    public SqlField() {
+    public SqlColumn() {
     }
 
-    public SqlField(String tableAlias, String name) {
+    public SqlColumn(String tableAlias, String name) {
         this.tableAlias = tableAlias;
         this.name = name;
     }
 
-    public SqlField(String schema, String tableAlias, String name) {
+    public SqlColumn(String schema, String tableAlias, String name) {
         this.schema = schema;
         this.tableAlias = tableAlias;
         this.name = name;

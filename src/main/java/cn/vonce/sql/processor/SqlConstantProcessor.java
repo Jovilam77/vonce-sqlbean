@@ -1,7 +1,7 @@
 package cn.vonce.sql.processor;
 
 import cn.vonce.common.utils.StringUtil;
-import cn.vonce.sql.annotation.SqlField;
+import cn.vonce.sql.annotation.SqlColumn;
 import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.Column;
 import com.squareup.javapoet.*;
@@ -90,9 +90,9 @@ public class SqlConstantProcessor extends AbstractProcessor {
                     for (Element subElement : element.getEnclosedElements()) {
                         if (subElement.getKind().isField() && !subElement.getModifiers().contains(Modifier.STATIC)) {
                             String sqlFieldName = subElement.getSimpleName().toString();
-                            SqlField sqlBeanField = subElement.getAnnotation(SqlField.class);
-                            if (sqlBeanField != null && StringUtil.isNotEmpty(sqlBeanField.value())) {
-                                sqlFieldName = sqlBeanField.value();
+                            SqlColumn sqlColumn = subElement.getAnnotation(SqlColumn.class);
+                            if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.value())) {
+                                sqlFieldName = sqlColumn.value();
                             }
                             FieldSpec sqlField = FieldSpec.builder(Column.class, sqlFieldName)
                                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
