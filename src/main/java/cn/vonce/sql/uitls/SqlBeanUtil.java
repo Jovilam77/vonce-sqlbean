@@ -129,19 +129,16 @@ public class SqlBeanUtil {
     public static Field getLogicallyField(Class<?> clazz) throws SqlBeanException {
         List<Field> fieldList = getBeanAllField(clazz);
         Field logicallyField = null;
-        int existId = 0;
+        int existLogicallyField = 0;
         for (Field field : fieldList) {
             SqlLogically sqlLogically = field.getAnnotation(SqlLogically.class);
             if (sqlLogically != null) {
                 logicallyField = field;
-                existId++;
+                existLogicallyField++;
             }
-            if (existId > 1) {
+            if (existLogicallyField > 1) {
                 throw new SqlBeanException("请正确的标识logically字段，logically字段只能标识一个，但我们在'" + field.getDeclaringClass().getName() + "'此实体类或其父类找到了不止一处");
             }
-        }
-        if (existId == 0) {
-            throw new SqlBeanException("请检查实体类是否有标识logically字段");
         }
         return logicallyField;
     }
@@ -155,19 +152,16 @@ public class SqlBeanUtil {
     public static Field getVersionField(Class<?> clazz) throws SqlBeanException {
         List<Field> fieldList = getBeanAllField(clazz);
         Field versionField = null;
-        int existId = 0;
+        int existVersionField = 0;
         for (Field field : fieldList) {
             SqlVersion sqlVersion = field.getAnnotation(SqlVersion.class);
             if (sqlVersion != null) {
                 versionField = field;
-                existId++;
+                existVersionField++;
             }
-            if (existId > 1) {
+            if (existVersionField > 1) {
                 throw new SqlBeanException("请正确的标识version字段，version字段只能标识一个，但我们在'" + field.getDeclaringClass().getName() + "'此实体类或其父类找到了不止一处");
             }
-        }
-        if (existId == 0) {
-            throw new SqlBeanException("请检查实体类是否有标识version字段");
         }
         return versionField;
     }

@@ -29,7 +29,7 @@ import java.util.Map;
  */
 @UseSpringJdbc
 @Service
-public class SpringJdbcSqlBeanServiceImpl<T,ID> extends SqlBeanProvider implements SqlBeanService<T,ID> {
+public class SpringJdbcSqlBeanServiceImpl<T, ID> extends SqlBeanProvider implements SqlBeanService<T, ID> {
 
     /**
      *
@@ -158,6 +158,17 @@ public class SpringJdbcSqlBeanServiceImpl<T,ID> extends SqlBeanProvider implemen
         try {
             return jdbcTemplate.queryForObject(super.selectSql(sqlBeanConfig, clazz, select),
                     new SpringJbdcSqlBeanMapper<Map<String, Object>>(clazz, Map.class));
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public <O> Map<String, O> selectMap(Class<O> valueType, Select select) {
+        try {
+            return jdbcTemplate.queryForObject(super.selectSql(sqlBeanConfig, clazz, select),
+                    new SpringJbdcSqlBeanMapper<Map<String, O>>(clazz, Map.class));
         } catch (Exception e) {
             logger.error(e.getMessage());
             return null;
@@ -310,6 +321,18 @@ public class SpringJdbcSqlBeanServiceImpl<T,ID> extends SqlBeanProvider implemen
             return null;
         }
 
+    }
+
+    @Override
+    public <O> List<Map<String, O>> selectMapList(Class<O> valueType, Select select) {
+        try {
+            return jdbcTemplate.query(super.selectSql(sqlBeanConfig, clazz, select),
+                    new SpringJbdcSqlBeanMapper<Map<String, O>>(clazz, Map.class));
+        } catch (
+                Exception e) {
+            logger.error(e.getMessage());
+            return null;
+        }
     }
 
     @Override

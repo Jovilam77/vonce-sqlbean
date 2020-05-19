@@ -35,12 +35,33 @@ public class SqlHelper {
     private static Logger logger = LoggerFactory.getLogger(SqlHelper.class);
 
     /**
+     * 参数为空抛出异常
+     *
+     * @param object
+     * @param message
+     */
+    public static void isNull(Object object, String message) {
+        if (object == null) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    /**
+     * 检查
+     */
+    public static void check(Common common) {
+        isNull(common.getSqlBeanConfig(), "请设置sqlBeanConfig");
+        isNull(common.getSqlBeanConfig().getDbType(), "请设置sqlBeanConfig -> dbType");
+    }
+
+    /**
      * 生成select sql语句
      *
      * @param select
      * @return
      */
     public static String buildSelectSql(Select select) {
+        check(select);
         StringBuffer sqlSb = new StringBuffer();
         Integer[] pageParam = null;
         String orderSql = orderBySql(select);
@@ -124,6 +145,7 @@ public class SqlHelper {
      * @throws SqlBeanException
      */
     public static String buildUpdateSql(Update update) {
+        check(update);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlHelperCons.UPDATE);
         sqlSb.append(getTableName(update, update.getUpdateBean()));
@@ -141,6 +163,7 @@ public class SqlHelper {
      */
     @SuppressWarnings("unchecked")
     public static String buildInsertSql(Insert insert) {
+        check(insert);
         Object[] objects;
         if (insert.getInsertBean().getClass().isArray()) {
             objects = (Object[]) insert.getInsertBean();
@@ -167,6 +190,7 @@ public class SqlHelper {
      * @return
      */
     public static String buildDeleteSql(Delete delete) {
+        check(delete);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlHelperCons.DELETE_FROM);
         sqlSb.append(getTableName(delete, null));
@@ -610,15 +634,17 @@ public class SqlHelper {
             if (bean != null) {
                 versionField = SqlBeanUtil.getVersionField(bean.getClass());
             }
-            versionEffectiveness = SqlBeanUtil.versionEffectiveness(versionField.getType().getName());
-            if (versionField != null && versionEffectiveness) {
-                versionConditionSql.append(SqlHelperCons.BEGIN_BRACKET);
-                versionConditionSql.append(SqlBeanUtil.getTableFieldName(versionField));
-                Object versionValue = ReflectAsmUtil.get(bean.getClass(), bean, versionField.getName());
-                versionConditionSql.append(versionValue == null ? SqlHelperCons.IS : SqlHelperCons.EQUAL_TO);
-                versionConditionSql.append(SqlBeanUtil.getSqlValue(common, versionValue));
-                versionConditionSql.append(SqlHelperCons.END_BRACKET);
-                versionConditionSql.append(SqlHelperCons.AND);
+            if (versionField != null) {
+                versionEffectiveness = SqlBeanUtil.versionEffectiveness(versionField.getType().getName());
+                if (versionEffectiveness) {
+                    versionConditionSql.append(SqlHelperCons.BEGIN_BRACKET);
+                    versionConditionSql.append(SqlBeanUtil.getTableFieldName(versionField));
+                    Object versionValue = ReflectAsmUtil.get(bean.getClass(), bean, versionField.getName());
+                    versionConditionSql.append(versionValue == null ? SqlHelperCons.IS : SqlHelperCons.EQUAL_TO);
+                    versionConditionSql.append(SqlBeanUtil.getSqlValue(common, versionValue));
+                    versionConditionSql.append(SqlHelperCons.END_BRACKET);
+                    versionConditionSql.append(SqlHelperCons.AND);
+                }
             }
         }
         // 优先使用条件字符串拼接
@@ -685,13 +711,7 @@ public class SqlHelper {
                 operator = SqlHelperCons.IN;
             } else if (sqlOperator == SqlOperator.NOT_IN) {
                 operator = SqlHelperCons.NOT_IN;
-            } /*else if (sqlOperator == MySqlOperator.EXISTS) {
-                                operator = EXISTS;
-                                needEndBracket = true;
-                            } else if (sqlOperator == MySqlOperator.NOT_EXISTS) {
-                                operator = NOT_EXISTS;
-                                needEndBracket = true;
-                            }*/ else if (sqlOperator == SqlOperator.LIKE || sqlOperator == SqlOperator.LIKE_L || sqlOperator == SqlOperator.LIKE_R) {
+            } else if (sqlOperator == SqlOperator.LIKE || sqlOperator == SqlOperator.LIKE_L || sqlOperator == SqlOperator.LIKE_R) {
                 operator = SqlHelperCons.LIKE;
             } else if (sqlOperator == SqlOperator.NOT_LIKE || sqlOperator == SqlOperator.NOT_LIKE_L || sqlOperator == SqlOperator.NOT_LIKE_R) {
                 operator = SqlHelperCons.NOT_LIKE;
@@ -779,7 +799,12 @@ public class SqlHelper {
             StringBuffer in_notIn = new StringBuffer();
             if (in_notInValues != null && in_notInValues.length > 0) {
                 for (int k = 0; k < in_notInValues.length; k++) {
-                    in_notIn.append(SqlBeanUtil.getSqlValue(common, in_notInValues[k]));
+                    if (in_notInValues[k] instanceof Original) {
+                        Original original = (Original) in_notInValues[k];
+                        in_notIn.append(original.getValue());
+                    } else {
+                        in_notIn.append(SqlBeanUtil.getSqlValue(common, in_notInValues[k]));
+                    }
                     in_notIn.append(SqlHelperCons.COMMA);
                 }
                 in_notIn.deleteCharAt(in_notIn.length() - SqlHelperCons.COMMA.length());

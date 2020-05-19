@@ -25,7 +25,7 @@ public class SqlHelperTest {
         select.setTable("`essay_comment`");
         select.join("user", "user.id", "essay_comment.userId");
         select.where("#essay_comment.essayId", "22essay_comment.essayId", SqlOperator.GREATER_THAN);
-        select.where(SqlLogic.AND, "", "essay_comment.essayId", 1, SqlOperator.LESS_THAN).where(SqlLogic.AND, "", "essay_comment.userId", "1111")
+        select.where(SqlLogic.AND, "", "", "essay_comment.essayId", 1, SqlOperator.LESS_THAN).where(SqlLogic.AND, "", "essay_comment.userId", "1111")
                 .where(SqlLogic.ORBracket, "", "user.nickname", "jovi");
         select.groupBy("id");
         select.having("sum(price)", 2999, SqlOperator.GREATER_THAN);
@@ -56,7 +56,7 @@ public class SqlHelperTest {
         stringList.add("6");
         select3.where("", "id", stringList, SqlOperator.BETWEEN);
         // MysqlBean3.where("name", "vicky");
-        select3.where(SqlLogic.AND, "", "sex", stringList, SqlOperator.IN);
+        select3.where(SqlLogic.AND, "", "", "sex", stringList, SqlOperator.IN);
         System.out.println("---select3---");// where id between 1 and 2
         System.out.println(SqlHelper.buildSelectSql(select3));
 
@@ -70,7 +70,7 @@ public class SqlHelperTest {
         stringList2.add(2);
         stringList2.add("6");
         select4.where("", "id", stringList2, SqlOperator.BETWEEN);
-        select4.wANDBracket("", "name", "vicky", SqlOperator.EQUAL_TO);
+        select4.wANDBracket("", "", "name", "vicky", SqlOperator.EQUAL_TO);
         select4.wOR("sex", stringList2, SqlOperator.IN);
         System.out.println("---select4---");// where id between 1 and 2
         System.out.println(SqlHelper.buildSelectSql(select4));
@@ -103,6 +103,7 @@ public class SqlHelperTest {
 
         // insert
         Insert insert = new Insert();
+        insert.setSqlBeanConfig(sqlBeanConfig);
         List<Join> list = new ArrayList<>();
         Join insertJoin = new Join();
         insertJoin.setMainKeyword("name1");
@@ -118,6 +119,7 @@ public class SqlHelperTest {
 
         // delete
         Delete delete = new Delete();
+        delete.setSqlBeanConfig(sqlBeanConfig);
         delete.where("", "id", 1, SqlOperator.GREATER_THAN);
         delete.where("name", "jovi");
         delete.setTable("user");

@@ -103,7 +103,7 @@ public interface MybatisSqlBeanDao<T> {
      * @return
      */
     @SelectProvider(type = MybatisSqlBeanProvider.class, method = "select")
-    Map<String, Object> selectMap(@Param("sqlBeanConfig") SqlBeanConfig sqlBeanConfig, @Param("clazz") Class<?> clazz, @Param("select") Select select);
+    <O> Map<String, O> selectMap(@Param("sqlBeanConfig") SqlBeanConfig sqlBeanConfig, @Param("clazz") Class<?> clazz, @Param("select") Select select);
 
     /**
      * 根据条件查询
@@ -201,7 +201,7 @@ public interface MybatisSqlBeanDao<T> {
      * @return
      */
     @SelectProvider(type = MybatisSqlBeanProvider.class, method = "select")
-    List<Map<String, Object>> selectMapList(@Param("sqlBeanConfig") SqlBeanConfig sqlBeanConfig, @Param("clazz") Class<?> clazz, @Param("select") Select select);
+    <O> List<Map<String, O>> selectMapList(@Param("sqlBeanConfig") SqlBeanConfig sqlBeanConfig, @Param("clazz") Class<?> clazz, @Param("select") Select select);
 
     /**
      * 根据自定义条件查询（可自动分页）返回List<T>

@@ -116,6 +116,11 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
     }
 
     @Override
+    public <O> Map<String, O> selectMap(Class<O> valueType, Select select) {
+        return mybatisSqlBeanDao.selectMap(sqlBeanConfig, clazz, select);
+    }
+
+    @Override
     public T selectOneByCondition(String where, Object... args) {
         return mybatisSqlBeanDao.selectOneByCondition(sqlBeanConfig, clazz, where, args);
     }
@@ -191,6 +196,11 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
 
     @Override
     public List<Map<String, Object>> selectMapList(Select select) {
+        return mybatisSqlBeanDao.selectMapList(sqlBeanConfig, clazz, select);
+    }
+
+    @Override
+    public <O> List<Map<String, O>> selectMapList(Class<O> valueType, Select select) {
         return mybatisSqlBeanDao.selectMapList(sqlBeanConfig, clazz, select);
     }
 

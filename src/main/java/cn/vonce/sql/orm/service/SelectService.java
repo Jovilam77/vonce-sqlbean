@@ -78,6 +78,15 @@ public interface SelectService<T, ID> extends PagingService {
     Map<String, Object> selectMap(Select select);
 
     /**
+     * 根据自定义条件查询返回Map
+     *
+     * @param valueType
+     * @param select
+     * @return
+     */
+    <O> Map<String, O> selectMap(Class<O> valueType, Select select);
+
+    /**
      * 根据条件查询
      *
      * @param where
@@ -191,6 +200,15 @@ public interface SelectService<T, ID> extends PagingService {
      * @return
      */
     List<Map<String, Object>> selectMapList(Select select);
+
+    /**
+     * 根据自定义条件查询（可自动分页）返回List<Map>结果集
+     *
+     * @param valueType
+     * @param select
+     * @return
+     */
+    <O> List<Map<String, O>> selectMapList(Class<O> valueType, Select select);
 
     /**
      * 根据自定义条件查询（可自动分页）返回List<T>
