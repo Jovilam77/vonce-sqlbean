@@ -64,17 +64,19 @@ public class SqlBeanUtil {
             table.setSchema(sqlJoin.schema());
             table.setName(sqlJoin.table());
             table.setAlias(sqlJoin.tableAlias());
-            if (StringUtil.isEmpty(table.getAlias())) {
-                table.setAlias(table.getName());
-            }
         }
         Table classTable = getTable(clazz);
-        if (StringUtil.isEmpty(table.getName())) {
+        if (StringUtil.isEmpty(table.getSchema())) {
             table.setSchema(classTable.getSchema());
+        }
+        if (StringUtil.isEmpty(table.getName())) {
             table.setName(classTable.getName());
         }
         if (StringUtil.isEmpty(table.getAlias())) {
             table.setAlias(classTable.getAlias());
+        }
+        if (StringUtil.isEmpty(table.getAlias())) {
+            table.setAlias(classTable.getName());
         }
         return table;
     }
@@ -111,11 +113,11 @@ public class SqlBeanUtil {
                 existId++;
             }
             if (existId > 1) {
-                throw new SqlBeanException("请正确的标识id字段，id字段只能标识一个，但我们在'" + field.getDeclaringClass().getName() + "'此实体类或其父类找到了不止一处");
+                throw new SqlBeanException("请正确标识@SqlId注解，id字段只能标识一个，但我们在'" + field.getDeclaringClass().getName() + "'此实体类或其父类找到了不止一处");
             }
         }
         if (existId == 0) {
-            throw new SqlBeanException("请检查实体类是否有标识id字段");
+            throw new SqlBeanException("请检查实体类的id字段是否正确标识@SqlId注解");
         }
         return idField;
     }
@@ -137,8 +139,11 @@ public class SqlBeanUtil {
                 existLogicallyField++;
             }
             if (existLogicallyField > 1) {
-                throw new SqlBeanException("请正确的标识logically字段，logically字段只能标识一个，但我们在'" + field.getDeclaringClass().getName() + "'此实体类或其父类找到了不止一处");
+                throw new SqlBeanException("请正确标识@SqlLogically注解，逻辑删除字段只能标识一个，但我们在'" + field.getDeclaringClass().getName() + "'此实体类或其父类找到了不止一处");
             }
+        }
+        if (existLogicallyField == 0) {
+            throw new SqlBeanException("请检查实体类申明逻辑删除的字段是否正确标识@SqlLogically注解");
         }
         return logicallyField;
     }
@@ -160,7 +165,7 @@ public class SqlBeanUtil {
                 existVersionField++;
             }
             if (existVersionField > 1) {
-                throw new SqlBeanException("请正确的标识version字段，version字段只能标识一个，但我们在'" + field.getDeclaringClass().getName() + "'此实体类或其父类找到了不止一处");
+                throw new SqlBeanException("请正确标识SqlVersion注解，version字段只能标识一个，但我们在'" + field.getDeclaringClass().getName() + "'此实体类或其父类找到了不止一处");
             }
         }
         return versionField;
@@ -297,7 +302,7 @@ public class SqlBeanUtil {
                         }
                         //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
                         Table subTable = getTable(subBeanClazz, sqlJoin);
-                        columnSet.add(new Column(sqlJoin.schema(), sqlJoin.table(), fieldName, getColumnAlias(subTable.getAlias(), javaField.getName())));
+                        columnSet.add(new Column(/*sqlJoin.schema(), */sqlJoin.table(), fieldName, getColumnAlias(subTable.getAlias(), javaField.getName())));
                     }
                 }
                 //没有指定查询的字段则查询所有字段
@@ -312,7 +317,7 @@ public class SqlBeanUtil {
                         if (isIgnore(field)) {
                             continue;
                         }
-                        columnSet.add(new Column(subTable.getAlias(), getTableFieldName(subBeanField), getColumnAlias(subTable.getAlias(), subBeanField.getName())));
+                        columnSet.add(new Column(/*subTable.getSchema(), */subTable.getAlias(), getTableFieldName(subBeanField), getColumnAlias(subTable.getAlias(), subBeanField.getName())));
                     }
                 }
             } else if (sqlJoin != null) {
@@ -324,10 +329,10 @@ public class SqlBeanUtil {
                     }
                     //可能会连同一个表，但连接条件不一样（这时表需要区分别名），所以查询的字段可能是同一个，但属于不同表别名下，所以用java字段名当sql字段别名不会出错
                     String subTableAlias = StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias();
-                    columnSet.add(new Column(sqlJoin.schema(), subTableAlias, tableFieldName, getColumnAlias(subTableAlias, field.getName())));
+                    columnSet.add(new Column(/*sqlJoin.schema(), */subTableAlias, tableFieldName, getColumnAlias(subTableAlias, field.getName())));
                 }
             } else {
-                columnSet.add(new Column(table.getSchema(), tableAlias, getTableFieldName(field), getColumnAlias(tableAlias, field.getName())));
+                columnSet.add(new Column(/*table.getSchema(), */tableAlias, getTableFieldName(field), getColumnAlias(tableAlias, field.getName())));
             }
         }
         return new ArrayList<>(columnSet);
