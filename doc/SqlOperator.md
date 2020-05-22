@@ -1,5 +1,4 @@
 ## 条件操作
-###### 条件操作有两种用法，分别是使用枚举和输入字符串
 ```java
 SqlOperator.IN = "IN"
 SqlOperator.NOT_IN = "NOT IN"
@@ -18,10 +17,5 @@ SqlOperator.NOT_EQUAL_TO = "!="
 Select select = new Select();
 select.where("id", 1, SqlOperator.GREATER_THAN);
 select.wAND("id", 10, SqlOperator.LESS_THAN);
-select.wORBracket("type", "军事");
-//等同于
-Select select = new Select();
-select.where("id", 1, ">");
-select.wAND("id", 10, "<");
 select.wORBracket("type", "军事");
 ```

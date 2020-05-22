@@ -775,6 +775,7 @@ public class SqlHelper {
     private static StringBuffer valueOperator(Common common, SqlCondition sqlCondition) {
         StringBuffer sql = new StringBuffer();
         String operator = getOperator(sqlCondition);
+        String transferred = SqlBeanUtil.getTransferred(common);
         boolean needEndBracket = false;
         Object[] betweenValues = null;
         Object value = sqlCondition.getValue();
@@ -835,7 +836,9 @@ public class SqlHelper {
         }
         //表别名
         if (StringUtil.isNotEmpty(sqlCondition.getTableAlias())) {
+            sql.append(transferred);
             sql.append(sqlCondition.getTableAlias());
+            sql.append(transferred);
             sql.append(SqlHelperCons.POINT);
         }
         //字段名

@@ -1,16 +1,28 @@
 ## 注解与联表查询
 ```java
+//标识该类生成sql常量
+@SqlConstant
+
 //标识表名
-@SqlBeanTable(value="表名")
+@SqlTable
+
+//标识id
+@SqlId
 
 //标识字段名
-@SqlBeanField(value="表字段名",id="是否为id",ignore="是否忽略该字段",isBean="是否为实体类",logically="是否为实体类字段",join=@SqlBeanJoin())
+@SqlColumn
+
+//标识乐观锁版本
+@SqlVersion
+
+//标识逻辑删除
+@SqlLogically
 
 //标识表链接
-@SqlBeanJoin(type="内连接还是外连接",table="表名",tableAlias="表别名",tableKeyword="表关键字",mainKeyword="主表关键字",field="查询的字段")
+@SqlJoin
 
-//标识该类是个包装类并继承于某个实体类（主表）
-@SqlBeanPojo
+//标识表连接并继承于某个实体类（主表）
+@SqlUnion
 ```
 ###### 以上注解属性的类型具体可以看代码文档
 #### 单表用法
