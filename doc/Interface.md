@@ -2,7 +2,7 @@
 ###接口
 ##### 增删查改
 ```java
-public interface EssayService extends SqlBeanService<Essay> {
+public interface EssayService extends SqlBeanService<Essay, String> {
 
 }
 ```
