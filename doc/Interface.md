@@ -10,13 +10,13 @@ public interface EssayService extends SqlBeanService<Essay> {
 
 ##### 仅查询
 ```java
-public interface EssayService extends SelectService<Essay> {
+public interface EssayService extends SelectService<Essay, String> {
 
 }
 ```
 ##### 仅插入
 ```java
-public interface EssayService extends InsertService<Essay> {
+public interface EssayService extends InsertService<Essay, String> {
 
 }
 ```
@@ -28,7 +28,7 @@ public interface EssayService extends DeleteService {
 ```
 ##### 仅更新
 ```java
-public interface EssayService extends UpdateService<Essay> {
+public interface EssayService extends UpdateService<Essay, String> {
 
 }
 ```
@@ -36,14 +36,14 @@ public interface EssayService extends UpdateService<Essay> {
 ##### Mybatis
 ```java
 @Service
-public class EssayServiceImpl extends MybatisSqlBeanServiceImpl<Essay> implements EssayService {
+public class EssayServiceImpl extends MybatisSqlBeanServiceImpl<Essay, String> implements EssayService {
 
 }
 ```
 ##### Spring JDBC
 ```java
 @Service
-public class EssayServiceImpl extends SpringJdbcSqlBeanServiceImpl<Essay> implements EssayService {
+public class EssayServiceImpl extends SpringJdbcSqlBeanServiceImpl<Essay, String> implements EssayService {
 
 }
 ```

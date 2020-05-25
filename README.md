@@ -15,6 +15,7 @@
 	</dependency>
 ###### 2：标注实体类，也可以不写，但类名与字段名必须与数据库表名字段名保持一致
 ```java
+@SqlConstant
 @SqlTable("d_essay")
 public class Essay {
 
@@ -151,12 +152,12 @@ public class EssayController {
 
 ##### ↓更多用法请查看下方文档↓
 
-#### [Select](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Select.md "Select")
-#### [Insert](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Insert.md "Insert")
-#### [Delete](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Delete.md "Delete")
-#### [Update](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Update.md "Update")
+#### [注解与用法（含ID生成、乐观锁、逻辑删除、连表查询）](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Annotation.md "注解与联表查询")
+#### [内置Select相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Select.md "Select")
+#### [内置Insert相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Insert.md "Insert")
+#### [内置Delete相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Delete.md "Delete")
+#### [内置Update相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Update.md "Update")
 #### [Service接口和实现类](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Interface.md "Service接口和实现类")
-#### [注解与联表查询](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Annotation.md "注解与联表查询")
 #### [分页查询](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Paging.md "分页查询")
 #### [条件操作](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/SqlOperator.md "条件操作")
 #### [条件逻辑](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/SqlLogic.md "条件逻辑")

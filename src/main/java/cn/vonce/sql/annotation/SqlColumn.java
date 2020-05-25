@@ -17,7 +17,7 @@ import java.lang.annotation.*;
 public @interface SqlColumn {
 
     /**
-     * 字段名称
+     * 列字段名称
      *
      * @return
      */

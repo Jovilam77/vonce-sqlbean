@@ -19,7 +19,7 @@ import java.lang.annotation.*;
 public @interface SqlJoin {
 
     /**
-     * 字段名称
+     * 列字段名称
      *
      * @return
      */
@@ -61,14 +61,14 @@ public @interface SqlJoin {
     String tableAlias() default "";
 
     /**
-     * 连接的表字段
+     * 连接的表列字段名
      *
      * @return
      */
     String tableKeyword() default "";
 
     /**
-     * 主表的字段
+     * 主表的列字段名
      *
      * @return
      */
