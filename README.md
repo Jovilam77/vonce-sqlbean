@@ -1,8 +1,8 @@
 ## Sqlbean(Sql生成助手)
 #### 介绍
-###### 这是一款使用Java面向对象思想来编写并生成Sql语句的助手，并在此基础上对Mybatis、Spring Jdbc实现了轻量级的插件支持。该插件的目的是为了提高开发效率，减少大量的Sql语句编写，让开发者更专注于业务代码的编写。
+###### 这是一款使用Java面向对象思想来编写并生成Sql语句的工具，并在此基础上同时对Mybatis和Spring Jdbc实现了类似于JPA的轻量级插件支持。插件中内置大量常用Sql执行的方法，目的是为了提高开发效率，减少大量的Sql语句编写，让开发者更专注于业务代码的编写。
 
-###### 特点：零配置，支持联表查询，支持Mybatis、Spring Jdbc，支持分页
+###### 特点：零配置导包即用，支持连表查询，支持分页，支持Mybatis、Spring Jdbc
 ###### 环境：JDK7+，Mybatis3.2.4+，(Spring MVC 4.1.2+ 或 Spring Boot 1x 或 Spring Boot 2x)
 ###### 数据库：Mysql，MariaDB，Oracle，Sqlserver2008+，PostgreSQL，DB2，Derby，Sqlite，HSQL，H2
 
@@ -152,13 +152,12 @@ public class EssayController {
 
 ##### ↓更多用法请查看下方文档↓
 
-#### [注解与用法（含ID生成、乐观锁、逻辑删除、连表查询）](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Annotation.md "注解与联表查询")
-#### [内置Select相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Select.md "Select")
-#### [内置Insert相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Insert.md "Insert")
-#### [内置Delete相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Delete.md "Delete")
-#### [内置Update相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Update.md "Update")
+#### [注解与用法（含ID生成、乐观锁、逻辑删除、连表查询）](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Annotation.md "注解与用法（含ID生成、乐观锁、逻辑删除、连表查询）")
+#### [内置Select相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Select.md "内置Select相关方法")
+#### [内置Insert相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Insert.md "内置Insert相关方法")
+#### [内置Delete相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Delete.md "内置Delete相关方法")
+#### [内置Update相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Update.md "内置Update相关方法")
+#### [Where条件和占位符](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Where.md "Where条件和占位符")
 #### [Service接口和实现类](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Interface.md "Service接口和实现类")
 #### [分页查询](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Paging.md "分页查询")
-#### [条件操作](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/SqlOperator.md "条件操作")
-#### [条件逻辑](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/SqlLogic.md "条件逻辑")
 #### [BaseController](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/BaseController.md "BaseController")
