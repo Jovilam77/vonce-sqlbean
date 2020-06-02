@@ -1,6 +1,6 @@
 
 ```java
-@SqlConstant     //标识该数据库实体类生成Sql常量
+@SqlConstant     //标识该数据库实体类生成Sql常量类
 ```
 
 ```java
@@ -93,7 +93,7 @@ public class Essay {
 }
 ```
 
-#### 生成的sql常量（maven编译之后自动生成，命名为Sql + 实体类名）
+#### 生成的Sql常量（maven编译之后自动生成，命名为Sql + 实体类名）
 ```java
 package com.xxx.xxx.model.sql;
 

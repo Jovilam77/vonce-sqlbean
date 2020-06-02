@@ -13,9 +13,9 @@
 		<artifactId>vonce-sqlbean</artifactId>
 		<version>1.3.0</version>
 	</dependency>
-###### 2：标注实体类，也可以不写，但类名与字段名必须与数据库表名字段名保持一致
+###### 2：标注实体类
 ```java
-@SqlConstant
+@SqlConstant //标识该数据库实体类生成Sql常量类
 @SqlTable("d_essay")
 public class Essay {
 
@@ -79,7 +79,7 @@ public class EssayServiceImpl extends MybatisSqlBeanServiceImpl<Essay,String> im
 ```
 ###### 5：Controller层
 ```java
-@RequestMapping("/essay/")
+@RequestMapping("essay")
 @RestController
 public class EssayController {
 	

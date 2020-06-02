@@ -57,7 +57,7 @@ select.where(SqlLogic.ORBracket, "type", "军事");            //不写操作符
 ```
 除了以xxx.where()方式设置where条件以外还支持xxx.setWhere()方法设置where条件，
 该方式设置where条件以手写sql的方式进行，不支持where以外的语法，如group、order、limit等，
-占位符“&”代表字段名称，占位符“&”代表字段值。
+占位符“&”代表字段名称，占位符“?”代表字段值。
 
 例如：setWhere("status = 7 AND type = 1");
      //那么使用占位符的方式即为
