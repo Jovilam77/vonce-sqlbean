@@ -1,6 +1,6 @@
 
 ```java
-@SqlConstant     //标识该数据库实体类生成sql常量
+@SqlConstant     //标识该数据库实体类生成Sql常量
 ```
 
 ```java
@@ -50,17 +50,17 @@ SqlJoin       //标识表连接
 
 
 ```java
-@SqlVersion     //标识乐观锁版本
+@SqlVersion   //标识乐观锁版本，仅支持int、long、Date、Timestamp类型
 ```
 
 ```java
-@SqlLogically      //标识逻辑删除，请配合logicallyDeleteById、logicallyDeleteByCondition这两个方法使用，[请看注解文档](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Annotation.md "请看注解文档")）
+@SqlLogically //标识逻辑删除，请配合logicallyDeleteById、logicallyDeleteByCondition这两个方法使用，请查看内置Delete文档
 ```
 
 
 #### 单表用法
 ```java
-@SqlConstant //生成sql常量
+@SqlConstant //生成Sql常量
 @SqlTable("d_essay") //表名
 public class Essay {
 
@@ -93,7 +93,7 @@ public class Essay {
 }
 ```
 
-#### 生成的sql常量（编译之后自动生成，命名为Sql + 实体类名）
+#### 生成的sql常量（maven编译之后自动生成，命名为Sql + 实体类名）
 ```java
 package com.xxx.xxx.model.sql;
 
