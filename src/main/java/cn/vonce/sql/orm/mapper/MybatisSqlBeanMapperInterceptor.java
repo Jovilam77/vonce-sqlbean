@@ -51,10 +51,9 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
                     Class<?> resultType = resultMaps.get(0).getType();
                     // 获取当前statement
                     Statement stmt = (Statement) invocation.getArgs()[0];
-                    if (resultType.getName().equals("java.lang.Object") || resultType.getName().equals("java.util.List")) {
-                        // 根据mapParam返回处理结果
+                    if (Object.class.getName().equals(resultType.getName())) {
                         return handleResultSet(stmt.getResultSet(), mapParam, resultType);
-                    } else if (resultType.getName().equals("java.util.Map")) {
+                    } else if (SqlBeanUtil.isMap(resultType.getName())) {
                         return mapHandleResultSet(stmt.getResultSet());
                     }
                     return baseHandleResultSet(stmt.getResultSet(), resultType);
@@ -93,9 +92,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
                 returnType = clazz;
             }
             List<Object> list;
-            if (SqlBeanUtil.isMap(returnType.getName())) {
-                return mapHandleResultSet(resultSet);
-            } else if (!SqlBeanUtil.isBaseType(returnType.getName())) {
+            if (!SqlBeanUtil.isBaseType(returnType.getName())) {
                 list = beanHandleResultSet(returnType, resultSet, super.getColumnNameList(resultSet));
             } else {
                 list = baseHandleResultSet(resultSet, resultType);

@@ -165,18 +165,6 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends SqlBeanProvider impleme
     }
 
     @Override
-    public <O> Map<String, O> selectMap(Class<O> valueType, Select select) {
-        try {
-            return jdbcTemplate.queryForObject(super.selectSql(sqlBeanConfig, clazz, select),
-                    new SpringJbdcSqlBeanMapper<Map<String, O>>(clazz, Map.class));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
-    }
-
-
-    @Override
     public T selectOneByCondition(String where, Object... args) {
         try {
             return jdbcTemplate.queryForObject(super.selectByConditionSql(sqlBeanConfig, clazz, null, where, args),
@@ -321,18 +309,6 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends SqlBeanProvider impleme
             return null;
         }
 
-    }
-
-    @Override
-    public <O> List<Map<String, O>> selectMapList(Class<O> valueType, Select select) {
-        try {
-            return jdbcTemplate.query(super.selectSql(sqlBeanConfig, clazz, select),
-                    new SpringJbdcSqlBeanMapper<Map<String, O>>(clazz, Map.class));
-        } catch (
-                Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
     }
 
     @Override

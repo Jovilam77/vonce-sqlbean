@@ -111,23 +111,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",map);
 }
 ```
-###### 8：根据自定义条件查询 返回Map，指定Map value返回类型
-```java
-<O> Map<String, O> selectMap(Class<O> valueType, Select select);
-```
-```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	Select select = new Select();
-	select.column("id");
-	select.column("title");
-	select.where("id",1);
-	Map<String,String> map = essayService.selectMap(String.class,select);
-	return super.successHint("获取成功",map);
-}
-```
-###### 9：根据条件查询
+###### 8：根据条件查询
 ```java
 T selectOneByCondition(String where, Object... args);
 ```
@@ -139,7 +123,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",essay);
 }
 ```
-###### 10：根据条件查询（指定返回类型）
+###### 9：根据条件查询（指定返回类型）
 ```java
 <O> O selectOneByCondition(Class<O> returnType, String where, Object... args);
 ```
@@ -156,7 +140,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",essayPojo);
 }
 ```
-###### 11：根据条件查询
+###### 10：根据条件查询
 ```java
 List<T> selectByCondition(String where, Object... args);
 ```
@@ -168,7 +152,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",essayPojo);
 }
 ```
-###### 12：根据条件查询 分页
+###### 11：根据条件查询 分页
 ```java
 List<T> selectByCondition(Paging paging, String where, Object... args);
 ```
@@ -184,7 +168,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",essayPojo);
 }
 ```
-###### 13：根据条件查询（指定返回类型）
+###### 12：根据条件查询（指定返回类型）
 ```java
 <O> List<O> selectByCondition(Class<O> returnType, String where, Object... args);
 ```
@@ -204,7 +188,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",essayPojoList);
 }
 ```
-###### 14：根据条件查询 分页（指定返回类型）
+###### 13：根据条件查询 分页（指定返回类型）
 ```java
 <O> List<O> selectByCondition(Class<O> returnType, Paging paging, String where, Object... args);
 ```
@@ -228,7 +212,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",essayPojoList);
 }
 ```
-###### 15：根据条件查询统计
+###### 14：根据条件查询统计
 ```java
 long selectCountByCondition(String where, Object... args);
 ```
@@ -240,7 +224,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",count);
 }
 ```
-###### 16：统计全部
+###### 15：统计全部
 ```java
 long countAll();
 ```
@@ -252,7 +236,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",count);
 }
 ```
-###### 17：查询全部
+###### 16：查询全部
 ```java
 List<T> selectAll();
 ```
@@ -264,7 +248,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",essayList);
 }
 ```
-###### 18：查询全部（指定返回类型）
+###### 17：查询全部（指定返回类型）
 ```java
 <O> List<O> selectAll(Class<O> returnType);
 ```
@@ -281,7 +265,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",essayPojoList);
 }
 ```
-###### 19：查询全部 分页
+###### 18：查询全部 分页
 ```java
 List<T> selectAll(Paging paging);
 ```
@@ -297,7 +281,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",essayList);
 }
 ```
-###### 20：查询全部 分页（指定返回类型）
+###### 19：查询全部 分页（指定返回类型）
 ```java
 <O> List<O> selectAll(Class<O> returnType, Paging paging);
 ```
@@ -318,7 +302,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",essayPojoList);
 }
 ```
-###### 21：根据自定义条件查询 返回Map
+###### 20：根据自定义条件查询 返回Map
 ```java
 List<Map<String, Object>> selectMapList(Select select);
 ```
@@ -333,22 +317,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",mapList);
 }
 ```
-###### 22：根据自定义条件查询 返回Map，指定Map value返回类型
-```java
-List<Map<String, Object>> selectMapList(Select select);
-```
-```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	Select select = new Select();
-	select.column("id");
-	select.column("title");
-	List<Map<String, String>> mapList = essayService.selectMapList(String.class,select);
-	return super.successHint("获取成功",mapList);
-}
-```
-###### 23：根据自定义条件查询
+###### 21：根据自定义条件查询
 ```java
 List<T> select(Select select);
 ```
@@ -363,7 +332,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",essayList);
 }
 ```
-###### 24：根据自定义条件查询
+###### 22：根据自定义条件查询
 ```java
 <O> List<O> select(Class<O> returnType, Select select);
 ```
@@ -383,7 +352,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",essayPojoList);
 }
 ```
-###### 25：根据自定义条件查询
+###### 23：根据自定义条件查询
 ```java
 long count(Select select);
 ```
@@ -398,7 +367,7 @@ public RS getEssay() {
 	return super.successHint("获取成功",count);
 }
 ```
-###### 26：根据自定义条件查询（插件内部使用）
+###### 24：根据自定义条件查询（插件内部使用）
 ```java
 long count(Class<?> clazz, Select select);
 ```
