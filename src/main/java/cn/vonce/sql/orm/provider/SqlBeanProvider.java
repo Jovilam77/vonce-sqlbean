@@ -442,14 +442,12 @@ public class SqlBeanProvider {
      * @throws SqlBeanException
      */
     private String setSelectAndBuild(Class<?> clazz, Select select) {
-        if (select.getTable() == null || StringUtil.isEmpty(select.getTable().getName()) || StringUtil.isEmpty(select.getTable().getAlias())) {
-            select.setTable(SqlBeanUtil.getTable(clazz));
-        }
         if (StringUtil.isEmpty(select.getTable().getName())) {
-            select.getTable().setName(select.getTable().getName());
-        }
-        if (StringUtil.isEmpty(select.getTable().getAlias())) {
-            select.getTable().setAlias(select.getTable().getAlias());
+            Table table = SqlBeanUtil.getTable(clazz);
+            select.getTable().setName(table.getName());
+            if (StringUtil.isEmpty(select.getTable().getAlias())) {
+                select.getTable().setAlias(table.getAlias());
+            }
         }
         try {
             SqlBeanUtil.setJoin(select, clazz);

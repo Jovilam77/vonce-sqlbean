@@ -5,8 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <name>vonce-sqlbean</name>
-    <description>This is an SQL generation assistant, and provides plug-in support for mybatis and spring jdbc. Using it
-        in your project can generate most SQL statements for you, which is a bit like hibernate.
+    <description>This is a tool that uses java object-oriented idea to write and generate SQL statements. On this basis, it also implements lightweight plug-in support similar to JPA for mybatis and spring JDBC. A large number of common SQL execution methods are built in plug-ins to improve development efficiency, reduce a large number of SQL statement writing, and make developers focus on business code writing.
     </description>
     <url>www.vonce.cn</url>
     <licenses>
@@ -136,7 +135,7 @@
         <druid-version>1.0.26</druid-version>
         <mysql.version>5.1.14</mysql.version>
         <com.google.guava.version>20.0</com.google.guava.version>
-        <vonce.common.version>1.0.4</vonce.common.version>
+        <vonce.common.version>1.0.5</vonce.common.version>
         <com.esotericsoftware.version>1.11.0</com.esotericsoftware.version>
         <dom4j>1.6.1</dom4j>
         <junit>4.12</junit>
