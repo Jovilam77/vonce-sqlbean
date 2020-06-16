@@ -158,7 +158,7 @@ public RS update() {
 ```
 ###### 9：更新（where条件为空会抛异常，因为更新全部非常危险）
 ```java
-long updateByBeanCondition(T bean, boolean updateNotNull, String[] filterFields, String where);
+long update(Update update);
 ```
 ```java
 @RequestMapping(value = "update", method = RequestMethod.PUT)
@@ -169,7 +169,7 @@ public RS update() {
 	essay.setContent("测试123");
 	Update update = new Update();
 	update.setUpdateBean(essay);
-	update.where("id", 1);
+	update.where("id", 1);//必须有where条件
 	essayService.update(update);
 	if(i > 0){
 		super.successHint("更新成功");
@@ -179,7 +179,7 @@ public RS update() {
 ```
 ###### 10：更新（如果要更新全部可以用这个）
 ```java
-long updateByBeanCondition(T bean, boolean updateNotNull, String[] filterFields, String where);
+long update(Update update, boolean ignore);
 ```
 ```java
 @RequestMapping(value = "update", method = RequestMethod.PUT)
@@ -190,7 +190,7 @@ public RS update() {
 	essay.setContent("测试123");
 	Update update = new Update();
 	update.setUpdateBean(essay);
-	//如果这里为false则抛异常
+	//如果这里为false并且没有where条件则抛异常
 	essayService.update(update, true);
 	if(i > 0){
 		super.successHint("更新成功");
