@@ -13,30 +13,30 @@ import java.io.Serializable;
  * @email 766255988@qq.com
  * @date 2018年4月16日下午7:15:10
  */
-public class SqlCondition extends SqlColumn implements Serializable {
+public class ConditionInfo extends SqlField implements Serializable {
 
     /**
      *
      */
     private static final long serialVersionUID = 1L;
 
-    public SqlCondition() {
+    public ConditionInfo() {
         super();
     }
 
-    public SqlCondition(String field, Object value) {
+    public ConditionInfo(String field, Object value) {
         this(null, "", "", field, value, null);
     }
 
-    public SqlCondition(String tableAlias, String field, Object value) {
+    public ConditionInfo(String tableAlias, String field, Object value) {
         this(null, "", tableAlias, field, value, null);
     }
 
-    public SqlCondition(String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
+    public ConditionInfo(String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
         this(null, schema, tableAlias, field, value, sqlOperator);
     }
 
-    public SqlCondition(SqlLogic sqlLogic, String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
+    public ConditionInfo(SqlLogic sqlLogic, String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
         super(schema, tableAlias, field);
         this.sqlLogic = sqlLogic;
         this.value = value;

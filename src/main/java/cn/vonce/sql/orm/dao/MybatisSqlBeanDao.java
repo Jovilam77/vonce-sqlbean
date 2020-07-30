@@ -377,4 +377,24 @@ public interface MybatisSqlBeanDao<T> {
     @InsertProvider(type = MybatisSqlBeanProvider.class, method = "insert")
     long insert(@Param("sqlBeanConfig") SqlBeanConfig sqlBeanConfig, @Param("insert") Insert insert);
 
+    /**
+     * 删除表
+     *
+     * @param sqlBeanConfig
+     * @param clazz
+     * @return
+     */
+    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "drop")
+    long drop(@Param("sqlBeanConfig") SqlBeanConfig sqlBeanConfig, @Param("clazz") Class<?> clazz);
+
+    /**
+     * 创建表
+     *
+     * @param sqlBeanConfig
+     * @param clazz
+     * @return
+     */
+    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "create")
+    long create(@Param("sqlBeanConfig") SqlBeanConfig sqlBeanConfig, @Param("clazz") Class<?> clazz);
+
 }

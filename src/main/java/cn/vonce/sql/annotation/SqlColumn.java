@@ -1,5 +1,7 @@
 package cn.vonce.sql.annotation;
 
+import cn.vonce.sql.enumerate.JdbcType;
+
 import java.lang.annotation.*;
 
 /**
@@ -22,6 +24,41 @@ public @interface SqlColumn {
      * @return
      */
     String value();
+
+    /**
+     * 不是null
+     *
+     * @return
+     */
+    boolean notNull() default false;
+
+    /**
+     * 类型
+     *
+     * @return
+     */
+    JdbcType type() default JdbcType.NULL;
+
+    /**
+     * 长度
+     *
+     * @return
+     */
+    int length() default 0;
+
+    /**
+     * 小数点
+     *
+     * @return
+     */
+    int decimal() default 0;
+
+    /**
+     * 默认值
+     *
+     * @return
+     */
+    String def() default "";
 
     /**
      * 是否忽略该字段

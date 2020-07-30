@@ -408,6 +408,31 @@ public class SqlBeanProvider {
     }
 
     /**
+     * 删除表
+     *
+     * @param sqlBeanConfig
+     * @param clazz
+     * @return
+     */
+    public String dropTableSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz) {
+        return "DROP TABLE IF EXISTS " + SqlBeanUtil.getTable(clazz).getName();
+    }
+
+    /**
+     * 创建表
+     *
+     * @param sqlBeanConfig
+     * @param clazz
+     * @return
+     */
+    public String createTableSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz) {
+        Create create = new Create();
+        create.setSqlBeanConfig(sqlBeanConfig);
+        create.setBeanClass(clazz);
+        return SqlHelper.buildCreateSql(create);
+    }
+
+    /**
      * 实例化Select
      *
      * @param clazz
@@ -454,6 +479,13 @@ public class SqlBeanProvider {
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
+        }
+        if (!select.getOrderBy().isEmpty()) {
+            for (Order order : select.getOrderBy()) {
+                if (StringUtil.isEmpty(order.getTableAlias())) {
+                    order.setTableAlias(select.getTable().getAlias());
+                }
+            }
         }
         return SqlHelper.buildSelectSql(select);
     }

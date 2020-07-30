@@ -2,16 +2,17 @@ package cn.vonce.sql.helper;
 
 import cn.vonce.common.utils.ReflectAsmUtil;
 import cn.vonce.common.utils.StringUtil;
+import com.google.common.collect.ListMultimap;
+
+import cn.vonce.sql.annotation.SqlColumn;
 import cn.vonce.sql.annotation.SqlId;
 import cn.vonce.sql.annotation.SqlUnion;
-import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.annotation.SqlVersion;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.uitls.SqlBeanUtil;
-import com.google.common.collect.ListMultimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,7 +149,7 @@ public class SqlHelper {
         check(update);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlHelperCons.UPDATE);
-        sqlSb.append(getTableName(update, update.getUpdateBean()));
+        sqlSb.append(getTableName(SqlBeanUtil.getTable(update.getUpdateBean().getClass()), update));
         sqlSb.append(SqlHelperCons.SET);
         sqlSb.append(setSql(update));
         sqlSb.append(whereSql(update, update.getUpdateBean()));
@@ -193,31 +194,122 @@ public class SqlHelper {
         check(delete);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlHelperCons.DELETE_FROM);
-        sqlSb.append(getTableName(delete, null));
+        sqlSb.append(getTableName(delete.getTable(), delete));
         sqlSb.append(whereSql(delete, null));
         return sqlSb.toString();
     }
 
     /**
-     * 返回带转义表名,优先级 tableName第一，注解第二，类名第三
+     * 生成create sql语句
      *
-     * @param common
-     * @param bean
+     * @param create
      * @return
      */
-    private static String getTableName(Common common, Object bean) {
-        String schema = common.getTable().getSchema();
-        String tableName = common.getTable().getName();
-        if ((common.getTable() == null || StringUtil.isEmpty(tableName)) && bean != null) {
-            SqlTable sqlTable = bean.getClass().getAnnotation(SqlTable.class);
-            if (sqlTable != null) {
-                schema = sqlTable.schema();
-                tableName = sqlTable.value();
+    public static String buildCreateSql(Create create) {
+        check(create);
+        StringBuffer sqlSb = new StringBuffer();
+        sqlSb.append(SqlHelperCons.CREATE_TABLE);
+        sqlSb.append(getTableName(SqlBeanUtil.getTable(create.getBeanClass()), create));
+        sqlSb.append(SqlHelperCons.BEGIN_BRACKET);
+        Field idField = null;
+        Field[] fields = create.getBeanClass().getDeclaredFields();
+        for (Field field : fields) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+            if (idField == null) {
+                if (field.getAnnotation(SqlId.class) != null) {
+                    idField = field;
+                }
+            }
+            SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
+            ColumnInfo columnInfo = getColumnInfo(create.getSqlBeanConfig().getDbType(), field.getType(), sqlColumn);
+            String columnName = field.getName();
+            if (sqlColumn != null) {
+                columnName = sqlColumn.value();
+            }
+            sqlSb.append(columnName);
+            sqlSb.append(SqlHelperCons.SPACES);
+            sqlSb.append(columnInfo.getType().name());
+            sqlSb.append(SqlHelperCons.BEGIN_BRACKET);
+            //字段长度
+            sqlSb.append(columnInfo.getLength());
+            if (columnInfo.getType().isFloat()) {
+                sqlSb.append(SqlHelperCons.COMMA);
+                sqlSb.append(columnInfo.getDecimal());
+            }
+            sqlSb.append(SqlHelperCons.END_BRACKET);
+            //是否为null
+            if (columnInfo.getNotNull()) {
+                sqlSb.append(SqlHelperCons.NOT_NULL);
+            }
+            //默认值
+            if (StringUtil.isNotEmpty(columnInfo.getDef())) {
+                sqlSb.append(SqlHelperCons.DEFAULT);
+                sqlSb.append(SqlBeanUtil.getSqlValue(create, columnInfo.getDef()));
+            }
+            sqlSb.append(SqlHelperCons.COMMA);
+        }
+        //主键
+        if (idField != null) {
+            sqlSb.append(SqlHelperCons.PRIMARY_KEY);
+            sqlSb.append(SqlHelperCons.BEGIN_BRACKET);
+            sqlSb.append(SqlBeanUtil.getTableFieldName(idField));
+            sqlSb.append(SqlHelperCons.END_BRACKET);
+        } else {
+            sqlSb.deleteCharAt(sqlSb.length() - 1);
+        }
+        sqlSb.append(SqlHelperCons.END_BRACKET);
+        return sqlSb.toString();
+    }
+
+    /**
+     * 获取列信息
+     *
+     * @param dbType
+     * @param clazz
+     * @param sqlColumn
+     * @return
+     */
+    private static ColumnInfo getColumnInfo(DbType dbType, Class<?> clazz, SqlColumn sqlColumn) {
+        ColumnInfo columnInfo = new ColumnInfo();
+        columnInfo.setNotNull(sqlColumn.notNull());
+        if (sqlColumn.type() != JdbcType.NULL) {
+            columnInfo.setType(sqlColumn.type());
+        } else {
+            if (dbType == DbType.SQLite) {
+                columnInfo.setType(JdbcType.getType(SQLiteJavaType.getType(clazz).name()));
+            } else {
+                columnInfo.setType(JdbcType.getType(JavaType.getType(clazz).name()));
             }
         }
-        if (StringUtil.isEmpty(tableName) && bean != null) {
-            tableName = bean.getClass().getSimpleName();
+        if (sqlColumn.length() != 0) {
+            columnInfo.setLength(sqlColumn.length());
+            columnInfo.setDecimal(sqlColumn.decimal());
+        } else {
+            columnInfo.setLength(columnInfo.getType().getLength());
         }
+        if (sqlColumn.decimal() != 0) {
+            columnInfo.setDecimal(sqlColumn.decimal());
+        } else {
+            columnInfo.setDecimal(columnInfo.getType().getDecimal());
+        }
+        if (StringUtil.isNotEmpty(sqlColumn.def())) {
+            columnInfo.setDef(sqlColumn.def());
+        }
+        return columnInfo;
+    }
+
+    /**
+     * 返回带转义表名,优先级 tableName第一，注解第二，类名第三
+     *
+     * @param table
+     * @param common
+     * @return
+     */
+    private static String getTableName(Table table, Common common) {
+        String schema = table.getSchema();
+        String tableName = table.getName();
         if (StringUtil.isNotEmpty(schema)) {
             tableName = schema + SqlHelperCons.POINT + tableName;
         }
@@ -242,11 +334,11 @@ public class SqlHelper {
                 if (existAlias) {
                     columnSql.append(SqlHelperCons.BEGIN_BRACKET);
                 }
-                if (StringUtil.isNotEmpty(schema)) {
-                    columnSql.append(SqlBeanUtil.isToUpperCase(select) ? schema.toUpperCase() : schema);
-                    columnSql.append(SqlHelperCons.POINT);
-                }
                 if (StringUtil.isNotEmpty(tableAlias)) {
+                    if (StringUtil.isNotEmpty(schema)) {
+                        columnSql.append(SqlBeanUtil.isToUpperCase(select) ? schema.toUpperCase() : schema);
+                        columnSql.append(SqlHelperCons.POINT);
+                    }
                     columnSql.append(transferred);
                     columnSql.append(SqlBeanUtil.isToUpperCase(select) ? tableAlias.toUpperCase() : tableAlias);
                     columnSql.append(transferred);
@@ -356,7 +448,7 @@ public class SqlHelper {
      * @throws IllegalArgumentException
      */
     private static String fieldAndValuesSql(Common common, Object[] objects) throws IllegalArgumentException {
-        String tableName = getTableName(common, objects[0]);
+        String tableName = getTableName(SqlBeanUtil.getTable(objects[0].getClass()), common);
         StringBuffer fieldSql = new StringBuffer();
         StringBuffer valueSql = new StringBuffer();
         StringBuffer fieldAndValuesSql = new StringBuffer();
@@ -568,33 +660,25 @@ public class SqlHelper {
      */
     private static String groupByAndOrderBySql(String type, Select select) {
         StringBuffer groupByAndOrderBySql = new StringBuffer();
-        SqlColumn[] sqlColumn;
+        SqlField[] sqlFields;
         if (SqlHelperCons.ORDER_BY.equals(type)) {
-            sqlColumn = select.getOrderBy().toArray(new SqlColumn[]{});
+            sqlFields = select.getOrderBy().toArray(new SqlField[]{});
         } else {
-            sqlColumn = select.getGroupBy().toArray(new SqlColumn[]{});
+            sqlFields = select.getGroupBy().toArray(new SqlField[]{});
         }
-        String transferred = SqlBeanUtil.getTransferred(select);
-        if (sqlColumn != null && sqlColumn.length != 0) {
+        if (sqlFields != null && sqlFields.length != 0) {
             groupByAndOrderBySql.append(type);
-            for (int i = 0; i < sqlColumn.length; i++) {
-                SqlColumn orderBy = sqlColumn[i];
-                groupByAndOrderBySql.append(transferred);
-                String tableAlias;
-                if (StringUtil.isNotEmpty(orderBy.getTableAlias())) {
-                    tableAlias = orderBy.getTableAlias();
-                } else {
-                    tableAlias = select.getTable().getAlias();
+            for (int i = 0; i < sqlFields.length; i++) {
+                SqlField sqlField = sqlFields[i];
+                if (StringUtil.isNotEmpty(sqlField.getTableAlias())) {
+                    if (StringUtil.isNotEmpty(sqlField.getSchema())) {
+                        groupByAndOrderBySql.append(sqlField.getSchema());
+                        groupByAndOrderBySql.append(SqlHelperCons.POINT);
+                    }
+                    groupByAndOrderBySql.append(sqlField.getTableAlias());
+                    groupByAndOrderBySql.append(SqlHelperCons.POINT);
                 }
-                String name = orderBy.getName();
-                if (SqlBeanUtil.isToUpperCase(select)) {
-                    tableAlias = tableAlias.toUpperCase();
-                    name = name.toUpperCase();
-                }
-                groupByAndOrderBySql.append(tableAlias);
-                groupByAndOrderBySql.append(transferred);
-                groupByAndOrderBySql.append(SqlHelperCons.POINT);
-                groupByAndOrderBySql.append(name);
+                groupByAndOrderBySql.append(sqlField.getName());
                 if (SqlHelperCons.ORDER_BY.equals(type)) {
                     groupByAndOrderBySql.append(SqlHelperCons.SPACES);
                     groupByAndOrderBySql.append(select.getOrderBy().get(i).getSqlSort().name());
@@ -623,7 +707,7 @@ public class SqlHelper {
      * @param whereMap
      * @return
      */
-    private static String conditionHandle(ConditionType conditionType, Common common, String where, Object[] args, Object bean, ListMultimap<String, SqlCondition> whereMap) {
+    private static String conditionHandle(ConditionType conditionType, Common common, String where, Object[] args, Object bean, ListMultimap<String, ConditionInfo> whereMap) {
         StringBuffer conditionSql = new StringBuffer();
         StringBuffer versionConditionSql = null;
         Field versionField = null;
@@ -670,17 +754,17 @@ public class SqlHelper {
                 conditionSql.append(SqlHelperCons.BEGIN_BRACKET);
                 int i = 0;
                 // 遍历所有条件
-                Collection<Map.Entry<String, SqlCondition>> sqlConditionEntryCollection = whereMap.entries();
-                for (Map.Entry<String, SqlCondition> sqlConditionEntry : sqlConditionEntryCollection) {
-                    SqlCondition sqlCondition = sqlConditionEntry.getValue();
+                Collection<Map.Entry<String, ConditionInfo>> sqlConditionEntryCollection = whereMap.entries();
+                for (Map.Entry<String, ConditionInfo> sqlConditionEntry : sqlConditionEntryCollection) {
+                    ConditionInfo conditionInfo = sqlConditionEntry.getValue();
                     // 遍历sql逻辑处理
                     if (i != 0 && i < sqlConditionEntryCollection.size()) {
-                        conditionSql.append(getLogic(sqlCondition.getSqlLogic()));
+                        conditionSql.append(getLogic(conditionInfo.getSqlLogic()));
                     }
                     if (SqlBeanUtil.isToUpperCase(common)) {
-                        sqlCondition.setName(sqlCondition.getName().toUpperCase());
+                        conditionInfo.setName(conditionInfo.getName().toUpperCase());
                     }
-                    conditionSql.append(valueOperator(common, sqlCondition));
+                    conditionSql.append(valueOperator(common, conditionInfo));
                     i++;
                 }
                 conditionSql.append(SqlHelperCons.END_BRACKET);
@@ -695,14 +779,14 @@ public class SqlHelper {
     /**
      * 获取操作符
      *
-     * @param sqlCondition
+     * @param conditionInfo
      * @return
      */
-    private static String getOperator(SqlCondition sqlCondition) {
+    private static String getOperator(ConditionInfo conditionInfo) {
         String operator = "";
         // 优先使用枚举类型的操作符
-        if (sqlCondition.getSqlOperator() != null) {
-            SqlOperator sqlOperator = sqlCondition.getSqlOperator();
+        if (conditionInfo.getSqlOperator() != null) {
+            SqlOperator sqlOperator = conditionInfo.getSqlOperator();
             if (sqlOperator == SqlOperator.IS) {
                 operator = SqlHelperCons.IS;
             } else if (sqlOperator == SqlOperator.IS_NOT) {
@@ -769,18 +853,18 @@ public class SqlHelper {
      * 值操作
      *
      * @param common
-     * @param sqlCondition
+     * @param conditionInfo
      * @return
      */
-    private static StringBuffer valueOperator(Common common, SqlCondition sqlCondition) {
+    private static StringBuffer valueOperator(Common common, ConditionInfo conditionInfo) {
         StringBuffer sql = new StringBuffer();
-        String operator = getOperator(sqlCondition);
+        String operator = getOperator(conditionInfo);
         String transferred = SqlBeanUtil.getTransferred(common);
         boolean needEndBracket = false;
         Object[] betweenValues = null;
-        Object value = sqlCondition.getValue();
+        Object value = conditionInfo.getValue();
         // 如果操作符为BETWEEN ，IN、NOT IN 则需额外处理
-        if (sqlCondition.getSqlOperator() == SqlOperator.BETWEEN) {
+        if (conditionInfo.getSqlOperator() == SqlOperator.BETWEEN) {
             betweenValues = getObjects(value);
             if (betweenValues == null) {
                 try {
@@ -791,7 +875,7 @@ public class SqlHelper {
                     return null;
                 }
             }
-        } else if (sqlCondition.getSqlOperator() == SqlOperator.IN || sqlCondition.getSqlOperator() == SqlOperator.NOT_IN) {
+        } else if (conditionInfo.getSqlOperator() == SqlOperator.IN || conditionInfo.getSqlOperator() == SqlOperator.NOT_IN) {
             needEndBracket = true;
             Object[] in_notInValues = getObjects(value);
             if (in_notInValues == null) {
@@ -812,41 +896,41 @@ public class SqlHelper {
                 value = in_notIn.toString();
             }
         } else {
-            value = sqlCondition.getValue();
+            value = conditionInfo.getValue();
             //对like操作符处理
             if (operator.indexOf(SqlHelperCons.LIKE) > -1) {
-                if (sqlCondition.getSqlOperator() == SqlOperator.LIKE || sqlCondition.getSqlOperator() == SqlOperator.LIKE_L || sqlCondition.getSqlOperator() == SqlOperator.NOT_LIKE || sqlCondition.getSqlOperator() == SqlOperator.NOT_LIKE_L) {
+                if (conditionInfo.getSqlOperator() == SqlOperator.LIKE || conditionInfo.getSqlOperator() == SqlOperator.LIKE_L || conditionInfo.getSqlOperator() == SqlOperator.NOT_LIKE || conditionInfo.getSqlOperator() == SqlOperator.NOT_LIKE_L) {
                     value = SqlHelperCons.PERCENT + value;
                 }
-                if (sqlCondition.getSqlOperator() == SqlOperator.LIKE || sqlCondition.getSqlOperator() == SqlOperator.LIKE_R || sqlCondition.getSqlOperator() == SqlOperator.NOT_LIKE || sqlCondition.getSqlOperator() == SqlOperator.NOT_LIKE_R) {
+                if (conditionInfo.getSqlOperator() == SqlOperator.LIKE || conditionInfo.getSqlOperator() == SqlOperator.LIKE_R || conditionInfo.getSqlOperator() == SqlOperator.NOT_LIKE || conditionInfo.getSqlOperator() == SqlOperator.NOT_LIKE_R) {
                     value = value + SqlHelperCons.PERCENT;
                 }
                 value = SqlHelperCons.SINGLE_QUOTATION_MARK + value + SqlHelperCons.SINGLE_QUOTATION_MARK;
             } else if (value instanceof Original) {
-                Original original = (Original) sqlCondition.getValue();
+                Original original = (Original) conditionInfo.getValue();
                 value = original.getValue();
             } else {
                 value = SqlBeanUtil.getSqlValue(common, value);
             }
         }
-        //schema
-        if (StringUtil.isNotEmpty(sqlCondition.getSchema())) {
-            sql.append(sqlCondition.getSchema());
-            sql.append(SqlHelperCons.POINT);
-        }
         //表别名
-        if (StringUtil.isNotEmpty(sqlCondition.getTableAlias())) {
+        if (StringUtil.isNotEmpty(conditionInfo.getTableAlias())) {
+            //schema
+            if (StringUtil.isNotEmpty(conditionInfo.getSchema())) {
+                sql.append(conditionInfo.getSchema());
+                sql.append(SqlHelperCons.POINT);
+            }
             sql.append(transferred);
-            sql.append(sqlCondition.getTableAlias());
+            sql.append(conditionInfo.getTableAlias());
             sql.append(transferred);
             sql.append(SqlHelperCons.POINT);
         }
         //字段名
-        sql.append(sqlCondition.getName());
+        sql.append(conditionInfo.getName());
         //操作符
         sql.append(operator);
         //值
-        if (sqlCondition.getSqlOperator() == SqlOperator.BETWEEN) {
+        if (conditionInfo.getSqlOperator() == SqlOperator.BETWEEN) {
             sql.append(SqlBeanUtil.getSqlValue(common, betweenValues[0]));
             sql.append(SqlHelperCons.AND);
             sql.append(SqlBeanUtil.getSqlValue(common, betweenValues[1]));

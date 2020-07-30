@@ -1,5 +1,7 @@
 package cn.vonce.sql.bean;
 
+import cn.vonce.common.utils.StringUtil;
+import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.enumerate.SqlLogic;
 import cn.vonce.sql.enumerate.SqlOperator;
@@ -20,7 +22,7 @@ import java.util.List;
  * @email 766255988@qq.com
  * @date 2017年8月18日上午9:00:19
  */
-public class Select extends Condition implements Serializable {
+public class Select extends SpecialCondition implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,7 +34,7 @@ public class Select extends Condition implements Serializable {
     private Page page = null;
     private String having = null;
     private Object[] havingArgs = null;
-    private ListMultimap<String, SqlCondition> havingMap = LinkedListMultimap.create();//having条件包含的逻辑
+    private ListMultimap<String, ConditionInfo> havingMap = LinkedListMultimap.create();//having条件包含的逻辑
     private String[] filterFields = null;//需要过滤的列字段
 
     /**
@@ -298,7 +300,7 @@ public class Select extends Condition implements Serializable {
      *
      * @return
      */
-    public ListMultimap<String, SqlCondition> getHavingMap() {
+    public ListMultimap<String, ConditionInfo> getHavingMap() {
         return havingMap;
     }
 
@@ -318,7 +320,15 @@ public class Select extends Condition implements Serializable {
      * @param sqlSort    排序方式
      */
     public Select orderBy(String columNname, SqlSort sqlSort) {
-        return orderBy("", "", columNname, sqlSort);
+        String schema = "";
+        String tableAlias = "";
+        if (StringUtil.isNotEmpty(columNname) && columNname.indexOf(SqlHelperCons.POINT) > -1) {
+            String[] tableNameAndField = columNname.split("\\" + SqlHelperCons.POINT);
+            schema = tableNameAndField.length == 3 ? tableNameAndField[0] : "";
+            tableAlias = tableNameAndField.length == 3 ? tableNameAndField[1] : tableNameAndField[0];
+            columNname = tableNameAndField.length == 3 ? tableNameAndField[2] : tableNameAndField[1];
+        }
+        return orderBy(schema, tableAlias, columNname, sqlSort);
     }
 
     /**
@@ -485,7 +495,7 @@ public class Select extends Condition implements Serializable {
      * @return
      */
     public Select having(SqlLogic sqlLogic, String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        havingMap.put(tableAlias + field, new SqlCondition(sqlLogic, schema, tableAlias, field, value, sqlOperator));
+        havingMap.put(tableAlias + field, new ConditionInfo(sqlLogic, schema, tableAlias, field, value, sqlOperator));
         return this;
     }
 

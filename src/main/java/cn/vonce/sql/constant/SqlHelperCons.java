@@ -21,7 +21,7 @@ public class SqlHelperCons {
     public static final String UPDATE = "UPDATE ";
     public static final String SET = " SET ";
     public static final String VALUES = "VALUES";
-    public static final String NULL_VALUE = "null";
+    public static final String NULL_VALUE = "NULL";
     public static final String INSERT_INTO = "INSERT INTO ";
     public static final String DELETE_FROM = "DELETE FROM ";
     public static final String IS = " IS ";
@@ -45,6 +45,7 @@ public class SqlHelperCons {
     public static final String ALL = " * ";
     public static final String SINGLE_ESCAPE_CHARACTER = "`";
     public static final String POINT = ".";
+    public static final String UNDERLINE = "_";
     //    public static final String WELL_NUMBER = "#";
     public static final String AS = " AS ";
     public static final String SINGLE_QUOTATION_MARK = "'";
@@ -53,6 +54,11 @@ public class SqlHelperCons {
     public static final String RIGHT_JOIN = " RIGHT JOIN ";
     public static final String FULL_JOIN = " FULL JOIN ";
     public static final String ON = " ON ";
+
+    public static final String CREATE_TABLE = "CREATE TABLE ";
+    public static final String PRIMARY_KEY = "PRIMARY KEY";
+    public static final String NOT_NULL = "NOT NULL";
+    public static final String DEFAULT = "DEFAULT ";
 
     // mssql
     public static final String TOP = " TOP ";
@@ -72,5 +78,11 @@ public class SqlHelperCons {
 
     public static final String OFFSET = " OFFSET ";
     public static final String ROWNUMBER = " ROWNUMBER() ";
+
+    // sqlite
+    public static final String INTEGER = "INTEGER";
+    public static final String REAL = "REAL";
+    public static final String TEXT = "TEXT";
+    public static final String BLOB = "BLOB";
 
 }

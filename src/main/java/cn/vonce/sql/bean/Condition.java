@@ -17,7 +17,7 @@ public class Condition extends Common {
 
     private String where = "";//条件
     private Object[] agrs = null;
-    private ListMultimap<String, SqlCondition> whereMap = LinkedListMultimap.create();//where条件包含的逻辑
+    private ListMultimap<String, ConditionInfo> whereMap = LinkedListMultimap.create();//where条件包含的逻辑
 
     /**
      * 获取where sql 内容
@@ -71,7 +71,7 @@ public class Condition extends Common {
      *
      * @return
      */
-    public ListMultimap<String, SqlCondition> getWhereMap() {
+    public ListMultimap<String, ConditionInfo> getWhereMap() {
         return whereMap;
     }
 
@@ -172,7 +172,7 @@ public class Condition extends Common {
      * @return
      */
     public Condition where(SqlLogic sqlLogic, String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        whereMap.put(tableAlias + field, new SqlCondition(sqlLogic, schema, tableAlias, field, value, sqlOperator));
+        whereMap.put(tableAlias + field, new ConditionInfo(sqlLogic, schema, tableAlias, field, value, sqlOperator));
         return this;
     }
 

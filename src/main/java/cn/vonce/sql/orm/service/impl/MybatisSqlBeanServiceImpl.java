@@ -5,6 +5,7 @@ import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.UseMybatis;
 import cn.vonce.sql.orm.dao.MybatisSqlBeanDao;
 import cn.vonce.sql.orm.service.SqlBeanService;
+import cn.vonce.sql.orm.service.TableService;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,8 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
      *
      */
     private static final long serialVersionUID = 1L;
+
+    private TableService tableService;
 
     @Autowired
     private MybatisSqlBeanDao<T> mybatisSqlBeanDao;
@@ -313,4 +316,22 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
         return mybatisSqlBeanDao.insert(sqlBeanConfig, insert);
     }
 
+    @Override
+    public TableService getTableService() {
+        if (tableService == null) {
+            tableService = new TableService() {
+                @Override
+                public long dropTable() {
+                    return mybatisSqlBeanDao.drop(sqlBeanConfig, clazz);
+                }
+
+                @Override
+                public long createTable() {
+                    dropTable();
+                    return mybatisSqlBeanDao.create(sqlBeanConfig, clazz);
+                }
+            };
+        }
+        return tableService;
+    }
 }

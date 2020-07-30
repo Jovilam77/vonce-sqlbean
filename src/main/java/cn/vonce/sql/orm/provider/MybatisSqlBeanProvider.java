@@ -169,7 +169,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String update(Map<String, Object> map) {
-        return super.updateSql((SqlBeanConfig) map.get("sqlBeanConfig"),(Update) map.get("update"), (boolean) map.get("ignore"));
+        return super.updateSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Update) map.get("update"), (boolean) map.get("ignore"));
     }
 
     /**
@@ -234,6 +234,26 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      */
     public String insert(Map<String, Object> map) {
         return super.insertBeanSql((SqlBeanConfig) map.get("sqlBeanConfig"), map.get("insert"));
+    }
+
+    /**
+     * 删除表
+     *
+     * @param map
+     * @return
+     */
+    public String drop(Map<String, Object> map) {
+        return super.dropTableSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"));
+    }
+
+    /**
+     * 创建表
+     *
+     * @param map
+     * @return
+     */
+    public String create(Map<String, Object> map) {
+        return super.createTableSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"));
     }
 
 }

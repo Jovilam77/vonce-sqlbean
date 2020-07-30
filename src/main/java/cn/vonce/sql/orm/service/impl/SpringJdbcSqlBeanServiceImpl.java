@@ -6,6 +6,7 @@ import cn.vonce.sql.config.UseSpringJdbc;
 import cn.vonce.sql.orm.mapper.SpringJbdcSqlBeanMapper;
 import cn.vonce.sql.orm.service.SqlBeanService;
 import cn.vonce.sql.orm.provider.SqlBeanProvider;
+import cn.vonce.sql.orm.service.TableService;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,8 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends SqlBeanProvider impleme
     private static final long serialVersionUID = 1L;
 
     private Logger logger = LoggerFactory.getLogger(SpringJdbcSqlBeanServiceImpl.class);
+
+    private TableService tableService;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -439,5 +442,24 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends SqlBeanProvider impleme
     @Override
     public long inset(Insert insert) {
         return jdbcTemplate.update(super.insertBeanSql(sqlBeanConfig, insert));
+    }
+
+    @Override
+    public TableService getTableService() {
+        if (tableService == null) {
+            tableService = new TableService() {
+                @Override
+                public long dropTable() {
+                    return jdbcTemplate.update(SpringJdbcSqlBeanServiceImpl.super.dropTableSql(sqlBeanConfig, clazz));
+                }
+
+                @Override
+                public long createTable() {
+                    dropTable();
+                    return jdbcTemplate.update(SpringJdbcSqlBeanServiceImpl.super.createTableSql(sqlBeanConfig, clazz));
+                }
+            };
+        }
+        return tableService;
     }
 }

@@ -158,7 +158,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             try {
                 while (resultSet.next()) {
                     Object value = super.baseHandleResultSet(resultSet);
-                    if (!value.getClass().getSimpleName().toLowerCase().equals(resultType.getSimpleName().toLowerCase())) {
+                    if (value != null && !value.getClass().getName().equals(resultType.getName())) {
                         value = super.getValueConvert(resultType.getName(), value);
                     }
                     resultList.add(value);
