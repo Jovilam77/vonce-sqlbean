@@ -3,7 +3,6 @@ package cn.vonce.sql.bean;
 import cn.vonce.common.utils.StringUtil;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.EscapeChar;
-
 import java.io.Serializable;
 
 /**
@@ -14,7 +13,7 @@ import java.io.Serializable;
  * @email 766255988@qq.com
  * @date 2020年3月1日上午10:00:00
  */
-public class Column extends SqlColumn implements Serializable {
+public class Column extends SqlField implements Serializable {
     public Column() {
         super();
     }
