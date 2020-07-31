@@ -1,0 +1,372 @@
+package cn.vonce.sql.page;
+
+
+import cn.vonce.sql.bean.Order;
+import cn.vonce.sql.bean.Paging;
+import cn.vonce.sql.bean.Select;
+import cn.vonce.sql.constant.SqlHelperCons;
+import cn.vonce.sql.enumerate.SqlSort;
+import cn.vonce.sql.uitls.StringUtil;
+
+import java.lang.reflect.Method;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
+
+/**
+ * 分页助手，使用该分页助手必须实现PagingService 接口
+ *
+ * @param <T>
+ * @author jovi
+ * @version 1.0
+ * @email 766255988@qq.com
+ * @date 2017年3月14日上午11:59:50
+ */
+public class PageHelper<T> {
+
+    public static final String SELECT = "select";
+    public static final String SELECT_MAP_LIST = "selectMapList";
+    public static final String COUNT = "count";
+
+    public PageHelper() {
+
+    }
+
+    /**
+     * 实例化分页助手 - 手动设置参数
+     *
+     * @param pagenum   当前页
+     * @param pagesize  每页数量
+     * @param timestamp 时间戳
+     */
+    public PageHelper(Integer pagenum, Integer pagesize, String timestamp) {
+        this(pagenum, pagesize, null, timestamp);
+    }
+
+    /**
+     * 实例化分页助手 - 手动设置参数
+     *
+     * @param pagenum   当前页
+     * @param pagesize  每页数量
+     * @param orders    排序
+     * @param timestamp 时间戳
+     */
+    public PageHelper(Integer pagenum, Integer pagesize, Order[] orders, String timestamp) {
+        init(pagenum, pagesize, orders, timestamp);
+    }
+
+    public void init(Integer pagenum, Integer pagesize, String timestamp) {
+        init(pagenum, pagesize, null, timestamp);
+    }
+
+    public void init(Integer pagenum, Integer pagesize, Order[] orders, String timestamp) {
+        if (this.pagenum == null) {
+            this.pagenum = pagenum == null ? 0 : pagenum;
+        }
+        if (this.pagesize == null) {
+            this.pagesize = pagesize == null ? 10 : pagesize;
+        }
+        if (this.orders == null) {
+            this.orders = orders;
+        }
+        if (this.timestamp == null) {
+            this.setTimestamp(timestamp);
+        }
+    }
+
+    private Integer pagenum;
+    private Integer pagesize;
+    private Integer totalRecords;
+    private Integer totalPage;
+    private Order[] orders;
+    private String timestamp;
+    private List<T> dataList;
+    private PagingMethod pagingMethod;
+
+    /**
+     * 获取当前页
+     *
+     * @return
+     */
+    public Integer getPagenum() {
+        return pagenum;
+    }
+
+    /**
+     * 获取每页数量
+     *
+     * @return
+     */
+    public Integer getPagesize() {
+        return pagesize;
+    }
+
+    /**
+     * 获取总数量
+     *
+     * @return
+     */
+    public Integer getTotalRecords() {
+        return totalRecords;
+    }
+
+    /**
+     * 获取总页数
+     *
+     * @return
+     */
+    public Integer getTotalPage() {
+        return totalPage;
+    }
+
+    public Order[] getOrders() {
+        return orders;
+    }
+
+    /**
+     * 获取分页时间戳
+     *
+     * @return
+     */
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * 设置分页时间戳(格式必须为："yyyy-MM-dd HH:mm:ss"， 不正确则设置为空)
+     *
+     * @param timestamp
+     */
+    private void setTimestamp(String timestamp) {
+        boolean convertSuccess = true;
+        try {
+            if (StringUtil.isNotEmpty(timestamp)) {
+                // 指定日期格式为四位年/两位月份/两位日期，注意yyyy-MM-dd区分大小写；
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                // 设置lenient为false.
+                // 否则SimpleDateFormat会比较宽松地验证日期，比如2007/02/29会被接受，并转换成2007/03/01
+                format.setLenient(false);
+                format.parse(timestamp);
+            } else {
+                convertSuccess = false;
+            }
+        } catch (ParseException e) {
+            // e.printStackTrace();
+            // 如果throw java.text.ParseException或者NullPointerException，就说明格式不对
+            convertSuccess = false;
+        }
+        if (convertSuccess) {
+            this.timestamp = timestamp;
+        }
+    }
+
+    /**
+     * 获取分页列表数据
+     *
+     * @return
+     */
+    public List<T> getDataList() {
+        return dataList;
+    }
+
+    /**
+     * 设置分页列表数据
+     *
+     * @param dataList
+     */
+    public void setDataList(List<T> dataList) {
+        this.dataList = dataList;
+    }
+
+    /**
+     * 获取pagingMethod分页查询的方法名称<br>
+     * 如果pagingMethod为空 默认 count 方法名为"count",select方法名为"select"
+     *
+     * @return
+     */
+    public PagingMethod getPagingMethod() {
+        if (pagingMethod == null) {
+            pagingMethod = new PagingMethod(COUNT, SELECT);
+        }
+        return pagingMethod;
+    }
+
+    /**
+     * 设置pagingMethod，count(统计),select(查询)方法的名称
+     *
+     * @param pagingMethod
+     */
+    public void setPagingMethod(PagingMethod pagingMethod) {
+        this.pagingMethod = pagingMethod;
+    }
+
+    /**
+     * 总数量、总页数处理
+     *
+     * @param count
+     */
+    public void dispose(long count) {
+        // 保存总数
+        this.totalRecords = (int) count;
+        // 计算最多有几页
+        int countPage = totalRecords % pagesize == 0 ? totalRecords / pagesize : totalRecords / pagesize + 1;
+        // 返回总页数
+        totalPage = countPage;
+        // 如果提交的页数比总实际页数大，那就等于实际总页数
+        if (pagenum > totalPage) {
+            pagenum = totalPage;
+        }
+    }
+
+    /**
+     * 获得分页数据
+     *
+     * @param select      查询条件拓展
+     * @param pageService 分页接口
+     * @return
+     */
+    public PageHelper<T> paging(Select select, PagingService pageService) {
+        return paging(null, select, pageService);
+    }
+
+    /**
+     * 获得分页数据
+     *
+     * @param tClazz
+     * @param select      SqlBean
+     * @param pageService 分页接口
+     * @return
+     */
+    public PageHelper<T> paging(Class<T> tClazz, Select select, PagingService pageService) {
+        try {
+            Class<? extends PagingService> clazz = pageService.getClass();
+            Method selectMethod = null;
+            Method countMethod = null;
+            // 衍生一个对象用于select查询
+            Select sqlBeanSelect = (Select) select.copy();
+            // 预防设置了查询字段，故将查询字段换位统计字段
+            select.getColumnList().clear();
+            select.column(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET);
+            // 先统计数量
+            long count;
+            if (tClazz != null) {
+                countMethod = clazz.getDeclaredMethod(this.getPagingMethod().getCount(), Class.class, Select.class);
+                count = (long) countMethod.invoke(pageService, tClazz, select);
+            } else {
+                countMethod = clazz.getDeclaredMethod(this.getPagingMethod().getCount(), Select.class);
+                count = (long) countMethod.invoke(pageService, select);
+            }
+            // 计算共有几页
+            this.dispose(count);
+            //设置分页
+            sqlBeanSelect.setPage(pagenum, pagesize);
+            sqlBeanSelect.orderBy(orders);
+            Object obj;
+            if (tClazz != null) {
+                selectMethod = clazz.getDeclaredMethod(this.getPagingMethod().getSelect(), Class.class, Select.class);
+                obj = selectMethod.invoke(pageService, tClazz, sqlBeanSelect);
+            } else {
+                selectMethod = clazz.getDeclaredMethod(this.getPagingMethod().getSelect(), Select.class);
+                obj = selectMethod.invoke(pageService, sqlBeanSelect);
+            }
+            this.setDataList((List<T>) obj);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return this;
+    }
+
+    /**
+     * 获取排序对象
+     *
+     * @param sortdatafields
+     * @param sortorders
+     * @return
+     */
+    public Order[] getOrder(String[] sortdatafields, String[] sortorders) {
+        Order[] orders = null;
+        if (sortdatafields != null && sortdatafields.length > 0) {
+            orders = new Order[sortdatafields.length];
+            for (int i = 0; i < sortdatafields.length; i++) {
+                Order order = null;
+                String field = sortdatafields[i];
+                String sort = null;
+                try {
+                    sort = sortorders[i];
+                } catch (Exception e) {
+                }
+                if (StringUtil.isNotEmpty(field) && field.indexOf(SqlHelperCons.POINT) > -1) {
+                    String[] tableNameAndField = field.split("\\" + SqlHelperCons.POINT);
+                    order = new Order("", tableNameAndField[0], tableNameAndField[1], SqlSort.get(sort));
+                } else {
+                    order = new Order(field, SqlSort.get(sort));
+                }
+                orders[i] = order;
+            }
+        }
+        return orders;
+    }
+
+    /**
+     * 返回结果集
+     *
+     * @return
+     */
+    public ResultData<List<T>> getResultData() {
+        ResultData<List<T>> resultData = new ResultData();
+        resultData.setData(this.getDataList());
+        resultData.setPagenum(this.getPagenum());
+        resultData.setPagesize(this.getPagesize());
+        resultData.setTotalRecords(this.getTotalRecords());
+        resultData.setTotalPage(this.getTotalPage());
+        resultData.setTimestamp(this.getTimestamp());
+        return resultData;
+    }
+
+    /**
+     * 返回分页参数对象
+     *
+     * @return
+     */
+    public Paging getPaging() {
+        return new Paging(this.pagenum, this.pagesize, this.orders);
+    }
+
+    /**
+     * 实现分类接口的方法
+     *
+     * @author jovi
+     * @version 1.0
+     */
+    public static class PagingMethod {
+        private String count;
+        private String select;
+
+        public PagingMethod() {
+            super();
+        }
+
+        public PagingMethod(String count, String select) {
+            super();
+            this.count = count;
+            this.select = select;
+        }
+
+        public String getCount() {
+            return count;
+        }
+
+        public void setCount(String count) {
+            this.count = count;
+        }
+
+        public String getSelect() {
+            return select;
+        }
+
+        public void setSelect(String select) {
+            this.select = select;
+        }
+
+    }
+}
