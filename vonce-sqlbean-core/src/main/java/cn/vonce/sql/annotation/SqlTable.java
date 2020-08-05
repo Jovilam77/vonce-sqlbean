@@ -16,11 +16,25 @@ import java.lang.annotation.*;
 public @interface SqlTable {
 
     /**
+     * 如果表不存在则自动创建表
+     *
+     * @return
+     */
+    boolean autoCreate() default true;
+
+    /**
      * 生成实体类生成对应表的字段常量
      *
      * @return
      */
     boolean generate() default true;
+
+    /**
+     * 是否为视图
+     *
+     * @return
+     */
+    boolean isView() default false;
 
     /**
      * 表名

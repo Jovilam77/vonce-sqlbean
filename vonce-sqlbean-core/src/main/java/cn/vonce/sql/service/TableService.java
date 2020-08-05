@@ -1,5 +1,7 @@
 package cn.vonce.sql.service;
 
+import java.util.List;
+
 /**
  * 表结构业务接口
  *
@@ -15,13 +17,25 @@ public interface TableService {
      *
      * @return
      */
-    long dropTable();
+    void dropTable();
 
     /**
      * 创建表结构
      *
      * @return
      */
-    long createTable();
+    void createTable();
+
+    /**
+     * 删除并创建表结构
+     */
+    void dropAndCreateTable();
+
+    /**
+     * 表是否存在
+     *
+     * @return
+     */
+    List<String> getTableList();
 
 }

@@ -244,7 +244,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String drop(Map<String, Object> map) {
-        return super.dropTableSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"));
+        return super.dropTableSql((Class<?>) map.get("clazz"));
     }
 
     /**
@@ -255,6 +255,16 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      */
     public String create(Map<String, Object> map) {
         return super.createTableSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"));
+    }
+
+    /**
+     * 获取表名列表
+     *
+     * @param map
+     * @return
+     */
+    public String selectTableList(Map<String, Object> map) {
+        return super.selectTableListSql((SqlBeanConfig) map.get("sqlBeanConfig"));
     }
 
 }

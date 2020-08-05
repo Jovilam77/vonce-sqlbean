@@ -13,6 +13,7 @@ import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.uitls.SqlBeanUtil;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -324,17 +325,21 @@ public class SqlHelper {
                 String tableAlias = select.getColumnList().get(i).getTableAlias();
                 String columnName = select.getColumnList().get(i).getName();
                 String transferred = SqlBeanUtil.getTransferred(select);
+                if (SqlBeanUtil.isToUpperCase(select)) {
+                    schema = schema.toUpperCase();
+                    columnName = columnName.toUpperCase();
+                }
                 boolean existAlias = StringUtil.isNotEmpty(select.getColumnList().get(i).getAlias());
                 if (existAlias) {
                     columnSql.append(SqlHelperCons.BEGIN_BRACKET);
                 }
                 if (StringUtil.isNotEmpty(tableAlias)) {
                     if (StringUtil.isNotEmpty(schema)) {
-                        columnSql.append(SqlBeanUtil.isToUpperCase(select) ? schema.toUpperCase() : schema);
+                        columnSql.append(schema);
                         columnSql.append(SqlHelperCons.POINT);
                     }
                     columnSql.append(transferred);
-                    columnSql.append(SqlBeanUtil.isToUpperCase(select) ? tableAlias.toUpperCase() : tableAlias);
+                    columnSql.append(tableAlias);
                     columnSql.append(transferred);
                     columnSql.append(SqlHelperCons.POINT);
                 }
@@ -362,11 +367,17 @@ public class SqlHelper {
     private static String fromFullName(Select select) {
         String transferred = SqlBeanUtil.getTransferred(select);
         StringBuffer fromSql = new StringBuffer();
-        if (StringUtil.isNotEmpty(select.getTable().getSchema())) {
-            fromSql.append(select.getTable().getSchema());
+        String tableName = select.getTable().getName();
+        String schema = select.getTable().getSchema();
+        if (SqlBeanUtil.isToUpperCase(select)) {
+            tableName = tableName.toUpperCase();
+            schema = schema.toUpperCase();
+        }
+        if (StringUtil.isNotEmpty(schema)) {
+            fromSql.append(schema);
             fromSql.append(SqlHelperCons.POINT);
         }
-        fromSql.append(select.getTable().getName());
+        fromSql.append(tableName);
         fromSql.append(SqlHelperCons.SPACES);
         fromSql.append(transferred);
         fromSql.append(select.getTable().getAlias());

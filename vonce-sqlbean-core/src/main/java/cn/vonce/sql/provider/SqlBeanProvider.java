@@ -410,12 +410,15 @@ public class SqlBeanProvider {
     /**
      * 删除表
      *
-     * @param sqlBeanConfig
      * @param clazz
      * @return
      */
-    public String dropTableSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz) {
+    public String dropTableSql(Class<?> clazz) {
         return "DROP TABLE IF EXISTS " + SqlBeanUtil.getTable(clazz).getName();
+    }
+
+    public String existsSql(Class<?> clazz) {
+        return "SELECT COUNT(1) FROM " + SqlBeanUtil.getTable(clazz).getName();
     }
 
     /**
@@ -430,6 +433,39 @@ public class SqlBeanProvider {
         create.setSqlBeanConfig(sqlBeanConfig);
         create.setBeanClass(clazz);
         return SqlHelper.buildCreateSql(create);
+    }
+
+    /**
+     * 获取表名列表
+     *
+     * @param sqlBeanConfig
+     * @return
+     */
+    public String selectTableListSql(SqlBeanConfig sqlBeanConfig) {
+        switch (sqlBeanConfig.getDbType()) {
+            case MySQL:
+            case MariaDB:
+                return "select table_name as `name` from information_schema.tables where table_schema = database() and table_type = 'BASE TABLE'";
+            case SQLServer2008:
+                return "select name from sysobjects where xtype='U'";
+            case Oracle:
+                return "select table_name as \"name\" from user_tables";
+            case PostgreSQL:
+                return "select tablename as \"name\" from pg_tables where schemaname = 'public'";
+            case DB2:
+//                return "select tabname AS \"table\" from syscat.tables where tabschema = current schema";
+                return "select name from sysibm.systables where type = 'T' and creator = current user";
+            case H2:
+                return "select table_name as \"name\" from information_schema.tables where table_type = 'TABLE'";
+            case Hsql:
+                return "select table_name as \"name\" from information_schema.tables where table_type = 'BASE TABLE'";
+            case Derby:
+                return "select tablename as \"name\" from SYS.systables where tabletype = 'T'";
+            case SQLite:
+                return "select name from sqlite_master where type='table'";
+            default:
+                throw new SqlBeanException("请配置正确的数据库");
+        }
     }
 
     /**

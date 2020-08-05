@@ -380,12 +380,11 @@ public interface MybatisSqlBeanDao<T> {
     /**
      * 删除表
      *
-     * @param sqlBeanConfig
      * @param clazz
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "drop")
-    long drop(@Param("sqlBeanConfig") SqlBeanConfig sqlBeanConfig, @Param("clazz") Class<?> clazz);
+    void drop(@Param("clazz") Class<?> clazz);
 
     /**
      * 创建表
@@ -395,6 +394,15 @@ public interface MybatisSqlBeanDao<T> {
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "create")
-    long create(@Param("sqlBeanConfig") SqlBeanConfig sqlBeanConfig, @Param("clazz") Class<?> clazz);
+    void create(@Param("sqlBeanConfig") SqlBeanConfig sqlBeanConfig, @Param("clazz") Class<?> clazz);
+
+    /**
+     * 获取表名列表
+     *
+     * @param sqlBeanConfig
+     * @return
+     */
+    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectTableList")
+    List<String> selectTableList(@Param("sqlBeanConfig") SqlBeanConfig sqlBeanConfig);
 
 }

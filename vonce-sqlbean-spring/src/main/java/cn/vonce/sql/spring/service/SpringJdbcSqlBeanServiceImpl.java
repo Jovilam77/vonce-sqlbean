@@ -47,7 +47,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends SqlBeanProvider impleme
     @Autowired
     private SqlBeanConfig sqlBeanConfig;
 
-    public Class<?> clazz;
+    private Class<?> clazz;
 
     public SpringJdbcSqlBeanServiceImpl() {
         Type[] typeArray = new Type[]{getClass().getGenericSuperclass()};
@@ -65,6 +65,11 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends SqlBeanProvider impleme
                 }
             }
         }
+    }
+
+    @Override
+    public Class<?> getBeanClass() {
+        return clazz;
     }
 
     @Override
@@ -449,15 +454,26 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends SqlBeanProvider impleme
         if (tableService == null) {
             tableService = new TableService() {
                 @Override
-                public long dropTable() {
-                    return jdbcTemplate.update(SpringJdbcSqlBeanServiceImpl.super.dropTableSql(sqlBeanConfig, clazz));
+                public void dropTable() {
+                    jdbcTemplate.update(SpringJdbcSqlBeanServiceImpl.super.dropTableSql(clazz));
                 }
 
                 @Override
-                public long createTable() {
-                    dropTable();
-                    return jdbcTemplate.update(SpringJdbcSqlBeanServiceImpl.super.createTableSql(sqlBeanConfig, clazz));
+                public void createTable() {
+                    jdbcTemplate.update(SpringJdbcSqlBeanServiceImpl.super.createTableSql(sqlBeanConfig, clazz));
                 }
+
+                @Override
+                public void dropAndCreateTable() {
+                    dropTable();
+                    createTable();
+                }
+
+                @Override
+                public List<String> getTableList() {
+                    return jdbcTemplate.queryForList(SpringJdbcSqlBeanServiceImpl.super.selectTableListSql(sqlBeanConfig), null, String.class);
+                }
+
             };
         }
         return tableService;

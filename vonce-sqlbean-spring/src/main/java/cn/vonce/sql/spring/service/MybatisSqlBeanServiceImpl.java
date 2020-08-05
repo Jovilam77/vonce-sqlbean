@@ -42,7 +42,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
     @Autowired
     private SqlBeanConfig sqlBeanConfig;
 
-    public Class<?> clazz;
+    private Class<?> clazz;
 
     public MybatisSqlBeanServiceImpl() {
         Type[] typeArray = new Type[]{getClass().getGenericSuperclass()};
@@ -60,6 +60,11 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
                 }
             }
         }
+    }
+
+    @Override
+    public Class<?> getBeanClass() {
+        return clazz;
     }
 
     @Override
@@ -321,15 +326,26 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
         if (tableService == null) {
             tableService = new TableService() {
                 @Override
-                public long dropTable() {
-                    return mybatisSqlBeanDao.drop(sqlBeanConfig, clazz);
+                public void dropTable() {
+                    mybatisSqlBeanDao.drop(clazz);
                 }
 
                 @Override
-                public long createTable() {
-                    dropTable();
-                    return mybatisSqlBeanDao.create(sqlBeanConfig, clazz);
+                public void createTable() {
+                    mybatisSqlBeanDao.create(sqlBeanConfig, clazz);
                 }
+
+                @Override
+                public void dropAndCreateTable() {
+                    dropTable();
+                    createTable();
+                }
+
+                @Override
+                public List<String> getTableList() {
+                    return mybatisSqlBeanDao.selectTableList(sqlBeanConfig);
+                }
+
             };
         }
         return tableService;
