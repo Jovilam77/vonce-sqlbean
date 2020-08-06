@@ -11,7 +11,7 @@
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
-		<version>1.4.0.BATE</version>
+		<version>1.4.0</version>
 	</dependency>
 ###### 2：标注实体类
 ```java
