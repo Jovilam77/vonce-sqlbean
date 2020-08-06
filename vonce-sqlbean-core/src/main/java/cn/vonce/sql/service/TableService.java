@@ -32,7 +32,7 @@ public interface TableService {
     void dropAndCreateTable();
 
     /**
-     * 表是否存在
+     * 获取表名列表
      *
      * @return
      */

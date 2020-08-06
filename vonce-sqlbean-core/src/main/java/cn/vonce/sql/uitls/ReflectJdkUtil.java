@@ -63,24 +63,8 @@ public class ReflectJdkUtil extends ReflectUtil {
         if (clazz == null || name == null || name.trim().length() == 0) {
             return null;
         }
-        Object object = null;
-        try {
-            name = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
-            String methodFullName = clazz.getName() + "." + name;
-            Method method = methodMap.get(methodFullName);
-            if (method == null) {
-                method = clazz.getMethod(name);
-                methodMap.put(methodFullName, method);
-            }
-            object = method.invoke(instance);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return object;
+        name = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
+        return invoke(clazz, instance, name);
     }
 
     @Override
@@ -88,12 +72,36 @@ public class ReflectJdkUtil extends ReflectUtil {
         if (clazz == null || name == null || name.trim().length() == 0) {
             return;
         }
+        name = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
+        invoke(clazz, instance, name, value);
+    }
+
+    @Override
+    public Object invoke(Class<?> clazz, Object instance, String name) {
         try {
-            name = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
             String methodFullName = clazz.getName() + "." + name;
             Method method = methodMap.get(methodFullName);
             if (method == null) {
-                Object.class.isArray();
+                method = clazz.getMethod(name);
+                methodMap.put(methodFullName, method);
+            }
+            return method.invoke(instance);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public void invoke(Class<?> clazz, Object instance, String name, Object value) {
+        try {
+            String methodFullName = clazz.getName() + "." + name;
+            Method method = methodMap.get(methodFullName);
+            if (method == null) {
                 method = getMethod(clazz.getMethods(), name, 1);
                 methodMap.put(methodFullName, method);
             }
@@ -103,6 +111,26 @@ public class ReflectJdkUtil extends ReflectUtil {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public Object invoke(Class<?> clazz, Object instance, String name, Class<?>[] parameterTypes, Object[] values) {
+        try {
+            String methodFullName = clazz.getName() + "." + name;
+            Method method = methodMap.get(methodFullName);
+            if (method == null) {
+                method = clazz.getMethod(name, parameterTypes);
+                methodMap.put(methodFullName, method);
+            }
+            return method.invoke(instance, values);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private Method getMethod(Method[] methods, String name, int paramCount) {

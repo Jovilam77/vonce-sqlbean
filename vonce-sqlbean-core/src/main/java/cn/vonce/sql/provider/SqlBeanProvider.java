@@ -417,10 +417,6 @@ public class SqlBeanProvider {
         return "DROP TABLE IF EXISTS " + SqlBeanUtil.getTable(clazz).getName();
     }
 
-    public String existsSql(Class<?> clazz) {
-        return "SELECT COUNT(1) FROM " + SqlBeanUtil.getTable(clazz).getName();
-    }
-
     /**
      * 创建表
      *
@@ -515,6 +511,13 @@ public class SqlBeanProvider {
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
+        }
+        if (!select.getOrderBy().isEmpty()) {
+            for (Order order : select.getOrderBy()) {
+                if (StringUtil.isEmpty(order.getTableAlias())) {
+                    order.setTableAlias(select.getTable().getAlias());
+                }
+            }
         }
         return SqlHelper.buildSelectSql(select);
     }

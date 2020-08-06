@@ -122,14 +122,14 @@
 
     <artifactId>vonce-sqlbean-spring</artifactId>
     <groupId>cn.vonce</groupId>
-    <version>1.3.1</version>
+    <version>1.4.0</version>
     <packaging>jar</packaging>
 
     <!-- 版本信息 -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <vonce.common.version>1.0.5</vonce.common.version>
-        <vonce.sqlbean.core.version>0.9.0.BATE</vonce.sqlbean.core.version>
+        <vonce.common.version>1.0.6</vonce.common.version>
+        <vonce.sqlbean.core.version>1.0.0</vonce.sqlbean.core.version>
         <log4j.version>1.2.17</log4j.version>
         <slf4j.version>1.7.8</slf4j.version>
         <servlet-api.version>4.0.0</servlet-api.version>
@@ -141,7 +141,6 @@
         <mysql.version>5.1.14</mysql.version>
         <com.google.guava.version>20.0</com.google.guava.version>
         <com.esotericsoftware.version>1.11.0</com.esotericsoftware.version>
-        <com.squareup.javapoet.version>1.12.1</com.squareup.javapoet.version>
         <dom4j>1.6.1</dom4j>
         <junit>4.12</junit>
     </properties>
@@ -226,12 +225,6 @@
             <groupId>com.esotericsoftware</groupId>
             <artifactId>reflectasm</artifactId>
             <version>${com.esotericsoftware.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.squareup</groupId>
-            <artifactId>javapoet</artifactId>
-            <version>${com.squareup.javapoet.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

@@ -43,6 +43,20 @@ public class ReflectAsmUtil extends ReflectUtil {
             return null;
         }
         name = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
+        return this.invoke(clazz, instance, name);
+    }
+
+    @Override
+    public void set(Class<?> clazz, Object instance, String name, Object value) {
+        if (clazz == null || name == null || name.trim().length() == 0) {
+            return;
+        }
+        name = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
+        this.invoke(clazz, instance, name, value);
+    }
+
+    @Override
+    public Object invoke(Class<?> clazz, Object instance, String name) {
         MethodAccess methodAccess = methodAccessMap.get(clazz);
         if (methodAccess == null) {
             methodAccess = MethodAccess.get(clazz);
@@ -52,17 +66,23 @@ public class ReflectAsmUtil extends ReflectUtil {
     }
 
     @Override
-    public void set(Class<?> clazz, Object instance, String name, Object value) {
-        if (clazz == null || name == null || name.trim().length() == 0) {
-            return;
-        }
-        name = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
+    public void invoke(Class<?> clazz, Object instance, String name, Object value) {
         MethodAccess methodAccess = methodAccessMap.get(clazz);
         if (methodAccess == null) {
             methodAccess = MethodAccess.get(clazz);
             methodAccessMap.put(clazz, methodAccess);
         }
         methodAccess.invoke(instance, name, value);
+    }
+
+    @Override
+    public Object invoke(Class<?> clazz, Object instance, String name, Class<?>[] parameterTypes, Object[] values) {
+        MethodAccess methodAccess = methodAccessMap.get(clazz);
+        if (methodAccess == null) {
+            methodAccess = MethodAccess.get(clazz);
+            methodAccessMap.put(clazz, methodAccess);
+        }
+        return methodAccess.invoke(instance, name, parameterTypes, values);
     }
 
 }

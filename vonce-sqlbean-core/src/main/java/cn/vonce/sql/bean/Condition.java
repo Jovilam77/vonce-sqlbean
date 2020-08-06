@@ -1,7 +1,9 @@
 package cn.vonce.sql.bean;
 
+import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.SqlLogic;
 import cn.vonce.sql.enumerate.SqlOperator;
+import cn.vonce.sql.helper.SqlHelper;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
 
@@ -172,6 +174,13 @@ public class Condition extends Common {
      * @return
      */
     public Condition where(SqlLogic sqlLogic, String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
+        if (value instanceof Select) {
+            if (sqlOperator == SqlOperator.IN || sqlOperator == SqlOperator.NOT_IN) {
+                value = new Original(SqlHelper.buildSelectSql((Select) value));
+            } else {
+                value = new Original(SqlHelperCons.BEGIN_BRACKET + SqlHelper.buildSelectSql((Select) value) + SqlHelperCons.END_BRACKET);
+            }
+        }
         whereMap.put(tableAlias + field, new ConditionInfo(sqlLogic, schema, tableAlias, field, value, sqlOperator));
         return this;
     }

@@ -4,6 +4,7 @@ import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.enumerate.SqlLogic;
 import cn.vonce.sql.enumerate.SqlOperator;
 import cn.vonce.sql.enumerate.SqlSort;
+import cn.vonce.sql.helper.SqlHelper;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
 
@@ -124,6 +125,17 @@ public class Select extends SpecialCondition implements Serializable {
      */
     public Select column(String columnName, String columnAlias) {
         return column("", "", columnName, columnAlias);
+    }
+
+    /**
+     * 添加column列字段
+     *
+     * @param select      子Sql
+     * @param columnAlias 别名
+     * @return
+     */
+    public Select column(Select select, String columnAlias) {
+        return column(SqlHelper.buildSelectSql(select), columnAlias);
     }
 
     /**

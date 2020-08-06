@@ -16,6 +16,12 @@ public abstract class ReflectUtil {
 
     public abstract void set(Class<?> clazz, Object instance, String name, Object value);
 
+    public abstract Object invoke(Class<?> clazz, Object instance, String name);
+
+    public abstract void invoke(Class<?> clazz, Object instance, String name, Object value);
+
+    public abstract Object invoke(Class<?> clazz, Object instance, String name, Class<?>[] parameterTypes, Object[] values);
+
     private static ReflectUtil reflectUtil;
 
     public static ReflectUtil instance() {

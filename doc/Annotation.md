@@ -1,19 +1,17 @@
-
 ```java
-@SqlConstant     //标识该数据库实体类生成Sql常量类
-```
-
-```java
-@SqlTable     //标识表名
+1：@SqlTable     //标识表名
 ```
 属性  | 解释  | 默认 | 必须
  :----: | :-----: | :-----: | :------:  
+ autoCreate  | 如果表不存在则自动创建表（SqlBeanConfig中含有总开关，默认开启） | true | 否
+ generate  | 生成实体类生成对应表的字段常量 | true | 否
+ isView  | 是否为视图 | false | 否
  value  | 表名 |  | 是
  alias  | 别名 | "" | 否
  schema  | schema | "" | 否
 
 ```java
-@SqlId     //标识id，目前仅支持UUID, SNOWFLAKE_ID_16, SNOWFLAKE_ID_18，请查看GenerateType枚举类
+2：@SqlId     //标识id，目前仅支持UUID, SNOWFLAKE_ID_16, SNOWFLAKE_ID_18，请查看GenerateType枚举类
 ```
 
 属性  | 解释  | 默认 | 必须
@@ -21,20 +19,25 @@
  generateType  | 生成类型 | GenerateType.NORMAL | 否
 
 ```java
-@SqlColumn     //标识字段名
+3：@SqlColumn     //标识字段名
 ```
 
 属性  | 解释  | 默认 | 必须
  :----: | :-----: | :-----: | :------: 
  value  | 表列字段名 |  | 是
+ notNull  | 不是null(创建表使用) | false | 否
+ type  | 类型(创建表使用) | JdbcType.NULL | 否
+ length  | 长度(创建表使用) | 0 | 否
+ decimal  | 小数点(创建表使用) | 0 | 否
+ def  | 默认值(创建表使用) | "" | 否
  ignore  | 是否忽略该字段 | false | 否
 
 ```java
-@SqlUnion     //标识表连接并继承于某个实体类（主表）
+4：@SqlUnion     //标识表连接并继承于某个实体类（主表）
 ```
 
 ```java
-@SqlJoin       //标识表连接
+5：@SqlJoin       //标识表连接
 ```
 
 属性  | 解释  | 默认 | 必须
@@ -50,15 +53,15 @@
 
 
 ```java
-@SqlVersion   //标识乐观锁版本，仅支持int、long、Date、Timestamp类型
+6：@SqlVersion   //标识乐观锁版本，仅支持int、long、Date、Timestamp类型
 ```
 
 ```java
-@SqlLogically //标识逻辑删除，请配合logicallyDeleteById、logicallyDeleteByCondition这两个方法使用，请查看内置Delete文档
+7：@SqlLogically //标识逻辑删除，请配合logicallyDeleteById、logicallyDeleteByCondition这两个方法使用，请查看内置Delete文档
 ```
 
 
-#### 单表用法
+#### 示例：单表用法（该例子已包含表生成、常量生成、id生成、乐观锁）
 ```java
 @SqlConstant //生成Sql常量
 @SqlTable("d_essay") //表名
@@ -93,7 +96,7 @@ public class Essay {
 }
 ```
 
-#### 生成的Sql常量（maven编译之后自动生成，命名为Sql + 实体类名）
+#### 示例：生成的Sql常量（maven编译之后自动生成，命名为Sql + 实体类名）
 ```java
 package com.xxx.xxx.model.sql;
 
@@ -126,7 +129,7 @@ public class SqlEssay {
   public static final Column version = new Column(_schema,_tableAlias,"version","");
 }
 ```
-#### 主外键联表查询的用法
+#### 示例：主外键联表查询的用法
 ```java
 @SqlUnion//标识该类是个包装类并继承于某个实体类（主表）
 public class EssayUnion extends Essay {
@@ -141,7 +144,7 @@ public class EssayUnion extends Essay {
 
 }
 ```
-#### 指定某字段关联查询的用法
+#### 示例：指定某字段关联查询的用法
 ```java
 @SqlUnion//标识该类是个包装类并继承于某个实体类（主表）
 public class EssayUnion extends Essay {
@@ -157,7 +160,7 @@ public class EssayUnion extends Essay {
 
 }
 ```
-#### 关联不同字段查询多个字段的用法
+#### 示例：关联不同字段查询多个字段的用法
 ```java
 @SqlUnion//标识该类是个包装类并继承于某个实体类（主表），该例子连表查询了两个用户信息，所以需要使用表别名
 public class EssayUnion extends Essay {

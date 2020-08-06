@@ -2,7 +2,7 @@
 #### 介绍
 ###### 这是一款使用Java面向对象思想来编写并生成Sql语句的工具，并在此基础上同时对Mybatis和Spring Jdbc实现了类似于JPA的轻量级插件支持。插件中内置大量常用Sql执行的方法，目的是为了提高开发效率，减少大量的Sql语句编写，让开发者更专注于业务代码的编写。
 
-###### 特点：零配置，连表查询，乐观锁，分页，支持Mybatis、Spring Jdbc
+###### 特点：零配置，自动建表，连表查询，乐观锁，分页，支持Mybatis、Spring Jdbc
 ###### 环境：JDK7+，Mybatis3.2.4+，(Spring MVC 4.1.2+ 或 Spring Boot 1x 或 Spring Boot 2x)
 ###### 数据库：Mysql，MariaDB，Oracle，Sqlserver2008+，PostgreSQL，DB2，Derby，Sqlite，HSQL，H2
 
@@ -10,12 +10,11 @@
 ###### 1：引入Maven依赖
 	<dependency>
 		<groupId>cn.vonce</groupId>
-		<artifactId>vonce-sqlbean</artifactId>
-		<version>1.3.0</version>
+		<artifactId>vonce-sqlbean-spring</artifactId>
+		<version>1.4.0.BATE</version>
 	</dependency>
 ###### 2：标注实体类
 ```java
-@SqlConstant //标识该数据库实体类生成Sql常量类
 @SqlTable("d_essay")
 public class Essay {
 
@@ -152,12 +151,14 @@ public class EssayController {
 
 ##### ↓更多用法请查看下方文档↓
 
-#### [注解与用法（含ID生成、乐观锁、逻辑删除、连表查询）](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Annotation.md "注解与用法（含ID生成、乐观锁、逻辑删除、连表查询）")
+#### [注解与用法（含ID生成、表生成、乐观锁、逻辑删除、连表查询）](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Annotation.md "注解与用法（含ID生成、乐观锁、逻辑删除、连表查询）")
 #### [内置Select相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Select.md "内置Select相关方法")
 #### [内置Insert相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Insert.md "内置Insert相关方法")
 #### [内置Delete相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Delete.md "内置Delete相关方法")
 #### [内置Update相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Update.md "内置Update相关方法")
+#### [表结构操作相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Table.md "表结构操作相关方法")
 #### [Service接口和实现类](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Interface.md "Service接口和实现类")
 #### [SqlBean和SqlHelper](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/SqlHelper.md "SqlBean和SqlHelper")
 #### [Where条件和占位符](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Where.md "Where条件和占位符")
 #### [分页查询](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Paging.md "分页查询")
+#### [SqlBeanConfig配置](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/SqlBeanConfig.md "SqlBeanConfig配置")
