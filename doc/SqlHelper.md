@@ -17,12 +17,9 @@
 ```java
     //在项目启动时会自动配置为你配置好SqlBeanConfig，
 	//所以在项目中如需生成Sql语句可通过自动注入即可。
-	//@Autowired
-    //private SqlBeanConfig sqlBeanConfig;
 	
-    SqlBeanConfig sqlBeanConfig = new SqlBeanConfig();
-    sqlBeanConfig.setDbType(DbType.MySQL);
-    sqlBeanConfig.setToUpperCase(false);
+	@Autowired
+    private SqlBeanConfig sqlBeanConfig;
 ```
 
 ## SqlBean - Select
