@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
- * RequestPageHelper
+ * ReqPageHelper
  *
  * @author Jovi
  * @version 1.0

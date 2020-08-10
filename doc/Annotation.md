@@ -63,7 +63,6 @@
 
 #### 示例：单表用法（该例子已包含表生成、常量生成、id生成、乐观锁）
 ```java
-@SqlConstant //生成Sql常量
 @SqlTable("d_essay") //表名
 public class Essay {
 

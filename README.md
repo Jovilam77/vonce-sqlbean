@@ -6,6 +6,9 @@
 ###### 环境：JDK7+，Mybatis3.2.4+，(Spring MVC 4.1.2+ 或 Spring Boot 1x 或 Spring Boot 2x)
 ###### 数据库：Mysql，MariaDB，Oracle，Sqlserver2008+，PostgreSQL，DB2，Derby，Sqlite，HSQL，H2
 
+###### Sqlbean For Android请移步这里👉 [gitee](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")， [github](https://github.com/Jovilam77/vonce-sqlbean-android "vonce-sqlbean-android")
+
+
 #### 简单上手
 ###### 1：引入Maven依赖
 	<dependency>
@@ -101,8 +104,8 @@ public class EssayController {
 	public RS getList(HttpServletRequest request) {
 		// 查询对象
 	//Select select = new Select();
-	// 分页助手
-	//PageHelper<Essay> pageHelper = new PageHelper<>(request);
+	// 分页助手PageHelper
+	//ReqPageHelper<Essay> pageHelper = new ReqPageHelper<>(request);
 	// 分页查询
 	//pageHelper.paging(select, essayService);
 	// 返回结果
