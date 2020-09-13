@@ -3,6 +3,7 @@ package cn.vonce.sql.spring.config;
 import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanConfig;
+import cn.vonce.sql.service.SqlBeanService;
 import cn.vonce.sql.spring.service.MybatisSqlBeanServiceImpl;
 import cn.vonce.sql.spring.service.SpringJdbcSqlBeanServiceImpl;
 import cn.vonce.sql.uitls.SqlBeanUtil;
@@ -18,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * 自动创建表监听类
+ *
  * @author Jovi
  * @version 1.0
  * @email imjovi@qq.com
@@ -35,13 +38,12 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
     public void onApplicationEvent(ContextRefreshedEvent evt) {
         if (evt.getApplicationContext().getParent() == null && sqlBeanConfig.getAutoCreate()) {
             List<String> beanNameList = new ArrayList<>();
-            beanNameList.addAll(Arrays.asList(evt.getApplicationContext().getBeanNamesForType(MybatisSqlBeanServiceImpl.class)));
-            beanNameList.addAll(Arrays.asList(evt.getApplicationContext().getBeanNamesForType(SpringJdbcSqlBeanServiceImpl.class)));
+            beanNameList.addAll(Arrays.asList(evt.getApplicationContext().getBeanNamesForType(SqlBeanService.class)));
             if (!beanNameList.isEmpty()) {
-                List<String> tableList = evt.getApplicationContext().getBean(beanNameList.get(0), MybatisSqlBeanServiceImpl.class).getTableService().getTableList();
+                List<String> tableList = evt.getApplicationContext().getBean(beanNameList.get(0), SqlBeanService.class).getTableService().getTableList();
                 for (String name : beanNameList) {
-                    MybatisSqlBeanServiceImpl mybatisSqlBeanService = evt.getApplicationContext().getBean(name, MybatisSqlBeanServiceImpl.class);
-                    Class<?> clazz = mybatisSqlBeanService.getBeanClass();
+                    SqlBeanService sqlBeanService = evt.getApplicationContext().getBean(name, SqlBeanService.class);
+                    Class<?> clazz = sqlBeanService.getBeanClass();
                     if (clazz == null) {
                         continue;
                     }
@@ -51,7 +53,7 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                         if (tableList.contains(table.getName()) || tableList.contains(table.getName().toUpperCase()) || tableList.contains(table.getName().toLowerCase())) {
                             continue;
                         }
-                        mybatisSqlBeanService.getTableService().createTable();
+                        sqlBeanService.getTableService().createTable();
                         logger.info("-----'{}'表不存在，已为你自动创建-----", table.getName());
                     }
                 }
