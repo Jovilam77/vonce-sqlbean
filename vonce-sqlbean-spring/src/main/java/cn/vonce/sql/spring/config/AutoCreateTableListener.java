@@ -46,10 +46,12 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                         continue;
                     }
                     SqlTable sqlTable = clazz.getAnnotation(SqlTable.class);
-                    if (sqlTable != null && !sqlTable.isView() && sqlTable.autoCreate() && tableList != null && !tableList.isEmpty()) {
+                    if (sqlTable != null && !sqlTable.isView() && sqlTable.autoCreate()) {
                         Table table = SqlBeanUtil.getTable(clazz);
-                        if (tableList.contains(table.getName()) || tableList.contains(table.getName().toUpperCase()) || tableList.contains(table.getName().toLowerCase())) {
-                            continue;
+                        if (tableList != null && !tableList.isEmpty()) {
+                            if (tableList.contains(table.getName()) || tableList.contains(table.getName().toUpperCase()) || tableList.contains(table.getName().toLowerCase())) {
+                                continue;
+                            }
                         }
                         sqlBeanService.getTableService().createTable();
                         logger.info("-----'{}'表不存在，已为你自动创建-----", table.getName());

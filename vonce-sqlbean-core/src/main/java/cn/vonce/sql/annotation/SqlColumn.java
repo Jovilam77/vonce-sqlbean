@@ -26,7 +26,7 @@ public @interface SqlColumn {
     String value();
 
     /**
-     * 不是null
+     * 不能是null
      *
      * @return
      */

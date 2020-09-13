@@ -208,6 +208,7 @@ public class SqlHelper {
         sqlSb.append(SqlHelperCons.BEGIN_BRACKET);
         Field idField = null;
         Field[] fields = create.getBeanClass().getDeclaredFields();
+        String transferred = SqlBeanUtil.getTransferred(create);
         for (Field field : fields) {
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
@@ -223,7 +224,9 @@ public class SqlHelper {
             if (sqlColumn != null) {
                 columnName = sqlColumn.value();
             }
+            sqlSb.append(transferred);
             sqlSb.append(columnName);
+            sqlSb.append(transferred);
             sqlSb.append(SqlHelperCons.SPACES);
             sqlSb.append(columnInfo.getType().name());
             sqlSb.append(SqlHelperCons.BEGIN_BRACKET);
@@ -268,28 +271,29 @@ public class SqlHelper {
      */
     private static ColumnInfo getColumnInfo(DbType dbType, Class<?> clazz, SqlColumn sqlColumn) {
         ColumnInfo columnInfo = new ColumnInfo();
-        columnInfo.setNotNull(sqlColumn.notNull());
-        if (sqlColumn.type() != JdbcType.NULL) {
+        if (sqlColumn != null && sqlColumn.type() != JdbcType.NULL) {
             columnInfo.setType(sqlColumn.type());
+            columnInfo.setNotNull(sqlColumn.notNull());
         } else {
             if (dbType == DbType.SQLite) {
                 columnInfo.setType(JdbcType.getType(SQLiteJavaType.getType(clazz).name()));
             } else {
                 columnInfo.setType(JdbcType.getType(JavaType.getType(clazz).name()));
             }
+            columnInfo.setNotNull(false);
         }
-        if (sqlColumn.length() != 0) {
+        if (sqlColumn != null && sqlColumn.length() != 0) {
             columnInfo.setLength(sqlColumn.length());
             columnInfo.setDecimal(sqlColumn.decimal());
         } else {
             columnInfo.setLength(columnInfo.getType().getLength());
         }
-        if (sqlColumn.decimal() != 0) {
+        if (sqlColumn != null && sqlColumn.decimal() != 0) {
             columnInfo.setDecimal(sqlColumn.decimal());
         } else {
             columnInfo.setDecimal(columnInfo.getType().getDecimal());
         }
-        if (StringUtil.isNotEmpty(sqlColumn.def())) {
+        if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.def())) {
             columnInfo.setDef(sqlColumn.def());
         }
         return columnInfo;
