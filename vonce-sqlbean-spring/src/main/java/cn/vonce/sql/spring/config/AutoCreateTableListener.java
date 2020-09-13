@@ -4,8 +4,6 @@ import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.service.SqlBeanService;
-import cn.vonce.sql.spring.service.MybatisSqlBeanServiceImpl;
-import cn.vonce.sql.spring.service.SpringJdbcSqlBeanServiceImpl;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
