@@ -142,7 +142,7 @@
         <com.google.guava.version>20.0</com.google.guava.version>
         <com.esotericsoftware.version>1.11.0</com.esotericsoftware.version>
         <dom4j>1.6.1</dom4j>
-        <junit>4.12</junit>
+        <junit>4.13.1</junit>
     </properties>
 
     <dependencies>
