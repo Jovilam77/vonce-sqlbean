@@ -2,6 +2,13 @@ package cn.vonce.sql.enumerate;
 
 import java.math.BigDecimal;
 
+/**
+ * Java类型对于的SQLite类型枚举类
+ *
+ * @author Jovi
+ * @version 1.0
+ * @email 766255988@qq.com
+ */
 public enum SQLiteJavaType {
 
     NULL(new Class[]{}),

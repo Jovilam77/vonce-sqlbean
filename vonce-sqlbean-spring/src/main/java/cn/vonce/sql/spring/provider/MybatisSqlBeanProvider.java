@@ -1,9 +1,6 @@
 package cn.vonce.sql.spring.provider;
 
-import cn.vonce.sql.bean.Delete;
-import cn.vonce.sql.bean.Paging;
-import cn.vonce.sql.bean.Select;
-import cn.vonce.sql.bean.Update;
+import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.provider.SqlBeanProvider;
 
@@ -265,6 +262,26 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      */
     public String selectTableList(Map<String, Object> map) {
         return super.selectTableListSql((SqlBeanConfig) map.get("sqlBeanConfig"));
+    }
+
+    /**
+     * 备份表和数据
+     *
+     * @param map
+     * @return
+     */
+    public String backup(Map<String, Object> map) {
+        return super.backupSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), (String) map.get("targetTableName"), (Column[]) map.get("columns"), (Condition) map.get("condition"));
+    }
+
+    /**
+     * 复制数据到指定表
+     *
+     * @param map
+     * @return
+     */
+    public String copy(Map<String, Object> map) {
+        return super.copySql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), (String) map.get("targetTableName"), (Column[]) map.get("columns"), (Condition) map.get("condition"));
     }
 
 }

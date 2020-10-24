@@ -1,5 +1,12 @@
 package cn.vonce.sql.enumerate;
 
+/**
+ * JdbcType枚举类
+ *
+ * @author Jovi
+ * @version 1.0
+ * @email 766255988@qq.com
+ */
 public enum JdbcType {
 
     NULL(0, 0, 0),

@@ -2,6 +2,13 @@ package cn.vonce.sql.enumerate;
 
 import java.math.BigDecimal;
 
+/**
+ * Java类型对于的SQL类型枚举类
+ *
+ * @author Jovi
+ * @version 1.0
+ * @email 766255988@qq.com
+ */
 public enum JavaType {
 
     INTEGER(new Class[]{int.class, Integer.class}),

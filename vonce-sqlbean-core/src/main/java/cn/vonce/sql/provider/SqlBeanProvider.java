@@ -7,11 +7,13 @@ import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.SqlOperator;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.SqlHelper;
+import cn.vonce.sql.uitls.DateUtil;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
 import java.lang.reflect.Field;
+import java.util.Date;
 
 /**
  * 通用的数据库操作sql语句生成
@@ -116,7 +118,7 @@ public class SqlBeanProvider {
         if (select.getColumnList().isEmpty()) {
             try {
                 select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
-                if (select.getPage() != null && select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
+                if (select.getPage() != null && select.getSqlBeanConfig().getDbType() == DbType.SQLServer) {
                     select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)));
                 }
             } catch (SqlBeanException e) {
@@ -442,7 +444,7 @@ public class SqlBeanProvider {
             case MySQL:
             case MariaDB:
                 return "select table_name as `name` from information_schema.tables where table_schema = database() and table_type = 'BASE TABLE'";
-            case SQLServer2008:
+            case SQLServer:
                 return "select name from sysobjects where xtype='U'";
             case Oracle:
                 return "select table_name as \"name\" from user_tables";
@@ -462,6 +464,97 @@ public class SqlBeanProvider {
             default:
                 throw new SqlBeanException("请配置正确的数据库");
         }
+    }
+
+    /**
+     * 备份表和数据
+     *
+     * @param sqlBeanConfig
+     * @param clazz
+     * @param targetTableName
+     * @param columns
+     * @param condition
+     * @return
+     */
+    public String backupSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String targetTableName, Column[] columns, Condition condition) {
+        StringBuffer backupSql = new StringBuffer();
+        String tableName = SqlBeanUtil.getTable(clazz).getName();
+        //非SQLServer、PostgreSQL数据库则使用：create table A as select * from B
+        if (DbType.SQLServer != sqlBeanConfig.getDbType() && DbType.PostgreSQL != sqlBeanConfig.getDbType()) {
+            backupSql.append(SqlHelperCons.CREATE_TABLE);
+            backupSql.append(targetTableName);
+            backupSql.append(SqlHelperCons.SPACES);
+            backupSql.append(SqlHelperCons.AS);
+        }
+        backupSql.append(SqlHelperCons.SELECT);
+        if (columns != null && columns.length > 0) {
+            for (Column column : columns) {
+                backupSql.append(column.getName());
+                backupSql.append(SqlHelperCons.COMMA);
+            }
+            backupSql.delete(backupSql.length() - SqlHelperCons.COMMA.length(), backupSql.length());
+        } else {
+            backupSql.append(SqlHelperCons.ALL);
+        }
+        //如果是SQLServer、PostgreSQL数据库则需要拼接INTO：select * into A from B
+        if (DbType.SQLServer == sqlBeanConfig.getDbType() || DbType.PostgreSQL == sqlBeanConfig.getDbType()) {
+            backupSql.append(SqlHelperCons.INTO);
+            backupSql.append(targetTableName);
+        }
+        backupSql.append(SqlHelperCons.FROM);
+        backupSql.append(tableName);
+        //如果是Derby数据库，仅支持创建表结构，其他数据库则可通过条件备份数据和是否需要数据
+        if (DbType.Derby == sqlBeanConfig.getDbType()) {
+            backupSql.append(" WITH NO DATA");
+        } else {
+            if (condition != null) {
+                condition.setSqlBeanConfig(sqlBeanConfig);
+                backupSql.append(SqlHelper.whereSql(condition, null));
+            }
+        }
+        return backupSql.toString();
+    }
+
+    /**
+     * 复制数据到指定表
+     *
+     * @param sqlBeanConfig
+     * @param clazz
+     * @param targetTableName
+     * @param columns
+     * @param condition
+     * @return
+     */
+    public String copySql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String targetTableName, Column[] columns, Condition condition) {
+        StringBuffer copySql = new StringBuffer();
+        StringBuffer columnSql = new StringBuffer();
+        copySql.append(SqlHelperCons.INSERT_INTO);
+        copySql.append(targetTableName);
+        if (columns != null && columns.length > 0) {
+            for (Column column : columns) {
+                columnSql.append(column.getName());
+                columnSql.append(SqlHelperCons.COMMA);
+            }
+            columnSql.delete(columnSql.length() - SqlHelperCons.COMMA.length(), columnSql.length());
+            copySql.append(SqlHelperCons.SPACES);
+            copySql.append(SqlHelperCons.BEGIN_BRACKET);
+            copySql.append(columnSql);
+            copySql.append(SqlHelperCons.END_BRACKET);
+        }
+        copySql.append(SqlHelperCons.SPACES);
+        copySql.append(SqlHelperCons.SELECT);
+        if (columns != null && columns.length > 0) {
+            copySql.append(columnSql);
+        } else {
+            copySql.append(SqlHelperCons.ALL);
+        }
+        copySql.append(SqlHelperCons.FROM);
+        copySql.append(SqlBeanUtil.getTable(clazz).getName());
+        if (condition != null) {
+            condition.setSqlBeanConfig(sqlBeanConfig);
+            copySql.append(SqlHelper.whereSql(condition, null));
+        }
+        return copySql.toString();
     }
 
     /**
@@ -568,7 +661,7 @@ public class SqlBeanProvider {
      */
     private void setPaging(Select select, Paging paging, Class<?> clazz) {
         if (paging != null) {
-            if (select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
+            if (select.getSqlBeanConfig().getDbType() == DbType.SQLServer) {
                 try {
                     select.setPage(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)), paging.getPagenum(), paging.getPagesize());
                 } catch (SqlBeanException e) {

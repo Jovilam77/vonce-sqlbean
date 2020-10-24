@@ -39,7 +39,7 @@ public class AutoConfig {
     @Bean
     @ConditionalOnUseSqlServer
     public SqlBeanConfig sqlServerConfig() {
-        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.SQLServer2008);
+        SqlBeanConfig sqlBeanConfig = new SqlBeanConfig(DbType.SQLServer);
         return sqlBeanConfig;
     }
 

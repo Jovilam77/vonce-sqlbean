@@ -63,7 +63,7 @@ public class SqlHelper {
         Integer[] pageParam = null;
         String orderSql = orderBySql(select);
         //SQLServer2008 分页处理
-        if (select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
+        if (select.getSqlBeanConfig().getDbType() == DbType.SQLServer) {
             if (SqlBeanUtil.isUsePage(select)) {
                 pageParam = pageParam(select);
                 sqlSb.append(SqlHelperCons.SELECT);
@@ -75,7 +75,7 @@ public class SqlHelper {
         //标准Sql
         sqlSb.append(select.isUseDistinct() ? SqlHelperCons.SELECT_DISTINCT : SqlHelperCons.SELECT);
         //SqlServer 分页处理
-        if (select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
+        if (select.getSqlBeanConfig().getDbType() == DbType.SQLServer) {
             if (SqlBeanUtil.isUsePage(select)) {
                 sqlSb.append(SqlHelperCons.TOP);
                 sqlSb.append(pageParam[0]);
@@ -95,7 +95,7 @@ public class SqlHelper {
             sqlSb.append(orderSql);
         }
         //SQLServer2008 分页处理
-        if (select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
+        if (select.getSqlBeanConfig().getDbType() == DbType.SQLServer) {
             // 主要逻辑 结束
             if (SqlBeanUtil.isUsePage(select)) {
                 sqlSb.append(SqlHelperCons.END_BRACKET);
@@ -628,7 +628,7 @@ public class SqlHelper {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private static String whereSql(Condition condition, Object bean) {
+    public static String whereSql(Condition condition, Object bean) {
         return conditionHandle(ConditionType.WHERE, condition, condition.getWhere(), condition.getAgrs(), bean, condition.getWhereMap());
     }
 
@@ -697,7 +697,7 @@ public class SqlHelper {
             }
             groupByAndOrderBySql.deleteCharAt(groupByAndOrderBySql.length() - SqlHelperCons.COMMA.length());
         } else {
-            if (SqlHelperCons.ORDER_BY.equals(type) && select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008 && SqlBeanUtil.isUsePage(select) && !SqlBeanUtil.isCount(select)) {
+            if (SqlHelperCons.ORDER_BY.equals(type) && select.getSqlBeanConfig().getDbType() == DbType.SQLServer && SqlBeanUtil.isUsePage(select) && !SqlBeanUtil.isCount(select)) {
                 groupByAndOrderBySql.append(type);
                 String tableFieldFullName = SqlBeanUtil.getTableFieldFullName(select, select.getTable().getSchema(), select.getTable().getAlias(), select.getPage().getIdName());
                 groupByAndOrderBySql.append(SqlBeanUtil.isToUpperCase(select) ? tableFieldFullName.toUpperCase() : tableFieldFullName);
@@ -1077,7 +1077,7 @@ public class SqlHelper {
     public static Integer[] pageParam(Select select) {
         Integer[] param;
         //SQLServer2008
-        if (DbType.SQLServer2008 == select.getSqlBeanConfig().getDbType()) {
+        if (DbType.SQLServer == select.getSqlBeanConfig().getDbType()) {
             int top = (select.getPage().getPagenum() + 1) * select.getPage().getPagesize();
             int begin = top - select.getPage().getPagesize();
             param = new Integer[]{top, begin};

@@ -405,4 +405,30 @@ public interface MybatisSqlBeanDao<T> {
     @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectTableList")
     List<String> selectTableList(@Param("sqlBeanConfig") SqlBeanConfig sqlBeanConfig);
 
+    /**
+     * 备份表和数据
+     *
+     * @param sqlBeanConfig
+     * @param clazz
+     * @param targetTableName
+     * @param columns
+     * @param condition
+     * @return
+     */
+    @InsertProvider(type = MybatisSqlBeanProvider.class, method = "backup")
+    long backup(@Param("sqlBeanConfig") SqlBeanConfig sqlBeanConfig, @Param("clazz") Class<?> clazz, @Param("targetTableName") String targetTableName, @Param("columns") Column[] columns, @Param("condition") Condition condition);
+
+    /**
+     * 复制数据到指定表
+     *
+     * @param sqlBeanConfig
+     * @param clazz
+     * @param targetTableName
+     * @param columns
+     * @param condition
+     * @return
+     */
+    @InsertProvider(type = MybatisSqlBeanProvider.class, method = "copy")
+    long copy(@Param("sqlBeanConfig") SqlBeanConfig sqlBeanConfig, @Param("clazz") Class<?> clazz, @Param("targetTableName") String targetTableName, @Param("columns") Column[] columns, @Param("condition") Condition condition);
+
 }

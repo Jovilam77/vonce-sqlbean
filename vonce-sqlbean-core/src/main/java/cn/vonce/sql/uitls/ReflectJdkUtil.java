@@ -18,8 +18,7 @@ public class ReflectJdkUtil extends ReflectUtil {
 
     private final Map<String, Method> methodMap = new WeakHashMap<>();
     private final Map<Class<?>, Constructor> constructorMap = new WeakHashMap<>();
-
-    private static ReflectJdkUtil reflectJdkUtil;
+    private static volatile ReflectJdkUtil reflectJdkUtil;
 
     private ReflectJdkUtil() {
 

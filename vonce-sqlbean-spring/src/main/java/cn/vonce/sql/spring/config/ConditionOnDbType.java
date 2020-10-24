@@ -60,7 +60,7 @@ public class ConditionOnDbType implements Condition {
                 return true;
             } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseOracle.class.getName()) && DbType.Oracle == getDbType(driverClassName)) {
                 return true;
-            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseSqlServer.class.getName()) && DbType.SQLServer2008 == getDbType(driverClassName)) {
+            } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUseSqlServer.class.getName()) && DbType.SQLServer == getDbType(driverClassName)) {
                 return true;
             } else if (annotatedTypeMetadata.isAnnotated(ConditionalOnUsePostgreSql.class.getName()) && DbType.PostgreSQL == getDbType(driverClassName)) {
                 return true;
@@ -339,7 +339,7 @@ public class ConditionOnDbType implements Condition {
         } else if ("oracle.jdbc.driver.OracleDriver".equals(driverClassName)) {
             return DbType.Oracle;
         } else if ("com.microsoft.sqlserver.jdbc.SQLServerDriver".equals(driverClassName)) {
-            return DbType.SQLServer2008;
+            return DbType.SQLServer;
         } else if ("org.postgresql.Driver".equals(driverClassName)) {
             return DbType.PostgreSQL;
         } else if ("com.ibm.db2.jcc.DB2Driver".equals(driverClassName)) {
