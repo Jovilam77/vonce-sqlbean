@@ -26,7 +26,6 @@ import java.util.*;
  * @date 2018年5月15日上午9:21:48
  */
 @Intercepts(@Signature(method = "handleResultSets", type = ResultSetHandler.class, args = {Statement.class}))
-@Component
 public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements Interceptor {
 
     private Logger logger = LoggerFactory.getLogger(MybatisSqlBeanMapperInterceptor.class);

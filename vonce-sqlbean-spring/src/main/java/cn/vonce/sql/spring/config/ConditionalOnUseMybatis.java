@@ -17,15 +17,15 @@ public class ConditionalOnUseMybatis implements Condition {
 
     @Override
     public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
-        try {
-            String[] beanName = conditionContext.getBeanFactory().getBeanNamesForType(MybatisSqlBeanMapperInterceptor.class);
-            if (beanName == null || beanName.length == 0) {
+        String[] beanName = conditionContext.getBeanFactory().getBeanNamesForType(MybatisSqlBeanMapperInterceptor.class);
+        if (beanName == null || beanName.length == 0) {
+            try {
                 Class.forName("org.apache.ibatis.plugin.Interceptor");
                 return true;
+            } catch (ClassNotFoundException e) {
+                return false;
             }
-        } catch (ClassNotFoundException e) {
-            return false;
         }
-        return false;
+        return true;
     }
 }

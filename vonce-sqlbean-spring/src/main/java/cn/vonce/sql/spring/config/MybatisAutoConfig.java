@@ -4,6 +4,8 @@ import cn.vonce.sql.spring.mapper.MybatisSqlBeanMapperInterceptor;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +22,8 @@ import java.util.List;
  * @date 2019/8/21 13:05
  */
 public class MybatisAutoConfig extends AutoConfig {
+
+    private Logger logger = LoggerFactory.getLogger(MybatisAutoConfig.class);
 
     /**
      * Spring mvc模式使用，Spring boot为空
@@ -41,6 +45,7 @@ public class MybatisAutoConfig extends AutoConfig {
             try {
                 sqlSessionFactory = beanFactory.getBean(SqlSessionFactory.class);
             } catch (Exception e) {
+                logger.error("MybatisAutoConfig：{}", e.getMessage());
             }
         }
         if (sqlSessionFactory != null) {
