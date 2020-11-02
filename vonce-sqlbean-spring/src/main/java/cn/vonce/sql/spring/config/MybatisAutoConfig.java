@@ -21,7 +21,7 @@ import java.util.List;
  * @email imjovi@qq.com
  * @date 2019/8/21 13:05
  */
-public class MybatisAutoConfig extends AutoConfig {
+public class MybatisAutoConfig {
 
     private Logger logger = LoggerFactory.getLogger(MybatisAutoConfig.class);
 

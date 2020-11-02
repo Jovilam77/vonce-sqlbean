@@ -17,7 +17,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import({MybatisAutoConfig.class, AutoCreateTableListener.class})
+@Import({MybatisAutoConfig.class/*, AutoCreateTableListener.class*/})
 @MapperScan("cn.vonce.sql.spring.dao")
 public @interface UseMybatis {
 
