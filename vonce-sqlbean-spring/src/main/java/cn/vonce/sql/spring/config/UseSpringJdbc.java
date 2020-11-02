@@ -16,7 +16,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-//@Import({AutoCreateTableListener.class})
+@Import({AutoCreateTableListener.class})
 public @interface UseSpringJdbc {
 
 

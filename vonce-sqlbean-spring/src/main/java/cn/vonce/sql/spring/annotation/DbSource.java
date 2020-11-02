@@ -6,7 +6,7 @@ import java.lang.annotation.*;
  * @author Jovi
  * @version 1.0
  * @email imjovi@qq.com
- * @date 2020/10/29 23:33
+ * @date 2020/11/2 23:11
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

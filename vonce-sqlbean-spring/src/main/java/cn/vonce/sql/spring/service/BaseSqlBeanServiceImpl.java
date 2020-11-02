@@ -1,31 +1,30 @@
-package cn.vonce.sql.service;
+package cn.vonce.sql.spring.service;
 
 import cn.vonce.sql.config.SqlBeanConfig;
-import cn.vonce.sql.config.SqlBeanDBConfig;
+import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.enumerate.DbType;
 
-import java.sql.SQLException;
 import java.util.Objects;
 
 public abstract class BaseSqlBeanServiceImpl {
 
-    private SqlBeanDBConfig sqlBeanDBConfig;
+    private SqlBeanDB sqlBeanDB;
 
     public abstract SqlBeanConfig getSqlBeanConfig();
     public abstract String getProductName();
 
-    public SqlBeanDBConfig getSqlBeanDBConfig() {
-        if (sqlBeanDBConfig == null) {
-            sqlBeanDBConfig = new SqlBeanDBConfig();
-            sqlBeanDBConfig.setSqlBeanConfig(getSqlBeanConfig());
+    public SqlBeanDB getSqlBeanDB() {
+        if (sqlBeanDB == null) {
+            sqlBeanDB = new SqlBeanDB();
+            sqlBeanDB.setSqlBeanConfig(getSqlBeanConfig());
             //如果用户未进行配置
             boolean isUserConfig = true;
-            if (sqlBeanDBConfig.getSqlBeanConfig() == null) {
+            if (sqlBeanDB.getSqlBeanConfig() == null) {
                 isUserConfig = false;
-                sqlBeanDBConfig.setSqlBeanConfig(new SqlBeanConfig());
+                sqlBeanDB.setSqlBeanConfig(new SqlBeanConfig());
             }
             DbType dbType = DbType.getDbType(getProductName());
-            sqlBeanDBConfig.setDbType(dbType);
+            sqlBeanDB.setDbType(dbType);
             //如果用户未进行配置则对某些数据库进行设置
             if (!isUserConfig) {
                 switch (Objects.requireNonNull(dbType)) {
@@ -34,12 +33,12 @@ public abstract class BaseSqlBeanServiceImpl {
                     case Derby:
                     case Hsql:
                     case H2:
-                        sqlBeanDBConfig.getSqlBeanConfig().setToUpperCase(true);
+                        sqlBeanDB.getSqlBeanConfig().setToUpperCase(true);
                         break;
                 }
             }
         }
-        return sqlBeanDBConfig;
+        return sqlBeanDB;
     }
 
 }

@@ -1,19 +1,17 @@
 package cn.vonce.sql.provider;
 
 import cn.vonce.sql.bean.*;
-import cn.vonce.sql.config.SqlBeanConfig;
+import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.SqlOperator;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.SqlHelper;
-import cn.vonce.sql.uitls.DateUtil;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
 import java.lang.reflect.Field;
-import java.util.Date;
 
 /**
  * 通用的数据库操作sql语句生成
@@ -32,8 +30,8 @@ public class SqlBeanProvider {
      * @param id
      * @return
      */
-    public String selectByIdSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object id) {
-        return selectByIdsSql(sqlBeanConfig, clazz, new Object[]{id});
+    public String selectByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object id) {
+        return selectByIdsSql(sqlBeanDB, clazz, new Object[]{id});
     }
 
     /**
@@ -43,11 +41,11 @@ public class SqlBeanProvider {
      * @param ids
      * @return
      */
-    public String selectByIdsSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object... ids) {
+    public String selectByIdsSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object... ids) {
         Select select;
         Field idField;
         try {
-            select = newSelect(sqlBeanConfig, clazz, false);
+            select = newSelect(sqlBeanDB, clazz, false);
             idField = SqlBeanUtil.getIdField(clazz);
         } catch (SqlBeanException e) {
             e.printStackTrace();
@@ -70,8 +68,8 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public String selectByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Paging paging, String where, Object... args) {
-        Select select = newSelect(sqlBeanConfig, clazz, false);
+    public String selectByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Paging paging, String where, Object... args) {
+        Select select = newSelect(sqlBeanDB, clazz, false);
         select.setWhere(where, args);
         setPaging(select, paging, clazz);
         return SqlHelper.buildSelectSql(select);
@@ -85,8 +83,8 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public String selectCountByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String where, Object[] args) {
-        Select select = newSelect(sqlBeanConfig, clazz, true);
+    public String selectCountByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
+        Select select = newSelect(sqlBeanDB, clazz, true);
         select.setWhere(where, args);
         return SqlHelper.buildSelectSql(select);
     }
@@ -97,8 +95,8 @@ public class SqlBeanProvider {
      * @param clazz
      * @return
      */
-    public String selectAllSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Paging paging) {
-        Select select = newSelect(sqlBeanConfig, clazz, false);
+    public String selectAllSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Paging paging) {
+        Select select = newSelect(sqlBeanDB, clazz, false);
         setPaging(select, paging, clazz);
         return SqlHelper.buildSelectSql(select);
     }
@@ -106,19 +104,19 @@ public class SqlBeanProvider {
     /**
      * 根据自定义条件查询（可自动分页）
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      * @param clazz
      * @param select
      * @return
      */
-    public String selectSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Select select) {
-        if (select.getSqlBeanConfig() == null) {
-            select.setSqlBeanConfig(sqlBeanConfig);
+    public String selectSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Select select) {
+        if (select.getSqlBeanDB() == null) {
+            select.setSqlBeanDB(sqlBeanDB);
         }
         if (select.getColumnList().isEmpty()) {
             try {
                 select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
-                if (select.getPage() != null && select.getSqlBeanConfig().getDbType() == DbType.SQLServer) {
+                if (select.getPage() != null && select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
                     select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)));
                 }
             } catch (SqlBeanException e) {
@@ -132,14 +130,14 @@ public class SqlBeanProvider {
     /**
      * 根据自定义条件统计
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      * @param clazz
      * @param select
      * @return
      */
-    public String countSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Select select) {
-        if (select.getSqlBeanConfig() == null) {
-            select.setSqlBeanConfig(sqlBeanConfig);
+    public String countSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Select select) {
+        if (select.getSqlBeanDB() == null) {
+            select.setSqlBeanDB(sqlBeanDB);
         }
         if (select.getColumnList() == null || select.getColumnList().isEmpty()) {
             select.column(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET);
@@ -154,7 +152,7 @@ public class SqlBeanProvider {
      * @param id
      * @return
      */
-    public String deleteByIdSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object id) {
+    public String deleteByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object id) {
         if (StringUtil.isEmpty(id)) {
             try {
                 throw new SqlBeanException("deleteByIdSql id不能为空");
@@ -164,7 +162,7 @@ public class SqlBeanProvider {
             }
         }
         Delete delete = new Delete();
-        delete.setSqlBeanConfig(sqlBeanConfig);
+        delete.setSqlBeanDB(sqlBeanDB);
         delete.setTable(clazz);
         Field idField;
         try {
@@ -185,9 +183,9 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public String deleteByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String where, Object[] args) {
+    public String deleteByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
         Delete delete = new Delete();
-        delete.setSqlBeanConfig(sqlBeanConfig);
+        delete.setSqlBeanDB(sqlBeanDB);
         delete.setTable(clazz);
         delete.setWhere(where, args);
         return SqlHelper.buildDeleteSql(delete);
@@ -201,9 +199,9 @@ public class SqlBeanProvider {
      * @param ignore
      * @return
      */
-    public String deleteSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Delete delete, boolean ignore) {
-        if (delete.getSqlBeanConfig() == null) {
-            delete.setSqlBeanConfig(sqlBeanConfig);
+    public String deleteSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Delete delete, boolean ignore) {
+        if (delete.getSqlBeanDB() == null) {
+            delete.setSqlBeanDB(sqlBeanDB);
         }
         if (delete.getTable() == null || StringUtil.isEmpty(delete.getTable().getName())) {
             delete.setTable(clazz);
@@ -227,9 +225,9 @@ public class SqlBeanProvider {
      * @param id
      * @return
      */
-    public String logicallyDeleteByIdSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object id) {
+    public String logicallyDeleteByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object id) {
         Update update = new Update();
-        update.setSqlBeanConfig(sqlBeanConfig);
+        update.setSqlBeanDB(sqlBeanDB);
         Object bean;
         try {
             bean = newLogicallyDeleteBean(clazz);
@@ -251,9 +249,9 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public String logicallyDeleteByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String where, Object[] args) {
+    public String logicallyDeleteByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
         Update update = new Update();
-        update.setSqlBeanConfig(sqlBeanConfig);
+        update.setSqlBeanDB(sqlBeanDB);
         try {
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
             update.setWhere(where, args);
@@ -267,14 +265,14 @@ public class SqlBeanProvider {
     /**
      * 更新
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      * @param update
      * @param ignore
      * @return
      */
-    public String updateSql(SqlBeanConfig sqlBeanConfig, Update update, boolean ignore) {
-        if (update.getSqlBeanConfig() == null) {
-            update.setSqlBeanConfig(sqlBeanConfig);
+    public String updateSql(SqlBeanDB sqlBeanDB, Update update, boolean ignore) {
+        if (update.getSqlBeanDB() == null) {
+            update.setSqlBeanDB(sqlBeanDB);
         }
         if (ignore || (!update.getWhereMap().isEmpty() || StringUtil.isNotEmpty(update.getWhere()))) {
             return SqlHelper.buildUpdateSql(update);
@@ -296,7 +294,7 @@ public class SqlBeanProvider {
      * @param filterFields
      * @return
      */
-    public String updateByIdSql(SqlBeanConfig sqlBeanConfig, Object bean, Object id, boolean updateNotNull, String[] filterFields) {
+    public String updateByIdSql(SqlBeanDB sqlBeanDB, Object bean, Object id, boolean updateNotNull, String[] filterFields) {
         if (StringUtil.isEmpty(id)) {
             try {
                 throw new SqlBeanException("updateByIdSql id不能为空");
@@ -305,7 +303,7 @@ public class SqlBeanProvider {
                 return null;
             }
         }
-        Update update = newUpdate(sqlBeanConfig, bean, updateNotNull);
+        Update update = newUpdate(sqlBeanDB, bean, updateNotNull);
         update.setFilterFields(filterFields);
         Field idField;
         try {
@@ -326,8 +324,8 @@ public class SqlBeanProvider {
      * @param filterFields
      * @return
      */
-    public String updateByBeanIdSql(SqlBeanConfig sqlBeanConfig, Object bean, boolean updateNotNull, String[] filterFields) {
-        Update update = newUpdate(sqlBeanConfig, bean, updateNotNull);
+    public String updateByBeanIdSql(SqlBeanDB sqlBeanDB, Object bean, boolean updateNotNull, String[] filterFields) {
+        Update update = newUpdate(sqlBeanDB, bean, updateNotNull);
         update.setFilterFields(filterFields);
         Field idField;
         try {
@@ -359,8 +357,8 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public String updateByConditionSql(SqlBeanConfig sqlBeanConfig, Object bean, boolean updateNotNull, String[] filterFields, String where, Object[] args) {
-        Update update = newUpdate(sqlBeanConfig, bean, updateNotNull);
+    public String updateByConditionSql(SqlBeanDB sqlBeanDB, Object bean, boolean updateNotNull, String[] filterFields, String where, Object[] args) {
+        Update update = newUpdate(sqlBeanDB, bean, updateNotNull);
         update.setFilterFields(filterFields);
         update.setWhere(where, args);
         return SqlHelper.buildUpdateSql(update);
@@ -375,8 +373,8 @@ public class SqlBeanProvider {
      * @param where
      * @return
      */
-    public String updateByBeanConditionSql(SqlBeanConfig sqlBeanConfig, Object bean, boolean updateNotNull, String[] filterFields, String where) {
-        Update update = newUpdate(sqlBeanConfig, bean, updateNotNull);
+    public String updateByBeanConditionSql(SqlBeanDB sqlBeanDB, Object bean, boolean updateNotNull, String[] filterFields, String where) {
+        Update update = newUpdate(sqlBeanDB, bean, updateNotNull);
         update.setFilterFields(filterFields);
         update.setWhere(where, null);
         return SqlHelper.buildUpdateSql(update);
@@ -388,9 +386,9 @@ public class SqlBeanProvider {
      * @param bean
      * @return
      */
-    public String insertBeanSql(SqlBeanConfig sqlBeanConfig, Object bean) {
+    public String insertBeanSql(SqlBeanDB sqlBeanDB, Object bean) {
         Insert insert = new Insert();
-        insert.setSqlBeanConfig(sqlBeanConfig);
+        insert.setSqlBeanDB(sqlBeanDB);
         insert.setInsertBean(bean);
         return SqlHelper.buildInsertSql(insert);
     }
@@ -398,13 +396,13 @@ public class SqlBeanProvider {
     /**
      * 插入数据
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      * @param insert
      * @return
      */
-    public String insertSql(SqlBeanConfig sqlBeanConfig, Insert insert) {
-        if (insert.getSqlBeanConfig() == null) {
-            insert.setSqlBeanConfig(sqlBeanConfig);
+    public String insertSql(SqlBeanDB sqlBeanDB, Insert insert) {
+        if (insert.getSqlBeanDB() == null) {
+            insert.setSqlBeanDB(sqlBeanDB);
         }
         return SqlHelper.buildInsertSql(insert);
     }
@@ -422,13 +420,13 @@ public class SqlBeanProvider {
     /**
      * 创建表
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      * @param clazz
      * @return
      */
-    public String createTableSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz) {
+    public String createTableSql(SqlBeanDB sqlBeanDB, Class<?> clazz) {
         Create create = new Create();
-        create.setSqlBeanConfig(sqlBeanConfig);
+        create.setSqlBeanDB(sqlBeanDB);
         create.setBeanClass(clazz);
         return SqlHelper.buildCreateSql(create);
     }
@@ -436,11 +434,11 @@ public class SqlBeanProvider {
     /**
      * 获取表名列表
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      * @return
      */
-    public String selectTableListSql(SqlBeanConfig sqlBeanConfig) {
-        switch (sqlBeanConfig.getDbType()) {
+    public String selectTableListSql(SqlBeanDB sqlBeanDB) {
+        switch (sqlBeanDB.getDbType()) {
             case MySQL:
             case MariaDB:
                 return "select table_name as `name` from information_schema.tables where table_schema = database() and table_type = 'BASE TABLE'";
@@ -469,18 +467,18 @@ public class SqlBeanProvider {
     /**
      * 备份表和数据
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      * @param clazz
      * @param targetTableName
      * @param columns
      * @param condition
      * @return
      */
-    public String backupSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String targetTableName, Column[] columns, Condition condition) {
+    public String backupSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String targetTableName, Column[] columns, Condition condition) {
         StringBuffer backupSql = new StringBuffer();
         String tableName = SqlBeanUtil.getTable(clazz).getName();
         //非SQLServer、PostgreSQL数据库则使用：create table A as select * from B
-        if (DbType.SQLServer != sqlBeanConfig.getDbType() && DbType.PostgreSQL != sqlBeanConfig.getDbType()) {
+        if (DbType.SQLServer != sqlBeanDB.getDbType() && DbType.PostgreSQL != sqlBeanDB.getDbType()) {
             backupSql.append(SqlHelperCons.CREATE_TABLE);
             backupSql.append(targetTableName);
             backupSql.append(SqlHelperCons.SPACES);
@@ -497,18 +495,18 @@ public class SqlBeanProvider {
             backupSql.append(SqlHelperCons.ALL);
         }
         //如果是SQLServer、PostgreSQL数据库则需要拼接INTO：select * into A from B
-        if (DbType.SQLServer == sqlBeanConfig.getDbType() || DbType.PostgreSQL == sqlBeanConfig.getDbType()) {
+        if (DbType.SQLServer == sqlBeanDB.getDbType() || DbType.PostgreSQL == sqlBeanDB.getDbType()) {
             backupSql.append(SqlHelperCons.INTO);
             backupSql.append(targetTableName);
         }
         backupSql.append(SqlHelperCons.FROM);
         backupSql.append(tableName);
         //如果是Derby数据库，仅支持创建表结构，其他数据库则可通过条件备份数据和是否需要数据
-        if (DbType.Derby == sqlBeanConfig.getDbType()) {
+        if (DbType.Derby == sqlBeanDB.getDbType()) {
             backupSql.append(" WITH NO DATA");
         } else {
             if (condition != null) {
-                condition.setSqlBeanConfig(sqlBeanConfig);
+                condition.setSqlBeanDB(sqlBeanDB);
                 backupSql.append(SqlHelper.whereSql(condition, null));
             }
         }
@@ -518,14 +516,14 @@ public class SqlBeanProvider {
     /**
      * 复制数据到指定表
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      * @param clazz
      * @param targetTableName
      * @param columns
      * @param condition
      * @return
      */
-    public String copySql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String targetTableName, Column[] columns, Condition condition) {
+    public String copySql(SqlBeanDB sqlBeanDB, Class<?> clazz, String targetTableName, Column[] columns, Condition condition) {
         StringBuffer copySql = new StringBuffer();
         StringBuffer columnSql = new StringBuffer();
         copySql.append(SqlHelperCons.INSERT_INTO);
@@ -551,7 +549,7 @@ public class SqlBeanProvider {
         copySql.append(SqlHelperCons.FROM);
         copySql.append(SqlBeanUtil.getTable(clazz).getName());
         if (condition != null) {
-            condition.setSqlBeanConfig(sqlBeanConfig);
+            condition.setSqlBeanDB(sqlBeanDB);
             copySql.append(SqlHelper.whereSql(condition, null));
         }
         return copySql.toString();
@@ -565,9 +563,9 @@ public class SqlBeanProvider {
      * @return
      * @throws SqlBeanException
      */
-    private Select newSelect(SqlBeanConfig sqlBeanConfig, Class<?> clazz, boolean isCount) {
+    private Select newSelect(SqlBeanDB sqlBeanDB, Class<?> clazz, boolean isCount) {
         Select select = new Select();
-        select.setSqlBeanConfig(sqlBeanConfig);
+        select.setSqlBeanDB(sqlBeanDB);
         select.setTable(clazz);
         try {
             if (isCount) {
@@ -644,9 +642,9 @@ public class SqlBeanProvider {
      * @return
      * @throws SqlBeanException
      */
-    private Update newUpdate(SqlBeanConfig sqlBeanConfig, Object bean, boolean updateNotNull) {
+    private Update newUpdate(SqlBeanDB sqlBeanDB, Object bean, boolean updateNotNull) {
         Update update = new Update();
-        update.setSqlBeanConfig(sqlBeanConfig);
+        update.setSqlBeanDB(sqlBeanDB);
         update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
         return update;
@@ -661,7 +659,7 @@ public class SqlBeanProvider {
      */
     private void setPaging(Select select, Paging paging, Class<?> clazz) {
         if (paging != null) {
-            if (select.getSqlBeanConfig().getDbType() == DbType.SQLServer) {
+            if (select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
                 try {
                     select.setPage(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)), paging.getPagenum(), paging.getPagesize());
                 } catch (SqlBeanException e) {

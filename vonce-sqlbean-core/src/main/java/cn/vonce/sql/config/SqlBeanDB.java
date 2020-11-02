@@ -2,7 +2,7 @@ package cn.vonce.sql.config;
 
 import cn.vonce.sql.enumerate.DbType;
 
-public class SqlBeanDBConfig {
+public class SqlBeanDB {
 
     private DbType dbType;
     private SqlBeanConfig sqlBeanConfig;

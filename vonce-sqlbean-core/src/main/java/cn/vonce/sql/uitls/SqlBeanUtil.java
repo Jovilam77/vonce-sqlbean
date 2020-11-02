@@ -623,7 +623,7 @@ public class SqlBeanUtil {
                 break;
             case DATE_TYPE:
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-                switch (common.getSqlBeanConfig().getDbType()) {
+                switch (common.getSqlBeanDB().getDbType()) {
                     case Oracle:
                         sqlValue = "to_timestamp(" + single_quotation_mark + sdf.format(value) + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
                         break;
@@ -684,7 +684,7 @@ public class SqlBeanUtil {
      */
     public static String getTransferred(Common common) {
         String transferred = SqlHelperCons.DOUBLE_ESCAPE_CHARACTER;
-        DbType dbType = common.getSqlBeanConfig().getDbType();
+        DbType dbType = common.getSqlBeanDB().getDbType();
         if (dbType == DbType.MySQL || dbType == DbType.MariaDB) {
             transferred = SqlHelperCons.SINGLE_ESCAPE_CHARACTER;
         }
@@ -698,7 +698,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean isToUpperCase(Common common) {
-        if (common.getSqlBeanConfig().getToUpperCase() != null && common.getSqlBeanConfig().getToUpperCase()) {
+        if (common.getSqlBeanDB().getSqlBeanConfig().getToUpperCase() != null && common.getSqlBeanDB().getSqlBeanConfig().getToUpperCase()) {
             return true;
         }
         return false;

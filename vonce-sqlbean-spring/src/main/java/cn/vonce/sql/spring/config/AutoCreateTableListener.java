@@ -2,17 +2,21 @@ package cn.vonce.sql.spring.config;
 
 import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.Table;
+import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.service.SqlBeanService;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 自动创建表监听类
@@ -27,9 +31,17 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Autowired(required = false)
+    private SqlBeanConfig sqlBeanConfig;
+
     @Override
     public void onApplicationEvent(ContextRefreshedEvent evt) {
-        if (evt.getApplicationContext().getParent() == null) {
+        //用户未进行配置或者配置了启用自动创建
+        if (evt.getApplicationContext().getParent() == null && (sqlBeanConfig == null || sqlBeanConfig.getAutoCreate())) {
+            Map<String, DataSource> dataSourceMap = evt.getApplicationContext().getBeansOfType(DataSource.class);
+            if (dataSourceMap == null || dataSourceMap.size() == 0) {
+                return;
+            }
             List<String> beanNameList = new ArrayList<>();
             beanNameList.addAll(Arrays.asList(evt.getApplicationContext().getBeanNamesForType(SqlBeanService.class)));
             if (!beanNameList.isEmpty()) {

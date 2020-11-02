@@ -2,6 +2,7 @@ package cn.vonce.sql.spring.provider;
 
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
+import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.provider.SqlBeanProvider;
 
 import java.util.Map;
@@ -23,7 +24,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String selectById(Map<String, Object> map) {
-        return super.selectByIdSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), map.get("id"));
+        return super.selectByIdSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("id"));
     }
 
     /**
@@ -33,7 +34,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String selectByIds(Map<String, Object> map) {
-        return super.selectByIdsSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), (Object[]) map.get("ids"));
+        return super.selectByIdsSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Object[]) map.get("ids"));
     }
 
     /**
@@ -51,7 +52,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return super.selectByConditionSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), paging, (String) map.get("where"), args);
+        return super.selectByConditionSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), paging, (String) map.get("where"), args);
     }
 
     /**
@@ -65,7 +66,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return super.selectCountByConditionSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
+        return super.selectCountByConditionSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
     }
 
     /**
@@ -79,7 +80,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
         if (map.containsKey("paging")) {
             paging = (Paging) map.get("paging");
         }
-        return super.selectAllSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), paging);
+        return super.selectAllSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), paging);
     }
 
     /**
@@ -89,7 +90,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String select(Map<String, Object> map) {
-        return super.selectSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), (Select) map.get("select"));
+        return super.selectSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Select) map.get("select"));
     }
 
     /**
@@ -99,7 +100,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String count(Map<String, Object> map) {
-        return super.countSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), (Select) map.get("select"));
+        return super.countSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Select) map.get("select"));
     }
 
     /**
@@ -109,7 +110,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String deleteById(Map<String, Object> map) {
-        return super.deleteByIdSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), map.get("id"));
+        return super.deleteByIdSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("id"));
     }
 
     /**
@@ -123,7 +124,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return super.deleteByConditionSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
+        return super.deleteByConditionSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
     }
 
     /**
@@ -133,7 +134,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String delete(Map<String, Object> map) {
-        return super.deleteSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), (Delete) map.get("delete"), (boolean) map.get("ignore"));
+        return super.deleteSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Delete) map.get("delete"), (boolean) map.get("ignore"));
     }
 
     /**
@@ -143,7 +144,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String logicallyDeleteById(Map<String, Object> map) {
-        return super.logicallyDeleteByIdSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), map.get("id"));
+        return super.logicallyDeleteByIdSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("id"));
     }
 
     /**
@@ -157,7 +158,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return super.logicallyDeleteByConditionSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
+        return super.logicallyDeleteByConditionSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
     }
 
     /**
@@ -167,7 +168,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String update(Map<String, Object> map) {
-        return super.updateSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Update) map.get("update"), (boolean) map.get("ignore"));
+        return super.updateSql((SqlBeanDB) map.get("sqlBeanDB"), (Update) map.get("update"), (boolean) map.get("ignore"));
     }
 
     /**
@@ -177,7 +178,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String updateById(Map<String, Object> map) {
-        return super.updateByIdSql((SqlBeanConfig) map.get("sqlBeanConfig"), map.get("bean"), map.get("id"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"));
+        return super.updateByIdSql((SqlBeanDB) map.get("sqlBeanDB"), map.get("bean"), map.get("id"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"));
     }
 
     /**
@@ -187,7 +188,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String updateByBeanId(Map<String, Object> map) {
-        return super.updateByBeanIdSql((SqlBeanConfig) map.get("sqlBeanConfig"), map.get("bean"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"));
+        return super.updateByBeanIdSql((SqlBeanDB) map.get("sqlBeanDB"), map.get("bean"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"));
     }
 
     /**
@@ -201,7 +202,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return super.updateByConditionSql((SqlBeanConfig) map.get("sqlBeanConfig"), map.get("bean"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"), (String) map.get("where"), args);
+        return super.updateByConditionSql((SqlBeanDB) map.get("sqlBeanDB"), map.get("bean"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"), (String) map.get("where"), args);
     }
 
     /**
@@ -211,7 +212,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String updateByBeanCondition(Map<String, Object> map) {
-        return super.updateByBeanConditionSql((SqlBeanConfig) map.get("sqlBeanConfig"), map.get("bean"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"), (String) map.get("where"));
+        return super.updateByBeanConditionSql((SqlBeanDB) map.get("sqlBeanDB"), map.get("bean"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"), (String) map.get("where"));
     }
 
     /**
@@ -221,7 +222,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String insertBean(Map<String, Object> map) {
-        return super.insertBeanSql((SqlBeanConfig) map.get("sqlBeanConfig"), map.get("beanList"));
+        return super.insertBeanSql((SqlBeanDB) map.get("sqlBeanDB"), map.get("beanList"));
     }
 
     /**
@@ -231,7 +232,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String insert(Map<String, Object> map) {
-        return super.insertBeanSql((SqlBeanConfig) map.get("sqlBeanConfig"), map.get("insert"));
+        return super.insertBeanSql((SqlBeanDB) map.get("sqlBeanDB"), map.get("insert"));
     }
 
     /**
@@ -251,7 +252,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String create(Map<String, Object> map) {
-        return super.createTableSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"));
+        return super.createTableSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"));
     }
 
     /**
@@ -261,7 +262,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String selectTableList(Map<String, Object> map) {
-        return super.selectTableListSql((SqlBeanConfig) map.get("sqlBeanConfig"));
+        return super.selectTableListSql((SqlBeanDB) map.get("sqlBeanDB"));
     }
 
     /**
@@ -271,7 +272,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String backup(Map<String, Object> map) {
-        return super.backupSql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), (String) map.get("targetTableName"), (Column[]) map.get("columns"), (Condition) map.get("condition"));
+        return super.backupSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("targetTableName"), (Column[]) map.get("columns"), (Condition) map.get("condition"));
     }
 
     /**
@@ -281,7 +282,7 @@ public class MybatisSqlBeanProvider extends SqlBeanProvider {
      * @return
      */
     public String copy(Map<String, Object> map) {
-        return super.copySql((SqlBeanConfig) map.get("sqlBeanConfig"), (Class<?>) map.get("clazz"), (String) map.get("targetTableName"), (Column[]) map.get("columns"), (Condition) map.get("condition"));
+        return super.copySql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("targetTableName"), (Column[]) map.get("columns"), (Condition) map.get("condition"));
     }
 
 }

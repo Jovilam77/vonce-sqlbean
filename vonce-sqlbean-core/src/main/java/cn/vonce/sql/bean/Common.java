@@ -1,7 +1,6 @@
 package cn.vonce.sql.bean;
 
-import cn.vonce.sql.config.SqlBeanConfig;
-import cn.vonce.sql.enumerate.DbType;
+import cn.vonce.sql.config.SqlBeanDB;
 
 import java.io.Serializable;
 
@@ -17,14 +16,14 @@ public class Common implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private SqlBeanConfig sqlBeanConfig = null;
+    private SqlBeanDB sqlBeanDB = null;
 
-    public SqlBeanConfig getSqlBeanConfig() {
-        return sqlBeanConfig;
+    public SqlBeanDB getSqlBeanDB() {
+        return sqlBeanDB;
     }
 
-    public void setSqlBeanConfig(SqlBeanConfig sqlBeanConfig) {
-        this.sqlBeanConfig = sqlBeanConfig;
+    public void setSqlBeanDB(SqlBeanDB sqlBeanDB) {
+        this.sqlBeanDB = sqlBeanDB;
     }
 
 }
