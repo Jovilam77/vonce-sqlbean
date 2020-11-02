@@ -1,5 +1,8 @@
 package cn.vonce.sql.service;
 
+import cn.vonce.sql.config.SqlBeanConfig;
+import cn.vonce.sql.config.SqlBeanDBConfig;
+
 /**
  * 通用的业务接口
  *
@@ -12,10 +15,10 @@ package cn.vonce.sql.service;
 public interface SqlBeanService<T, ID> extends SelectService<T, ID>, InsertService<T>, UpdateService<T, ID>, DeleteService<ID> {
 
     /**
-     * 获取数据库产品名称
+     * 获取配置
      * @return
      */
-    String getProductName();
+    SqlBeanDBConfig getSqlBeanDBConfig();
 
     /**
      * 获取Bean类型

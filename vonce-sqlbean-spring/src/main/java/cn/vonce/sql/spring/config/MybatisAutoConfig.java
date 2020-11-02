@@ -19,7 +19,7 @@ import java.util.List;
  * @email imjovi@qq.com
  * @date 2019/8/21 13:05
  */
-public class MybatisAutoConfig extends AutoConfig {
+public class MybatisAutoConfig {
 
     /**
      * Spring mvc模式使用，Spring boot为空

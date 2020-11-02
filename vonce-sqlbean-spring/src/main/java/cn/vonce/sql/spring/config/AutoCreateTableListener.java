@@ -2,12 +2,10 @@ package cn.vonce.sql.spring.config;
 
 import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.Table;
-import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.service.SqlBeanService;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
@@ -29,12 +27,9 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private SqlBeanConfig sqlBeanConfig;
-
     @Override
     public void onApplicationEvent(ContextRefreshedEvent evt) {
-        if (evt.getApplicationContext().getParent() == null && sqlBeanConfig.getAutoCreate()) {
+        if (evt.getApplicationContext().getParent() == null) {
             List<String> beanNameList = new ArrayList<>();
             beanNameList.addAll(Arrays.asList(evt.getApplicationContext().getBeanNamesForType(SqlBeanService.class)));
             if (!beanNameList.isEmpty()) {

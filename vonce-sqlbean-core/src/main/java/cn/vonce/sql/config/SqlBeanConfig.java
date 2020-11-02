@@ -21,24 +21,24 @@ public class SqlBeanConfig implements Serializable {
 
     }
 
-    public SqlBeanConfig(DbType dbType) {
-        this.dbType = dbType;
-    }
+//    public SqlBeanConfig(DbType dbType) {
+//        this.dbType = dbType;
+//    }
 
-    private DbType dbType;
+//    private DbType dbType;
     private Boolean toUpperCase;
     private UniqueIdProcessor uniqueIdProcessor;
     private Boolean autoCreate;
 
-    public DbType getDbType() {
-        return dbType;
-    }
-
-    public void setDbType(DbType dbType) {
-        if (this.dbType == null) {
-            this.dbType = dbType;
-        }
-    }
+//    public DbType getDbType() {
+//        return dbType;
+//    }
+//
+//    public void setDbType(DbType dbType) {
+//        if (this.dbType == null) {
+//            this.dbType = dbType;
+//        }
+//    }
 
     public Boolean getToUpperCase() {
         return toUpperCase;

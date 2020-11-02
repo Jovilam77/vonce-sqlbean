@@ -1,6 +1,8 @@
 package cn.vonce.sql.spring.service;
 
 import cn.vonce.sql.bean.*;
+import cn.vonce.sql.config.SqlBeanConfig;
+import cn.vonce.sql.config.SqlBeanDBConfig;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.spring.config.UseMybatis;
 import cn.vonce.sql.spring.dao.MybatisSqlBeanDao;
@@ -15,10 +17,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 通用的业务实现
@@ -31,7 +30,7 @@ import java.util.Map;
  */
 @UseMybatis
 @Service
-public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
+public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl implements SqlBeanService<T, ID> {
 
     /**
      *
@@ -43,11 +42,15 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
     @Autowired
     private MybatisSqlBeanDao<T> mybatisSqlBeanDao;
 
+    @Autowired(required = false)
+    private SqlBeanConfig sqlBeanConfig;
+
+    private SqlBeanDBConfig sqlBeanDBConfig;
+
     @Autowired
     private SqlSession sqlSession;
 
     private Class<?> clazz;
-
 
     public MybatisSqlBeanServiceImpl() {
         Type[] typeArray = new Type[]{getClass().getGenericSuperclass()};
@@ -67,14 +70,51 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
         }
     }
 
-    @Override
-    public String getProductName() {
+    public String getProductName(){
+        //获取当前连接的数据库类型
+        String productName = null;
         try {
-            return sqlSession.getConfiguration().getEnvironment().getDataSource().getConnection().getMetaData().getDatabaseProductName();
+            productName = sqlSession.getConfiguration().getEnvironment().getDataSource().getConnection().getMetaData().getDatabaseProductName();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return null;
+        return productName;
+    }
+
+    @Override
+    public SqlBeanDBConfig getSqlBeanDBConfig() {
+        if (sqlBeanDBConfig == null) {
+            sqlBeanDBConfig = new SqlBeanDBConfig();
+            //如果用户未进行配置
+            boolean isUserConfig = true;
+            if (sqlBeanConfig == null) {
+                isUserConfig = false;
+                sqlBeanConfig = new SqlBeanConfig();
+            }
+            //获取当前连接的数据库类型
+            String productName = null;
+            try {
+                productName = sqlSession.getConfiguration().getEnvironment().getDataSource().getConnection().getMetaData().getDatabaseProductName();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+            DbType dbType = DbType.getDbType(productName);
+            sqlBeanDBConfig.setDbType(dbType);
+            //如果用户未进行配置则对某些数据库进行设置
+            if (!isUserConfig) {
+                switch (Objects.requireNonNull(dbType)) {
+                    case Oracle:
+                    case DB2:
+                    case Derby:
+                    case Hsql:
+                    case H2:
+                        sqlBeanConfig.setToUpperCase(true);
+                        break;
+                }
+            }
+            sqlBeanDBConfig.setSqlBeanConfig(sqlBeanConfig);
+        }
+        return sqlBeanDBConfig;
     }
 
     @Override
@@ -87,7 +127,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
         if (id == null) {
             return null;
         }
-        return mybatisSqlBeanDao.selectById(DbType.getSqlBeanConfig(getProductName()), clazz, id);
+        return mybatisSqlBeanDao.selectById(getSqlBeanDBConfig(), clazz, id);
     }
 
     @Override
@@ -96,9 +136,9 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
             return null;
         }
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
-            return mybatisSqlBeanDao.selectByIdO(DbType.getSqlBeanConfig(getProductName()), clazz, returnType, id);
+            return mybatisSqlBeanDao.selectByIdO(getSqlBeanDBConfig(), clazz, returnType, id);
         }
-        return mybatisSqlBeanDao.selectByIdO(DbType.getSqlBeanConfig(getProductName()), returnType, returnType, id);
+        return mybatisSqlBeanDao.selectByIdO(getSqlBeanDBConfig(), returnType, returnType, id);
     }
 
     @Override
@@ -106,7 +146,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
         if (ids == null || ids.length == 0) {
             return null;
         }
-        return mybatisSqlBeanDao.selectByIds(DbType.getSqlBeanConfig(getProductName()), clazz, ids);
+        return mybatisSqlBeanDao.selectByIds(getSqlBeanDBConfig(), clazz, ids);
     }
 
     @Override
@@ -115,232 +155,232 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
             return null;
         }
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
-            return mybatisSqlBeanDao.selectByIdsO(DbType.getSqlBeanConfig(getProductName()), clazz, returnType, ids);
+            return mybatisSqlBeanDao.selectByIdsO(getSqlBeanDBConfig(), clazz, returnType, ids);
         }
-        return mybatisSqlBeanDao.selectByIdsO(DbType.getSqlBeanConfig(getProductName()), returnType, returnType, ids);
+        return mybatisSqlBeanDao.selectByIdsO(getSqlBeanDBConfig(), returnType, returnType, ids);
     }
 
     @Override
     public T selectOne(Select select) {
-        return mybatisSqlBeanDao.selectOne(DbType.getSqlBeanConfig(getProductName()), clazz, select);
+        return mybatisSqlBeanDao.selectOne(getSqlBeanDBConfig(), clazz, select);
     }
 
     @Override
     public <O> O selectOne(Class<O> returnType, Select select) {
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
-            return mybatisSqlBeanDao.selectOneO(DbType.getSqlBeanConfig(getProductName()), clazz, returnType, select);
+            return mybatisSqlBeanDao.selectOneO(getSqlBeanDBConfig(), clazz, returnType, select);
         }
-        return mybatisSqlBeanDao.selectOneO(DbType.getSqlBeanConfig(getProductName()), returnType, returnType, select);
+        return mybatisSqlBeanDao.selectOneO(getSqlBeanDBConfig(), returnType, returnType, select);
     }
 
     @Override
     public Map<String, Object> selectMap(Select select) {
-        return mybatisSqlBeanDao.selectMap(DbType.getSqlBeanConfig(getProductName()), clazz, select);
+        return mybatisSqlBeanDao.selectMap(getSqlBeanDBConfig(), clazz, select);
     }
 
     @Override
     public T selectOneByCondition(String where, Object... args) {
-        return mybatisSqlBeanDao.selectOneByCondition(DbType.getSqlBeanConfig(getProductName()), clazz, where, args);
+        return mybatisSqlBeanDao.selectOneByCondition(getSqlBeanDBConfig(), clazz, where, args);
     }
 
     @Override
     public <O> O selectOneByCondition(Class<O> returnType, String where, Object... args) {
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
-            return mybatisSqlBeanDao.selectOneByConditionO(DbType.getSqlBeanConfig(getProductName()), clazz, returnType, where, args);
+            return mybatisSqlBeanDao.selectOneByConditionO(getSqlBeanDBConfig(), clazz, returnType, where, args);
         }
-        return mybatisSqlBeanDao.selectOneByConditionO(DbType.getSqlBeanConfig(getProductName()), returnType, returnType, where, args);
+        return mybatisSqlBeanDao.selectOneByConditionO(getSqlBeanDBConfig(), returnType, returnType, where, args);
     }
 
     @Override
     public <O> List<O> selectByCondition(Class<O> returnType, String where, Object... args) {
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
-            return mybatisSqlBeanDao.selectByConditionO(DbType.getSqlBeanConfig(getProductName()), clazz, returnType, null, where, args);
+            return mybatisSqlBeanDao.selectByConditionO(getSqlBeanDBConfig(), clazz, returnType, null, where, args);
         }
-        return mybatisSqlBeanDao.selectByConditionO(DbType.getSqlBeanConfig(getProductName()), returnType, returnType, null, where, args);
+        return mybatisSqlBeanDao.selectByConditionO(getSqlBeanDBConfig(), returnType, returnType, null, where, args);
     }
 
     @Override
     public <O> List<O> selectByCondition(Class<O> returnType, Paging paging, String where, Object... args) {
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
-            return mybatisSqlBeanDao.selectByConditionO(DbType.getSqlBeanConfig(getProductName()), clazz, returnType, paging, where, args);
+            return mybatisSqlBeanDao.selectByConditionO(getSqlBeanDBConfig(), clazz, returnType, paging, where, args);
         }
-        return mybatisSqlBeanDao.selectByConditionO(DbType.getSqlBeanConfig(getProductName()), returnType, returnType, paging, where, args);
+        return mybatisSqlBeanDao.selectByConditionO(getSqlBeanDBConfig(), returnType, returnType, paging, where, args);
     }
 
     @Override
     public List<T> selectByCondition(String where, Object... args) {
-        return mybatisSqlBeanDao.selectByCondition(DbType.getSqlBeanConfig(getProductName()), clazz, null, where, args);
+        return mybatisSqlBeanDao.selectByCondition(getSqlBeanDBConfig(), clazz, null, where, args);
     }
 
     @Override
     public List<T> selectByCondition(Paging paging, String where, Object... args) {
-        return mybatisSqlBeanDao.selectByCondition(DbType.getSqlBeanConfig(getProductName()), clazz, paging, where, args);
+        return mybatisSqlBeanDao.selectByCondition(getSqlBeanDBConfig(), clazz, paging, where, args);
     }
 
     public long selectCountByCondition(String where, Object... args) {
-        return mybatisSqlBeanDao.selectCountByCondition(DbType.getSqlBeanConfig(getProductName()), clazz, where, args);
+        return mybatisSqlBeanDao.selectCountByCondition(getSqlBeanDBConfig(), clazz, where, args);
     }
 
     @Override
     public long countAll() {
-        return mybatisSqlBeanDao.selectCountByCondition(DbType.getSqlBeanConfig(getProductName()), clazz, null, null);
+        return mybatisSqlBeanDao.selectCountByCondition(getSqlBeanDBConfig(), clazz, null, null);
     }
 
     @Override
     public List<T> selectAll() {
-        return mybatisSqlBeanDao.selectAll(DbType.getSqlBeanConfig(getProductName()), clazz, null);
+        return mybatisSqlBeanDao.selectAll(getSqlBeanDBConfig(), clazz, null);
     }
 
     @Override
     public List<T> selectAll(Paging paging) {
-        return mybatisSqlBeanDao.selectAll(DbType.getSqlBeanConfig(getProductName()), clazz, paging);
+        return mybatisSqlBeanDao.selectAll(getSqlBeanDBConfig(), clazz, paging);
     }
 
     @Override
     public <O> List<O> selectAll(Class<O> returnType) {
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
-            return mybatisSqlBeanDao.selectAllO(DbType.getSqlBeanConfig(getProductName()), clazz, returnType, null);
+            return mybatisSqlBeanDao.selectAllO(getSqlBeanDBConfig(), clazz, returnType, null);
         }
-        return mybatisSqlBeanDao.selectAllO(DbType.getSqlBeanConfig(getProductName()), returnType, returnType, null);
+        return mybatisSqlBeanDao.selectAllO(getSqlBeanDBConfig(), returnType, returnType, null);
     }
 
     @Override
     public <O> List<O> selectAll(Class<O> returnType, Paging paging) {
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
-            return mybatisSqlBeanDao.selectAllO(DbType.getSqlBeanConfig(getProductName()), clazz, returnType, paging);
+            return mybatisSqlBeanDao.selectAllO(getSqlBeanDBConfig(), clazz, returnType, paging);
         }
-        return mybatisSqlBeanDao.selectAllO(DbType.getSqlBeanConfig(getProductName()), returnType, returnType, paging);
+        return mybatisSqlBeanDao.selectAllO(getSqlBeanDBConfig(), returnType, returnType, paging);
     }
 
     @Override
     public List<Map<String, Object>> selectMapList(Select select) {
-        return mybatisSqlBeanDao.selectMapList(DbType.getSqlBeanConfig(getProductName()), clazz, select);
+        return mybatisSqlBeanDao.selectMapList(getSqlBeanDBConfig(), clazz, select);
     }
 
     @Override
     public <O> List<O> select(Class<O> returnType, Select select) {
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
-            return mybatisSqlBeanDao.selectO(DbType.getSqlBeanConfig(getProductName()), clazz, returnType, select);
+            return mybatisSqlBeanDao.selectO(getSqlBeanDBConfig(), clazz, returnType, select);
         }
-        return mybatisSqlBeanDao.selectO(DbType.getSqlBeanConfig(getProductName()), returnType, returnType, select);
+        return mybatisSqlBeanDao.selectO(getSqlBeanDBConfig(), returnType, returnType, select);
     }
 
     @Override
     public List<T> select(Select select) {
-        return mybatisSqlBeanDao.select(DbType.getSqlBeanConfig(getProductName()), clazz, select);
+        return mybatisSqlBeanDao.select(getSqlBeanDBConfig(), clazz, select);
     }
 
     @Override
     public long count(Select select) {
-        return mybatisSqlBeanDao.count(DbType.getSqlBeanConfig(getProductName()), clazz, select);
+        return mybatisSqlBeanDao.count(getSqlBeanDBConfig(), clazz, select);
     }
 
     @Override
     public long count(Class<?> clazz, Select select) {
-        return mybatisSqlBeanDao.count(DbType.getSqlBeanConfig(getProductName()), clazz, select);
+        return mybatisSqlBeanDao.count(getSqlBeanDBConfig(), clazz, select);
     }
 
     @Override
     public long deleteById(ID... id) {
-        return mybatisSqlBeanDao.deleteById(DbType.getSqlBeanConfig(getProductName()), clazz, id);
+        return mybatisSqlBeanDao.deleteById(getSqlBeanDBConfig(), clazz, id);
     }
 
     @Override
     public long deleteByCondition(String where, Object... args) {
-        return mybatisSqlBeanDao.deleteByCondition(DbType.getSqlBeanConfig(getProductName()), clazz, where, args);
+        return mybatisSqlBeanDao.deleteByCondition(getSqlBeanDBConfig(), clazz, where, args);
     }
 
     @Override
     public long delete(Delete delete) {
-        return mybatisSqlBeanDao.delete(DbType.getSqlBeanConfig(getProductName()), clazz, delete, false);
+        return mybatisSqlBeanDao.delete(getSqlBeanDBConfig(), clazz, delete, false);
     }
 
     @Override
     public long delete(Delete delete, boolean ignore) {
-        return mybatisSqlBeanDao.delete(DbType.getSqlBeanConfig(getProductName()), clazz, delete, ignore);
+        return mybatisSqlBeanDao.delete(getSqlBeanDBConfig(), clazz, delete, ignore);
     }
 
     @Override
     public long logicallyDeleteById(ID id) {
-        return mybatisSqlBeanDao.logicallyDeleteById(DbType.getSqlBeanConfig(getProductName()), clazz, id);
+        return mybatisSqlBeanDao.logicallyDeleteById(getSqlBeanDBConfig(), clazz, id);
     }
 
     @Override
     public long logicallyDeleteByCondition(String where, Object... args) {
-        return mybatisSqlBeanDao.logicallyDeleteByCondition(DbType.getSqlBeanConfig(getProductName()), clazz, where, args);
+        return mybatisSqlBeanDao.logicallyDeleteByCondition(getSqlBeanDBConfig(), clazz, where, args);
     }
 
     @Override
     public long update(Update update) {
-        return mybatisSqlBeanDao.update(DbType.getSqlBeanConfig(getProductName()), update, false);
+        return mybatisSqlBeanDao.update(getSqlBeanDBConfig(), update, false);
     }
 
     @Override
     public long update(Update update, boolean ignore) {
-        return mybatisSqlBeanDao.update(DbType.getSqlBeanConfig(getProductName()), update, ignore);
+        return mybatisSqlBeanDao.update(getSqlBeanDBConfig(), update, ignore);
     }
 
     @Override
     public long updateById(T bean, ID id, boolean updateNotNull) {
-        return mybatisSqlBeanDao.updateById(DbType.getSqlBeanConfig(getProductName()), bean, id, updateNotNull, null);
+        return mybatisSqlBeanDao.updateById(getSqlBeanDBConfig(), bean, id, updateNotNull, null);
     }
 
     @Override
     public long updateById(T bean, ID id, boolean updateNotNull, String[] filterFields) {
-        return mybatisSqlBeanDao.updateById(DbType.getSqlBeanConfig(getProductName()), bean, id, updateNotNull, filterFields);
+        return mybatisSqlBeanDao.updateById(getSqlBeanDBConfig(), bean, id, updateNotNull, filterFields);
     }
 
     @Override
     public long updateByBeanId(T bean, boolean updateNotNull) {
-        return mybatisSqlBeanDao.updateByBeanId(DbType.getSqlBeanConfig(getProductName()), bean, updateNotNull, null);
+        return mybatisSqlBeanDao.updateByBeanId(getSqlBeanDBConfig(), bean, updateNotNull, null);
     }
 
     @Override
     public long updateByBeanId(T bean, boolean updateNotNull, String[] filterFields) {
-        return mybatisSqlBeanDao.updateByBeanId(DbType.getSqlBeanConfig(getProductName()), bean, updateNotNull, filterFields);
+        return mybatisSqlBeanDao.updateByBeanId(getSqlBeanDBConfig(), bean, updateNotNull, filterFields);
     }
 
     @Override
     public long updateByCondition(T bean, boolean updateNotNull, String where, Object... args) {
-        return mybatisSqlBeanDao.updateByCondition(DbType.getSqlBeanConfig(getProductName()), bean, updateNotNull, null, where, args);
+        return mybatisSqlBeanDao.updateByCondition(getSqlBeanDBConfig(), bean, updateNotNull, null, where, args);
     }
 
     @Override
     public long updateByCondition(T bean, boolean updateNotNull, String[] filterFields, String where, Object... args) {
-        return mybatisSqlBeanDao.updateByCondition(DbType.getSqlBeanConfig(getProductName()), bean, updateNotNull, filterFields, where, args);
+        return mybatisSqlBeanDao.updateByCondition(getSqlBeanDBConfig(), bean, updateNotNull, filterFields, where, args);
     }
 
     @Override
     public long updateByBeanCondition(T bean, boolean updateNotNull, String where) {
-        return mybatisSqlBeanDao.updateByBeanCondition(DbType.getSqlBeanConfig(getProductName()), bean, updateNotNull, null, where);
+        return mybatisSqlBeanDao.updateByBeanCondition(getSqlBeanDBConfig(), bean, updateNotNull, null, where);
     }
 
     @Override
     public long updateByBeanCondition(T bean, boolean updateNotNull, String[] filterFields, String where) {
-        return mybatisSqlBeanDao.updateByBeanCondition(DbType.getSqlBeanConfig(getProductName()), bean, updateNotNull, filterFields, where);
+        return mybatisSqlBeanDao.updateByBeanCondition(getSqlBeanDBConfig(), bean, updateNotNull, filterFields, where);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public long insert(T... bean) {
-        return mybatisSqlBeanDao.insertBean(DbType.getSqlBeanConfig(getProductName()), Arrays.asList(bean));
+        return mybatisSqlBeanDao.insertBean(getSqlBeanDBConfig(), Arrays.asList(bean));
     }
 
     @Override
     public long insert(List<T> beanList) {
-        return mybatisSqlBeanDao.insertBean(DbType.getSqlBeanConfig(getProductName()), beanList);
+        return mybatisSqlBeanDao.insertBean(getSqlBeanDBConfig(), beanList);
     }
 
     @Override
     public long inset(Insert insert) {
-        return mybatisSqlBeanDao.insert(DbType.getSqlBeanConfig(getProductName()), insert);
+        return mybatisSqlBeanDao.insert(getSqlBeanDBConfig(), insert);
     }
 
     @Override
     public String backup() {
         String targetTableName = SqlBeanUtil.getTable(clazz).getName() + "_" + DateUtil.dateToString(new Date(), "yyyyMMddHHmmss");
         try {
-            mybatisSqlBeanDao.backup(DbType.getSqlBeanConfig(getProductName()), clazz, targetTableName, null, null);
+            mybatisSqlBeanDao.backup(getSqlBeanDBConfig(), clazz, targetTableName, null, null);
         } catch (Exception e) {
             return null;
         }
@@ -349,22 +389,22 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
 
     @Override
     public void backup(String targetTableName) {
-        mybatisSqlBeanDao.backup(DbType.getSqlBeanConfig(getProductName()), clazz, targetTableName, null, null);
+        mybatisSqlBeanDao.backup(getSqlBeanDBConfig(), clazz, targetTableName, null, null);
     }
 
     @Override
     public void backup(String targetTableName, Column[] columns, Condition condition) {
-        mybatisSqlBeanDao.backup(DbType.getSqlBeanConfig(getProductName()), clazz, targetTableName, columns, condition);
+        mybatisSqlBeanDao.backup(getSqlBeanDBConfig(), clazz, targetTableName, columns, condition);
     }
 
     @Override
     public long copy(String targetTableName, Condition condition) {
-        return mybatisSqlBeanDao.copy(DbType.getSqlBeanConfig(getProductName()), clazz, targetTableName, null, condition);
+        return mybatisSqlBeanDao.copy(getSqlBeanDBConfig(), clazz, targetTableName, null, condition);
     }
 
     @Override
     public long copy(String targetTableName, Column[] columns, Condition condition) {
-        return mybatisSqlBeanDao.copy(DbType.getSqlBeanConfig(getProductName()), clazz, targetTableName, columns, condition);
+        return mybatisSqlBeanDao.copy(getSqlBeanDBConfig(), clazz, targetTableName, columns, condition);
     }
 
     @Override
@@ -378,7 +418,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
 
                 @Override
                 public void createTable() {
-                    mybatisSqlBeanDao.create(DbType.getSqlBeanConfig(getProductName()), clazz);
+                    mybatisSqlBeanDao.create(getSqlBeanDBConfig(), clazz);
                 }
 
                 @Override
@@ -389,7 +429,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID> {
 
                 @Override
                 public List<String> getTableList() {
-                    return mybatisSqlBeanDao.selectTableList(DbType.getSqlBeanConfig(getProductName()));
+                    return mybatisSqlBeanDao.selectTableList(getSqlBeanDBConfig());
                 }
 
             };
