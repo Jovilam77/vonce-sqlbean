@@ -2,6 +2,7 @@ package cn.vonce.sql.spring.service;
 
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
+import cn.vonce.sql.spring.annotation.DbReadOrWrite;
 import cn.vonce.sql.spring.config.UseSpringJdbc;
 import cn.vonce.sql.spring.mapper.SpringJbdcSqlBeanMapper;
 import cn.vonce.sql.provider.SqlBeanProvider;
@@ -94,6 +95,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return clazz;
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public T selectById(ID id) {
         if (id == null) {
@@ -108,6 +110,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public <O> O selectById(Class<O> returnType, ID id) {
         if (id == null) {
@@ -125,6 +128,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public List<T> selectByIds(ID... ids) {
         if (ids == null || ids.length == 0) {
@@ -139,6 +143,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public <O> List<O> selectByIds(Class<O> returnType, ID... ids) {
         if (ids == null || ids.length == 0) {
@@ -156,7 +161,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
-
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public T selectOne(Select select) {
         try {
@@ -168,7 +173,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
-
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public <O> O selectOne(Class<O> returnType, Select select) {
         try {
@@ -183,6 +188,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public Map<String, Object> selectMap(Select select) {
         try {
@@ -194,6 +200,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public T selectOneByCondition(String where, Object... args) {
         try {
@@ -205,6 +212,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public <O> O selectOneByCondition(Class<O> returnType, String where, Object... args) {
         try {
@@ -219,6 +227,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public <O> List<O> selectByCondition(Class<O> returnType, String where, Object... args) {
         try {
@@ -233,6 +242,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public <O> List<O> selectByCondition(Class<O> returnType, Paging paging, String where, Object... args) {
         try {
@@ -247,6 +257,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public List<T> selectByCondition(String where, Object... args) {
         try {
@@ -258,6 +269,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public List<T> selectByCondition(Paging paging, String where, Object... args) {
         try {
@@ -269,15 +281,19 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
+    @Override
     public long selectCountByCondition(String where, Object... args) {
         return jdbcTemplate.queryForObject(sqlBeanProvider.selectCountByConditionSql(getSqlBeanDB(), clazz, where, args), new SpringJbdcSqlBeanMapper<Long>(clazz, Long.class));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public long countAll() {
         return jdbcTemplate.queryForObject(sqlBeanProvider.selectCountByConditionSql(getSqlBeanDB(), clazz, null, null), new SpringJbdcSqlBeanMapper<Long>(clazz, Long.class));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public List<T> selectAll() {
         try {
@@ -289,6 +305,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public List<T> selectAll(Paging paging) {
         try {
@@ -300,6 +317,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public <O> List<O> selectAll(Class<O> returnType) {
         try {
@@ -314,6 +332,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public <O> List<O> selectAll(Class<O> returnType, Paging paging) {
         try {
@@ -328,6 +347,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public List<Map<String, Object>> selectMapList(Select select) {
         try {
@@ -341,6 +361,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public <O> List<O> select(Class<O> returnType, Select select) {
         try {
@@ -355,6 +376,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public List<T> select(Select select) {
         try {
@@ -366,111 +388,133 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public long count(Select select) {
         return jdbcTemplate.queryForObject(sqlBeanProvider.countSql(getSqlBeanDB(), clazz, select), new SpringJbdcSqlBeanMapper<Long>(clazz, Long.class));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.READ)
     @Override
     public long count(Class<?> clazz, Select select) {
         return jdbcTemplate.queryForObject(sqlBeanProvider.countSql(getSqlBeanDB(), clazz, select), Long.class);
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long deleteById(ID... id) {
         return jdbcTemplate.update(sqlBeanProvider.deleteByIdSql(getSqlBeanDB(), clazz, id));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long deleteByCondition(String where, Object... args) {
         return jdbcTemplate.update(sqlBeanProvider.deleteByConditionSql(getSqlBeanDB(), clazz, where, args));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long delete(Delete delete) {
         return jdbcTemplate.update(sqlBeanProvider.deleteSql(getSqlBeanDB(), clazz, delete, false));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long delete(Delete delete, boolean ignore) {
         return jdbcTemplate.update(sqlBeanProvider.deleteSql(getSqlBeanDB(), clazz, delete, ignore));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long logicallyDeleteById(ID id) {
         return jdbcTemplate.update(sqlBeanProvider.logicallyDeleteByIdSql(getSqlBeanDB(), clazz, id));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long logicallyDeleteByCondition(String where, Object... args) {
         return jdbcTemplate.update(sqlBeanProvider.logicallyDeleteByConditionSql(getSqlBeanDB(), clazz, where, args));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long update(Update update) {
         return jdbcTemplate.update(sqlBeanProvider.updateSql(getSqlBeanDB(), update, false));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long update(Update update, boolean ignore) {
         return jdbcTemplate.update(sqlBeanProvider.updateSql(getSqlBeanDB(), update, ignore));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long updateById(T bean, ID id, boolean updateNotNull) {
         return jdbcTemplate.update(sqlBeanProvider.updateByIdSql(getSqlBeanDB(), bean, id, updateNotNull, null));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long updateById(T bean, ID id, boolean updateNotNull, String[] filterFields) {
         return jdbcTemplate.update(sqlBeanProvider.updateByIdSql(getSqlBeanDB(), bean, id, updateNotNull, filterFields));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long updateByBeanId(T bean, boolean updateNotNull) {
         return jdbcTemplate.update(sqlBeanProvider.updateByBeanIdSql(getSqlBeanDB(), bean, updateNotNull, null));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long updateByBeanId(T bean, boolean updateNotNull, String[] filterFields) {
         return jdbcTemplate.update(sqlBeanProvider.updateByBeanIdSql(getSqlBeanDB(), bean, updateNotNull, filterFields));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long updateByCondition(T bean, boolean updateNotNull, String where, Object... args) {
         return jdbcTemplate.update(sqlBeanProvider.updateByConditionSql(getSqlBeanDB(), bean, updateNotNull, null, where, args));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long updateByCondition(T bean, boolean updateNotNull, String[] filterFields, String where, Object... args) {
         return jdbcTemplate.update(sqlBeanProvider.updateByConditionSql(getSqlBeanDB(), bean, updateNotNull, filterFields, where, args));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long updateByBeanCondition(T bean, boolean updateNotNull, String where) {
         return jdbcTemplate.update(sqlBeanProvider.updateByBeanConditionSql(getSqlBeanDB(), bean, updateNotNull, null, where));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long updateByBeanCondition(T bean, boolean updateNotNull, String[] filterFields, String where) {
         return jdbcTemplate.update(sqlBeanProvider.updateByBeanConditionSql(getSqlBeanDB(), bean, updateNotNull, filterFields, where));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long insert(T... bean) {
         return jdbcTemplate.update(sqlBeanProvider.insertBeanSql(getSqlBeanDB(), bean));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long insert(List<T> beanList) {
         return jdbcTemplate.update(sqlBeanProvider.insertBeanSql(getSqlBeanDB(), beanList));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long inset(Insert insert) {
         return jdbcTemplate.update(sqlBeanProvider.insertBeanSql(getSqlBeanDB(), insert));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public String backup() {
         String targetTableName = SqlBeanUtil.getTable(clazz).getName() + "_" + DateUtil.dateToString(new Date(), "yyyyMMddHHmmss");
@@ -482,21 +526,25 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return targetTableName;
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public void backup(String targetTableName) {
         jdbcTemplate.update(sqlBeanProvider.backupSql(getSqlBeanDB(), clazz, targetTableName, null, null));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public void backup(String targetTableName, Column[] columns, Condition condition) {
         jdbcTemplate.update(sqlBeanProvider.backupSql(getSqlBeanDB(), clazz, targetTableName, columns, condition));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long copy(String targetTableName, Condition condition) {
         return jdbcTemplate.update(sqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetTableName, null, condition));
     }
 
+    @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
     @Override
     public long copy(String targetTableName, Column[] columns, Condition condition) {
         return jdbcTemplate.update(sqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetTableName, columns, condition));
@@ -506,22 +554,26 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public TableService getTableService() {
         if (tableService == null) {
             tableService = new TableService() {
+                @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
                 @Override
                 public void dropTable() {
                     jdbcTemplate.update(sqlBeanProvider.dropTableSql(clazz));
                 }
 
+                @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
                 @Override
                 public void createTable() {
                     jdbcTemplate.update(sqlBeanProvider.createTableSql(getSqlBeanDB(), clazz));
                 }
 
+                @DbReadOrWrite(DbReadOrWrite.Type.WRITE)
                 @Override
                 public void dropAndCreateTable() {
                     dropTable();
                     createTable();
                 }
 
+                @DbReadOrWrite(DbReadOrWrite.Type.READ)
                 @Override
                 public List<String> getTableList() {
                     return jdbcTemplate.queryForList(sqlBeanProvider.selectTableListSql(getSqlBeanDB()), null, String.class);
