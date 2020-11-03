@@ -1,6 +1,7 @@
 package cn.vonce.sql.spring.config;
 
 
+import cn.vonce.sql.spring.datasource.DataSourceAspect;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -16,7 +17,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import({AutoCreateTableListener.class})
+@Import({AutoCreateTableListener.class, DataSourceAspect.class})
 public @interface UseSpringJdbc {
 
 

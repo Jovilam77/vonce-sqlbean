@@ -3,6 +3,8 @@ package cn.vonce.sql.spring.annotation;
 import java.lang.annotation.*;
 
 /**
+ * 选择数据源
+ *
  * @author Jovi
  * @version 1.0
  * @email imjovi@qq.com
@@ -12,10 +14,10 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Documented
 @Inherited
-public @interface DbReadOrWrite {
+public @interface DbSwitch {
 
     enum Type {
-        READ, WRITE
+        MASTER, SLAVE
     }
 
     Type value();

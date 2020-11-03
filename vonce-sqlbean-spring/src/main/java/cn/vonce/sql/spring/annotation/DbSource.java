@@ -3,6 +3,8 @@ package cn.vonce.sql.spring.annotation;
 import java.lang.annotation.*;
 
 /**
+ * 多数据源
+ *
  * @author Jovi
  * @version 1.0
  * @email imjovi@qq.com
