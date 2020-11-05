@@ -44,7 +44,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     private Logger logger = LoggerFactory.getLogger(SpringJdbcSqlBeanServiceImpl.class);
 
     private TableService tableService;
-    
+
     private SqlBeanProvider sqlBeanProvider;
 
     @Autowired(required = false)
@@ -550,37 +550,28 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return jdbcTemplate.update(sqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetTableName, columns, condition));
     }
 
+    @DbSwitch(DbSwitch.Type.MASTER)
     @Override
-    public TableService getTableService() {
-        if (tableService == null) {
-            tableService = new TableService() {
-                @DbSwitch(DbSwitch.Type.MASTER)
-                @Override
-                public void dropTable() {
-                    jdbcTemplate.update(sqlBeanProvider.dropTableSql(clazz));
-                }
+    public void dropTable() {
+        jdbcTemplate.update(sqlBeanProvider.dropTableSql(clazz));
+    }
 
-                @DbSwitch(DbSwitch.Type.MASTER)
-                @Override
-                public void createTable() {
-                    jdbcTemplate.update(sqlBeanProvider.createTableSql(getSqlBeanDB(), clazz));
-                }
+    @DbSwitch(DbSwitch.Type.MASTER)
+    @Override
+    public void createTable() {
+        jdbcTemplate.update(sqlBeanProvider.createTableSql(getSqlBeanDB(), clazz));
+    }
 
-                @DbSwitch(DbSwitch.Type.MASTER)
-                @Override
-                public void dropAndCreateTable() {
-                    dropTable();
-                    createTable();
-                }
+    @DbSwitch(DbSwitch.Type.MASTER)
+    @Override
+    public void dropAndCreateTable() {
+        dropTable();
+        createTable();
+    }
 
-                @DbSwitch(DbSwitch.Type.SLAVE)
-                @Override
-                public List<String> getTableList() {
-                    return jdbcTemplate.queryForList(sqlBeanProvider.selectTableListSql(getSqlBeanDB()), null, String.class);
-                }
-
-            };
-        }
-        return tableService;
+    @DbSwitch(DbSwitch.Type.SLAVE)
+    @Override
+    public List<String> getTableList() {
+        return jdbcTemplate.queryForList(sqlBeanProvider.selectTableListSql(getSqlBeanDB()), String.class);
     }
 }

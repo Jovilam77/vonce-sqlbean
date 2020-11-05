@@ -12,6 +12,7 @@ import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
@@ -72,7 +73,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     }
 
     @Override
-    public String getProductName(){
+    public String getProductName() {
         //获取当前连接的数据库类型
         String productName = null;
         try {
@@ -422,38 +423,28 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, targetTableName, columns, condition);
     }
 
+    @DbSwitch(DbSwitch.Type.MASTER)
     @Override
-    public TableService getTableService() {
-        if (tableService == null) {
-            tableService = new TableService() {
+    public void dropTable() {
+        mybatisSqlBeanDao.drop(clazz);
+    }
 
-                @DbSwitch(DbSwitch.Type.MASTER)
-                @Override
-                public void dropTable() {
-                    mybatisSqlBeanDao.drop(clazz);
-                }
+    @DbSwitch(DbSwitch.Type.MASTER)
+    @Override
+    public void createTable() {
+        mybatisSqlBeanDao.create(getSqlBeanDB(), clazz);
+    }
 
-                @DbSwitch(DbSwitch.Type.MASTER)
-                @Override
-                public void createTable() {
-                    mybatisSqlBeanDao.create(getSqlBeanDB(), clazz);
-                }
+    @DbSwitch(DbSwitch.Type.MASTER)
+    @Override
+    public void dropAndCreateTable() {
+        dropTable();
+        createTable();
+    }
 
-                @DbSwitch(DbSwitch.Type.MASTER)
-                @Override
-                public void dropAndCreateTable() {
-                    dropTable();
-                    createTable();
-                }
-
-                @DbSwitch(DbSwitch.Type.SLAVE)
-                @Override
-                public List<String> getTableList() {
-                    return mybatisSqlBeanDao.selectTableList(getSqlBeanDB());
-                }
-
-            };
-        }
-        return tableService;
+    @DbSwitch(DbSwitch.Type.SLAVE)
+    @Override
+    public List<String> getTableList() {
+        return mybatisSqlBeanDao.selectTableList(getSqlBeanDB());
     }
 }

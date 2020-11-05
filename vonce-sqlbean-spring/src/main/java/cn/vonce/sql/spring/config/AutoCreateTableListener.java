@@ -38,7 +38,7 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
             List<String> beanNameList = new ArrayList<>();
             beanNameList.addAll(Arrays.asList(evt.getApplicationContext().getBeanNamesForType(SqlBeanService.class)));
             if (!beanNameList.isEmpty()) {
-                List<String> tableList = evt.getApplicationContext().getBean(beanNameList.get(0), SqlBeanService.class).getTableService().getTableList();
+                List<String> tableList = evt.getApplicationContext().getBean(beanNameList.get(0), SqlBeanService.class).getTableList();
                 for (String name : beanNameList) {
                     SqlBeanService sqlBeanService = evt.getApplicationContext().getBean(name, SqlBeanService.class);
                     Class<?> clazz = sqlBeanService.getBeanClass();
@@ -53,7 +53,7 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                                 continue;
                             }
                         }
-                        sqlBeanService.getTableService().createTable();
+                        sqlBeanService.createTable();
                         logger.info("-----'{}'表不存在，已为你自动创建-----", table.getName());
                     }
                 }
