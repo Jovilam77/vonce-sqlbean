@@ -229,14 +229,16 @@ public class SqlHelper {
             sqlSb.append(transferred);
             sqlSb.append(SqlHelperCons.SPACES);
             sqlSb.append(columnInfo.getType().name());
-            sqlSb.append(SqlHelperCons.BEGIN_BRACKET);
-            //字段长度
-            sqlSb.append(columnInfo.getLength());
-            if (columnInfo.getType().isFloat()) {
-                sqlSb.append(SqlHelperCons.COMMA);
-                sqlSb.append(columnInfo.getDecimal());
+            if (columnInfo.getLength() > 0) {
+                sqlSb.append(SqlHelperCons.BEGIN_BRACKET);
+                //字段长度
+                sqlSb.append(columnInfo.getLength());
+                if (columnInfo.getType().isFloat()) {
+                    sqlSb.append(SqlHelperCons.COMMA);
+                    sqlSb.append(columnInfo.getDecimal());
+                }
+                sqlSb.append(SqlHelperCons.END_BRACKET);
             }
-            sqlSb.append(SqlHelperCons.END_BRACKET);
             //是否为null
             if (columnInfo.getNotNull()) {
                 sqlSb.append(SqlHelperCons.NOT_NULL);

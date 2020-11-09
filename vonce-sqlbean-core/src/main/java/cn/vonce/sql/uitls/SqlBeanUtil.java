@@ -618,8 +618,10 @@ public class SqlBeanUtil {
         String sqlValue = "";
         switch (whatType(value.getClass().getName())) {
             case VALUE_TYPE:
-            case BOOL_TYPE:
                 sqlValue = value.toString();
+                break;
+            case BOOL_TYPE:
+                sqlValue = Boolean.parseBoolean(value.toString()) == true ? "1" : "0";
                 break;
             case DATE_TYPE:
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
