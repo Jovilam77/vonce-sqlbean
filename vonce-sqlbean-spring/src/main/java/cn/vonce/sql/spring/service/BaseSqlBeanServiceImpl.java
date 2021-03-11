@@ -6,11 +6,20 @@ import cn.vonce.sql.enumerate.DbType;
 
 import java.util.Objects;
 
+/**
+ * SqlBeanServiceImpl 抽象类 获取配置通用实现
+ *
+ * @param
+ * @author Jovi
+ * @version 1.0
+ * @email 766255988@qq.com
+ */
 public abstract class BaseSqlBeanServiceImpl {
 
     private SqlBeanDB sqlBeanDB;
 
     public abstract SqlBeanConfig getSqlBeanConfig();
+
     public abstract String getProductName();
 
     public SqlBeanDB getSqlBeanDB() {

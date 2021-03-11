@@ -7,9 +7,9 @@ import cn.vonce.sql.spring.config.UseSpringJdbc;
 import cn.vonce.sql.spring.mapper.SpringJbdcSqlBeanMapper;
 import cn.vonce.sql.provider.SqlBeanProvider;
 import cn.vonce.sql.service.SqlBeanService;
-import cn.vonce.sql.service.TableService;
 import cn.vonce.sql.uitls.DateUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
+import cn.vonce.sql.uitls.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +43,6 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     private Logger logger = LoggerFactory.getLogger(SpringJdbcSqlBeanServiceImpl.class);
 
-    private TableService tableService;
-
     private SqlBeanProvider sqlBeanProvider;
 
     @Autowired(required = false)
@@ -52,6 +50,8 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    private String productName;
 
     private Class<?> clazz;
 
@@ -67,7 +67,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
                     clazz = this.getClass().getClassLoader().loadClass(trueTypeClass.getName());
                     return;
                 } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage(), e);
                 }
             }
         }
@@ -81,11 +81,12 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @Override
     public String getProductName() {
-        String productName = null;
-        try {
-            productName = jdbcTemplate.getDataSource().getConnection().getMetaData().getDatabaseProductName();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        if (StringUtil.isEmpty(productName)) {
+            try {
+                productName = jdbcTemplate.getDataSource().getConnection().getMetaData().getDatabaseProductName();
+            } catch (SQLException e) {
+                logger.error(e.getMessage(), e);
+            }
         }
         return productName;
     }
@@ -105,7 +106,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.queryForObject(sqlBeanProvider.selectByIdSql(getSqlBeanDB(), clazz, id),
                     new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -123,7 +124,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.queryForObject(sqlBeanProvider.selectByIdSql(getSqlBeanDB(), clazz, id),
                     new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -138,7 +139,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.queryForObject(sqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, ids),
                     new SpringJbdcSqlBeanMapper<List<T>>(clazz, clazz));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -156,7 +157,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.queryForObject(sqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, ids),
                     new SpringJbdcSqlBeanMapper<List<O>>(clazz, returnType));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -168,7 +169,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.queryForObject(sqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
                     new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -183,7 +184,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.queryForObject(sqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
                     new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -195,7 +196,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.queryForObject(sqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
                     new SpringJbdcSqlBeanMapper<Map<String, Object>>(clazz, Map.class));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -207,7 +208,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.queryForObject(sqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args),
                     new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -222,7 +223,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.queryForObject(sqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args),
                     new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -237,7 +238,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.query(sqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args),
                     new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -252,7 +253,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.query(sqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, paging, where, args),
                     new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -264,7 +265,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.query(sqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args),
                     new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -276,7 +277,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.query(sqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, paging, where, args),
                     new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -300,7 +301,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.query(sqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, null),
                     new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -312,7 +313,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.query(sqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, paging),
                     new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -327,7 +328,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.query(sqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, null),
                     new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -342,7 +343,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.query(sqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, paging),
                     new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -355,7 +356,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
                     new SpringJbdcSqlBeanMapper<Map<String, Object>>(clazz, Map.class));
         } catch (
                 Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -371,7 +372,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.query(sqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
                     new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -383,7 +384,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return jdbcTemplate.query(sqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
                     new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }

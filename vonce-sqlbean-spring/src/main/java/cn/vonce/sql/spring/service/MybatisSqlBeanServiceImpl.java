@@ -6,10 +6,12 @@ import cn.vonce.sql.spring.annotation.DbSwitch;
 import cn.vonce.sql.spring.config.UseMybatis;
 import cn.vonce.sql.spring.dao.MybatisSqlBeanDao;
 import cn.vonce.sql.service.SqlBeanService;
-import cn.vonce.sql.service.TableService;
 import cn.vonce.sql.uitls.DateUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
+import cn.vonce.sql.uitls.StringUtil;
 import org.apache.ibatis.session.SqlSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +38,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
      */
     private static final long serialVersionUID = 1L;
 
-    private TableService tableService;
+    private Logger logger = LoggerFactory.getLogger(MybatisSqlBeanServiceImpl.class);
 
     @Autowired
     private MybatisSqlBeanDao<T> mybatisSqlBeanDao;
@@ -46,6 +48,8 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @Autowired
     private SqlSession sqlSession;
+
+    private String productName;
 
     private Class<?> clazz;
 
@@ -61,7 +65,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
                     clazz = this.getClass().getClassLoader().loadClass(trueTypeClass.getName());
                     return;
                 } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage(), e);
                 }
             }
         }
@@ -74,12 +78,12 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @Override
     public String getProductName() {
-        //获取当前连接的数据库类型
-        String productName = null;
-        try {
-            productName = sqlSession.getConfiguration().getEnvironment().getDataSource().getConnection().getMetaData().getDatabaseProductName();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        if (StringUtil.isEmpty(productName)) {
+            try {
+                productName = sqlSession.getConfiguration().getEnvironment().getDataSource().getConnection().getMetaData().getDatabaseProductName();
+            } catch (SQLException e) {
+                logger.error(e.getMessage(), e);
+            }
         }
         return productName;
     }
@@ -394,6 +398,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         try {
             mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, targetTableName, null, null);
         } catch (Exception e) {
+            logger.error(e.getMessage(), e);
             return null;
         }
         return targetTableName;
