@@ -213,7 +213,41 @@ public class Select extends SpecialCondition implements Serializable {
      * @param mainKeyword  主表关键列字段
      */
     public Select join(JoinType joinType, String schema, String table, String tableAlias, String tableKeyword, String mainKeyword) {
-        joinList.add(new Join(joinType, schema, table, tableAlias, tableKeyword, mainKeyword));
+        joinList.add(new Join(joinType, schema, table, tableAlias, tableKeyword, mainKeyword, ""));
+        return this;
+    }
+
+    /**
+     * 添加表连接
+     *
+     * @param table 关联的表名
+     * @param on    连接条件
+     */
+    public Select join(String table, String on) {
+        return join(JoinType.INNER_JOIN, "", table, table, on);
+    }
+
+    /**
+     * 添加表连接
+     *
+     * @param joinType 连接类型
+     * @param table    关联的表名
+     * @param on       连接条件
+     */
+    public Select join(JoinType joinType, String table, String on) {
+        return join(joinType, "", table, table, on);
+    }
+
+    /**
+     * 添加表连接
+     *
+     * @param joinType 连接类型
+     * @param schema   schema
+     * @param table    关联的表名
+     * @param on       连接条件
+     */
+    public Select join(JoinType joinType, String schema, String table, String tableAlias, String on) {
+        joinList.add(new Join(joinType, schema, table, tableAlias, "", "", on));
         return this;
     }
 

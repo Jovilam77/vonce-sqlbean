@@ -425,8 +425,8 @@ public class SqlHelper {
                     schema = schema.toUpperCase();
                     tableName = tableName.toUpperCase();
                     tableAlias = tableAlias.toUpperCase();
-                    tableKeyword = tableKeyword.toUpperCase();
-                    mainKeyword = mainKeyword.toUpperCase();
+//                    tableKeyword = tableKeyword.toUpperCase();
+//                    mainKeyword = mainKeyword.toUpperCase();
                 }
                 if (StringUtil.isNotEmpty(schema)) {
                     joinSql.append(schema);
@@ -439,9 +439,13 @@ public class SqlHelper {
                 joinSql.append(tableAlias);
                 joinSql.append(transferred);
                 joinSql.append(SqlHelperCons.ON);
-                joinSql.append(tableKeyword);
-                joinSql.append(SqlHelperCons.EQUAL_TO);
-                joinSql.append(mainKeyword);
+                if (StringUtil.isNotEmpty(join.getOn())) {
+                    joinSql.append(join.getOn());
+                } else {
+                    joinSql.append(tableKeyword);
+                    joinSql.append(SqlHelperCons.EQUAL_TO);
+                    joinSql.append(mainKeyword);
+                }
                 if (i < select.getJoin().size() - 1) {
                     joinSql.append(SqlHelperCons.SPACES);
                 }
