@@ -52,7 +52,7 @@ public class ConditionInfo extends SqlField implements Serializable {
         return value;
     }
 
-    public void setValue(Object value) {
+    private void setValue(Object value) {
         this.value = value;
     }
 
@@ -60,7 +60,7 @@ public class ConditionInfo extends SqlField implements Serializable {
         return sqlOperator;
     }
 
-    public void setSqlOperator(SqlOperator sqlOperator) {
+    private void setSqlOperator(SqlOperator sqlOperator) {
         this.sqlOperator = sqlOperator;
     }
 
@@ -68,7 +68,7 @@ public class ConditionInfo extends SqlField implements Serializable {
         return sqlLogic;
     }
 
-    public void setSqlLogic(SqlLogic sqlLogic) {
+    private void setSqlLogic(SqlLogic sqlLogic) {
         this.sqlLogic = sqlLogic;
     }
 
