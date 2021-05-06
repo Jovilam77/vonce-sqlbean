@@ -41,13 +41,17 @@ public class Wrapper {
         return this;
     }
 
+    public List<Object> getCondList() {
+        return this.condList;
+    }
+
     public static void main(String[] args) {
 
         //WHERE type = 1 AND time between '2018-01-01' AND '2021-05-01'
         Wrapper.cond(Cond.lt("type", "1")).and(Cond.between("time", "2018-01-01", "2021-05-01"));
 
         //WHERE time > '2018-01-01' AND (type = 1 OR type = 2)
-        Wrapper.cond(Cond.gt("time","2018-01-01"))
+        Wrapper.cond(Cond.gt("time", "2018-01-01"))
                 .and(Wrapper.cond(Cond.eq("type", 1)).or(Cond.eq("type", 2)));
     }
 
