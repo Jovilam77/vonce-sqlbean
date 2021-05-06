@@ -15,38 +15,38 @@ import com.google.common.collect.ListMultimap;
  * @email 766255988@qq.com
  * @date 2020年3月1日上午10:00:10
  */
-public class Condition extends Common {
+public class Condition_copy extends Common {
 
-    private String condition = "";//条件
+    private String where = "";//条件
     private Object[] agrs = null;
-    private ListMultimap<String, ConditionInfo> conditionMap = LinkedListMultimap.create();//where条件包含的逻辑
+    private ListMultimap<String, ConditionInfo> whereMap = LinkedListMultimap.create();//where条件包含的逻辑
 
     /**
-     * 获取condition sql 内容
+     * 获取where sql 内容
      *
      * @return
      */
-    protected String getCondition() {
-        return condition;
-    }
-
-    /**
-     * 设置condition sql 内容
-     *
-     * @param condition
-     */
-    protected void setCondition(String condition) {
-        this.condition = condition;
+    public String getWhere() {
+        return where;
     }
 
     /**
      * 设置where sql 内容
      *
-     * @param condition
+     * @param where
+     */
+    public void setWhere(String where) {
+        this.where = where;
+    }
+
+    /**
+     * 设置where sql 内容
+     *
+     * @param where
      * @param args
      */
-    protected void setCondition(String condition, Object... args) {
-        this.condition = condition;
+    public void setWhere(String where, Object... args) {
+        this.where = where;
         this.agrs = args;
     }
 
@@ -73,8 +73,8 @@ public class Condition extends Common {
      *
      * @return
      */
-    public ListMultimap<String, ConditionInfo> getCondMap() {
-        return conditionMap;
+    public ListMultimap<String, ConditionInfo> getWhereMap() {
+        return whereMap;
     }
 
     /**
@@ -83,8 +83,8 @@ public class Condition extends Common {
      * @param field 字段
      * @param value 字段值
      */
-    public Condition cond(String field, Object value) {
-        return cond(field, value, SqlOperator.EQUAL_TO);
+    public Condition_copy where(String field, Object value) {
+        return where(field, value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -94,8 +94,8 @@ public class Condition extends Common {
      * @param value  字段值
      * @author Jovi
      */
-    public Condition cond(Column column, Object value) {
-        return cond(SqlLogic.AND, column.getSchema(), column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
+    public Condition_copy where(Column column, Object value) {
+        return where(SqlLogic.AND, column.getSchema(), column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
     }
 
 
@@ -107,8 +107,8 @@ public class Condition extends Common {
      * @param sqlOperator 操作符
      * @return
      */
-    public Condition cond(String field, Object value, SqlOperator sqlOperator) {
-        return cond(SqlLogic.AND, "", "", field, value, sqlOperator);
+    public Condition_copy where(String field, Object value, SqlOperator sqlOperator) {
+        return where(SqlLogic.AND, "", "", field, value, sqlOperator);
     }
 
     /**
@@ -118,8 +118,8 @@ public class Condition extends Common {
      * @param value      字段值
      * @return
      */
-    public Condition cond(SqlLogic sqlLogic, String tableAlias, String field, Object value) {
-        return cond(sqlLogic, "", tableAlias, field, value, SqlOperator.EQUAL_TO);
+    public Condition_copy where(SqlLogic sqlLogic, String tableAlias, String field, Object value) {
+        return where(sqlLogic, "", tableAlias, field, value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -131,8 +131,8 @@ public class Condition extends Common {
      * @param sqlOperator 操作符
      * @return
      */
-    public Condition cond(String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        return cond(SqlLogic.AND, "", tableAlias, field, value, sqlOperator);
+    public Condition_copy where(String tableAlias, String field, Object value, SqlOperator sqlOperator) {
+        return where(SqlLogic.AND, "", tableAlias, field, value, sqlOperator);
     }
 
     /**
@@ -144,8 +144,8 @@ public class Condition extends Common {
      * @return
      * @author Jovi
      */
-    public Condition cond(Column column, Object value, SqlOperator sqlOperator) {
-        return cond(SqlLogic.AND, column.getSchema(), column.getTableAlias(), column.name(), value, sqlOperator);
+    public Condition_copy where(Column column, Object value, SqlOperator sqlOperator) {
+        return where(SqlLogic.AND, column.getSchema(), column.getTableAlias(), column.name(), value, sqlOperator);
     }
 
     /**
@@ -158,8 +158,8 @@ public class Condition extends Common {
      * @return
      * @author Jovi
      */
-    public Condition cond(SqlLogic sqlLogic, Column column, Object value, SqlOperator sqlOperator) {
-        return cond(sqlLogic, column.getSchema(), column.getTableAlias(), column.name(), value, sqlOperator);
+    public Condition_copy where(SqlLogic sqlLogic, Column column, Object value, SqlOperator sqlOperator) {
+        return where(sqlLogic, column.getSchema(), column.getTableAlias(), column.name(), value, sqlOperator);
     }
 
     /**
@@ -173,7 +173,7 @@ public class Condition extends Common {
      * @param sqlOperator 操作符
      * @return
      */
-    public Condition cond(SqlLogic sqlLogic, String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
+    public Condition_copy where(SqlLogic sqlLogic, String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
         if (value instanceof Select) {
             if (sqlOperator == SqlOperator.IN || sqlOperator == SqlOperator.NOT_IN) {
                 value = new Original(SqlHelper.buildSelectSql((Select) value));
@@ -181,7 +181,7 @@ public class Condition extends Common {
                 value = new Original(SqlHelperCons.BEGIN_BRACKET + SqlHelper.buildSelectSql((Select) value) + SqlHelperCons.END_BRACKET);
             }
         }
-        conditionMap.put(tableAlias + field, new ConditionInfo(sqlLogic, schema, tableAlias, field, value, sqlOperator));
+        whereMap.put(tableAlias + field, new ConditionInfo(sqlLogic, schema, tableAlias, field, value, sqlOperator));
         return this;
     }
 
@@ -193,8 +193,8 @@ public class Condition extends Common {
      * @param value
      * @return
      */
-    public Condition and(String field, Object value) {
-        return and(field, value, SqlOperator.EQUAL_TO);
+    public Condition_copy wAND(String field, Object value) {
+        return wAND(field, value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -204,8 +204,8 @@ public class Condition extends Common {
      * @return
      * @author Jovi
      */
-    public Condition and(Column column, Object value) {
-        return and(column.getSchema(), column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
+    public Condition_copy wAND(Column column, Object value) {
+        return wAND(column.getSchema(), column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -216,8 +216,8 @@ public class Condition extends Common {
      * @param sqlOperator
      * @return
      */
-    public Condition and(String field, Object value, SqlOperator sqlOperator) {
-        return and("", "", field, value, sqlOperator);
+    public Condition_copy wAND(String field, Object value, SqlOperator sqlOperator) {
+        return wAND("", "", field, value, sqlOperator);
     }
 
     /**
@@ -229,8 +229,8 @@ public class Condition extends Common {
      * @return
      * @author Jovi
      */
-    public Condition and(Column column, Object value, SqlOperator sqlOperator) {
-        return and(column.getSchema(), column.getTableAlias(), column.name(), value, sqlOperator);
+    public Condition_copy wAND(Column column, Object value, SqlOperator sqlOperator) {
+        return wAND(column.getSchema(), column.getTableAlias(), column.name(), value, sqlOperator);
     }
 
     /**
@@ -243,8 +243,8 @@ public class Condition extends Common {
      * @param sqlOperator
      * @return
      */
-    public Condition and(String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        return cond(SqlLogic.AND, schema, tableAlias, field, value, sqlOperator);
+    public Condition_copy wAND(String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
+        return where(SqlLogic.AND, schema, tableAlias, field, value, sqlOperator);
     }
 
     /**
@@ -254,8 +254,8 @@ public class Condition extends Common {
      * @param value
      * @return
      */
-    public Condition or(String field, Object value) {
-        return or(field, value, SqlOperator.EQUAL_TO);
+    public Condition_copy wOR(String field, Object value) {
+        return wOR(field, value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -266,8 +266,8 @@ public class Condition extends Common {
      * @return
      * @author Jovi
      */
-    public Condition or(Column column, Object value) {
-        return or(column.getSchema(), column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
+    public Condition_copy wOR(Column column, Object value) {
+        return wOR(column.getSchema(), column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -278,8 +278,8 @@ public class Condition extends Common {
      * @param sqlOperator
      * @return
      */
-    public Condition or(String field, Object value, SqlOperator sqlOperator) {
-        return or("", "", field, value, sqlOperator);
+    public Condition_copy wOR(String field, Object value, SqlOperator sqlOperator) {
+        return wOR("", "", field, value, sqlOperator);
     }
 
     /**
@@ -290,8 +290,8 @@ public class Condition extends Common {
      * @param sqlOperator
      * @return
      */
-    public Condition or(Column column, Object value, SqlOperator sqlOperator) {
-        return or(column.getSchema(), column.getTableAlias(), column.name(), value, sqlOperator);
+    public Condition_copy wOR(Column column, Object value, SqlOperator sqlOperator) {
+        return wOR(column.getSchema(), column.getTableAlias(), column.name(), value, sqlOperator);
     }
 
     /**
@@ -304,8 +304,8 @@ public class Condition extends Common {
      * @param sqlOperator
      * @return
      */
-    public Condition or(String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        return cond(SqlLogic.OR, schema, tableAlias, field, value, sqlOperator);
+    public Condition_copy wOR(String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
+        return where(SqlLogic.OR, schema, tableAlias, field, value, sqlOperator);
     }
 
     /**
@@ -315,8 +315,8 @@ public class Condition extends Common {
      * @param value
      * @return
      */
-    public Condition andBracket(String field, Object value) {
-        return andBracket(field, value, SqlOperator.EQUAL_TO);
+    public Condition_copy wANDBracket(String field, Object value) {
+        return wANDBracket(field, value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -327,8 +327,8 @@ public class Condition extends Common {
      * @return
      * @author Jovi
      */
-    public Condition andBracket(Column column, Object value) {
-        return andBracket(column.getSchema(), column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
+    public Condition_copy wANDBracket(Column column, Object value) {
+        return wANDBracket(column.getSchema(), column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -339,8 +339,8 @@ public class Condition extends Common {
      * @param sqlOperator
      * @return
      */
-    public Condition andBracket(String field, Object value, SqlOperator sqlOperator) {
-        return andBracket("", "", field, value, sqlOperator);
+    public Condition_copy wANDBracket(String field, Object value, SqlOperator sqlOperator) {
+        return wANDBracket("", "", field, value, sqlOperator);
     }
 
     /**
@@ -351,8 +351,8 @@ public class Condition extends Common {
      * @param sqlOperator
      * @return
      */
-    public Condition andBracket(Column column, Object value, SqlOperator sqlOperator) {
-        return andBracket(column.getSchema(), column.getTableAlias(), column.name(), value, sqlOperator);
+    public Condition_copy wANDBracket(Column column, Object value, SqlOperator sqlOperator) {
+        return wANDBracket(column.getSchema(), column.getTableAlias(), column.name(), value, sqlOperator);
     }
 
     /**
@@ -365,8 +365,8 @@ public class Condition extends Common {
      * @param sqlOperator
      * @return
      */
-    public Condition andBracket(String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        return cond(SqlLogic.ANDBracket, schema, tableAlias, field, value, sqlOperator);
+    public Condition_copy wANDBracket(String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
+        return where(SqlLogic.ANDBracket, schema, tableAlias, field, value, sqlOperator);
     }
 
     /**
@@ -376,8 +376,8 @@ public class Condition extends Common {
      * @param value
      * @return
      */
-    public Condition orBracket(String field, Object value) {
-        return orBracket(field, value, SqlOperator.EQUAL_TO);
+    public Condition_copy wORBracket(String field, Object value) {
+        return wORBracket(field, value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -388,8 +388,8 @@ public class Condition extends Common {
      * @return
      * @author Jovi
      */
-    public Condition orBracket(Column column, Object value) {
-        return orBracket(column.getSchema(), column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
+    public Condition_copy wORBracket(Column column, Object value) {
+        return wORBracket(column.getSchema(), column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -400,8 +400,8 @@ public class Condition extends Common {
      * @param sqlOperator
      * @return
      */
-    public Condition orBracket(String field, Object value, SqlOperator sqlOperator) {
-        return orBracket("", "", field, value, sqlOperator);
+    public Condition_copy wORBracket(String field, Object value, SqlOperator sqlOperator) {
+        return wORBracket("", "", field, value, sqlOperator);
     }
 
     /**
@@ -412,8 +412,8 @@ public class Condition extends Common {
      * @param sqlOperator
      * @return
      */
-    public Condition orBracket(Column column, Object value, SqlOperator sqlOperator) {
-        return orBracket(column.getSchema(), column.getTableAlias(), column.name(), value, sqlOperator);
+    public Condition_copy wORBracket(Column column, Object value, SqlOperator sqlOperator) {
+        return wORBracket(column.getSchema(), column.getTableAlias(), column.name(), value, sqlOperator);
     }
 
     /**
@@ -426,8 +426,8 @@ public class Condition extends Common {
      * @param sqlOperator
      * @return
      */
-    public Condition orBracket(String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        return cond(SqlLogic.ORBracket, schema, tableAlias, field, value, sqlOperator);
+    public Condition_copy wORBracket(String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
+        return where(SqlLogic.ORBracket, schema, tableAlias, field, value, sqlOperator);
     }
 
 }

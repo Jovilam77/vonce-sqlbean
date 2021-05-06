@@ -21,7 +21,7 @@ import java.util.List;
  * @email 766255988@qq.com
  * @date 2017年8月18日上午9:00:19
  */
-public class Select extends SpecialCondition implements Serializable {
+public class Select extends WhereCondition implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

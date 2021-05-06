@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @email 766255988@qq.com
  * @date 2017年8月18日上午9:00:19
  */
-public class Update extends Condition implements Serializable {
+public class Update extends WhereCondition implements Serializable {
 
     private boolean updateNotNull = true;//默认只更新不为空的字段
     private Object updateBean = null;//更新的实体对象
