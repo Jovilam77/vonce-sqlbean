@@ -7,7 +7,7 @@ import cn.vonce.sql.uitls.StringUtil;
 import java.io.Serializable;
 
 /**
- * Common
+ * Column
  *
  * @author Jovi
  * @version 1.0
