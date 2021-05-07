@@ -2,6 +2,7 @@ package cn.vonce.sql.spring.datasource;
 
 import cn.vonce.sql.spring.annotation.DbSource;
 import cn.vonce.sql.spring.annotation.DbSwitch;
+import cn.vonce.sql.spring.enumerate.DbRole;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
@@ -39,7 +40,7 @@ public class DataSourceAspect {
                 Method method = clazz.getMethod(methodName, parameterTypes);
                 if (method.isAnnotationPresent(DbSwitch.class)) {
                     DbSwitch dbSwitch = method.getAnnotation(DbSwitch.class);
-                    if (dbSwitch.value() == DbSwitch.Type.SLAVE) {
+                    if (dbSwitch.value() == DbRole.SLAVE) {
                         if (dbSource.slave().length > 1) {
                             dataSource = dbSource.slave()[new Random().nextInt(dbSource.slave().length + 1)];
                         } else {

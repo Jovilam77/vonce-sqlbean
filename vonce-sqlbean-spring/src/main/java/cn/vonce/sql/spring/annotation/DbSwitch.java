@@ -1,5 +1,7 @@
 package cn.vonce.sql.spring.annotation;
 
+import cn.vonce.sql.spring.enumerate.DbRole;
+
 import java.lang.annotation.*;
 
 /**
@@ -16,10 +18,6 @@ import java.lang.annotation.*;
 @Inherited
 public @interface DbSwitch {
 
-    enum Type {
-        MASTER, SLAVE
-    }
-
-    Type value();
+    DbRole value();
 
 }
