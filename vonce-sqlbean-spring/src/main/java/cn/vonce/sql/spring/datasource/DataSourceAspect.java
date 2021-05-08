@@ -31,23 +31,19 @@ public class DataSourceAspect {
     @Before("pointcut()")
     public void before(JoinPoint joinPoint) {
         Class<?> clazz = joinPoint.getTarget().getClass();
-        String methodName = joinPoint.getSignature().getName();
-        Class[] parameterTypes = ((MethodSignature) joinPoint.getSignature()).getParameterTypes();
-        String dataSource = null;
         if (clazz.isAnnotationPresent(DbSource.class)) {
+            String methodName = joinPoint.getSignature().getName();
+            Class[] parameterTypes = ((MethodSignature) joinPoint.getSignature()).getParameterTypes();
+            String dataSource = null;
             DbSource dbSource = clazz.getAnnotation(DbSource.class);
             try {
                 Method method = clazz.getMethod(methodName, parameterTypes);
-                if (method.isAnnotationPresent(DbSwitch.class)) {
-                    DbSwitch dbSwitch = method.getAnnotation(DbSwitch.class);
-                    if (dbSwitch.value() == DbRole.SLAVE) {
-                        if (dbSource.slave().length > 1) {
-                            dataSource = dbSource.slave()[new Random().nextInt(dbSource.slave().length + 1)];
-                        } else {
-                            dataSource = dbSource.slave()[0];
-                        }
+                DbSwitch dbSwitch = method.getAnnotation(DbSwitch.class);
+                if (dbSwitch != null && dbSwitch.value() == DbRole.SLAVE) {
+                    if (dbSource.slave().length > 1) {
+                        dataSource = dbSource.slave()[new Random().nextInt(dbSource.slave().length)];
                     } else {
-                        dataSource = dbSource.master();
+                        dataSource = dbSource.slave()[0];
                     }
                 } else {
                     dataSource = dbSource.master();
