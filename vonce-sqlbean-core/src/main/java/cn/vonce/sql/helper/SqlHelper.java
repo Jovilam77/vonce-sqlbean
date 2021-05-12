@@ -635,7 +635,7 @@ public class SqlHelper {
      */
     @SuppressWarnings("unchecked")
     public static String whereSql(Condition condition, Object bean) {
-        return conditionHandle(ConditionType.WHERE, condition, condition.getWhere(), condition.getAgrs(), bean, condition.getWhereMap());
+        return conditionHandle(ConditionType.WHERE, condition, condition.getWhere(), condition.getAgrs(), bean, condition.getWhereMap(), condition.getWhereWrapper());
     }
 
     /**
@@ -653,7 +653,7 @@ public class SqlHelper {
      * @return
      */
     private static String havingSql(Select select) {
-        return conditionHandle(ConditionType.HAVING, select, select.getHaving(), select.getHavingArgs(), null, select.getHavingMap());
+        return conditionHandle(ConditionType.HAVING, select, select.getHaving(), select.getHavingArgs(), null, select.getHavingMap(), select.getHavingWrapper());
     }
 
     /**
@@ -715,14 +715,15 @@ public class SqlHelper {
     /**
      * 条件处理
      *
-     * @param conditionType
-     * @param common
-     * @param where
-     * @param args
-     * @param whereMap
+     * @param conditionType 条件类型（where还是 having）
+     * @param common        公共类
+     * @param condition     条件字符串（优先级1）
+     * @param args          条件字符串参数
+     * @param conditionMap  条件Map（优先级3）
+     * @param wrapper       条件包装器（优先级2）
      * @return
      */
-    private static String conditionHandle(ConditionType conditionType, Common common, String where, Object[] args, Object bean, ListMultimap<String, ConditionInfo> whereMap) {
+    private static String conditionHandle(ConditionType conditionType, Common common, String condition, Object[] args, Object bean, ListMultimap<String, ConditionInfo> conditionMap, Wrapper wrapper) {
         StringBuffer conditionSql = new StringBuffer();
         StringBuffer versionConditionSql = null;
         Field versionField = null;
@@ -746,30 +747,38 @@ public class SqlHelper {
                 }
             }
         }
-        // 优先使用条件字符串拼接
-        if (where != null && !"".equals(where)) {
+        // 优先级1 使用条件字符串拼接
+        if (condition != null && !"".equals(condition)) {
             conditionSql.append(ConditionType.WHERE == conditionType ? SqlHelperCons.WHERE : SqlHelperCons.HAVING);
             if (versionField != null && versionEffectiveness) {
                 conditionSql.append(versionConditionSql);
             }
             conditionSql.append(SqlHelperCons.BEGIN_BRACKET);
             if (args != null && args.length > 0) {
-                conditionSql.append(SqlBeanUtil.getCondition(common, where, args));
-            } else if (where.indexOf("${") > -1 && bean != null) {
-                conditionSql.append(SqlBeanUtil.getCondition(common, where, bean));
+                conditionSql.append(SqlBeanUtil.getCondition(common, condition, args));
+            } else if (condition.indexOf("${") > -1 && bean != null) {
+                conditionSql.append(SqlBeanUtil.getCondition(common, condition, bean));
             } else {
-                conditionSql.append(where);
+                conditionSql.append(condition);
             }
             conditionSql.append(SqlHelperCons.END_BRACKET);
+        }
+        // 优先级2 使用条件包装器
+        else if (wrapper != null && !wrapper.getModelList().isEmpty()) {
+            conditionSql.append(ConditionType.WHERE == conditionType ? SqlHelperCons.WHERE : SqlHelperCons.HAVING);
+            if (versionField != null && versionEffectiveness) {
+                conditionSql.append(versionConditionSql);
+            }
+            conditionSql.append(conditionWrapperHandle(common, wrapper));
         } else {
-            if (whereMap.size() > 0) {
-                if (versionField != null && versionEffectiveness) {
-                    conditionSql.append(versionConditionSql);
-                }
+            if (versionField != null && versionEffectiveness) {
+                conditionSql.append(versionConditionSql);
+            }
+            if (conditionMap.size() > 0) {
                 conditionSql.append(SqlHelperCons.BEGIN_BRACKET);
                 int i = 0;
                 // 遍历所有条件
-                Collection<Map.Entry<String, ConditionInfo>> sqlConditionEntryCollection = whereMap.entries();
+                Collection<Map.Entry<String, ConditionInfo>> sqlConditionEntryCollection = conditionMap.entries();
                 for (Map.Entry<String, ConditionInfo> sqlConditionEntry : sqlConditionEntryCollection) {
                     ConditionInfo conditionInfo = sqlConditionEntry.getValue();
                     // 遍历sql逻辑处理
@@ -787,6 +796,35 @@ public class SqlHelper {
             if (conditionSql.length() != 0) {
                 conditionSql.insert(0, ConditionType.WHERE == conditionType ? SqlHelperCons.WHERE : SqlHelperCons.HAVING);
             }
+        }
+        return conditionSql.toString();
+    }
+
+    /**
+     * 条件包装器解析
+     *
+     * @param common
+     * @param wrapper
+     * @return
+     */
+    private static String conditionWrapperHandle(Common common, Wrapper wrapper) {
+        StringBuffer conditionSql = new StringBuffer();
+        if (!wrapper.getModelList().isEmpty()) {
+            conditionSql.append(SqlHelperCons.BEGIN_BRACKET);
+            for (int i = 0; i < wrapper.getModelList().size(); i++) {
+                Wrapper.Model model = wrapper.getModelList().get(i);
+                // 遍历sql逻辑处理
+                if (i != 0 && i < wrapper.getModelList().size()) {
+                    conditionSql.append(getLogic(model.getSqlLogic()));
+                }
+                Object item = model.getItem();
+                if (item instanceof Cond) {
+                    conditionSql.append(valueOperator(common, (Cond) item));
+                } else {
+                    conditionSql.append(conditionWrapperHandle(common, (Wrapper) item));
+                }
+            }
+            conditionSql.append(SqlHelperCons.END_BRACKET);
         }
         return conditionSql.toString();
     }

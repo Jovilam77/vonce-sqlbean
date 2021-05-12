@@ -39,11 +39,11 @@ public class DataSourceAspect {
             try {
                 Method method = clazz.getMethod(methodName, parameterTypes);
                 DbSwitch dbSwitch = method.getAnnotation(DbSwitch.class);
-                if (dbSwitch != null && dbSwitch.value() == DbRole.SLAVE) {
-                    if (dbSource.slave().length > 1) {
-                        dataSource = dbSource.slave()[new Random().nextInt(dbSource.slave().length)];
-                    } else {
+                if (dbSwitch != null && dbSwitch.value() == DbRole.SLAVE && dbSource.slave().length > 0) {
+                    if (dbSource.slave().length == 1) {
                         dataSource = dbSource.slave()[0];
+                    } else {
+                        dataSource = dbSource.slave()[new Random().nextInt(dbSource.slave().length)];
                     }
                 } else {
                     dataSource = dbSource.master();

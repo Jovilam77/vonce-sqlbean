@@ -1,5 +1,7 @@
 package cn.vonce.sql.helper;
 
+import cn.vonce.sql.enumerate.SqlLogic;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,46 +15,103 @@ import java.util.List;
  */
 public class Wrapper {
 
-    private List<Object> condList = new ArrayList<>();
+    private List<Model> modelList = new ArrayList<>();
 
+    /**
+     * 条件
+     *
+     * @param cond
+     * @return
+     */
     public static Wrapper cond(Cond cond) {
         Wrapper wrapper = new Wrapper();
-        wrapper.condList.add(cond);
+        wrapper.modelList.add(new Model(SqlLogic.AND, cond));
         return wrapper;
     }
 
+    /**
+     * 并且
+     *
+     * @param wrapper
+     * @return
+     */
     public Wrapper and(Wrapper wrapper) {
-        condList.add(wrapper);
+        modelList.add(new Model(SqlLogic.AND, wrapper));
         return this;
     }
 
+    /**
+     * 并且
+     *
+     * @param cond
+     * @return
+     */
     public Wrapper and(Cond cond) {
-        condList.add(cond);
+        modelList.add(new Model(SqlLogic.AND, cond));
         return this;
     }
 
+    /**
+     * 或者
+     *
+     * @param wrapper
+     * @return
+     */
     public Wrapper or(Wrapper wrapper) {
-        condList.add(wrapper);
+        modelList.add(new Model(SqlLogic.OR, wrapper));
         return this;
     }
 
+    /**
+     * 或者
+     *
+     * @param cond
+     * @return
+     */
     public Wrapper or(Cond cond) {
-        condList.add(cond);
+        modelList.add(new Model(SqlLogic.OR, cond));
         return this;
     }
 
-    public List<Object> getCondList() {
-        return this.condList;
+    /**
+     * 获得条件模型列表
+     *
+     * @return
+     */
+    public List<Model> getModelList() {
+        return this.modelList;
     }
 
-    public static void main(String[] args) {
+    /**
+     * 条件模型
+     */
+    public static class Model {
+        private SqlLogic sqlLogic;
+        private Object item;
 
-        //WHERE type = 1 AND time between '2018-01-01' AND '2021-05-01'
-        Wrapper.cond(Cond.lt("type", "1")).and(Cond.between("time", "2018-01-01", "2021-05-01"));
+        public Model() {
+        }
 
-        //WHERE time > '2018-01-01' AND (type = 1 OR type = 2)
-        Wrapper.cond(Cond.gt("time", "2018-01-01"))
-                .and(Wrapper.cond(Cond.eq("type", 1)).or(Cond.eq("type", 2)));
+        public Model(SqlLogic sqlLogic, Object item) {
+            this.sqlLogic = sqlLogic;
+            this.item = item;
+        }
+
+        public SqlLogic getSqlLogic() {
+            return sqlLogic;
+        }
+
+        public void setSqlLogic(SqlLogic sqlLogic) {
+            this.sqlLogic = sqlLogic;
+        }
+
+        public Object getItem() {
+            return item;
+        }
+
+        public void setItem(Object item) {
+            this.item = item;
+        }
     }
 
 }

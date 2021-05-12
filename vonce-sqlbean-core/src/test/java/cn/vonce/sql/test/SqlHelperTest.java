@@ -4,10 +4,13 @@ import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.enumerate.*;
+import cn.vonce.sql.helper.Cond;
 import cn.vonce.sql.helper.SqlHelper;
+import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.model.User;
 import cn.vonce.sql.model.sql.SqlEssay;
 import cn.vonce.sql.model.sql.SqlUser;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +41,9 @@ public class SqlHelperTest {
 
         // select4
         select4(sqlBeanDB);
+
+        // select5
+        select5(sqlBeanDB);
 
         // insert1
         insert1(sqlBeanDB);
@@ -133,6 +139,21 @@ public class SqlHelperTest {
                 .wOR(SqlUser.gender, gender, SqlOperator.IN);
         System.out.println("---select4---");
         System.out.println(SqlHelper.buildSelectSql(select4));
+    }
+
+    /**
+     * 查询5
+     *
+     * @param sqlBeanDB
+     */
+    private static void select5(SqlBeanDB sqlBeanDB) {
+        Select select5 = new Select();
+        select5.setSqlBeanDB(sqlBeanDB);
+        select5.setColumn(SqlUser._all);
+        select5.setTable(SqlUser._tableName);
+        select5.setWhere(Wrapper.cond(Cond.eq(SqlUser.id, 1)).and(Wrapper.cond(Cond.eq(SqlUser.gender, "1")).or(Cond.eq(SqlUser.nickname, 1))));
+        System.out.println("---select5---");
+        System.out.println(SqlHelper.buildSelectSql(select5));
     }
 
     /**
