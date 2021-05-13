@@ -2,6 +2,7 @@ package cn.vonce.sql.spring.service;
 
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
+import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.spring.annotation.DbSwitch;
 import cn.vonce.sql.spring.config.UseSpringJdbc;
 import cn.vonce.sql.spring.enumerate.DbRole;
@@ -231,12 +232,60 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @DbSwitch(DbRole.SLAVE)
     @Override
+    public T selectOneByCondition(Wrapper where) {
+        try {
+            Select select = new Select();
+            select.setWhere(where);
+            return jdbcTemplate.queryForObject(sqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                    new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public <O> O selectOneByCondition(Class<O> returnType, Wrapper where) {
+        try {
+            Select select = new Select();
+            select.setWhere(where);
+            if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+                clazz = returnType;
+            }
+            return jdbcTemplate.queryForObject(sqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                    new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
     public <O> List<O> selectByCondition(Class<O> returnType, String where, Object... args) {
         try {
             if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
                 clazz = returnType;
             }
             return jdbcTemplate.query(sqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args),
+                    new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public <O> List<O> selectByCondition(Class<O> returnType, Wrapper where) {
+        try {
+            Select select = new Select();
+            select.setWhere(where);
+            if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+                clazz = returnType;
+            }
+            return jdbcTemplate.query(sqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
                     new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -261,9 +310,42 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @DbSwitch(DbRole.SLAVE)
     @Override
+    public <O> List<O> selectByCondition(Class<O> returnType, Paging paging, Wrapper where) {
+        try {
+            Select select = new Select();
+            select.setWhere(where);
+            select.setPage(paging.getPagenum(), paging.getPagesize());
+            select.orderBy(paging.getOrders());
+            if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+                clazz = returnType;
+            }
+            return jdbcTemplate.query(sqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                    new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
     public List<T> selectByCondition(String where, Object... args) {
         try {
             return jdbcTemplate.query(sqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args),
+                    new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public List<T> selectByCondition(Wrapper where) {
+        try {
+            Select select = new Select();
+            select.setWhere(where);
+            return jdbcTemplate.query(sqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
                     new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -285,8 +367,32 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @DbSwitch(DbRole.SLAVE)
     @Override
+    public List<T> selectByCondition(Paging paging, Wrapper where) {
+        try {
+            Select select = new Select();
+            select.setWhere(where);
+            select.setPage(paging.getPagenum(), paging.getPagesize());
+            select.orderBy(paging.getOrders());
+            return jdbcTemplate.query(sqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                    new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
     public long selectCountByCondition(String where, Object... args) {
         return jdbcTemplate.queryForObject(sqlBeanProvider.selectCountByConditionSql(getSqlBeanDB(), clazz, where, args), new SpringJbdcSqlBeanMapper<Long>(clazz, Long.class));
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public long selectCountByCondition(Wrapper where) {
+        Select select = new Select();
+        select.setWhere(where);
+        return jdbcTemplate.queryForObject(sqlBeanProvider.countSql(getSqlBeanDB(), clazz, select), new SpringJbdcSqlBeanMapper<Long>(clazz, Long.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -416,6 +522,14 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public long deleteByCondition(Wrapper where) {
+        Delete delete = new Delete();
+        delete.setWhere(where);
+        return jdbcTemplate.update(sqlBeanProvider.deleteSql(getSqlBeanDB(), clazz, delete, false));
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public long delete(Delete delete) {
         return jdbcTemplate.update(sqlBeanProvider.deleteSql(getSqlBeanDB(), clazz, delete, false));
     }
@@ -482,8 +596,26 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public long updateByCondition(T bean, boolean updateNotNull, Wrapper where) {
+        Update update = new Update();
+        update.setWhere(where);
+        return jdbcTemplate.update(sqlBeanProvider.updateSql(getSqlBeanDB(), update, false));
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public long updateByCondition(T bean, boolean updateNotNull, String[] filterFields, String where, Object... args) {
         return jdbcTemplate.update(sqlBeanProvider.updateByConditionSql(getSqlBeanDB(), bean, updateNotNull, filterFields, where, args));
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public long updateByCondition(T bean, boolean updateNotNull, String[] filterFields, Wrapper where) {
+        Update update = new Update();
+        update.setWhere(where);
+        update.setUpdateNotNull(updateNotNull);
+        update.setFilterFields(filterFields);
+        return jdbcTemplate.update(sqlBeanProvider.updateSql(getSqlBeanDB(), update, false));
     }
 
     @DbSwitch(DbRole.MASTER)

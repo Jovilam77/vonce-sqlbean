@@ -1,6 +1,7 @@
 package cn.vonce.sql.spring.dao;
 
 import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.spring.provider.MybatisSqlBeanProvider;
 import cn.vonce.sql.bean.Delete;
 import cn.vonce.sql.bean.Insert;

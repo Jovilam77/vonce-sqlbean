@@ -1,6 +1,7 @@
 package cn.vonce.sql.service;
 
 import cn.vonce.sql.bean.Delete;
+import cn.vonce.sql.helper.Wrapper;
 
 /**
  * Delete 通用业务接口
@@ -27,9 +28,16 @@ public interface DeleteService<ID> {
      * @param where
      * @param args
      * @return
-     *
      */
     long deleteByCondition(String where, Object... args);
+
+    /**
+     * 根据条件删除
+     *
+     * @param where
+     * @return
+     */
+    long deleteByCondition(Wrapper where);
 
     /**
      * 删除(where条件为空会抛异常，因为删除全部非常危险)

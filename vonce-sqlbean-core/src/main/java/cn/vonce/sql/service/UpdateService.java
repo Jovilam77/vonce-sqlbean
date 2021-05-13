@@ -1,6 +1,7 @@
 package cn.vonce.sql.service;
 
 import cn.vonce.sql.bean.Update;
+import cn.vonce.sql.helper.Wrapper;
 
 /**
  * Update 通用业务接口
@@ -11,7 +12,7 @@ import cn.vonce.sql.bean.Update;
  * @email 766255988@qq.com
  * @date 2019年6月27日下午3:57:33
  */
-public interface UpdateService<T,ID> {
+public interface UpdateService<T, ID> {
 
     /**
      * 根据id条件更新
@@ -69,12 +70,33 @@ public interface UpdateService<T,ID> {
      *
      * @param bean
      * @param updateNotNull
+     * @param where
+     * @return
+     */
+    long updateByCondition(T bean, boolean updateNotNull, Wrapper where);
+
+    /**
+     * 根据条件更新
+     *
+     * @param bean
+     * @param updateNotNull
      * @param filterFields
      * @param where
      * @param args
      * @return
      */
     long updateByCondition(T bean, boolean updateNotNull, String[] filterFields, String where, Object... args);
+
+    /**
+     * 根据条件更新
+     *
+     * @param bean
+     * @param updateNotNull
+     * @param filterFields
+     * @param where
+     * @return
+     */
+    long updateByCondition(T bean, boolean updateNotNull, String[] filterFields, Wrapper where);
 
     /**
      * 根据实体类字段条件更新

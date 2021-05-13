@@ -1,7 +1,6 @@
 package cn.vonce.sql.spring.provider;
 
 import cn.vonce.sql.bean.*;
-import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.provider.SqlBeanProvider;
 
