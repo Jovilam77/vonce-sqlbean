@@ -725,34 +725,10 @@ public class SqlHelper {
      */
     private static String conditionHandle(ConditionType conditionType, Common common, String condition, Object[] args, Object bean, ListMultimap<String, ConditionInfo> conditionMap, Wrapper wrapper) {
         StringBuffer conditionSql = new StringBuffer();
-        StringBuffer versionConditionSql = null;
-        Field versionField = null;
-        boolean versionEffectiveness = false;
-        //更新时乐观锁处理
-        if (common instanceof Update) {
-            versionConditionSql = new StringBuffer();
-            if (bean != null) {
-                versionField = SqlBeanUtil.getVersionField(bean.getClass());
-            }
-            if (versionField != null) {
-                versionEffectiveness = SqlBeanUtil.versionEffectiveness(versionField.getType().getName());
-                if (versionEffectiveness) {
-                    versionConditionSql.append(SqlHelperCons.BEGIN_BRACKET);
-                    versionConditionSql.append(SqlBeanUtil.getTableFieldName(versionField));
-                    Object versionValue = ReflectUtil.instance().get(bean.getClass(), bean, versionField.getName());
-                    versionConditionSql.append(versionValue == null ? SqlHelperCons.IS : SqlHelperCons.EQUAL_TO);
-                    versionConditionSql.append(SqlBeanUtil.getSqlValue(common, versionValue));
-                    versionConditionSql.append(SqlHelperCons.END_BRACKET);
-                    versionConditionSql.append(SqlHelperCons.AND);
-                }
-            }
-        }
         // 优先级1 使用条件字符串拼接
         if (condition != null && !"".equals(condition)) {
             conditionSql.append(ConditionType.WHERE == conditionType ? SqlHelperCons.WHERE : SqlHelperCons.HAVING);
-            if (versionField != null && versionEffectiveness) {
-                conditionSql.append(versionConditionSql);
-            }
+            conditionSql.append(versionCondition(common, bean));
             conditionSql.append(SqlHelperCons.BEGIN_BRACKET);
             if (args != null && args.length > 0) {
                 conditionSql.append(SqlBeanUtil.getCondition(common, condition, args));
@@ -766,14 +742,10 @@ public class SqlHelper {
         // 优先级2 使用条件包装器
         else if (wrapper != null && !wrapper.getModelList().isEmpty()) {
             conditionSql.append(ConditionType.WHERE == conditionType ? SqlHelperCons.WHERE : SqlHelperCons.HAVING);
-            if (versionField != null && versionEffectiveness) {
-                conditionSql.append(versionConditionSql);
-            }
+            conditionSql.append(versionCondition(common, bean));
             conditionSql.append(conditionWrapperHandle(common, wrapper));
         } else {
-            if (versionField != null && versionEffectiveness) {
-                conditionSql.append(versionConditionSql);
-            }
+            conditionSql.append(versionCondition(common, bean));
             if (conditionMap.size() > 0) {
                 conditionSql.append(SqlHelperCons.BEGIN_BRACKET);
                 int i = 0;
@@ -798,6 +770,37 @@ public class SqlHelper {
             }
         }
         return conditionSql.toString();
+    }
+
+    /**
+     * 乐观锁处理
+     *
+     * @param common
+     * @param bean
+     * @return
+     */
+    private static String versionCondition(Common common, Object bean) {
+        StringBuffer versionConditionSql = new StringBuffer();
+        Field versionField = null;
+        //更新时乐观锁处理
+        if (common instanceof Update) {
+            if (bean != null) {
+                versionField = SqlBeanUtil.getVersionField(bean.getClass());
+            }
+            if (versionField != null) {
+                boolean versionEffectiveness = SqlBeanUtil.versionEffectiveness(versionField.getType().getName());
+                if (versionEffectiveness) {
+                    versionConditionSql.append(SqlHelperCons.BEGIN_BRACKET);
+                    versionConditionSql.append(SqlBeanUtil.getTableFieldName(versionField));
+                    Object versionValue = ReflectUtil.instance().get(bean.getClass(), bean, versionField.getName());
+                    versionConditionSql.append(versionValue == null ? SqlHelperCons.IS : SqlHelperCons.EQUAL_TO);
+                    versionConditionSql.append(SqlBeanUtil.getSqlValue(common, versionValue));
+                    versionConditionSql.append(SqlHelperCons.END_BRACKET);
+                    versionConditionSql.append(SqlHelperCons.AND);
+                }
+            }
+        }
+        return versionConditionSql.toString();
     }
 
     /**
