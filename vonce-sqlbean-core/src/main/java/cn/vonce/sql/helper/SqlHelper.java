@@ -1,13 +1,10 @@
 package cn.vonce.sql.helper;
 
+import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.StringUtil;
 import com.google.common.collect.ListMultimap;
 
-import cn.vonce.sql.annotation.SqlColumn;
-import cn.vonce.sql.annotation.SqlId;
-import cn.vonce.sql.annotation.SqlUnion;
-import cn.vonce.sql.annotation.SqlVersion;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.*;
@@ -16,10 +13,7 @@ import cn.vonce.sql.uitls.SqlBeanUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * SQL 语句助手
@@ -135,7 +129,7 @@ public class SqlHelper {
     }
 
     /**
-     * 生成update sql语句(目前仅限数据库字段与实体类bean字段一致使用)
+     * 生成update sql语句
      *
      * @param update
      * @return
@@ -153,7 +147,7 @@ public class SqlHelper {
     }
 
     /**
-     * 生成insert sql语句(目前仅限数据库字段与实体类bean字段一致使用)
+     * 生成insert sql语句
      *
      * @param insert
      * @return
@@ -482,6 +476,7 @@ public class SqlHelper {
         } else {
             fieldAndValuesSql.append(SqlHelperCons.INSERT_INTO);
         }
+        Date date = new Date();
         for (int i = 0; i < objects.length; i++) {
             //每次必须清空
             valueSql.delete(0, valueSql.length());
@@ -514,18 +509,19 @@ public class SqlHelper {
                         fieldSql.append(SqlHelperCons.COMMA);
                     }
                 }
+                Object value = ReflectUtil.instance().get(objects[i].getClass(), objects[i], field.getName());
                 //如果此字段为id且需要生成唯一id
                 if (sqlId != null && sqlId.generateType() != GenerateType.AUTO && sqlId.generateType() != GenerateType.NORMAL) {
-                    Object value = ReflectUtil.instance().get(objects[i].getClass(), objects[i], field.getName());
                     if (StringUtil.isEmpty(value)) {
                         value = common.getSqlBeanDB().getSqlBeanConfig().getUniqueIdProcessor().uniqueId(sqlId.generateType());
                     }
                     valueSql.append(SqlBeanUtil.getSqlValue(common, value));
-                    valueSql.append(SqlHelperCons.COMMA);
+                } else if (field.isAnnotationPresent(SqlInsertTime.class) && SqlBeanUtil.whatType(field.getType().getName()) == WhatType.DATE_TYPE && value == null) {
+                    valueSql.append(SqlBeanUtil.getSqlValue(common, date));
                 } else {
                     valueSql.append(SqlBeanUtil.getSqlValue(common, ReflectUtil.instance().get(objects[i].getClass(), objects[i], field.getName())));
-                    valueSql.append(SqlHelperCons.COMMA);
                 }
+                valueSql.append(SqlHelperCons.COMMA);
             }
             valueSql.deleteCharAt(valueSql.length() - SqlHelperCons.COMMA.length());
             valueSql.append(SqlHelperCons.END_BRACKET);
@@ -601,6 +597,7 @@ public class SqlHelper {
             }
             filterAfterList.add(fields[i]);
         }
+        Date date = new Date();
         for (int i = 0; i < filterAfterList.size(); i++) {
             String name = SqlBeanUtil.getTableFieldName(filterAfterList.get(i));
             Object objectValue = ReflectUtil.instance().get(bean.getClass(), bean, filterAfterList.get(i).getName());
@@ -608,9 +605,11 @@ public class SqlHelper {
             setSql.append(SqlBeanUtil.isToUpperCase(update) ? name.toUpperCase() : name);
             setSql.append(transferred);
             setSql.append(SqlHelperCons.EQUAL_TO);
-            if (filterAfterList.get(i).getAnnotation(SqlVersion.class) != null) {
+            if (filterAfterList.get(i).isAnnotationPresent(SqlVersion.class)) {
                 Object o = SqlBeanUtil.updateVersion(filterAfterList.get(i).getType().getName(), objectValue);
                 setSql.append(SqlBeanUtil.getSqlValue(update, o));
+            } else if (filterAfterList.get(i).isAnnotationPresent(SqlUpdateTime.class) && SqlBeanUtil.whatType(filterAfterList.get(i).getType().getName()) == WhatType.DATE_TYPE && objectValue == null) {
+                setSql.append(SqlBeanUtil.getSqlValue(update, date));
             } else {
                 setSql.append(SqlBeanUtil.getSqlValue(update, objectValue));
             }
@@ -717,7 +716,8 @@ public class SqlHelper {
      * @param wrapper       条件包装器（优先级2）
      * @return
      */
-    private static String conditionHandle(ConditionType conditionType, Common common, String condition, Object[] args, Object bean, ListMultimap<String, ConditionInfo> conditionMap, Wrapper wrapper) {
+    private static String conditionHandle(ConditionType conditionType, Common common, String condition, Object[]
+            args, Object bean, ListMultimap<String, ConditionInfo> conditionMap, Wrapper wrapper) {
         StringBuffer conditionSql = new StringBuffer();
         // 优先级1 使用条件字符串拼接
         if (condition != null && !"".equals(condition)) {

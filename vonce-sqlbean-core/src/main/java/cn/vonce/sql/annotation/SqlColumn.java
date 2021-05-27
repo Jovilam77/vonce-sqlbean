@@ -37,7 +37,7 @@ public @interface SqlColumn {
      *
      * @return
      */
-    JdbcType type() default JdbcType.NULL;
+    JdbcType type() default JdbcType.NOTHING;
 
     /**
      * 长度
