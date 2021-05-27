@@ -3,7 +3,7 @@ package cn.vonce.sql.enumerate;
 import java.math.BigDecimal;
 
 /**
- * Java类型对于的SQL类型枚举类
+ * Java类型对应的SQL类型枚举类
  *
  * @author Jovi
  * @version 1.0
