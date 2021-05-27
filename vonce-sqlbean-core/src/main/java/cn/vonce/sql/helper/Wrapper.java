@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class Wrapper {
 
-    private List<Data> modelList = new ArrayList<>();
+    private List<Data> dataList = new ArrayList<>();
 
     /**
      * 条件
@@ -25,7 +25,7 @@ public class Wrapper {
      */
     public static Wrapper where(Cond cond) {
         Wrapper wrapper = new Wrapper();
-        wrapper.modelList.add(new Data(SqlLogic.AND, cond));
+        wrapper.dataList.add(new Data(SqlLogic.AND, cond));
         return wrapper;
     }
 
@@ -46,7 +46,7 @@ public class Wrapper {
      * @return
      */
     public Wrapper and(Wrapper wrapper) {
-        modelList.add(new Data(SqlLogic.AND, wrapper));
+        dataList.add(new Data(SqlLogic.AND, wrapper));
         return this;
     }
 
@@ -57,7 +57,7 @@ public class Wrapper {
      * @return
      */
     public Wrapper and(Cond cond) {
-        modelList.add(new Data(SqlLogic.AND, cond));
+        dataList.add(new Data(SqlLogic.AND, cond));
         return this;
     }
 
@@ -68,7 +68,7 @@ public class Wrapper {
      * @return
      */
     public Wrapper or(Wrapper wrapper) {
-        modelList.add(new Data(SqlLogic.OR, wrapper));
+        dataList.add(new Data(SqlLogic.OR, wrapper));
         return this;
     }
 
@@ -79,7 +79,7 @@ public class Wrapper {
      * @return
      */
     public Wrapper or(Cond cond) {
-        modelList.add(new Data(SqlLogic.OR, cond));
+        dataList.add(new Data(SqlLogic.OR, cond));
         return this;
     }
 
@@ -88,8 +88,8 @@ public class Wrapper {
      *
      * @return
      */
-    public List<Data> getModelList() {
-        return this.modelList;
+    public List<Data> getDataList() {
+        return this.dataList;
     }
 
     /**

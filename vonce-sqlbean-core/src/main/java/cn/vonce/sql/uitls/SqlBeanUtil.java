@@ -462,7 +462,7 @@ public class SqlBeanUtil {
                 }
                 if (objects != null) {
                     for (int i = 0; i < objects.length; i++) {
-                        value.append(getSqlValue(common, objects[i], null));
+                        value.append(getSqlValue(common, objects[i]));
                         value.append(SqlHelperCons.COMMA);
                     }
                     value.deleteCharAt(value.length() - SqlHelperCons.COMMA.length());
@@ -500,7 +500,7 @@ public class SqlBeanUtil {
             if (endIndex != -1) {
                 String name = conditionSql.substring(startIndex + prefix.length(), endIndex);
                 int nextIndex = endIndex + suffix.length();
-                String value = getSqlValue(common, ReflectJdkUtil.instance().get(bean.getClass(), bean, name), null);
+                String value = getSqlValue(common, ReflectJdkUtil.instance().get(bean.getClass(), bean, name));
                 conditionSql.replace(startIndex, endIndex + suffix.length(), value);
                 nextIndex = startIndex + value.length();
                 startIndex = conditionSql.indexOf(prefix, nextIndex);
@@ -655,6 +655,16 @@ public class SqlBeanUtil {
                 break;
         }
         return isTrue;
+    }
+
+    /**
+     * 获取sql实际值(过滤sql注入)
+     *
+     * @param value
+     * @return
+     */
+    public static String getSqlValue(Common common, Object value) {
+        return getSqlValue(common, value, null);
     }
 
     /**
