@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class Wrapper {
 
-    private List<Model> modelList = new ArrayList<>();
+    private List<Data> modelList = new ArrayList<>();
 
     /**
      * 条件
@@ -23,10 +23,20 @@ public class Wrapper {
      * @param cond
      * @return
      */
-    public static Wrapper cond(Cond cond) {
+    public static Wrapper where(Cond cond) {
         Wrapper wrapper = new Wrapper();
-        wrapper.modelList.add(new Model(SqlLogic.AND, cond));
+        wrapper.modelList.add(new Data(SqlLogic.AND, cond));
         return wrapper;
+    }
+
+    /**
+     * 条件
+     *
+     * @param cond
+     * @return
+     */
+    public static Wrapper having(Cond cond) {
+        return where(cond);
     }
 
     /**
@@ -36,7 +46,7 @@ public class Wrapper {
      * @return
      */
     public Wrapper and(Wrapper wrapper) {
-        modelList.add(new Model(SqlLogic.AND, wrapper));
+        modelList.add(new Data(SqlLogic.AND, wrapper));
         return this;
     }
 
@@ -47,7 +57,7 @@ public class Wrapper {
      * @return
      */
     public Wrapper and(Cond cond) {
-        modelList.add(new Model(SqlLogic.AND, cond));
+        modelList.add(new Data(SqlLogic.AND, cond));
         return this;
     }
 
@@ -58,7 +68,7 @@ public class Wrapper {
      * @return
      */
     public Wrapper or(Wrapper wrapper) {
-        modelList.add(new Model(SqlLogic.OR, wrapper));
+        modelList.add(new Data(SqlLogic.OR, wrapper));
         return this;
     }
 
@@ -69,7 +79,7 @@ public class Wrapper {
      * @return
      */
     public Wrapper or(Cond cond) {
-        modelList.add(new Model(SqlLogic.OR, cond));
+        modelList.add(new Data(SqlLogic.OR, cond));
         return this;
     }
 
@@ -78,21 +88,21 @@ public class Wrapper {
      *
      * @return
      */
-    public List<Model> getModelList() {
+    public List<Data> getModelList() {
         return this.modelList;
     }
 
     /**
      * 条件模型
      */
-    public static class Model {
+    public static class Data {
         private SqlLogic sqlLogic;
         private Object item;
 
-        public Model() {
+        public Data() {
         }
 
-        public Model(SqlLogic sqlLogic, Object item) {
+        public Data(SqlLogic sqlLogic, Object item) {
             this.sqlLogic = sqlLogic;
             this.item = item;
         }

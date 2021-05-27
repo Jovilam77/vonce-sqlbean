@@ -151,7 +151,7 @@ public class SqlHelperTest {
         select5.setSqlBeanDB(sqlBeanDB);
         select5.setColumn(SqlUser._all);
         select5.setTable(SqlUser._tableName);
-        select5.setWhere(Wrapper.cond(Cond.eq(SqlUser.id, 1)).and(Wrapper.cond(Cond.eq(SqlUser.gender, "1")).or(Cond.eq(SqlUser.nickname, 1))));
+        select5.setWhere(Wrapper.where(Cond.eq(SqlUser.id, 1)).and(Wrapper.where(Cond.eq(SqlUser.gender, "1")).or(Cond.eq(SqlUser.nickname, 1))));
         System.out.println("---select5---");
         System.out.println(SqlHelper.buildSelectSql(select5));
     }

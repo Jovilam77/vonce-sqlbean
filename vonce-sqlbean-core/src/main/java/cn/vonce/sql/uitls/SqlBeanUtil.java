@@ -4,6 +4,7 @@ import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.constant.SqlHelperCons;
 import cn.vonce.sql.enumerate.DbType;
+import cn.vonce.sql.enumerate.JdbcType;
 import cn.vonce.sql.enumerate.WhatType;
 import cn.vonce.sql.exception.SqlBeanException;
 
@@ -461,7 +462,7 @@ public class SqlBeanUtil {
                 }
                 if (objects != null) {
                     for (int i = 0; i < objects.length; i++) {
-                        value.append(getSqlValue(common, objects[i]));
+                        value.append(getSqlValue(common, objects[i], null));
                         value.append(SqlHelperCons.COMMA);
                     }
                     value.deleteCharAt(value.length() - SqlHelperCons.COMMA.length());
@@ -499,7 +500,7 @@ public class SqlBeanUtil {
             if (endIndex != -1) {
                 String name = conditionSql.substring(startIndex + prefix.length(), endIndex);
                 int nextIndex = endIndex + suffix.length();
-                String value = getSqlValue(common, ReflectJdkUtil.instance().get(bean.getClass(), bean, name));
+                String value = getSqlValue(common, ReflectJdkUtil.instance().get(bean.getClass(), bean, name), null);
                 conditionSql.replace(startIndex, endIndex + suffix.length(), value);
                 nextIndex = startIndex + value.length();
                 startIndex = conditionSql.indexOf(prefix, nextIndex);
@@ -546,6 +547,58 @@ public class SqlBeanUtil {
             case "java.sql.Date":
             case "java.sql.Timestamp":
             case "java.sql.Time":
+                whatType = WhatType.DATE_TYPE;
+                break;
+            default:
+                whatType = WhatType.OBJECT_TYPE;
+                break;
+        }
+        return whatType;
+    }
+
+    /**
+     * 获取字段类型
+     *
+     * @param jdbcType
+     * @return
+     */
+    public static WhatType whatType(JdbcType jdbcType) {
+        WhatType whatType;
+        switch (jdbcType) {
+            case CHAR:
+            case NCHAR:
+            case VARCHAR:
+            case VARCHAR2:
+            case NVARCHAR:
+            case TINYTEXT:
+            case TEXT:
+            case NTEXT:
+            case LONGTEXT:
+            case CLOB:
+            case NCLOB:
+                whatType = WhatType.STRING_TYPE;
+                break;
+            case BIT:
+                whatType = WhatType.BOOL_TYPE;
+                break;
+            case TINYINT:
+            case SMALLINT:
+            case INTEGER:
+            case BIGINT:
+            case LONG:
+            case FLOAT:
+            case DOUBLE:
+            case DECIMAL:
+            case NUMERIC:
+            case MONEY:
+            case SMALLMONEY:
+                whatType = WhatType.VALUE_TYPE;
+                break;
+            case DATE:
+            case TIME:
+            case DATETIME:
+            case DATETIME2:
+            case TIMESTAMP:
                 whatType = WhatType.DATE_TYPE;
                 break;
             default:
@@ -610,27 +663,43 @@ public class SqlBeanUtil {
      * @param value
      * @return
      */
-    public static String getSqlValue(Common common, Object value) {
+    public static String getSqlValue(Common common, Object value, JdbcType jdbcType) {
         if (value == null) {
             return SqlHelperCons.NULL_VALUE;
         }
         String single_quotation_mark = SqlHelperCons.SINGLE_QUOTATION_MARK;
-        String sqlValue = "";
-        switch (whatType(value.getClass().getName())) {
+        String sqlValue;
+        WhatType whatType;
+        if (jdbcType == null) {
+            whatType = whatType(value.getClass().getName());
+        } else {
+            whatType = whatType(jdbcType);
+        }
+        switch (whatType) {
             case VALUE_TYPE:
                 sqlValue = value.toString();
                 break;
             case BOOL_TYPE:
-                sqlValue = Boolean.parseBoolean(value.toString()) == true ? "1" : "0";
+                if (jdbcType != null) {
+                    sqlValue = (String) value;
+                } else {
+                    sqlValue = Boolean.parseBoolean(value.toString()) == true ? "1" : "0";
+                }
                 break;
             case DATE_TYPE:
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                String dateString;
+                if (jdbcType != null) {
+                    dateString = (String) value;
+                } else {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                    dateString = sdf.format(value);
+                }
                 switch (common.getSqlBeanDB().getDbType()) {
                     case Oracle:
-                        sqlValue = "to_timestamp(" + single_quotation_mark + sdf.format(value) + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
+                        sqlValue = "to_timestamp(" + single_quotation_mark + dateString + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
                         break;
                     default:
-                        sqlValue = single_quotation_mark + sdf.format(value) + single_quotation_mark;
+                        sqlValue = single_quotation_mark + dateString + single_quotation_mark;
                         break;
                 }
                 break;

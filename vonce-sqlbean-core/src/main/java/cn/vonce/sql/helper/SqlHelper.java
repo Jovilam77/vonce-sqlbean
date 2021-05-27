@@ -246,7 +246,7 @@ public class SqlHelper {
             //默认值
             if (StringUtil.isNotEmpty(columnInfo.getDef())) {
                 sqlSb.append(SqlHelperCons.DEFAULT);
-                sqlSb.append(SqlBeanUtil.getSqlValue(create, columnInfo.getDef()));
+                sqlSb.append(SqlBeanUtil.getSqlValue(create, columnInfo.getDef(), null));
             }
             sqlSb.append(SqlHelperCons.COMMA);
         }
@@ -273,7 +273,7 @@ public class SqlHelper {
      */
     private static ColumnInfo getColumnInfo(DbType dbType, Class<?> clazz, SqlColumn sqlColumn) {
         ColumnInfo columnInfo = new ColumnInfo();
-        if (sqlColumn != null && sqlColumn.type() != JdbcType.NULL) {
+        if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
             columnInfo.setType(sqlColumn.type());
             columnInfo.setNotNull(sqlColumn.notNull());
         } else {
@@ -526,10 +526,10 @@ public class SqlHelper {
                     if (StringUtil.isEmpty(value)) {
                         value = common.getSqlBeanDB().getSqlBeanConfig().getUniqueIdProcessor().uniqueId(sqlId.generateType());
                     }
-                    valueSql.append(SqlBeanUtil.getSqlValue(common, value));
+                    valueSql.append(SqlBeanUtil.getSqlValue(common, value, null));
                     valueSql.append(SqlHelperCons.COMMA);
                 } else {
-                    valueSql.append(SqlBeanUtil.getSqlValue(common, ReflectUtil.instance().get(objects[i].getClass(), objects[i], field.getName())));
+                    valueSql.append(SqlBeanUtil.getSqlValue(common, ReflectUtil.instance().get(objects[i].getClass(), objects[i], field.getName()), null));
                     valueSql.append(SqlHelperCons.COMMA);
                 }
             }
@@ -616,9 +616,9 @@ public class SqlHelper {
             setSql.append(SqlHelperCons.EQUAL_TO);
             if (filterAfterList.get(i).getAnnotation(SqlVersion.class) != null) {
                 Object o = SqlBeanUtil.updateVersion(filterAfterList.get(i).getType().getName(), objectValue);
-                setSql.append(SqlBeanUtil.getSqlValue(update, o));
+                setSql.append(SqlBeanUtil.getSqlValue(update, o, null));
             } else {
-                setSql.append(SqlBeanUtil.getSqlValue(update, objectValue));
+                setSql.append(SqlBeanUtil.getSqlValue(update, objectValue, null));
             }
             setSql.append(SqlHelperCons.COMMA);
         }
@@ -794,7 +794,7 @@ public class SqlHelper {
                     versionConditionSql.append(SqlBeanUtil.getTableFieldName(versionField));
                     Object versionValue = ReflectUtil.instance().get(bean.getClass(), bean, versionField.getName());
                     versionConditionSql.append(versionValue == null ? SqlHelperCons.IS : SqlHelperCons.EQUAL_TO);
-                    versionConditionSql.append(SqlBeanUtil.getSqlValue(common, versionValue));
+                    versionConditionSql.append(SqlBeanUtil.getSqlValue(common, versionValue, null));
                     versionConditionSql.append(SqlHelperCons.END_BRACKET);
                     versionConditionSql.append(SqlHelperCons.AND);
                 }
@@ -815,12 +815,12 @@ public class SqlHelper {
         if (!wrapper.getModelList().isEmpty()) {
             conditionSql.append(SqlHelperCons.BEGIN_BRACKET);
             for (int i = 0; i < wrapper.getModelList().size(); i++) {
-                Wrapper.Model model = wrapper.getModelList().get(i);
+                Wrapper.Data data = wrapper.getModelList().get(i);
                 // 遍历sql逻辑处理
                 if (i != 0 && i < wrapper.getModelList().size()) {
-                    conditionSql.append(getLogic(model.getSqlLogic()));
+                    conditionSql.append(getLogic(data.getSqlLogic()));
                 }
-                Object item = model.getItem();
+                Object item = data.getItem();
                 if (item instanceof Cond) {
                     conditionSql.append(valueOperator(common, (Cond) item));
                 } else {
@@ -943,7 +943,7 @@ public class SqlHelper {
                         Original original = (Original) in_notInValues[k];
                         in_notIn.append(original.getValue());
                     } else {
-                        in_notIn.append(SqlBeanUtil.getSqlValue(common, in_notInValues[k]));
+                        in_notIn.append(SqlBeanUtil.getSqlValue(common, in_notInValues[k], null));
                     }
                     in_notIn.append(SqlHelperCons.COMMA);
                 }
@@ -965,7 +965,7 @@ public class SqlHelper {
                 Original original = (Original) conditionInfo.getValue();
                 value = original.getValue();
             } else {
-                value = SqlBeanUtil.getSqlValue(common, value);
+                value = SqlBeanUtil.getSqlValue(common, value, null);
             }
         }
         //表别名
@@ -986,9 +986,9 @@ public class SqlHelper {
         sql.append(operator);
         //值
         if (conditionInfo.getSqlOperator() == SqlOperator.BETWEEN) {
-            sql.append(SqlBeanUtil.getSqlValue(common, betweenValues[0]));
+            sql.append(SqlBeanUtil.getSqlValue(common, betweenValues[0], null));
             sql.append(SqlHelperCons.AND);
-            sql.append(SqlBeanUtil.getSqlValue(common, betweenValues[1]));
+            sql.append(SqlBeanUtil.getSqlValue(common, betweenValues[1], null));
         } else {
             sql.append(value);
         }
