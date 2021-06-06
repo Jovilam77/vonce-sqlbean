@@ -24,7 +24,7 @@ public interface InsertService<T> {
      * @return
      */
     @SuppressWarnings("unchecked")
-    long insert(T... bean);
+    int insert(T... bean);
 
     /**
      * 插入数据
@@ -33,7 +33,7 @@ public interface InsertService<T> {
      * @return
      */
     @SuppressWarnings("unchecked")
-    long insert(List<T> beanList);
+    int insert(List<T> beanList);
 
     /**
      * 插入数据
@@ -41,7 +41,7 @@ public interface InsertService<T> {
      * @param insert
      * @return
      */
-    long inset(Insert insert);
+    int inset(Insert insert);
 
     /**
      * 备份表和数据到一张新表(表名_+时间)
@@ -75,7 +75,7 @@ public interface InsertService<T> {
      * @param condition
      * @return
      */
-    long copy(String targetTableName, Condition condition);
+    int copy(String targetTableName, Condition condition);
 
     /**
      * 根据条件将数据复制插入到指定结构的表中
@@ -85,6 +85,6 @@ public interface InsertService<T> {
      * @param condition
      * @return
      */
-    long copy(String targetTableName, Column[] columns, Condition condition);
+    int copy(String targetTableName, Column[] columns, Condition condition);
 
 }

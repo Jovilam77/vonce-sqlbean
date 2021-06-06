@@ -22,7 +22,7 @@ public interface UpdateService<T, ID> {
      * @param updateNotNull
      * @return
      */
-    long updateById(T bean, ID id, boolean updateNotNull);
+    int updateById(T bean, ID id, boolean updateNotNull);
 
     /**
      * 根据实体类id条件更新
@@ -31,7 +31,7 @@ public interface UpdateService<T, ID> {
      * @param updateNotNull
      * @return
      */
-    long updateByBeanId(T bean, boolean updateNotNull);
+    int updateByBeanId(T bean, boolean updateNotNull);
 
     /**
      * 根据实体类id条件更新
@@ -41,7 +41,7 @@ public interface UpdateService<T, ID> {
      * @param filterFields
      * @return
      */
-    long updateByBeanId(T bean, boolean updateNotNull, String[] filterFields);
+    int updateByBeanId(T bean, boolean updateNotNull, String[] filterFields);
 
     /**
      * 根据实体类id条件更新
@@ -52,7 +52,7 @@ public interface UpdateService<T, ID> {
      * @param filterFields
      * @return
      */
-    long updateById(T bean, ID id, boolean updateNotNull, String[] filterFields);
+    int updateById(T bean, ID id, boolean updateNotNull, String[] filterFields);
 
     /**
      * 根据条件更新
@@ -63,7 +63,7 @@ public interface UpdateService<T, ID> {
      * @param args
      * @return
      */
-    long updateByCondition(T bean, boolean updateNotNull, String where, Object... args);
+    int updateByCondition(T bean, boolean updateNotNull, String where, Object... args);
 
     /**
      * 根据条件更新
@@ -73,7 +73,7 @@ public interface UpdateService<T, ID> {
      * @param where
      * @return
      */
-    long updateByCondition(T bean, boolean updateNotNull, Wrapper where);
+    int updateByCondition(T bean, boolean updateNotNull, Wrapper where);
 
     /**
      * 根据条件更新
@@ -85,7 +85,7 @@ public interface UpdateService<T, ID> {
      * @param args
      * @return
      */
-    long updateByCondition(T bean, boolean updateNotNull, String[] filterFields, String where, Object... args);
+    int updateByCondition(T bean, boolean updateNotNull, String[] filterFields, String where, Object... args);
 
     /**
      * 根据条件更新
@@ -96,7 +96,7 @@ public interface UpdateService<T, ID> {
      * @param where
      * @return
      */
-    long updateByCondition(T bean, boolean updateNotNull, String[] filterFields, Wrapper where);
+    int updateByCondition(T bean, boolean updateNotNull, String[] filterFields, Wrapper where);
 
     /**
      * 根据实体类字段条件更新
@@ -106,7 +106,7 @@ public interface UpdateService<T, ID> {
      * @param where
      * @return
      */
-    long updateByBeanCondition(T bean, boolean updateNotNull, String where);
+    int updateByBeanCondition(T bean, boolean updateNotNull, String where);
 
     /**
      * 根据实体类字段条件更新
@@ -117,7 +117,7 @@ public interface UpdateService<T, ID> {
      * @param where
      * @return
      */
-    long updateByBeanCondition(T bean, boolean updateNotNull, String[] filterFields, String where);
+    int updateByBeanCondition(T bean, boolean updateNotNull, String[] filterFields, String where);
 
     /**
      * 更新(where条件为空会抛异常，因为更新全部非常危险)
@@ -125,7 +125,7 @@ public interface UpdateService<T, ID> {
      * @param update
      * @return
      */
-    long update(Update update);
+    int update(Update update);
 
     /**
      * 更新
@@ -134,6 +134,6 @@ public interface UpdateService<T, ID> {
      * @param ignore 如果为true则不指定where条件也能执行，false则抛异常
      * @return
      */
-    long update(Update update, boolean ignore);
+    int update(Update update, boolean ignore);
 
 }

@@ -3,6 +3,8 @@ package cn.vonce.sql.spring.service;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.helper.Wrapper;
+import cn.vonce.sql.provider.SqlBeanProvider;
+import cn.vonce.sql.service.TableService;
 import cn.vonce.sql.spring.annotation.DbSwitch;
 import cn.vonce.sql.spring.config.UseMybatis;
 import cn.vonce.sql.spring.dao.MybatisSqlBeanDao;
@@ -33,14 +35,11 @@ import java.util.*;
  */
 @UseMybatis
 @Service
-public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl implements SqlBeanService<T, ID> {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
+public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl implements SqlBeanService<T, ID>, TableService {
 
     private Logger logger = LoggerFactory.getLogger(MybatisSqlBeanServiceImpl.class);
+
+    private SqlBeanProvider sqlBeanProvider;
 
     @Autowired
     private MybatisSqlBeanDao<T> mybatisSqlBeanDao;
@@ -71,6 +70,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
                 }
             }
         }
+        sqlBeanProvider = new SqlBeanProvider();
     }
 
     @Override
@@ -266,22 +266,22 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public long selectCountByCondition(String where, Object... args) {
-        return mybatisSqlBeanDao.selectCountByCondition(getSqlBeanDB(), clazz, where, args);
+    public int selectCountByCondition(String where, Object... args) {
+        return sqlSession.selectOne(sqlBeanProvider.selectCountByConditionSql(getSqlBeanDB(), clazz, where, args));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public long selectCountByCondition(Wrapper where) {
+    public int selectCountByCondition(Wrapper where) {
         Select select = new Select();
         select.setWhere(where);
-        return mybatisSqlBeanDao.count(getSqlBeanDB(), clazz, select);
+        return sqlSession.selectOne(sqlBeanProvider.countSql(getSqlBeanDB(), clazz, select));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public long countAll() {
-        return mybatisSqlBeanDao.selectCountByCondition(getSqlBeanDB(), clazz, null, null);
+    public int countAll() {
+        return sqlSession.selectOne(sqlBeanProvider.selectCountByConditionSql(getSqlBeanDB(), clazz, null, null));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -337,157 +337,157 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public long count(Select select) {
-        return mybatisSqlBeanDao.count(getSqlBeanDB(), clazz, select);
+    public int count(Select select) {
+        return sqlSession.selectOne(sqlBeanProvider.countSql(getSqlBeanDB(), clazz, select));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public long count(Class<?> clazz, Select select) {
-        return mybatisSqlBeanDao.count(getSqlBeanDB(), clazz, select);
+    public int count(Class<?> clazz, Select select) {
+        return sqlSession.selectOne(sqlBeanProvider.countSql(getSqlBeanDB(), clazz, select));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long deleteById(ID... id) {
-        return mybatisSqlBeanDao.deleteById(getSqlBeanDB(), clazz, id);
+    public int deleteById(ID... id) {
+        return sqlSession.delete(sqlBeanProvider.deleteByIdSql(getSqlBeanDB(), clazz, id));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long deleteByCondition(String where, Object... args) {
-        return mybatisSqlBeanDao.deleteByCondition(getSqlBeanDB(), clazz, where, args);
+    public int deleteByCondition(String where, Object... args) {
+        return sqlSession.delete(sqlBeanProvider.deleteByConditionSql(getSqlBeanDB(), clazz, where, args));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long deleteByCondition(Wrapper where) {
+    public int deleteByCondition(Wrapper where) {
         Delete delete = new Delete();
         delete.setWhere(where);
-        return mybatisSqlBeanDao.delete(getSqlBeanDB(), clazz, delete, false);
+        return sqlSession.delete(sqlBeanProvider.deleteSql(getSqlBeanDB(), clazz, delete, false));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long delete(Delete delete) {
-        return mybatisSqlBeanDao.delete(getSqlBeanDB(), clazz, delete, false);
+    public int delete(Delete delete) {
+        return sqlSession.delete(sqlBeanProvider.deleteSql(getSqlBeanDB(), clazz, delete, false));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long delete(Delete delete, boolean ignore) {
-        return mybatisSqlBeanDao.delete(getSqlBeanDB(), clazz, delete, ignore);
+    public int delete(Delete delete, boolean ignore) {
+        return sqlSession.delete(sqlBeanProvider.deleteSql(getSqlBeanDB(), clazz, delete, ignore));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long logicallyDeleteById(ID id) {
-        return mybatisSqlBeanDao.logicallyDeleteById(getSqlBeanDB(), clazz, id);
+    public int logicallyDeleteById(ID id) {
+        return sqlSession.update(sqlBeanProvider.logicallyDeleteByIdSql(getSqlBeanDB(), clazz, id));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long logicallyDeleteByCondition(String where, Object... args) {
-        return mybatisSqlBeanDao.logicallyDeleteByCondition(getSqlBeanDB(), clazz, where, args);
+    public int logicallyDeleteByCondition(String where, Object... args) {
+        return sqlSession.update(sqlBeanProvider.logicallyDeleteByConditionSql(getSqlBeanDB(), clazz, where, args));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long update(Update update) {
-        return mybatisSqlBeanDao.update(getSqlBeanDB(), update, false);
+    public int update(Update update) {
+        return sqlSession.update(sqlBeanProvider.updateSql(getSqlBeanDB(), update, false));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long update(Update update, boolean ignore) {
-        return mybatisSqlBeanDao.update(getSqlBeanDB(), update, ignore);
+    public int update(Update update, boolean ignore) {
+        return sqlSession.update(sqlBeanProvider.updateSql(getSqlBeanDB(), update, ignore));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long updateById(T bean, ID id, boolean updateNotNull) {
-        return mybatisSqlBeanDao.updateById(getSqlBeanDB(), bean, id, updateNotNull, null);
+    public int updateById(T bean, ID id, boolean updateNotNull) {
+        return sqlSession.update(sqlBeanProvider.updateByIdSql(getSqlBeanDB(), bean, id, updateNotNull, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long updateById(T bean, ID id, boolean updateNotNull, String[] filterFields) {
-        return mybatisSqlBeanDao.updateById(getSqlBeanDB(), bean, id, updateNotNull, filterFields);
+    public int updateById(T bean, ID id, boolean updateNotNull, String[] filterFields) {
+        return sqlSession.update(sqlBeanProvider.updateByIdSql(getSqlBeanDB(), bean, id, updateNotNull, filterFields));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long updateByBeanId(T bean, boolean updateNotNull) {
-        return mybatisSqlBeanDao.updateByBeanId(getSqlBeanDB(), bean, updateNotNull, null);
+    public int updateByBeanId(T bean, boolean updateNotNull) {
+        return sqlSession.update(sqlBeanProvider.updateByBeanIdSql(getSqlBeanDB(), bean, updateNotNull, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long updateByBeanId(T bean, boolean updateNotNull, String[] filterFields) {
-        return mybatisSqlBeanDao.updateByBeanId(getSqlBeanDB(), bean, updateNotNull, filterFields);
+    public int updateByBeanId(T bean, boolean updateNotNull, String[] filterFields) {
+        return sqlSession.update(sqlBeanProvider.updateByBeanIdSql(getSqlBeanDB(), bean, updateNotNull, filterFields));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long updateByCondition(T bean, boolean updateNotNull, String where, Object... args) {
-        return mybatisSqlBeanDao.updateByCondition(getSqlBeanDB(), bean, updateNotNull, null, where, args);
+    public int updateByCondition(T bean, boolean updateNotNull, String where, Object... args) {
+        return sqlSession.update(sqlBeanProvider.updateByConditionSql(getSqlBeanDB(), bean, updateNotNull, null, where, args));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long updateByCondition(T bean, boolean updateNotNull, Wrapper where) {
+    public int updateByCondition(T bean, boolean updateNotNull, Wrapper where) {
         Update update = new Update();
         update.setUpdateBean(bean);
         update.setWhere(where);
-        return mybatisSqlBeanDao.update(getSqlBeanDB(), update, false);
+        return sqlSession.update(sqlBeanProvider.updateSql(getSqlBeanDB(), update, false));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long updateByCondition(T bean, boolean updateNotNull, String[] filterFields, String where, Object... args) {
-        return mybatisSqlBeanDao.updateByCondition(getSqlBeanDB(), bean, updateNotNull, filterFields, where, args);
+    public int updateByCondition(T bean, boolean updateNotNull, String[] filterFields, String where, Object... args) {
+        return sqlSession.update(sqlBeanProvider.updateByConditionSql(getSqlBeanDB(), bean, updateNotNull, filterFields, where, args));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long updateByCondition(T bean, boolean updateNotNull, String[] filterFields, Wrapper where) {
+    public int updateByCondition(T bean, boolean updateNotNull, String[] filterFields, Wrapper where) {
         Update update = new Update();
         update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
         update.setFilterFields(filterFields);
         update.setWhere(where);
-        return mybatisSqlBeanDao.update(getSqlBeanDB(), update, false);
+        return sqlSession.update(sqlBeanProvider.updateSql(getSqlBeanDB(), update, false));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long updateByBeanCondition(T bean, boolean updateNotNull, String where) {
-        return mybatisSqlBeanDao.updateByBeanCondition(getSqlBeanDB(), bean, updateNotNull, null, where);
+    public int updateByBeanCondition(T bean, boolean updateNotNull, String where) {
+        return sqlSession.update(sqlBeanProvider.updateByBeanConditionSql(getSqlBeanDB(), bean, updateNotNull, null, where));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long updateByBeanCondition(T bean, boolean updateNotNull, String[] filterFields, String where) {
-        return mybatisSqlBeanDao.updateByBeanCondition(getSqlBeanDB(), bean, updateNotNull, filterFields, where);
+    public int updateByBeanCondition(T bean, boolean updateNotNull, String[] filterFields, String where) {
+        return sqlSession.update(sqlBeanProvider.updateByBeanConditionSql(getSqlBeanDB(), bean, updateNotNull, filterFields, where));
     }
 
     @SuppressWarnings("unchecked")
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long insert(T... bean) {
-        return mybatisSqlBeanDao.insertBean(getSqlBeanDB(), Arrays.asList(bean));
+    public int insert(T... bean) {
+        return sqlSession.insert(sqlBeanProvider.insertBeanSql(getSqlBeanDB(), bean));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long insert(List<T> beanList) {
-        return mybatisSqlBeanDao.insertBean(getSqlBeanDB(), beanList);
+    public int insert(List<T> beanList) {
+        return sqlSession.insert(sqlBeanProvider.insertBeanSql(getSqlBeanDB(), beanList));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long inset(Insert insert) {
-        return mybatisSqlBeanDao.insert(getSqlBeanDB(), insert);
+    public int inset(Insert insert) {
+        return sqlSession.insert(sqlBeanProvider.insertSql(getSqlBeanDB(), insert));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -495,7 +495,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     public String backup() {
         String targetTableName = SqlBeanUtil.getTable(clazz).getName() + "_" + DateUtil.dateToString(new Date(), "yyyyMMddHHmmss");
         try {
-            mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, targetTableName, null, null);
+            sqlSession.insert(sqlBeanProvider.backupSql(getSqlBeanDB(), clazz, targetTableName, null, null));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return null;
@@ -506,37 +506,37 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(String targetTableName) {
-        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, targetTableName, null, null);
+        sqlSession.insert(sqlBeanProvider.backupSql(getSqlBeanDB(), clazz, targetTableName, null, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(String targetTableName, Column[] columns, Condition condition) {
-        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, targetTableName, columns, condition);
+        sqlSession.insert(sqlBeanProvider.backupSql(getSqlBeanDB(), clazz, targetTableName, columns, condition));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long copy(String targetTableName, Condition condition) {
-        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, targetTableName, null, condition);
+    public int copy(String targetTableName, Condition condition) {
+        return sqlSession.insert(sqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetTableName, null, condition));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public long copy(String targetTableName, Column[] columns, Condition condition) {
-        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, targetTableName, columns, condition);
+    public int copy(String targetTableName, Column[] columns, Condition condition) {
+        return sqlSession.insert(sqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetTableName, columns, condition));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void dropTable() {
-        mybatisSqlBeanDao.drop(clazz);
+        sqlSession.update(sqlBeanProvider.dropTableSql(clazz));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void createTable() {
-        mybatisSqlBeanDao.create(getSqlBeanDB(), clazz);
+        sqlSession.update(sqlBeanProvider.createTableSql(getSqlBeanDB(), clazz));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -549,6 +549,6 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<String> getTableList() {
-        return mybatisSqlBeanDao.selectTableList(getSqlBeanDB());
+        return sqlSession.selectList(sqlBeanProvider.selectTableListSql(getSqlBeanDB()));
     }
 }

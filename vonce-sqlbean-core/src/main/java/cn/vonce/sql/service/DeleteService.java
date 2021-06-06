@@ -20,7 +20,7 @@ public interface DeleteService<ID> {
      * @param id
      * @return
      */
-    long deleteById(ID... id);
+    int deleteById(ID... id);
 
     /**
      * 根据条件删除
@@ -29,7 +29,7 @@ public interface DeleteService<ID> {
      * @param args
      * @return
      */
-    long deleteByCondition(String where, Object... args);
+    int deleteByCondition(String where, Object... args);
 
     /**
      * 根据条件删除
@@ -37,7 +37,7 @@ public interface DeleteService<ID> {
      * @param where
      * @return
      */
-    long deleteByCondition(Wrapper where);
+    int deleteByCondition(Wrapper where);
 
     /**
      * 删除(where条件为空会抛异常，因为删除全部非常危险)
@@ -45,7 +45,7 @@ public interface DeleteService<ID> {
      * @param delete
      * @return
      */
-    long delete(Delete delete);
+    int delete(Delete delete);
 
     /**
      * 删除
@@ -54,7 +54,7 @@ public interface DeleteService<ID> {
      * @param ignore 如果为true则不指定where条件也能执行，false则抛异常
      * @return
      */
-    long delete(Delete delete, boolean ignore);
+    int delete(Delete delete, boolean ignore);
 
     /**
      * 逻辑删除根据id条件
@@ -62,7 +62,7 @@ public interface DeleteService<ID> {
      * @param id
      * @return
      */
-    long logicallyDeleteById(ID id);
+    int logicallyDeleteById(ID id);
 
     /**
      * 根据条件逻辑删除
@@ -71,6 +71,6 @@ public interface DeleteService<ID> {
      * @param args
      * @return
      */
-    long logicallyDeleteByCondition(String where, Object... args);
+    int logicallyDeleteByCondition(String where, Object... args);
 
 }

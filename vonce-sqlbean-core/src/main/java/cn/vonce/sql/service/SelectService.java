@@ -200,7 +200,7 @@ public interface SelectService<T, ID> extends PagingService {
      * @param args
      * @return
      */
-    long selectCountByCondition(String where, Object... args);
+    int selectCountByCondition(String where, Object... args);
 
     /**
      * 根据条件查询统计
@@ -208,14 +208,14 @@ public interface SelectService<T, ID> extends PagingService {
      * @param where
      * @return
      */
-    long selectCountByCondition(Wrapper where);
+    int selectCountByCondition(Wrapper where);
 
     /**
      * 统计全部
      *
      * @return
      */
-    long countAll();
+    int countAll();
 
     /**
      * 查询全部
@@ -280,7 +280,7 @@ public interface SelectService<T, ID> extends PagingService {
      * @param select
      * @return
      */
-    long count(Select select);
+    int count(Select select);
 
     /**
      * 根据自定义条件统计
@@ -289,6 +289,6 @@ public interface SelectService<T, ID> extends PagingService {
      * @param select
      * @return
      */
-    long count(Class<?> clazz, Select select);
+    int count(Class<?> clazz, Select select);
 
 }
