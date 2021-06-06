@@ -11,11 +11,6 @@ package cn.vonce.sql.service;
  */
 public interface SqlBeanService<T, ID> extends SelectService<T, ID>, InsertService<T>, UpdateService<T, ID>, DeleteService<ID> {
 
-    /**
-     * 获取Bean类型
-     *
-     * @return
-     */
-    Class<?> getBeanClass();
+
 
 }
