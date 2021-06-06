@@ -27,49 +27,51 @@ public enum JdbcType {
 
     DECIMAL(8, 10, 2),
 
-    NUMERIC(9, 10, 2),
+    REAL(9, 10, 2),
 
-    MONEY(10, 0, 2),
+    NUMERIC(10, 10, 2),
 
-    SMALLMONEY(11, 0, 2),
+    MONEY(11, 10, 4),
 
-    DATE(12, 0, 0),
+    SMALLMONEY(12, 10, 4),
 
-    TIME(13, 0, 0),
+    DATE(13, 0, 0),
 
-    DATETIME(14, 0, 0),
+    TIME(14, 0, 0),
 
-    DATETIME2(15, 0, 0),
+    DATETIME(15, 0, 0),
 
-    TIMESTAMP(16, 0, 0),
+    DATETIME2(16, 0, 0),
 
-    CHAR(17, 255, 0),
+    TIMESTAMP(17, 0, 0),
 
-    NCHAR(18, 255, 0),
+    CHAR(18, 255, 0),
 
-    VARCHAR(19, 255, 0),
+    NCHAR(19, 255, 0),
 
-    VARCHAR2(20, 255, 0),
+    VARCHAR(20, 255, 0),
 
-    NVARCHAR(21, 255, 0),
+    VARCHAR2(21, 255, 0),
 
-    TINYTEXT(22, 0, 0),
+    NVARCHAR(22, 255, 0),
 
-    TEXT(23, 0, 0),
+    TINYTEXT(23, 0, 0),
 
-    NTEXT(24, 0, 0),
+    TEXT(24, 0, 0),
 
-    LONGTEXT(25, 0, 0),
+    NTEXT(25, 0, 0),
 
-    BIT(26, 1, 0),
+    LONGTEXT(26, 0, 0),
 
-    CLOB(27, 0, 0),
+    BIT(27, 1, 0),
 
-    NCLOB(28, 0, 0),
+    CLOB(28, 0, 0),
 
-    BLOB(29, 0, 0),
+    NCLOB(29, 0, 0),
 
-    NBLOB(30, 0, 0);
+    BLOB(30, 0, 0),
+
+    NBLOB(31, 0, 0);
 
 
     JdbcType(
