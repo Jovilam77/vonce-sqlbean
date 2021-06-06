@@ -3,6 +3,7 @@ package cn.vonce.sql.service;
 import cn.vonce.sql.bean.Column;
 import cn.vonce.sql.bean.Condition;
 import cn.vonce.sql.bean.Insert;
+import cn.vonce.sql.helper.Wrapper;
 
 import java.util.List;
 
@@ -63,28 +64,28 @@ public interface InsertService<T> {
      *
      * @param targetTableName
      * @param columns
-     * @param condition
+     * @param wrapper
      * @return
      */
-    void backup(String targetTableName, Column[] columns, Condition condition);
+    void backup(String targetTableName, Column[] columns, Wrapper wrapper);
 
     /**
      * 根据条件将数据复制插入到同样结构的表中
      *
      * @param targetTableName
-     * @param condition
+     * @param wrapper
      * @return
      */
-    int copy(String targetTableName, Condition condition);
+    int copy(String targetTableName, Wrapper wrapper);
 
     /**
      * 根据条件将数据复制插入到指定结构的表中
      *
      * @param targetTableName
      * @param columns
-     * @param condition
+     * @param wrapper
      * @return
      */
-    int copy(String targetTableName, Column[] columns, Condition condition);
+    int copy(String targetTableName, Column[] columns, Wrapper wrapper);
 
 }

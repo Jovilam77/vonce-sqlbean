@@ -73,4 +73,12 @@ public interface DeleteService<ID> {
      */
     int logicallyDeleteByCondition(String where, Object... args);
 
+    /**
+     * 根据条件逻辑删除
+     *
+     * @param where
+     * @return
+     */
+    int logicallyDeleteByCondition(Wrapper where);
+
 }

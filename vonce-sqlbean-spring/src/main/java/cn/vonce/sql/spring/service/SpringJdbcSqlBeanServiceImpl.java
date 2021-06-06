@@ -548,6 +548,11 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return jdbcTemplate.update(sqlBeanProvider.logicallyDeleteByConditionSql(getSqlBeanDB(), clazz, where, args));
     }
 
+    @Override
+    public int logicallyDeleteByCondition(Wrapper where) {
+        return jdbcTemplate.update(sqlBeanProvider.logicallyDeleteByConditionSql(getSqlBeanDB(), clazz, where));
+    }
+
     @DbSwitch(DbRole.MASTER)
     @Override
     public int update(Update update) {
@@ -666,20 +671,20 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public void backup(String targetTableName, Column[] columns, Condition condition) {
-        jdbcTemplate.update(sqlBeanProvider.backupSql(getSqlBeanDB(), clazz, targetTableName, columns, condition));
+    public void backup(String targetTableName, Column[] columns, Wrapper wrapper) {
+        jdbcTemplate.update(sqlBeanProvider.backupSql(getSqlBeanDB(), clazz, targetTableName, columns, wrapper));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int copy(String targetTableName, Condition condition) {
-        return jdbcTemplate.update(sqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetTableName, null, condition));
+    public int copy(String targetTableName, Wrapper wrapper) {
+        return jdbcTemplate.update(sqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetTableName, null, wrapper));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int copy(String targetTableName, Column[] columns, Condition condition) {
-        return jdbcTemplate.update(sqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetTableName, columns, condition));
+    public int copy(String targetTableName, Column[] columns, Wrapper wrapper) {
+        return jdbcTemplate.update(sqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetTableName, columns, wrapper));
     }
 
     @DbSwitch(DbRole.MASTER)

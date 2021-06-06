@@ -7,6 +7,7 @@ import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.SqlOperator;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.SqlHelper;
+import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
@@ -263,6 +264,26 @@ public class SqlBeanProvider {
     }
 
     /**
+     * 逻辑删除
+     *
+     * @param clazz
+     * @param wrapper
+     * @return
+     */
+    public String logicallyDeleteByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Wrapper wrapper) {
+        Update update = new Update();
+        update.setSqlBeanDB(sqlBeanDB);
+        try {
+            update.setUpdateBean(newLogicallyDeleteBean(clazz));
+            update.setWhere(wrapper);
+        } catch (SqlBeanException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return SqlHelper.buildUpdateSql(update);
+    }
+
+    /**
      * 更新
      *
      * @param sqlBeanDB
@@ -474,7 +495,7 @@ public class SqlBeanProvider {
      * @param condition
      * @return
      */
-    public String backupSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String targetTableName, Column[] columns, Condition condition) {
+    public String backupSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String targetTableName, Column[] columns, Wrapper wrapper) {
         StringBuffer backupSql = new StringBuffer();
         String tableName = SqlBeanUtil.getTable(clazz).getName();
         //非SQLServer、PostgreSQL数据库则使用：create table A as select * from B
@@ -505,8 +526,10 @@ public class SqlBeanProvider {
         if (DbType.Derby == sqlBeanDB.getDbType()) {
             backupSql.append(" WITH NO DATA");
         } else {
-            if (condition != null) {
+            if (wrapper != null && !wrapper.getDataList().isEmpty()) {
+                Condition condition = new Condition();
                 condition.setSqlBeanDB(sqlBeanDB);
+                condition.setWhere(wrapper);
                 backupSql.append(SqlHelper.whereSql(condition, null));
             }
         }
@@ -520,10 +543,10 @@ public class SqlBeanProvider {
      * @param clazz
      * @param targetTableName
      * @param columns
-     * @param condition
+     * @param wrapper
      * @return
      */
-    public String copySql(SqlBeanDB sqlBeanDB, Class<?> clazz, String targetTableName, Column[] columns, Condition condition) {
+    public String copySql(SqlBeanDB sqlBeanDB, Class<?> clazz, String targetTableName, Column[] columns, Wrapper wrapper) {
         StringBuffer copySql = new StringBuffer();
         StringBuffer columnSql = new StringBuffer();
         copySql.append(SqlHelperCons.INSERT_INTO);
@@ -548,8 +571,10 @@ public class SqlBeanProvider {
         }
         copySql.append(SqlHelperCons.FROM);
         copySql.append(SqlBeanUtil.getTable(clazz).getName());
-        if (condition != null) {
+        if (wrapper != null && !wrapper.getDataList().isEmpty()) {
+            Condition condition = new Condition();
             condition.setSqlBeanDB(sqlBeanDB);
+            condition.setWhere(wrapper);
             copySql.append(SqlHelper.whereSql(condition, null));
         }
         return copySql.toString();

@@ -391,6 +391,11 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return sqlSession.update(sqlBeanProvider.logicallyDeleteByConditionSql(getSqlBeanDB(), clazz, where, args));
     }
 
+    @Override
+    public int logicallyDeleteByCondition(Wrapper where) {
+        return sqlSession.update(sqlBeanProvider.logicallyDeleteByConditionSql(getSqlBeanDB(), clazz, where));
+    }
+
     @DbSwitch(DbRole.MASTER)
     @Override
     public int update(Update update) {
@@ -511,20 +516,20 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public void backup(String targetTableName, Column[] columns, Condition condition) {
-        sqlSession.insert(sqlBeanProvider.backupSql(getSqlBeanDB(), clazz, targetTableName, columns, condition));
+    public void backup(String targetTableName, Column[] columns, Wrapper wrapper) {
+        sqlSession.insert(sqlBeanProvider.backupSql(getSqlBeanDB(), clazz, targetTableName, columns, wrapper));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int copy(String targetTableName, Condition condition) {
-        return sqlSession.insert(sqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetTableName, null, condition));
+    public int copy(String targetTableName, Wrapper wrapper) {
+        return sqlSession.insert(sqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetTableName, null, wrapper));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int copy(String targetTableName, Column[] columns, Condition condition) {
-        return sqlSession.insert(sqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetTableName, columns, condition));
+    public int copy(String targetTableName, Column[] columns, Wrapper wrapper) {
+        return sqlSession.insert(sqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetTableName, columns, wrapper));
     }
 
     @DbSwitch(DbRole.MASTER)
