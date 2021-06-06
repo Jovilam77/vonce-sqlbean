@@ -504,16 +504,16 @@ public class SqlHelper {
                 if (i == 0) {
                     String tableFieldName = SqlBeanUtil.getTableFieldName(field);
                     //如果此字段非id字段 或者 此字段为id字段但是不是自增的id则生成该字段的insert语句
-                    if (sqlId == null || (sqlId != null && sqlId.generateType() != GenerateType.AUTO)) {
+                    if (sqlId == null || (sqlId != null && sqlId.type() != IdType.AUTO)) {
                         fieldSql.append(transferred + (SqlBeanUtil.isToUpperCase(common) ? tableFieldName.toUpperCase() : tableFieldName) + transferred);
                         fieldSql.append(SqlHelperCons.COMMA);
                     }
                 }
                 Object value = ReflectUtil.instance().get(objects[i].getClass(), objects[i], field.getName());
                 //如果此字段为id且需要生成唯一id
-                if (sqlId != null && sqlId.generateType() != GenerateType.AUTO && sqlId.generateType() != GenerateType.NORMAL) {
+                if (sqlId != null && sqlId.type() != IdType.AUTO && sqlId.type() != IdType.NORMAL) {
                     if (StringUtil.isEmpty(value)) {
-                        value = common.getSqlBeanDB().getSqlBeanConfig().getUniqueIdProcessor().uniqueId(sqlId.generateType());
+                        value = common.getSqlBeanDB().getSqlBeanConfig().getUniqueIdProcessor().uniqueId(sqlId.type());
                     }
                     valueSql.append(SqlBeanUtil.getSqlValue(common, value));
                 } else if (field.isAnnotationPresent(SqlInsertTime.class) && SqlBeanUtil.whatType(field.getType().getName()) == WhatType.DATE_TYPE && value == null) {

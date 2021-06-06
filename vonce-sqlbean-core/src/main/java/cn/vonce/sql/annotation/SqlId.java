@@ -1,6 +1,6 @@
 package cn.vonce.sql.annotation;
 
-import cn.vonce.sql.enumerate.GenerateType;
+import cn.vonce.sql.enumerate.IdType;
 
 import java.lang.annotation.*;
 
@@ -18,6 +18,6 @@ import java.lang.annotation.*;
 @Inherited
 public @interface SqlId {
 
-    GenerateType generateType() default GenerateType.NORMAL;
+    IdType type() default IdType.NORMAL;
 
 }

@@ -1,6 +1,6 @@
 package cn.vonce.sql.processor;
 
-import cn.vonce.sql.enumerate.GenerateType;
+import cn.vonce.sql.enumerate.IdType;
 import cn.vonce.sql.uitls.SnowflakeId16;
 import cn.vonce.sql.uitls.SnowflakeId18;
 
@@ -19,8 +19,8 @@ public class DefaultUniqueIdProcessor implements UniqueIdProcessor {
     private final SnowflakeId18 snowflakeId18 = new SnowflakeId18(0);
 
     @Override
-    public Object uniqueId(GenerateType generateType) {
-        switch (generateType) {
+    public Object uniqueId(IdType idType) {
+        switch (idType) {
             case UUID:
                 return UUID.randomUUID().toString().replace("-", "");
             case SNOWFLAKE_ID_16:

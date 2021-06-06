@@ -2,6 +2,7 @@ package cn.vonce.sql.helper;
 
 import cn.vonce.sql.enumerate.SqlLogic;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
  * @email 766255988@qq.com
  * @date 2021年4月28日下午5:49:00
  */
-public class Wrapper {
+public class Wrapper implements Serializable {
 
     private List<Data> dataList = new ArrayList<>();
 

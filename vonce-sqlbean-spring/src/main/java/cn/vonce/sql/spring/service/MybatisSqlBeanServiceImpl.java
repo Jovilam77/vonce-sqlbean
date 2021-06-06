@@ -437,6 +437,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Override
     public long updateByCondition(T bean, boolean updateNotNull, Wrapper where) {
         Update update = new Update();
+        update.setUpdateBean(bean);
         update.setWhere(where);
         return mybatisSqlBeanDao.update(getSqlBeanDB(), update, false);
     }
@@ -451,6 +452,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Override
     public long updateByCondition(T bean, boolean updateNotNull, String[] filterFields, Wrapper where) {
         Update update = new Update();
+        update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
         update.setFilterFields(filterFields);
         update.setWhere(where);

@@ -598,6 +598,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @Override
     public long updateByCondition(T bean, boolean updateNotNull, Wrapper where) {
         Update update = new Update();
+        update.setUpdateBean(bean);
         update.setWhere(where);
         return jdbcTemplate.update(sqlBeanProvider.updateSql(getSqlBeanDB(), update, false));
     }
@@ -612,9 +613,10 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @Override
     public long updateByCondition(T bean, boolean updateNotNull, String[] filterFields, Wrapper where) {
         Update update = new Update();
-        update.setWhere(where);
+        update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
         update.setFilterFields(filterFields);
+        update.setWhere(where);
         return jdbcTemplate.update(sqlBeanProvider.updateSql(getSqlBeanDB(), update, false));
     }
 

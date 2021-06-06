@@ -203,7 +203,7 @@ public class SqlBeanProvider {
         if (delete.getSqlBeanDB() == null) {
             delete.setSqlBeanDB(sqlBeanDB);
         }
-        if (delete.getTable() == null || StringUtil.isEmpty(delete.getTable().getName())) {
+        if (delete.getTable() == null || StringUtil.isEmpty(delete.getTable().getName()) || !delete.getWhereWrapper().getDataList().isEmpty()) {
             delete.setTable(clazz);
         }
         if (ignore || !delete.getWhereMap().isEmpty()) {
@@ -274,7 +274,7 @@ public class SqlBeanProvider {
         if (update.getSqlBeanDB() == null) {
             update.setSqlBeanDB(sqlBeanDB);
         }
-        if (ignore || (!update.getWhereMap().isEmpty() || StringUtil.isNotEmpty(update.getWhere()))) {
+        if (ignore || (!update.getWhereMap().isEmpty() || StringUtil.isNotEmpty(update.getWhere()) || !update.getWhereWrapper().getDataList().isEmpty())) {
             return SqlHelper.buildUpdateSql(update);
         } else {
             try {
@@ -635,7 +635,7 @@ public class SqlBeanProvider {
     }
 
     /**
-     * 实例化Select
+     * 实例化Update
      *
      * @param bean
      * @param updateNotNull

@@ -17,7 +17,7 @@ public enum JavaType {
     FLOAT(new Class[]{float.class, Float.class}),
     DOUBLE(new Class[]{double.class, Double.class}),
     NUMERIC(new Class[]{BigDecimal.class}),
-    CHAR(new Class[]{char.class, Character.class, String.class}),
+    CHAR(new Class[]{char.class, Character.class}),
     VARCHAR(new Class[]{String.class}),
     TINYINT(new Class[]{byte.class, Byte.class}),
     BIT(new Class[]{boolean.class, Boolean.class}),

@@ -1,6 +1,6 @@
 package cn.vonce.sql.processor;
 
-import cn.vonce.sql.enumerate.GenerateType;
+import cn.vonce.sql.enumerate.IdType;
 
 /**
  * 唯一id处理器接口
@@ -15,9 +15,9 @@ public interface UniqueIdProcessor {
     /**
      * 生成唯一id
      *
-     * @param generateType
+     * @param idType
      * @return
      */
-    Object uniqueId(GenerateType generateType);
+    Object uniqueId(IdType idType);
 
 }
