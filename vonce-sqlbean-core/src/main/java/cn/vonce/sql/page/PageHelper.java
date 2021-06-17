@@ -204,9 +204,9 @@ public class PageHelper<T> {
      *
      * @param count
      */
-    public void dispose(long count) {
+    public void dispose(int count) {
         // 保存总数
-        this.totalRecords = (int) count;
+        this.totalRecords = count;
         // 计算最多有几页
         int countPage = totalRecords % pagesize == 0 ? totalRecords / pagesize : totalRecords / pagesize + 1;
         // 返回总页数
@@ -248,13 +248,13 @@ public class PageHelper<T> {
             sqlBeanSelect.setPage(pagenum, pagesize);
             sqlBeanSelect.orderBy(orders);
             // 先统计数量
-            long count;
+            int count;
             Object obj;
             if (tClazz != null) {
-                count = (long) ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getCount(), new Class[]{Class.class, Select.class}, new Object[]{tClazz, select});
+                count = ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getCount(), new Class[]{Class.class, Select.class}, new Object[]{tClazz, select});
                 obj = ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getSelect(), new Class[]{Class.class, Select.class}, new Object[]{tClazz, sqlBeanSelect});
             } else {
-                count = (long) ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getCount(), new Class[]{Select.class}, new Object[]{select});
+                count = ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getCount(), new Class[]{Select.class}, new Object[]{select});
                 obj = ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getSelect(), new Class[]{Select.class}, new Object[]{sqlBeanSelect});
             }
             // 计算共有几页
