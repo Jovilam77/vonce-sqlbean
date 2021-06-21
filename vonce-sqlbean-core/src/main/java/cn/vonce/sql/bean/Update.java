@@ -15,6 +15,7 @@ public class Update extends Condition implements Serializable {
     private boolean updateNotNull = true;//默认只更新不为空的字段
     private Object updateBean = null;//更新的实体对象
     private String[] filterFields = null;//需要过滤的字段
+    private boolean logicallyDelete = false;//是否为逻辑删除
 
     /**
      * 设置是否只更新不为null的字段
@@ -70,5 +71,11 @@ public class Update extends Condition implements Serializable {
         this.filterFields = filterField;
     }
 
+    public boolean isLogicallyDelete() {
+        return logicallyDelete;
+    }
 
+    public void setLogicallyDelete(boolean logicallyDelete) {
+        this.logicallyDelete = logicallyDelete;
+    }
 }

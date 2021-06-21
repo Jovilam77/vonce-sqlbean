@@ -80,6 +80,22 @@ public class SqlBeanUtil {
     }
 
     /**
+     * 返回带转义表名,优先级 tableName第一，注解第二，类名第三
+     *
+     * @param table
+     * @param common
+     * @return
+     */
+    public static String getTableName(Table table, Common common) {
+        String schema = table.getSchema();
+        String tableName = table.getName();
+        if (StringUtil.isNotEmpty(schema)) {
+            tableName = schema + SqlHelperCons.POINT + tableName;
+        }
+        return SqlBeanUtil.isToUpperCase(common) ? tableName.toUpperCase() : tableName;
+    }
+
+    /**
      * 获取Bean字段中实际对于的表字段
      *
      * @param field
@@ -465,7 +481,7 @@ public class SqlBeanUtil {
                         value.append(getSqlValue(common, objects[i]));
                         value.append(SqlHelperCons.COMMA);
                     }
-                    value.deleteCharAt(value.length() - SqlHelperCons.COMMA.length());
+                    value.delete(value.length() - SqlHelperCons.COMMA.length(),value.length());
                 }
                 conditionSql.append(value);
                 index++;

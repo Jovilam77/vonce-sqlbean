@@ -1,6 +1,7 @@
 package cn.vonce.sql.helper;
 
 import cn.vonce.sql.annotation.*;
+import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.StringUtil;
 import com.google.common.collect.ListMultimap;
@@ -198,7 +199,7 @@ public class SqlHelper {
         check(create);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlHelperCons.CREATE_TABLE);
-        sqlSb.append(getTableName(SqlBeanUtil.getTable(create.getBeanClass()), create));
+        sqlSb.append(getTableName(create.getTable(), create));
         sqlSb.append(SqlHelperCons.BEGIN_BRACKET);
         Field idField = null;
         Field[] fields = create.getBeanClass().getDeclaredFields();
@@ -213,6 +214,9 @@ public class SqlHelper {
                 }
             }
             SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
+            if (sqlColumn.ignore()) {
+                continue;
+            }
             ColumnInfo columnInfo = getColumnInfo(create.getSqlBeanDB().getDbType(), field.getType(), sqlColumn);
             String columnName = field.getName();
             if (sqlColumn != null) {
@@ -255,6 +259,82 @@ public class SqlHelper {
         }
         sqlSb.append(SqlHelperCons.END_BRACKET);
         return sqlSb.toString();
+    }
+
+    /**
+     * 生成backup sql语句
+     *
+     * @param backup
+     * @return
+     */
+    public static String buildBackup(Backup backup) {
+        StringBuffer backupSql = new StringBuffer();
+        //非SQLServer、PostgreSQL数据库则使用：create table A as select * from B
+        if (DbType.SQLServer != backup.getSqlBeanDB().getDbType() && DbType.PostgreSQL != backup.getSqlBeanDB().getDbType()) {
+            backupSql.append(SqlHelperCons.CREATE_TABLE);
+            backupSql.append(getTableName(backup.getTargetSchema(), backup.getTargetTableName()));
+            backupSql.append(SqlHelperCons.SPACES);
+            backupSql.append(SqlHelperCons.AS);
+        }
+        backupSql.append(SqlHelperCons.SELECT);
+        if (backup.getColumns() != null && backup.getColumns().length > 0) {
+            for (Column column : backup.getColumns()) {
+                backupSql.append(column.getName());
+                backupSql.append(SqlHelperCons.COMMA);
+            }
+            backupSql.delete(backupSql.length() - SqlHelperCons.COMMA.length(), backupSql.length());
+        } else {
+            backupSql.append(SqlHelperCons.ALL);
+        }
+        //如果是SQLServer、PostgreSQL数据库则需要拼接INTO：select * into A from B
+        if (DbType.SQLServer == backup.getSqlBeanDB().getDbType() || DbType.PostgreSQL == backup.getSqlBeanDB().getDbType()) {
+            backupSql.append(SqlHelperCons.INTO);
+            backupSql.append(getTableName(backup.getTargetSchema(), backup.getTargetTableName()));
+        }
+        backupSql.append(SqlHelperCons.FROM);
+        backupSql.append(getTableName(backup.getTable(), backup));
+        //如果是Derby数据库，仅支持创建表结构，其他数据库则可通过条件备份数据和是否需要数据
+        if (DbType.Derby == backup.getSqlBeanDB().getDbType()) {
+            backupSql.append(" WITH NO DATA");
+        } else {
+            backupSql.append(whereSql(backup, null));
+        }
+        return backupSql.toString();
+    }
+
+    /**
+     * 生成copy sql语句
+     *
+     * @param copy
+     * @return
+     */
+    public static String buildCopy(Copy copy) {
+        StringBuffer copySql = new StringBuffer();
+        StringBuffer columnSql = new StringBuffer();
+        copySql.append(SqlHelperCons.INSERT_INTO);
+        copySql.append(getTableName(copy.getTargetSchema(), copy.getTargetTableName()));
+        if (copy.getColumns() != null && copy.getColumns().length > 0) {
+            for (Column column : copy.getColumns()) {
+                columnSql.append(column.getName());
+                columnSql.append(SqlHelperCons.COMMA);
+            }
+            columnSql.delete(columnSql.length() - SqlHelperCons.COMMA.length(), columnSql.length());
+            copySql.append(SqlHelperCons.SPACES);
+            copySql.append(SqlHelperCons.BEGIN_BRACKET);
+            copySql.append(columnSql);
+            copySql.append(SqlHelperCons.END_BRACKET);
+        }
+        copySql.append(SqlHelperCons.SPACES);
+        copySql.append(SqlHelperCons.SELECT);
+        if (copy.getColumns() != null && copy.getColumns().length > 0) {
+            copySql.append(columnSql);
+        } else {
+            copySql.append(SqlHelperCons.ALL);
+        }
+        copySql.append(SqlHelperCons.FROM);
+        copySql.append(getTableName(copy.getTable(), copy));
+        copySql.append(whereSql(copy, null));
+        return copySql.toString();
     }
 
     /**
@@ -303,12 +383,22 @@ public class SqlHelper {
      * @return
      */
     private static String getTableName(Table table, Common common) {
-        String schema = table.getSchema();
-        String tableName = table.getName();
+        String tableName = getTableName(table.getSchema(), table.getName());
+        return SqlBeanUtil.isToUpperCase(common) ? tableName.toUpperCase() : tableName;
+    }
+
+    /**
+     * 返回带schema表名
+     *
+     * @param schema
+     * @param tableName
+     * @return
+     */
+    private static String getTableName(String schema, String tableName) {
         if (StringUtil.isNotEmpty(schema)) {
             tableName = schema + SqlHelperCons.POINT + tableName;
         }
-        return SqlBeanUtil.isToUpperCase(common) ? tableName.toUpperCase() : tableName;
+        return tableName;
     }
 
     /**
@@ -465,9 +555,6 @@ public class SqlHelper {
             fields = objects[0].getClass().getDeclaredFields();
         }
         if (common.getSqlBeanDB().getDbType() == DbType.Oracle) {
-            if (common.getSqlBeanDB().getSqlBeanConfig().getToUpperCase()) {
-                tableName = tableName.toUpperCase();
-            }
             if (objects != null && objects.length > 1) {
                 fieldAndValuesSql.append(SqlHelperCons.INSERT_ALL_INTO);
             } else {
@@ -608,7 +695,7 @@ public class SqlHelper {
             if (filterAfterList.get(i).isAnnotationPresent(SqlVersion.class)) {
                 Object o = SqlBeanUtil.updateVersion(filterAfterList.get(i).getType().getName(), objectValue);
                 setSql.append(SqlBeanUtil.getSqlValue(update, o));
-            } else if (filterAfterList.get(i).isAnnotationPresent(SqlUpdateTime.class) && SqlBeanUtil.whatType(filterAfterList.get(i).getType().getName()) == WhatType.DATE_TYPE && objectValue == null) {
+            } else if (filterAfterList.get(i).isAnnotationPresent(SqlUpdateTime.class) && SqlBeanUtil.whatType(filterAfterList.get(i).getType().getName()) == WhatType.DATE_TYPE) {
                 setSql.append(SqlBeanUtil.getSqlValue(update, date));
             } else {
                 setSql.append(SqlBeanUtil.getSqlValue(update, objectValue));
@@ -774,6 +861,9 @@ public class SqlHelper {
      * @return
      */
     private static String versionCondition(Common common, Object bean) {
+        if (common instanceof Update && ((Update) common).isLogicallyDelete()) {
+            return "";
+        }
         StringBuffer versionConditionSql = new StringBuffer();
         Field versionField = null;
         //更新时乐观锁处理

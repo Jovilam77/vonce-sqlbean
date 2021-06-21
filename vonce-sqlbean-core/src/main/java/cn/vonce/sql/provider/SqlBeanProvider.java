@@ -165,6 +165,7 @@ public class SqlBeanProvider {
         Delete delete = new Delete();
         delete.setSqlBeanDB(sqlBeanDB);
         delete.setTable(clazz);
+        setSchema(delete);
         Field idField;
         try {
             idField = SqlBeanUtil.getIdField(clazz);
@@ -189,6 +190,7 @@ public class SqlBeanProvider {
         delete.setSqlBeanDB(sqlBeanDB);
         delete.setTable(clazz);
         delete.setWhere(where, args);
+        setSchema(delete);
         return SqlHelper.buildDeleteSql(delete);
     }
 
@@ -204,10 +206,11 @@ public class SqlBeanProvider {
         if (delete.getSqlBeanDB() == null) {
             delete.setSqlBeanDB(sqlBeanDB);
         }
-        if (delete.getTable() == null || StringUtil.isEmpty(delete.getTable().getName()) || !delete.getWhereWrapper().getDataList().isEmpty()) {
+        if (delete.getTable() == null || StringUtil.isEmpty(delete.getTable().getName())) {
             delete.setTable(clazz);
         }
-        if (ignore || !delete.getWhereMap().isEmpty()) {
+        setSchema(delete);
+        if (ignore || (!delete.getWhereMap().isEmpty() || StringUtil.isNotEmpty(delete.getWhere()) || !delete.getWhereWrapper().getDataList().isEmpty())) {
             return SqlHelper.buildDeleteSql(delete);
         } else {
             try {
@@ -235,6 +238,7 @@ public class SqlBeanProvider {
             update.setUpdateBean(bean);
             Field idField = SqlBeanUtil.getIdField(bean.getClass());
             update.where(SqlBeanUtil.getTableFieldName(idField), id);
+            setSchema(update);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -256,6 +260,7 @@ public class SqlBeanProvider {
         try {
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
             update.setWhere(where, args);
+            setSchema(update);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -276,6 +281,7 @@ public class SqlBeanProvider {
         try {
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
             update.setWhere(wrapper);
+            setSchema(update);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -295,6 +301,7 @@ public class SqlBeanProvider {
         if (update.getSqlBeanDB() == null) {
             update.setSqlBeanDB(sqlBeanDB);
         }
+        setSchema(update);
         if (ignore || (!update.getWhereMap().isEmpty() || StringUtil.isNotEmpty(update.getWhere()) || !update.getWhereWrapper().getDataList().isEmpty())) {
             return SqlHelper.buildUpdateSql(update);
         } else {
@@ -411,6 +418,7 @@ public class SqlBeanProvider {
         Insert insert = new Insert();
         insert.setSqlBeanDB(sqlBeanDB);
         insert.setInsertBean(bean);
+        setSchema(insert);
         return SqlHelper.buildInsertSql(insert);
     }
 
@@ -425,6 +433,7 @@ public class SqlBeanProvider {
         if (insert.getSqlBeanDB() == null) {
             insert.setSqlBeanDB(sqlBeanDB);
         }
+        setSchema(insert);
         return SqlHelper.buildInsertSql(insert);
     }
 
@@ -448,6 +457,7 @@ public class SqlBeanProvider {
     public static String createTableSql(SqlBeanDB sqlBeanDB, Class<?> clazz) {
         Create create = new Create();
         create.setSqlBeanDB(sqlBeanDB);
+        create.setTable(clazz);
         create.setBeanClass(clazz);
         return SqlHelper.buildCreateSql(create);
     }
@@ -496,44 +506,13 @@ public class SqlBeanProvider {
      * @return
      */
     public static String backupSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String targetTableName, Column[] columns, Wrapper wrapper) {
-        StringBuffer backupSql = new StringBuffer();
-        String tableName = SqlBeanUtil.getTable(clazz).getName();
-        //非SQLServer、PostgreSQL数据库则使用：create table A as select * from B
-        if (DbType.SQLServer != sqlBeanDB.getDbType() && DbType.PostgreSQL != sqlBeanDB.getDbType()) {
-            backupSql.append(SqlHelperCons.CREATE_TABLE);
-            backupSql.append(targetTableName);
-            backupSql.append(SqlHelperCons.SPACES);
-            backupSql.append(SqlHelperCons.AS);
-        }
-        backupSql.append(SqlHelperCons.SELECT);
-        if (columns != null && columns.length > 0) {
-            for (Column column : columns) {
-                backupSql.append(column.getName());
-                backupSql.append(SqlHelperCons.COMMA);
-            }
-            backupSql.delete(backupSql.length() - SqlHelperCons.COMMA.length(), backupSql.length());
-        } else {
-            backupSql.append(SqlHelperCons.ALL);
-        }
-        //如果是SQLServer、PostgreSQL数据库则需要拼接INTO：select * into A from B
-        if (DbType.SQLServer == sqlBeanDB.getDbType() || DbType.PostgreSQL == sqlBeanDB.getDbType()) {
-            backupSql.append(SqlHelperCons.INTO);
-            backupSql.append(targetTableName);
-        }
-        backupSql.append(SqlHelperCons.FROM);
-        backupSql.append(tableName);
-        //如果是Derby数据库，仅支持创建表结构，其他数据库则可通过条件备份数据和是否需要数据
-        if (DbType.Derby == sqlBeanDB.getDbType()) {
-            backupSql.append(" WITH NO DATA");
-        } else {
-            if (wrapper != null && !wrapper.getDataList().isEmpty()) {
-                Condition condition = new Condition();
-                condition.setSqlBeanDB(sqlBeanDB);
-                condition.setWhere(wrapper);
-                backupSql.append(SqlHelper.whereSql(condition, null));
-            }
-        }
-        return backupSql.toString();
+        Backup backup = new Backup();
+        backup.setSqlBeanDB(sqlBeanDB);
+        backup.setTable(clazz);
+        backup.setColumns(columns);
+        backup.setTargetTableName(targetTableName);
+        backup.setWhere(wrapper);
+        return SqlHelper.buildBackup(backup);
     }
 
     /**
@@ -547,37 +526,13 @@ public class SqlBeanProvider {
      * @return
      */
     public static String copySql(SqlBeanDB sqlBeanDB, Class<?> clazz, String targetTableName, Column[] columns, Wrapper wrapper) {
-        StringBuffer copySql = new StringBuffer();
-        StringBuffer columnSql = new StringBuffer();
-        copySql.append(SqlHelperCons.INSERT_INTO);
-        copySql.append(targetTableName);
-        if (columns != null && columns.length > 0) {
-            for (Column column : columns) {
-                columnSql.append(column.getName());
-                columnSql.append(SqlHelperCons.COMMA);
-            }
-            columnSql.delete(columnSql.length() - SqlHelperCons.COMMA.length(), columnSql.length());
-            copySql.append(SqlHelperCons.SPACES);
-            copySql.append(SqlHelperCons.BEGIN_BRACKET);
-            copySql.append(columnSql);
-            copySql.append(SqlHelperCons.END_BRACKET);
-        }
-        copySql.append(SqlHelperCons.SPACES);
-        copySql.append(SqlHelperCons.SELECT);
-        if (columns != null && columns.length > 0) {
-            copySql.append(columnSql);
-        } else {
-            copySql.append(SqlHelperCons.ALL);
-        }
-        copySql.append(SqlHelperCons.FROM);
-        copySql.append(SqlBeanUtil.getTable(clazz).getName());
-        if (wrapper != null && !wrapper.getDataList().isEmpty()) {
-            Condition condition = new Condition();
-            condition.setSqlBeanDB(sqlBeanDB);
-            condition.setWhere(wrapper);
-            copySql.append(SqlHelper.whereSql(condition, null));
-        }
-        return copySql.toString();
+        Copy copy = new Copy();
+        copy.setSqlBeanDB(sqlBeanDB);
+        copy.setTable(clazz);
+        copy.setColumns(columns);
+        copy.setTargetTableName(targetTableName);
+        copy.setWhere(wrapper);
+        return SqlHelper.buildCopy(copy);
     }
 
     /**
@@ -599,6 +554,7 @@ public class SqlBeanProvider {
                 select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
             }
             SqlBeanUtil.setJoin(select, clazz);
+            setSchema(select);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -622,6 +578,7 @@ public class SqlBeanProvider {
                 select.getTable().setAlias(table.getAlias());
             }
         }
+        setSchema(select);
         try {
             SqlBeanUtil.setJoin(select, clazz);
         } catch (SqlBeanException e) {
@@ -672,6 +629,7 @@ public class SqlBeanProvider {
         update.setSqlBeanDB(sqlBeanDB);
         update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
+        setSchema(update);
         return update;
     }
 
@@ -694,6 +652,19 @@ public class SqlBeanProvider {
                 select.setPage(null, paging.getPagenum(), paging.getPagesize());
             }
             select.orderBy(paging.getOrders());
+        }
+    }
+
+    /**
+     * 统一设置Schema
+     */
+    private static void setSchema(Common common) {
+        //自主设置优先级高
+        if (StringUtil.isEmpty(common.getTable().getSchema())) {
+            String schema = SchemaContextHolder.getSchema();
+            if (StringUtil.isNotEmpty(schema)) {
+                common.getTable().setSchema(schema);
+            }
         }
     }
 
