@@ -8,7 +8,7 @@ package cn.vonce.sql.bean;
  * @email 766255988@qq.com
  * @date 2021年6月21日下午21:53:00
  */
-public class Copy extends  Condition{
+public class Copy extends Condition {
 
     private String targetSchema;
     private String targetTableName;

@@ -338,6 +338,18 @@ public class SqlHelper {
     }
 
     /**
+     * 生成drop sql语句
+     * @param drop
+     * @return
+     */
+    public static String buildDrop(Drop drop) {
+        StringBuffer dropSql = new StringBuffer();
+        dropSql.append("DROP TABLE IF EXISTS ");
+        dropSql.append(getTableName(drop.getTable(), drop));
+        return dropSql.toString();
+    }
+
+    /**
      * 获取列信息
      *
      * @param dbType

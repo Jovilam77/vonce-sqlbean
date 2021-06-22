@@ -444,7 +444,10 @@ public class SqlBeanProvider {
      * @return
      */
     public static String dropTableSql(Class<?> clazz) {
-        return "DROP TABLE IF EXISTS " + SqlBeanUtil.getTable(clazz).getName();
+        Drop drop = new Drop();
+        drop.setTable(clazz);
+        setSchema(drop);
+        return SqlHelper.buildDrop(drop);
     }
 
     /**
@@ -459,6 +462,7 @@ public class SqlBeanProvider {
         create.setSqlBeanDB(sqlBeanDB);
         create.setTable(clazz);
         create.setBeanClass(clazz);
+        setSchema(create);
         return SqlHelper.buildCreateSql(create);
     }
 
@@ -512,6 +516,7 @@ public class SqlBeanProvider {
         backup.setColumns(columns);
         backup.setTargetTableName(targetTableName);
         backup.setWhere(wrapper);
+        setSchema(backup);
         return SqlHelper.buildBackup(backup);
     }
 
