@@ -481,7 +481,7 @@ public class SqlBeanUtil {
                         value.append(getSqlValue(common, objects[i]));
                         value.append(SqlHelperCons.COMMA);
                     }
-                    value.delete(value.length() - SqlHelperCons.COMMA.length(),value.length());
+                    value.delete(value.length() - SqlHelperCons.COMMA.length(), value.length());
                 }
                 conditionSql.append(value);
                 index++;
@@ -845,6 +845,25 @@ public class SqlBeanUtil {
                 return true;
         }
         return false;
+    }
+
+    /**
+     * 获取object数组
+     *
+     * @param bean
+     * @return
+     */
+    public static Object[] getObjectArray(Object bean) {
+        Object[] objects;
+        if (bean.getClass().isArray()) {
+            objects = (Object[]) bean;
+        } else if (bean instanceof Collection) {
+            Collection<Object> list = (Collection<Object>) bean;
+            objects = list.toArray();
+        } else {
+            objects = new Object[]{bean};
+        }
+        return objects;
     }
 
 }

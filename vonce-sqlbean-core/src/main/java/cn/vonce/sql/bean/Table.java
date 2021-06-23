@@ -1,5 +1,7 @@
 package cn.vonce.sql.bean;
 
+import cn.vonce.sql.uitls.StringUtil;
+
 import java.io.Serializable;
 
 /**
@@ -56,6 +58,13 @@ public class Table implements Serializable {
 
     public void setAlias(String alias) {
         this.alias = alias;
+    }
+
+    public boolean isNotSet() {
+        if (StringUtil.isEmpty(getSchema()) && StringUtil.isEmpty(getName()) && StringUtil.isEmpty(getAlias())) {
+            return true;
+        }
+        return false;
     }
 
     @Override

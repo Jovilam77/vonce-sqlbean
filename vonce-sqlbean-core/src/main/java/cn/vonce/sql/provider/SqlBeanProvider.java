@@ -206,7 +206,7 @@ public class SqlBeanProvider {
         if (delete.getSqlBeanDB() == null) {
             delete.setSqlBeanDB(sqlBeanDB);
         }
-        if (delete.getTable() == null || StringUtil.isEmpty(delete.getTable().getName())) {
+        if (delete.getTable().isNotSet()) {
             delete.setTable(clazz);
         }
         setSchema(delete);
@@ -231,10 +231,11 @@ public class SqlBeanProvider {
      */
     public static String logicallyDeleteByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object id) {
         Update update = new Update();
-        update.setSqlBeanDB(sqlBeanDB);
         Object bean;
         try {
             bean = newLogicallyDeleteBean(clazz);
+            update.setSqlBeanDB(sqlBeanDB);
+            update.setTable(clazz);
             update.setUpdateBean(bean);
             Field idField = SqlBeanUtil.getIdField(bean.getClass());
             update.where(SqlBeanUtil.getTableFieldName(idField), id);
@@ -256,8 +257,9 @@ public class SqlBeanProvider {
      */
     public static String logicallyDeleteByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
         Update update = new Update();
-        update.setSqlBeanDB(sqlBeanDB);
         try {
+            update.setSqlBeanDB(sqlBeanDB);
+            update.setTable(clazz);
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
             update.setWhere(where, args);
             setSchema(update);
@@ -277,8 +279,9 @@ public class SqlBeanProvider {
      */
     public static String logicallyDeleteByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Wrapper wrapper) {
         Update update = new Update();
-        update.setSqlBeanDB(sqlBeanDB);
         try {
+            update.setSqlBeanDB(sqlBeanDB);
+            update.setTable(clazz);
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
             update.setWhere(wrapper);
             setSchema(update);
@@ -293,13 +296,17 @@ public class SqlBeanProvider {
      * 更新
      *
      * @param sqlBeanDB
+     * @param clazz
      * @param update
      * @param ignore
      * @return
      */
-    public static String updateSql(SqlBeanDB sqlBeanDB, Update update, boolean ignore) {
+    public static String updateSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Update update, boolean ignore) {
         if (update.getSqlBeanDB() == null) {
             update.setSqlBeanDB(sqlBeanDB);
+        }
+        if (update.getTable().isNotSet()) {
+            update.setTable(clazz);
         }
         setSchema(update);
         if (ignore || (!update.getWhereMap().isEmpty() || StringUtil.isNotEmpty(update.getWhere()) || !update.getWhereWrapper().getDataList().isEmpty())) {
@@ -317,12 +324,14 @@ public class SqlBeanProvider {
     /**
      * 根据实体类id条件更新
      *
+     * @param sqlBeanDB
+     * @param clazz
      * @param bean
      * @param updateNotNull
      * @param filterFields
      * @return
      */
-    public static String updateByIdSql(SqlBeanDB sqlBeanDB, Object bean, Object id, boolean updateNotNull, String[] filterFields) {
+    public static String updateByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, Object id, boolean updateNotNull, String[] filterFields) {
         if (StringUtil.isEmpty(id)) {
             try {
                 throw new SqlBeanException("updateByIdSql id不能为空");
@@ -331,7 +340,7 @@ public class SqlBeanProvider {
                 return null;
             }
         }
-        Update update = newUpdate(sqlBeanDB, bean, updateNotNull);
+        Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull);
         update.setFilterFields(filterFields);
         Field idField;
         try {
@@ -347,13 +356,15 @@ public class SqlBeanProvider {
     /**
      * 根据实体类id条件更新
      *
+     * @param sqlBeanDB
+     * @param clazz
      * @param bean
      * @param updateNotNull
      * @param filterFields
      * @return
      */
-    public static String updateByBeanIdSql(SqlBeanDB sqlBeanDB, Object bean, boolean updateNotNull, String[] filterFields) {
-        Update update = newUpdate(sqlBeanDB, bean, updateNotNull);
+    public static String updateByBeanIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, String[] filterFields) {
+        Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull);
         update.setFilterFields(filterFields);
         Field idField;
         try {
@@ -378,6 +389,8 @@ public class SqlBeanProvider {
     /**
      * 根据条件更新
      *
+     * @param sqlBeanDB
+     * @param clazz
      * @param bean
      * @param updateNotNull
      * @param filterFields
@@ -385,8 +398,8 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public static String updateByConditionSql(SqlBeanDB sqlBeanDB, Object bean, boolean updateNotNull, String[] filterFields, String where, Object[] args) {
-        Update update = newUpdate(sqlBeanDB, bean, updateNotNull);
+    public static String updateByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, String[] filterFields, String where, Object[] args) {
+        Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull);
         update.setFilterFields(filterFields);
         update.setWhere(where, args);
         return SqlHelper.buildUpdateSql(update);
@@ -395,14 +408,16 @@ public class SqlBeanProvider {
     /**
      * 根据实体类字段条件更新
      *
+     * @param sqlBeanDB
+     * @param clazz
      * @param bean
      * @param updateNotNull
      * @param filterFields
      * @param where
      * @return
      */
-    public static String updateByBeanConditionSql(SqlBeanDB sqlBeanDB, Object bean, boolean updateNotNull, String[] filterFields, String where) {
-        Update update = newUpdate(sqlBeanDB, bean, updateNotNull);
+    public static String updateByBeanConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, String[] filterFields, String where) {
+        Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull);
         update.setFilterFields(filterFields);
         update.setWhere(where, null);
         return SqlHelper.buildUpdateSql(update);
@@ -414,9 +429,10 @@ public class SqlBeanProvider {
      * @param bean
      * @return
      */
-    public static String insertBeanSql(SqlBeanDB sqlBeanDB, Object bean) {
+    public static String insertBeanSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean) {
         Insert insert = new Insert();
         insert.setSqlBeanDB(sqlBeanDB);
+        insert.setTable(clazz);
         insert.setInsertBean(bean);
         setSchema(insert);
         return SqlHelper.buildInsertSql(insert);
@@ -426,12 +442,16 @@ public class SqlBeanProvider {
      * 插入数据
      *
      * @param sqlBeanDB
+     * @param clazz
      * @param insert
      * @return
      */
-    public static String insertSql(SqlBeanDB sqlBeanDB, Insert insert) {
+    public static String insertSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Insert insert) {
         if (insert.getSqlBeanDB() == null) {
             insert.setSqlBeanDB(sqlBeanDB);
+        }
+        if (insert.getTable().isNotSet()) {
+            insert.setTable(clazz);
         }
         setSchema(insert);
         return SqlHelper.buildInsertSql(insert);
@@ -440,11 +460,13 @@ public class SqlBeanProvider {
     /**
      * 删除表
      *
+     * @param sqlBeanDB
      * @param clazz
      * @return
      */
-    public static String dropTableSql(Class<?> clazz) {
+    public static String dropTableSql(SqlBeanDB sqlBeanDB, Class<?> clazz) {
         Drop drop = new Drop();
+        drop.setSqlBeanDB(sqlBeanDB);
         drop.setTable(clazz);
         setSchema(drop);
         return SqlHelper.buildDrop(drop);
@@ -625,13 +647,17 @@ public class SqlBeanProvider {
      * 实例化Update
      *
      * @param bean
+     * @param clazz
      * @param updateNotNull
      * @return
      * @throws SqlBeanException
      */
-    private static Update newUpdate(SqlBeanDB sqlBeanDB, Object bean, boolean updateNotNull) {
+    private static Update newUpdate(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull) {
         Update update = new Update();
         update.setSqlBeanDB(sqlBeanDB);
+        if (update.getTable().isNotSet()) {
+            update.setTable(clazz);
+        }
         update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
         setSchema(update);
@@ -666,7 +692,7 @@ public class SqlBeanProvider {
     private static void setSchema(Common common) {
         //自主设置优先级高
         if (StringUtil.isEmpty(common.getTable().getSchema())) {
-            String schema = SchemaContextHolder.getSchema();
+            String schema = DynSchemaContextHolder.getSchema();
             if (StringUtil.isNotEmpty(schema)) {
                 common.getTable().setSchema(schema);
             }

@@ -178,7 +178,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String update(Map<String, Object> map) {
-        return SqlBeanProvider.updateSql((SqlBeanDB) map.get("sqlBeanDB"), (Update) map.get("update"), (boolean) map.get("ignore"));
+        return SqlBeanProvider.updateSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Update) map.get("update"), (boolean) map.get("ignore"));
     }
 
     /**
@@ -188,7 +188,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String updateById(Map<String, Object> map) {
-        return SqlBeanProvider.updateByIdSql((SqlBeanDB) map.get("sqlBeanDB"), map.get("bean"), map.get("id"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"));
+        return SqlBeanProvider.updateByIdSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), map.get("id"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"));
     }
 
     /**
@@ -198,7 +198,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String updateByBeanId(Map<String, Object> map) {
-        return SqlBeanProvider.updateByBeanIdSql((SqlBeanDB) map.get("sqlBeanDB"), map.get("bean"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"));
+        return SqlBeanProvider.updateByBeanIdSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"));
     }
 
     /**
@@ -212,7 +212,7 @@ public class MybatisSqlBeanProvider {
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return SqlBeanProvider.updateByConditionSql((SqlBeanDB) map.get("sqlBeanDB"), map.get("bean"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"), (String) map.get("where"), args);
+        return SqlBeanProvider.updateByConditionSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"), (String) map.get("where"), args);
     }
 
     /**
@@ -222,7 +222,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String updateByBeanCondition(Map<String, Object> map) {
-        return SqlBeanProvider.updateByBeanConditionSql((SqlBeanDB) map.get("sqlBeanDB"), map.get("bean"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"), (String) map.get("where"));
+        return SqlBeanProvider.updateByBeanConditionSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (String[]) map.get("filterFields"), (String) map.get("where"));
     }
 
     /**
@@ -232,7 +232,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String insertBean(Map<String, Object> map) {
-        return SqlBeanProvider.insertBeanSql((SqlBeanDB) map.get("sqlBeanDB"), map.get("beanList"));
+        return SqlBeanProvider.insertBeanSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("beanList"));
     }
 
     /**
@@ -242,7 +242,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String insert(Map<String, Object> map) {
-        return SqlBeanProvider.insertBeanSql((SqlBeanDB) map.get("sqlBeanDB"), map.get("insert"));
+        return SqlBeanProvider.insertBeanSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("insert"));
     }
 
     /**
@@ -252,7 +252,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String drop(Map<String, Object> map) {
-        return SqlBeanProvider.dropTableSql((Class<?>) map.get("clazz"));
+        return SqlBeanProvider.dropTableSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"));
     }
 
     /**

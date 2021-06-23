@@ -156,18 +156,9 @@ public class SqlHelper {
     @SuppressWarnings("unchecked")
     public static String buildInsertSql(Insert insert) {
         check(insert);
-        Object[] objects;
-        if (insert.getInsertBean().getClass().isArray()) {
-            objects = (Object[]) insert.getInsertBean();
-        } else if (insert.getInsertBean() instanceof Collection) {
-            Collection<Object> list = (Collection<Object>) insert.getInsertBean();
-            objects = list.toArray();
-        } else {
-            objects = new Object[]{insert.getInsertBean()};
-        }
         String sql = null;
         try {
-            sql = fieldAndValuesSql(insert, objects);
+            sql = fieldAndValuesSql(insert, SqlBeanUtil.getObjectArray(insert.getInsertBean()));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
@@ -214,7 +205,7 @@ public class SqlHelper {
                 }
             }
             SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
-            if (sqlColumn.ignore()) {
+            if (sqlColumn != null && sqlColumn.ignore()) {
                 continue;
             }
             ColumnInfo columnInfo = getColumnInfo(create.getSqlBeanDB().getDbType(), field.getType(), sqlColumn);
@@ -268,11 +259,16 @@ public class SqlHelper {
      * @return
      */
     public static String buildBackup(Backup backup) {
+        check(backup);
+        String targetSchema = backup.getTargetSchema();
+        if (StringUtil.isEmpty(targetSchema)) {
+            targetSchema = backup.getTable().getSchema();
+        }
         StringBuffer backupSql = new StringBuffer();
         //非SQLServer、PostgreSQL数据库则使用：create table A as select * from B
         if (DbType.SQLServer != backup.getSqlBeanDB().getDbType() && DbType.PostgreSQL != backup.getSqlBeanDB().getDbType()) {
             backupSql.append(SqlHelperCons.CREATE_TABLE);
-            backupSql.append(getTableName(backup.getTargetSchema(), backup.getTargetTableName()));
+            backupSql.append(getTableName(targetSchema, backup.getTargetTableName()));
             backupSql.append(SqlHelperCons.SPACES);
             backupSql.append(SqlHelperCons.AS);
         }
@@ -289,7 +285,7 @@ public class SqlHelper {
         //如果是SQLServer、PostgreSQL数据库则需要拼接INTO：select * into A from B
         if (DbType.SQLServer == backup.getSqlBeanDB().getDbType() || DbType.PostgreSQL == backup.getSqlBeanDB().getDbType()) {
             backupSql.append(SqlHelperCons.INTO);
-            backupSql.append(getTableName(backup.getTargetSchema(), backup.getTargetTableName()));
+            backupSql.append(getTableName(targetSchema, backup.getTargetTableName()));
         }
         backupSql.append(SqlHelperCons.FROM);
         backupSql.append(getTableName(backup.getTable(), backup));
@@ -309,10 +305,15 @@ public class SqlHelper {
      * @return
      */
     public static String buildCopy(Copy copy) {
+        check(copy);
+        String targetSchema = copy.getTargetSchema();
+        if (StringUtil.isEmpty(targetSchema)) {
+            targetSchema = copy.getTable().getSchema();
+        }
         StringBuffer copySql = new StringBuffer();
         StringBuffer columnSql = new StringBuffer();
         copySql.append(SqlHelperCons.INSERT_INTO);
-        copySql.append(getTableName(copy.getTargetSchema(), copy.getTargetTableName()));
+        copySql.append(getTableName(targetSchema, copy.getTargetTableName()));
         if (copy.getColumns() != null && copy.getColumns().length > 0) {
             for (Column column : copy.getColumns()) {
                 columnSql.append(column.getName());
@@ -339,6 +340,7 @@ public class SqlHelper {
 
     /**
      * 生成drop sql语句
+     *
      * @param drop
      * @return
      */
@@ -553,7 +555,7 @@ public class SqlHelper {
      * @throws IllegalArgumentException
      */
     private static String fieldAndValuesSql(Common common, Object[] objects) throws IllegalArgumentException {
-        String tableName = getTableName(SqlBeanUtil.getTable(objects[0].getClass()), common);
+        String tableName = getTableName(common.getTable(), common);
         StringBuffer fieldSql = new StringBuffer();
         StringBuffer valueSql = new StringBuffer();
         StringBuffer fieldAndValuesSql = new StringBuffer();
@@ -1017,7 +1019,7 @@ public class SqlHelper {
         Object value = conditionInfo.getValue();
         // 如果操作符为BETWEEN ，IN、NOT IN 则需额外处理
         if (conditionInfo.getSqlOperator() == SqlOperator.BETWEEN) {
-            betweenValues = getObjects(value);
+            betweenValues = SqlBeanUtil.getObjectArray(value);
             if (betweenValues == null) {
                 try {
                     throw new SqlBeanException("between 条件的值必须为Array或ArrayList");
@@ -1028,7 +1030,7 @@ public class SqlHelper {
             }
         } else if (conditionInfo.getSqlOperator() == SqlOperator.IN || conditionInfo.getSqlOperator() == SqlOperator.NOT_IN) {
             needEndBracket = true;
-            Object[] in_notInValues = getObjects(value);
+            Object[] in_notInValues = SqlBeanUtil.getObjectArray(value);
             if (in_notInValues == null) {
                 in_notInValues = new Object[]{value};
             }
@@ -1093,26 +1095,6 @@ public class SqlHelper {
             sql.append(SqlHelperCons.END_BRACKET);
         }
         return sql;
-    }
-
-    /**
-     * 根据一个Object类型获得一个Object类型的数据
-     *
-     * @param value
-     * @return
-     */
-    private static Object[] getObjects(Object value) {
-        if (value == null) {
-            return null;
-        }
-        Object[] objects = null;
-        if (value.getClass().isArray()) {
-            objects = (Object[]) value;
-        } else if (value instanceof Collection) {
-            Collection<Object> list = ((Collection<Object>) value);
-            objects = list.toArray();
-        }
-        return objects;
     }
 
     /**

@@ -553,43 +553,43 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int update(Update update) {
-        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), update, false));
+        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), clazz, update, false));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int update(Update update, boolean ignore) {
-        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), update, ignore));
+        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), clazz, update, ignore));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateById(T bean, ID id, boolean updateNotNull) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanDB(), bean, id, updateNotNull, null));
+        return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanDB(), clazz, bean, id, updateNotNull, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateById(T bean, ID id, boolean updateNotNull, String[] filterFields) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanDB(), bean, id, updateNotNull, filterFields));
+        return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanDB(), clazz, bean, id, updateNotNull, filterFields));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBeanId(T bean, boolean updateNotNull) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanDB(), bean, updateNotNull, null));
+        return jdbcTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanDB(), clazz, bean, updateNotNull, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBeanId(T bean, boolean updateNotNull, String[] filterFields) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanDB(), bean, updateNotNull, filterFields));
+        return jdbcTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanDB(), clazz, bean, updateNotNull, filterFields));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByCondition(T bean, boolean updateNotNull, String where, Object... args) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByConditionSql(getSqlBeanDB(), bean, updateNotNull, null, where, args));
+        return jdbcTemplate.update(SqlBeanProvider.updateByConditionSql(getSqlBeanDB(), clazz, bean, updateNotNull, null, where, args));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -598,13 +598,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         Update update = new Update();
         update.setUpdateBean(bean);
         update.setWhere(where);
-        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), update, false));
+        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), clazz, update, false));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByCondition(T bean, boolean updateNotNull, String[] filterFields, String where, Object... args) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByConditionSql(getSqlBeanDB(), bean, updateNotNull, filterFields, where, args));
+        return jdbcTemplate.update(SqlBeanProvider.updateByConditionSql(getSqlBeanDB(), clazz, bean, updateNotNull, filterFields, where, args));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -615,37 +615,37 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         update.setUpdateNotNull(updateNotNull);
         update.setFilterFields(filterFields);
         update.setWhere(where);
-        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), update, false));
+        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), clazz, update, false));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBeanCondition(T bean, boolean updateNotNull, String where) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByBeanConditionSql(getSqlBeanDB(), bean, updateNotNull, null, where));
+        return jdbcTemplate.update(SqlBeanProvider.updateByBeanConditionSql(getSqlBeanDB(), clazz, bean, updateNotNull, null, where));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBeanCondition(T bean, boolean updateNotNull, String[] filterFields, String where) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByBeanConditionSql(getSqlBeanDB(), bean, updateNotNull, filterFields, where));
+        return jdbcTemplate.update(SqlBeanProvider.updateByBeanConditionSql(getSqlBeanDB(), clazz, bean, updateNotNull, filterFields, where));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int insert(T... bean) {
-        return jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), bean));
+        return jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), clazz, bean));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int insert(List<T> beanList) {
-        return jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), beanList));
+        return jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), clazz, beanList));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int inset(Insert insert) {
-        return jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), insert));
+        return jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), clazz, insert));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -687,7 +687,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void dropTable() {
-        jdbcTemplate.update(SqlBeanProvider.dropTableSql(clazz));
+        jdbcTemplate.update(SqlBeanProvider.dropTableSql(getSqlBeanDB(), clazz));
     }
 
     @DbSwitch(DbRole.MASTER)

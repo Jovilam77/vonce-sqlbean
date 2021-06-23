@@ -311,41 +311,45 @@ public interface MybatisSqlBeanDao<T> {
      * 更新
      *
      * @param sqlBeanDB
+     * @param clazz
      * @param update
      * @param ignore
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "update")
-    int update(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("update") Update update, @Param("ignore") boolean ignore);
+    int update(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("update") Update update, @Param("ignore") boolean ignore);
 
     /**
      * 根据id条更新
      *
      * @param sqlBeanDB
+     * @param clazz
      * @param bean
      * @param updateNotNull
      * @param filterFields
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateById")
-    int updateById(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("bean") T bean, @Param("id") Object id, @Param("updateNotNull") boolean updateNotNull, @Param("filterFields") String[] filterFields);
+    int updateById(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("id") Object id, @Param("updateNotNull") boolean updateNotNull, @Param("filterFields") String[] filterFields);
 
     /**
      * 根据实体类id条件更新
      *
      * @param sqlBeanDB
+     * @param clazz
      * @param bean
      * @param updateNotNull
      * @param filterFields
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateByBeanId")
-    int updateByBeanId(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("filterFields") String[] filterFields);
+    int updateByBeanId(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("filterFields") String[] filterFields);
 
     /**
      * 根据条件更新
      *
      * @param sqlBeanDB
+     * @param clazz
      * @param bean
      * @param updateNotNull
      * @param filterFields
@@ -354,12 +358,13 @@ public interface MybatisSqlBeanDao<T> {
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateByCondition")
-    int updateByCondition(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("filterFields") String[] filterFields, @Param("where") String where, @Param("args") Object... args);
+    int updateByCondition(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("filterFields") String[] filterFields, @Param("where") String where, @Param("args") Object... args);
 
     /**
      * 根据实体类字段条件更新
      *
      * @param sqlBeanDB
+     * @param clazz
      * @param bean
      * @param updateNotNull
      * @param filterFields
@@ -367,27 +372,29 @@ public interface MybatisSqlBeanDao<T> {
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateByBeanCondition")
-    int updateByBeanCondition(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("filterFields") String[] filterFields, @Param("where") String where);
+    int updateByBeanCondition(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("filterFields") String[] filterFields, @Param("where") String where);
 
     /**
      * 插入数据
      *
      * @param sqlBeanDB
+     * @param clazz
      * @param beanList
      * @return
      */
     @InsertProvider(type = MybatisSqlBeanProvider.class, method = "insertBean")
-    int insertBean(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("beanList") List<T> beanList);
+    int insertBean(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("beanList") List<T> beanList);
 
     /**
      * 插入数据
      *
      * @param sqlBeanDB
+     * @param clazz
      * @param insert
      * @return
      */
     @InsertProvider(type = MybatisSqlBeanProvider.class, method = "insert")
-    int insert(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("insert") Insert insert);
+    int insert(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("insert") Insert insert);
 
     /**
      * 删除表
@@ -396,7 +403,7 @@ public interface MybatisSqlBeanDao<T> {
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "drop")
-    void drop(@Param("clazz") Class<?> clazz);
+    void drop(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz);
 
     /**
      * 创建表
