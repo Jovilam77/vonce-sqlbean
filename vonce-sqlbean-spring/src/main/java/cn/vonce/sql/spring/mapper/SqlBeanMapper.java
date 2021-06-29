@@ -2,7 +2,7 @@ package cn.vonce.sql.spring.mapper;
 
 
 import cn.vonce.sql.annotation.SqlJoin;
-import cn.vonce.sql.constant.SqlHelperCons;
+import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
@@ -110,7 +110,7 @@ public class SqlBeanMapper {
                             continue;
                         }
                         String subFieldName = subField.getName();
-                        subFieldName = subTableAlias + SqlHelperCons.UNDERLINE + subFieldName;
+                        subFieldName = subTableAlias + SqlConstant.UNDERLINE + subFieldName;
                         setFieldValue(subBean, subField, subFieldName, resultSet);
                     }
                     ReflectUtil.instance().set(bean.getClass(), bean, fieldName, subBean);
@@ -118,18 +118,25 @@ public class SqlBeanMapper {
                 } else {
                     if (!columnNameList.contains(fieldName)) {
                         String subTableAlias = sqlJoin.table();
-                        if (cn.vonce.common.utils.StringUtil.isNotEmpty(sqlJoin.tableAlias())) {
+                        if (StringUtil.isNotEmpty(sqlJoin.tableAlias())) {
                             subTableAlias = sqlJoin.tableAlias();
                         }
-                        fieldName = subTableAlias + SqlHelperCons.UNDERLINE + fieldName;
+                        fieldName = subTableAlias + SqlConstant.UNDERLINE + fieldName;
                     }
                     setFieldValue(bean, field, fieldName, resultSet);
                 }
             } else {
-                if (!columnNameList.contains(fieldName)) {
-                    fieldName = tableAlias + SqlHelperCons.UNDERLINE + fieldName;
+                //优先使用 表别名+字段名才方式匹配
+                String newFieldName = tableAlias + SqlConstant.UNDERLINE + fieldName;
+                if (!columnNameList.contains(newFieldName)) {
+                    //其次通过驼峰转下划线方式匹配
+                    newFieldName = StringUtil.humpToUnderline(fieldName);
+                    if (!columnNameList.contains(newFieldName)) {
+                        //再其次通过字段名匹配
+                        newFieldName = fieldName;
+                    }
                 }
-                setFieldValue(bean, field, fieldName, resultSet);
+                setFieldValue(bean, field, newFieldName, resultSet);
             }
         }
         return bean;

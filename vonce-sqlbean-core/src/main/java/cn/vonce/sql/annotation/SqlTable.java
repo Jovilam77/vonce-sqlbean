@@ -27,7 +27,15 @@ public @interface SqlTable {
      *
      * @return
      */
-    boolean generate() default true;
+    boolean constant() default true;
+
+    /**
+     * map-underscore-to-camel-case
+     * 是否开启Java字段驼峰命名转Sql字段下划线命名
+     *
+     * @return
+     */
+    boolean mapUsToCc() default true;
 
     /**
      * 是否为视图

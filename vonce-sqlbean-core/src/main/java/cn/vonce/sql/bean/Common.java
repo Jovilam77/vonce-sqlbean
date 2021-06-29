@@ -19,6 +19,7 @@ public class Common implements Serializable {
 
     private SqlBeanDB sqlBeanDB = null;
     private Table table = new Table();
+//    private Class<?> beanClass;
 
     public SqlBeanDB getSqlBeanDB() {
         return sqlBeanDB;
@@ -86,6 +87,25 @@ public class Common implements Serializable {
      */
     public void setTable(Class<?> clazz) {
         this.table = SqlBeanUtil.getTable(clazz);
+//        this.beanClass = clazz;
     }
+
+//    /**
+//     * 获得当前操作的关联实体类
+//     *
+//     * @return
+//     */
+//    public Class<?> getBeanClass() {
+//        return beanClass;
+//    }
+//
+//    /**
+//     * 设置当前操作的关联实体类
+//     *
+//     * @param beanClass
+//     */
+//    public void setBeanClass(Class<?> beanClass) {
+//        this.beanClass = beanClass;
+//    }
 
 }

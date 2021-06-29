@@ -10,16 +10,16 @@ import java.io.Serializable;
  * @email 766255988@qq.com
  * @date 2017年8月18日上午9:00:19
  */
-public class Insert extends Common implements Serializable {
+public class Insert<T> extends Common implements Serializable {
 
-    private Object insertBean = null;//插入的实体对象
+    private T[] insertBean = null;//插入的实体对象
 
     /**
      * 获取插入实体类
      *
      * @return
      */
-    public Object getInsertBean() {
+    public T[] getInsertBean() {
         return insertBean;
     }
 
@@ -28,7 +28,7 @@ public class Insert extends Common implements Serializable {
      *
      * @param insertBean
      */
-    public void setInsertBean(Object insertBean) {
+    public void setInsertBean(T... insertBean) {
         this.insertBean = insertBean;
     }
 

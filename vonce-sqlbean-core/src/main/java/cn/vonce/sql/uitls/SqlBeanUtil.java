@@ -2,7 +2,7 @@ package cn.vonce.sql.uitls;
 
 import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.bean.*;
-import cn.vonce.sql.constant.SqlHelperCons;
+import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.JdbcType;
 import cn.vonce.sql.enumerate.WhatType;
@@ -19,23 +19,37 @@ import java.util.*;
 public class SqlBeanUtil {
 
     /**
+     * 获取SqlTable注解
+     *
+     * @param clazz
+     * @return
+     */
+    public static SqlTable getSqlTable(Class<?> clazz) {
+        if (clazz == null) {
+            return null;
+        }
+        SqlUnion sqlUnion = clazz.getAnnotation(SqlUnion.class);
+        SqlTable sqlTable;
+        if (sqlUnion != null) {
+            sqlTable = clazz.getSuperclass().getAnnotation(SqlTable.class);
+        } else {
+            sqlTable = clazz.getAnnotation(SqlTable.class);
+        }
+        return sqlTable;
+    }
+
+    /**
      * 根据类名获取表名信息
      *
      * @param clazz
      * @return
      */
     public static Table getTable(Class<?> clazz) {
-        SqlUnion sqlUnion = clazz.getAnnotation(SqlUnion.class);
-        SqlTable sqlTable;
+        SqlTable sqlTable = getSqlTable(clazz);
         String className = "";
         String schema = "";
         String tableName = "";
         String tableAlias = "";
-        if (sqlUnion != null) {
-            sqlTable = clazz.getSuperclass().getAnnotation(SqlTable.class);
-        } else {
-            sqlTable = clazz.getAnnotation(SqlTable.class);
-        }
         if (sqlTable != null) {
             schema = sqlTable.schema();
             tableName = sqlTable.value();
@@ -90,10 +104,31 @@ public class SqlBeanUtil {
         String schema = table.getSchema();
         String tableName = table.getName();
         if (StringUtil.isNotEmpty(schema)) {
-            tableName = schema + SqlHelperCons.POINT + tableName;
+            tableName = schema + SqlConstant.POINT + tableName;
         }
         return SqlBeanUtil.isToUpperCase(common) ? tableName.toUpperCase() : tableName;
     }
+
+//    /**
+//     * 获取Bean字段中实际对于的表字段
+//     *
+//     * @param field
+//     * @param clazz
+//     * @return
+//     */
+//    public static String getTableFieldName(Field field, Class<?> clazz) {
+//        SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
+//        String name = field.getName();
+//        if (sqlColumn != null) {
+//            name = sqlColumn.value();
+//        } else {
+//            SqlTable sqlTable = getSqlTable(clazz);
+//            if (sqlTable != null && sqlTable.mapUsToCc()) {
+//                name = StringUtil.humpToUnderline(name);
+//            }
+//        }
+//        return name;
+//    }
 
     /**
      * 获取Bean字段中实际对于的表字段
@@ -106,6 +141,11 @@ public class SqlBeanUtil {
         String name = field.getName();
         if (sqlColumn != null) {
             name = sqlColumn.value();
+        } else {
+            SqlTable sqlTable = getSqlTable(field.getDeclaringClass());
+            if (sqlTable != null && sqlTable.mapUsToCc()) {
+                name = StringUtil.humpToUnderline(name);
+            }
         }
         return name;
     }
@@ -422,7 +462,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static String getColumnAlias(String tableAlias, String fieldName) {
-        return tableAlias + SqlHelperCons.UNDERLINE + fieldName;
+        return tableAlias + SqlConstant.UNDERLINE + fieldName;
     }
 
     /**
@@ -439,12 +479,12 @@ public class SqlBeanUtil {
         StringBuffer fullName = new StringBuffer();
         if (StringUtil.isNotEmpty(schema)) {
             fullName.append(schema);
-            fullName.append(SqlHelperCons.POINT);
+            fullName.append(SqlConstant.POINT);
         }
         fullName.append(transferred);
         fullName.append(tableAlias);
         fullName.append(transferred);
-        fullName.append(SqlHelperCons.POINT);
+        fullName.append(SqlConstant.POINT);
         fullName.append(tableFieldName);
         return fullName.toString();
     }
@@ -479,9 +519,9 @@ public class SqlBeanUtil {
                 if (objects != null) {
                     for (int i = 0; i < objects.length; i++) {
                         value.append(getSqlValue(common, objects[i]));
-                        value.append(SqlHelperCons.COMMA);
+                        value.append(SqlConstant.COMMA);
                     }
-                    value.delete(value.length() - SqlHelperCons.COMMA.length(), value.length());
+                    value.delete(value.length() - SqlConstant.COMMA.length(), value.length());
                 }
                 conditionSql.append(value);
                 index++;
@@ -691,9 +731,9 @@ public class SqlBeanUtil {
      */
     public static String getSqlValue(Common common, Object value, JdbcType jdbcType) {
         if (value == null) {
-            return SqlHelperCons.NULL_VALUE;
+            return SqlConstant.NULL_VALUE;
         }
-        String single_quotation_mark = SqlHelperCons.SINGLE_QUOTATION_MARK;
+        String single_quotation_mark = SqlConstant.SINGLE_QUOTATION_MARK;
         String sqlValue;
         WhatType whatType;
         if (jdbcType == null) {
@@ -744,7 +784,7 @@ public class SqlBeanUtil {
      */
     public static boolean isCount(Select select) {
         boolean isTrue = true;
-        if (select.getColumnList() != null && !select.getColumnList().contains(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET)) {
+        if (select.getColumnList() != null && !select.getColumnList().contains(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET)) {
             isTrue = false;
         }
         return isTrue;
@@ -780,10 +820,10 @@ public class SqlBeanUtil {
      * @return
      */
     public static String getTransferred(Common common) {
-        String transferred = SqlHelperCons.DOUBLE_ESCAPE_CHARACTER;
+        String transferred = SqlConstant.DOUBLE_ESCAPE_CHARACTER;
         DbType dbType = common.getSqlBeanDB().getDbType();
         if (dbType == DbType.MySQL || dbType == DbType.MariaDB) {
-            transferred = SqlHelperCons.SINGLE_ESCAPE_CHARACTER;
+            transferred = SqlConstant.SINGLE_ESCAPE_CHARACTER;
         }
         return transferred;
     }

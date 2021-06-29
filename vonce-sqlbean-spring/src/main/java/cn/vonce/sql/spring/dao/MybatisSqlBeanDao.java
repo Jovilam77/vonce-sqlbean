@@ -326,11 +326,12 @@ public interface MybatisSqlBeanDao<T> {
      * @param clazz
      * @param bean
      * @param updateNotNull
+     * @param optimisticLock
      * @param filterFields
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateById")
-    int updateById(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("id") Object id, @Param("updateNotNull") boolean updateNotNull, @Param("filterFields") String[] filterFields);
+    int updateById(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("id") Object id, @Param("updateNotNull") boolean updateNotNull, @Param("updateNotNull") boolean optimisticLock, @Param("filterFields") String[] filterFields);
 
     /**
      * 根据实体类id条件更新
@@ -339,11 +340,12 @@ public interface MybatisSqlBeanDao<T> {
      * @param clazz
      * @param bean
      * @param updateNotNull
+     * @param optimisticLock
      * @param filterFields
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateByBeanId")
-    int updateByBeanId(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("filterFields") String[] filterFields);
+    int updateByBeanId(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("updateNotNull") boolean optimisticLock, @Param("filterFields") String[] filterFields);
 
     /**
      * 根据条件更新
@@ -352,13 +354,14 @@ public interface MybatisSqlBeanDao<T> {
      * @param clazz
      * @param bean
      * @param updateNotNull
+     * @param optimisticLock
      * @param filterFields
      * @param where
      * @param args
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateByCondition")
-    int updateByCondition(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("filterFields") String[] filterFields, @Param("where") String where, @Param("args") Object... args);
+    int updateByCondition(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("updateNotNull") boolean optimisticLock, @Param("filterFields") String[] filterFields, @Param("where") String where, @Param("args") Object... args);
 
     /**
      * 根据实体类字段条件更新
@@ -367,12 +370,13 @@ public interface MybatisSqlBeanDao<T> {
      * @param clazz
      * @param bean
      * @param updateNotNull
+     * @param optimisticLock
      * @param filterFields
      * @param where
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateByBeanCondition")
-    int updateByBeanCondition(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("filterFields") String[] filterFields, @Param("where") String where);
+    int updateByBeanCondition(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("updateNotNull") boolean optimisticLock, @Param("filterFields") String[] filterFields, @Param("where") String where);
 
     /**
      * 插入数据

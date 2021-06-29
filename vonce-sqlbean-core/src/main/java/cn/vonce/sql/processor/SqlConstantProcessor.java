@@ -40,7 +40,7 @@ public class SqlConstantProcessor extends AbstractProcessor {
             for (TypeElement typeElement : annotations) {
                 for (Element element : env.getElementsAnnotatedWith(typeElement)) {
                     SqlTable sqlTable = element.getAnnotation(SqlTable.class);
-                    if (!sqlTable.generate()) {
+                    if (!sqlTable.constant()) {
                         continue;
                     }
                     Element enclosingElement = element.getEnclosingElement();

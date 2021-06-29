@@ -23,7 +23,8 @@ public enum JavaType {
     BIT(new Class[]{boolean.class, Boolean.class}),
     DATE(new Class[]{java.sql.Date.class}),
     TIME(new Class[]{java.sql.Time.class}),
-    TIMESTAMP(new Class[]{java.sql.Timestamp.class, java.util.Date.class}),
+    TIMESTAMP(new Class[]{java.sql.Timestamp.class}),
+    DATETIME(new Class[]{java.util.Date.class}),
     CLOB(new Class[]{java.sql.Clob.class}),
     BLOB(new Class[]{java.sql.Blob.class});
 

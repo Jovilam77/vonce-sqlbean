@@ -42,7 +42,7 @@ public interface InsertService<T> {
      * @param insert
      * @return
      */
-    int inset(Insert insert);
+    int inset(Insert<T> insert);
 
     /**
      * 备份表和数据到一张新表(表名_+时间)

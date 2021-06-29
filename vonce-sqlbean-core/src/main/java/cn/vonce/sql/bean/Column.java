@@ -1,6 +1,6 @@
 package cn.vonce.sql.bean;
 
-import cn.vonce.sql.constant.SqlHelperCons;
+import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.EscapeChar;
 import cn.vonce.sql.uitls.StringUtil;
 
@@ -62,7 +62,7 @@ public class Column extends SqlField implements Serializable {
     public String fullName(EscapeChar escapeChar) {
         String ec = es(escapeChar);
         if (StringUtil.isNotEmpty(super.getTableAlias())) {
-            return ec + super.getTableAlias() + ec + SqlHelperCons.POINT + ec + name() + ec;
+            return ec + super.getTableAlias() + ec + SqlConstant.POINT + ec + name() + ec;
         }
         return name(escapeChar);
     }
@@ -117,9 +117,9 @@ public class Column extends SqlField implements Serializable {
         if (escapeChar == null) {
             return "";
         }
-        String ec = SqlHelperCons.DOUBLE_ESCAPE_CHARACTER;
+        String ec = SqlConstant.DOUBLE_ESCAPE_CHARACTER;
         if (EscapeChar.SINGLE == escapeChar) {
-            ec = SqlHelperCons.SINGLE_ESCAPE_CHARACTER;
+            ec = SqlConstant.SINGLE_ESCAPE_CHARACTER;
         }
         return ec;
     }

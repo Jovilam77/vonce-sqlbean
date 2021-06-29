@@ -4,7 +4,7 @@ package cn.vonce.sql.page;
 import cn.vonce.sql.bean.Order;
 import cn.vonce.sql.bean.Paging;
 import cn.vonce.sql.bean.Select;
-import cn.vonce.sql.constant.SqlHelperCons;
+import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.SqlSort;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.StringUtil;
@@ -243,7 +243,7 @@ public class PageHelper<T> {
             Select sqlBeanSelect = (Select) select.copy();
             // 预防设置了查询字段，故将查询字段换位统计字段
             select.getColumnList().clear();
-            select.column(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET);
+            select.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
             //设置分页
             sqlBeanSelect.setPage(pagenum, pagesize);
             sqlBeanSelect.orderBy(orders);
@@ -285,8 +285,8 @@ public class PageHelper<T> {
                     sort = sortorders[i];
                 } catch (Exception e) {
                 }
-                if (StringUtil.isNotEmpty(field) && field.indexOf(SqlHelperCons.POINT) > -1) {
-                    String[] tableNameAndField = field.split("\\" + SqlHelperCons.POINT);
+                if (StringUtil.isNotEmpty(field) && field.indexOf(SqlConstant.POINT) > -1) {
+                    String[] tableNameAndField = field.split("\\" + SqlConstant.POINT);
                     order = new Order("", tableNameAndField[0], tableNameAndField[1], SqlSort.get(sort));
                 } else {
                     order = new Order(field, SqlSort.get(sort));
