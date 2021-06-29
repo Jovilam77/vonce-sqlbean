@@ -3,6 +3,7 @@ package cn.vonce.sql.processor;
 import cn.vonce.sql.annotation.SqlColumn;
 import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.uitls.StringUtil;
+
 import javax.annotation.processing.*;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
@@ -40,16 +41,21 @@ public class SqlConstantProcessor extends AbstractProcessor {
             for (TypeElement typeElement : annotations) {
                 for (Element element : env.getElementsAnnotatedWith(typeElement)) {
                     SqlTable sqlTable = element.getAnnotation(SqlTable.class);
-                    if (!sqlTable.constant()) {
+                    if (sqlTable != null && !sqlTable.constant()) {
                         continue;
                     }
                     Element enclosingElement = element.getEnclosingElement();
                     //获取父元素的全类名,用来生成包名
                     String packageName = ((PackageElement) enclosingElement).getQualifiedName().toString() + ".sql";
-                    String className = PREFIX + element.getSimpleName();
-                    String schema = sqlTable.schema();
-                    String tableName = sqlTable.value();
-                    String tableAlias = sqlTable.alias();
+                    String schema = "";
+                    String tableName = element.getSimpleName().toString();
+                    String tableAlias = "";
+                    String className = PREFIX + tableName;
+                    if (sqlTable != null) {
+                        schema = sqlTable.schema();
+                        tableName = sqlTable.value();
+                        tableAlias = sqlTable.alias();
+                    }
                     if (StringUtil.isEmpty(tableAlias)) {
                         tableAlias = tableName;
                     }
@@ -71,6 +77,10 @@ public class SqlConstantProcessor extends AbstractProcessor {
                                 SqlColumn sqlColumn = subElement.getAnnotation(SqlColumn.class);
                                 if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.value())) {
                                     sqlFieldName = sqlColumn.value();
+                                } else {
+                                    if (sqlTable != null && sqlTable.mapUsToCc()) {
+                                        sqlFieldName = StringUtil.humpToUnderline(sqlFieldName);
+                                    }
                                 }
                                 code.append(String.format("\tpublic static final Column %s = new Column(_schema,_tableAlias,\"%s\",\"\");\n", sqlFieldName, sqlFieldName));
                             }
