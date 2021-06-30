@@ -21,17 +21,17 @@
 @SqlTable("d_essay")
 public class Essay {
 
-	@SqlId(generateType = GenerateType.UUID)
-	@SqlColumn("id")
+	@SqlId(type = IdType.UUID)
+	//@SqlColumn("id") 常规情况下可不写
 	private String id;
 
-	@SqlColumn("userId" )
+	//@SqlColumn("user_id" ) 常规情况下可不写
 	private String userId;
 
-	@SqlColumn("content" )
+	//@SqlColumn("content" ) 常规情况下可不写
 	private String content;
 
-	@SqlColumn("creationTime" )
+	//@SqlColumn("creation_time" ) 常规情况下可不写
 	private Date creationTime;
 	
 	/**省略get set方法*/
@@ -45,12 +45,6 @@ public interface EssayService extends SqlBeanService<Essay,String> {
 
 	//已内置大量常用查询、更新、删除、插入方法，这里可以写自己封装的方法
 
-	Essay selectByUserId(String userId);
-	
-	List<Essay> selectByTimeRange(String start,String end);
-	
-	long updateEssayById(String userId);
-
 }
 ```
 ###### 4：Service实现类只需继承MybatisSqlBeanServiceImpl<实体类,ID>和实现你的Service接口
@@ -58,24 +52,7 @@ public interface EssayService extends SqlBeanService<Essay,String> {
 @Service
 public class EssayServiceImpl extends MybatisSqlBeanServiceImpl<Essay,String> implements EssayService {
 
-	public Essay selectByUserId(String userId){
-		return super.selectOneByCondition("& = ?", SqlEssay.userId, userId);
-	}
 	
-	public List<Essay> selectByTimeRange(String start,String end){
-		return super.selectByCondition("& > ? AND & < ?", SqlEssay.creationTime, start, SqlEssay.creationTime, end);
-	}
-	
-	public long updateEssayById(String userId){
-		Essay essay = new Essay();
-		essay.setId(userId);
-		essay.setContent("欢迎使用Sqlbean");
-		//return super.updateByCondition(essay, true, "& = ?", SqlEssay.id, id);
-		//return updateById(essay, userId, true);
-		return updateByBeanId(essay, true);
-	}
-	
-	//更多用法查阅详细文档
 
 }
 ```
@@ -91,11 +68,49 @@ public class EssayController {
 	//查询
 	@GetMapping("get")
 	public RS get() {
-		List<Essay> list = essayService.selectAll();
-		list = essayService.selectByCondition("& = ?" , SqlEssay.type, 2);
-		Essay essay = essayService.selectById(1);
-		essay = essayService.selectOneByCondition("& = ?" , SqlEssay.id, 1);
-		return super.successHint("获取成功", list);
+		//查询列表  全部
+        List<Essay> list = essayService.selectAll();
+        //查询列表  根据条件查询 方式一
+        list = essayService.selectByCondition("& > ?", SqlEssay.id, 20);
+        //查询列表  根据条件查询 方式二 推荐
+        list = essayService.selectByCondition(Wrapper.where(Cond.gt(SqlEssay.id, 10)).and(Cond.lt(SqlEssay.id, 20)));
+
+
+        //查询单条  根据id
+        Essay essay = essayService.selectById(1L);
+        //查询单条  根据条件查询 方式一
+        essay = essayService.selectOneByCondition("& = ?", SqlEssay.id, 1);
+        //查询单条  根据条件查询 方式二 推荐
+        essay = essayService.selectOneByCondition(Wrapper.where(Cond.eq(SqlEssay.id, 333)));
+
+        //复杂查询
+        Select select = new Select();
+        //指定查询的字段
+        select.column(SqlEssay.id).column(SqlEssay.content);
+        //指定查询的表 可不写
+        //select.setTable(Essay.class);
+        //看需求指定连表 这里不演示
+        //select.join("","");
+        //id 大于 1  这里的id建议用SqlEssay.id 常量替代 这里演示多种写法特意不写
+        select.where("id", 1, SqlOperator.GREATER_THAN);
+        //并且 内容等于222 这里的content建议用SqlEssay.content 常量替代 这里演示多种写法特意不写
+        select.wAND("content", "222");
+        //条件也可用包装器 复杂条件推荐使用
+        //select.setWhere(Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
+        //也可使用表达式 如果这三种条件同时出现 那么此方式优先级最高 上面包装器次之
+        //select.setWhere("& = ? AND & = ?", SqlEssay.id, 1, SqlEssay.content, "222");
+        //根据id倒序
+        select.orderBy("id", SqlSort.DESC);
+
+        //用于查询Map 多条结果时会报错
+        Map<String, Object> map = essayService.selectMap(select);
+		//用于查询Map列表
+        List<Map<String, Object>> mapList = essayService.selectMapList(select);
+
+        //用于查询对象列表
+        list = essayService.select(select);
+		
+        return super.successHint("获取成功", list);
 		// 更多用法请查看下方详细文档...
 	}
 
