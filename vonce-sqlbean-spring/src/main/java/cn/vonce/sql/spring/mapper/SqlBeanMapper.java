@@ -195,31 +195,24 @@ public class SqlBeanMapper {
         try {
             switch (fieldType) {
                 case "byte":
-                case "java.lang.Byte":
                     value = resultSet.getByte(fieldName);
                     break;
                 case "short":
-                case "java.lang.Short":
                     value = resultSet.getShort(fieldName);
                     break;
                 case "int":
-                case "java.lang.Integer":
                     value = resultSet.getInt(fieldName);
                     break;
                 case "float":
-                case "java.lang.Float":
                     value = resultSet.getFloat(fieldName);
                     break;
                 case "double":
-                case "java.lang.Double":
                     value = resultSet.getDouble(fieldName);
                     break;
                 case "long":
-                case "java.lang.Long":
                     value = resultSet.getLong(fieldName);
                     break;
                 case "boolean":
-                case "java.lang.Boolean":
                     value = resultSet.getBoolean(fieldName);
                     break;
                 case "char":
@@ -316,35 +309,27 @@ public class SqlBeanMapper {
         Object value = null;
         switch (typeName) {
             case "byte":
-            case "java.lang.Byte":
                 value = new Byte("0");
                 break;
             case "short":
-            case "java.lang.Short":
                 value = new Short("0");
                 break;
             case "int":
-            case "java.lang.Integer":
                 value = 0;
                 break;
             case "long":
-            case "java.lang.Long":
                 value = 0L;
                 break;
             case "float":
-            case "java.lang.Float":
                 value = 0F;
                 break;
             case "double":
-            case "java.lang.Double":
                 value = 0D;
                 break;
             case "char":
-            case "java.lang.Char":
                 value = '\u0000';
                 break;
             case "boolean":
-            case "java.lang.Boolean":
                 value = false;
                 break;
         }

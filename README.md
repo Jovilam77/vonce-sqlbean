@@ -21,9 +21,9 @@
 @SqlTable("d_essay")
 public class Essay {
 
-	@SqlId(type = IdType.UUID)
+	@SqlId(type = IdType.SNOWFLAKE_ID_16) //标识id字段
 	//@SqlColumn("id") 常规情况下可不写
-	private String id;
+	private Long id;
 
 	//@SqlColumn("user_id" ) 常规情况下可不写
 	private String userId;
@@ -33,6 +33,10 @@ public class Essay {
 
 	//@SqlColumn("creation_time" ) 常规情况下可不写
 	private Date creationTime;
+
+    @SqlVersion //标识乐观锁字段
+    //@SqlColumn("update_time" ) 常规情况下可不写
+	private Date updateTime;
 	
 	/**省略get set方法*/
 	
@@ -66,8 +70,8 @@ public class EssayController {
 	private EssayService essayService;
 
 	//查询
-	@GetMapping("get")
-	public RS get() {
+	@GetMapping("select")
+	public RS select() {
 		//查询列表  全部
         List<Essay> list = essayService.selectAll();
         //查询列表  根据条件查询 方式一
@@ -111,29 +115,39 @@ public class EssayController {
         list = essayService.select(select);
 		
         return super.successHint("获取成功", list);
-		// 更多用法请查看下方详细文档...
+		//更多用法请查看下方详细文档...
 	}
 
 	//分页
 	@GetMapping("getList")
 	public RS getList(HttpServletRequest request) {
 		// 查询对象
-	//Select select = new Select();
-	// 分页助手PageHelper
-	//ReqPageHelper<Essay> pageHelper = new ReqPageHelper<>(request);
-	// 分页查询
-	//pageHelper.paging(select, essayService);
-	// 返回结果
-	//return super.customHint(pageHelper.toResult("获取列表成功"));
-	// 或者这样
-	return super.customHint(new PageHelper<Essay>(request).paging(new Select(),essayService).toResult("获取文章列表成功"));
+        Select select = new Select();
+        // 分页助手ReqPageHelper
+        ReqPageHelper<Essay> pageHelper = new ReqPageHelper<>(request);
+        //分页查询
+        pageHelper.paging(select, essayService);
+        //返回结果
+        return super.customHint(pageHelper.toResult("获取列表成功"));
+        // 或者这样
+        // return super.customHint(new PageHelper<Essay>(request).paging(new Select(),essayService).toResult("获取文章列表成功"));
+        
+        //又或者 更简便的用法（不带统计和页数信息）
+        //List<Essay> list = essayService.selectByCondition(new Paging(0,10), Wrapper.where(Cond.gt(SqlEssay.id, 10)).and(Cond.lt(SqlEssay.id, 20)));
+        //return super.successHint("获取成功", list);
 	}
 
 	//更新
 	@PostMapping("update")
-	public RS update(String id) {
-		long i = essayService.updateEssayById(id);
-		if (i > 0) {
+	public RS update(Essay essay) {
+	    //根据bean内部id更新
+		long i = essayService.updateByBeanId(essay);
+		//根据外部id更新 参数3的true代表仅更新不为null字段 参数4的true代表使用乐观锁
+        //i = essayService.updateById(essay,20,true,true);
+		//根据条件更新 参数2的true代表仅更新不为null字段 参数3的true代表使用乐观锁
+        //i = essayService.updateByCondition(essay,true,true,Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
+		//更多用法请查看下方详细文档...
+        if (i > 0) {
 			return super.successHint("更新成功");
 		}
 		return super.othersHint("更新失败");
@@ -142,8 +156,12 @@ public class EssayController {
 	//删除
 	@PostMapping("deleteById")
 	public RS deleteById(Integer[] id) {
+	    //根据id删除
 		long i = essayService.deleteById(id);
-		if (i > 0) {
+		//根据条件删除
+        //i = essayService.deleteByCondition(Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
+        //更多用法请查看下方详细文档...
+        if (i > 0) {
 			return super.successHint("删除成功");
 		}
 		return super.othersHint("删除失败");

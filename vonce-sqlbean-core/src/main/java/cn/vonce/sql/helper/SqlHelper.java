@@ -677,38 +677,30 @@ public class SqlHelper {
         } else {
             fields = bean.getClass().getDeclaredFields();
         }
-        List<Field> filterAfterList = new ArrayList<>();
+        Date date = new Date();
         for (int i = 0; i < fields.length; i++) {
             if (Modifier.isStatic(fields[i].getModifiers())) {
                 continue;
             }
-            String name = SqlBeanUtil.getTableFieldName(fields[i]);
-            Object objectValue = ReflectUtil.instance().get(bean.getClass(), bean, fields[i].getName());
-            if (update.isUpdateNotNull()) {
-                if (objectValue == null) {
-                    continue;
-                }
-            }
             if (SqlBeanUtil.isIgnore(fields[i])) {
                 continue;
             }
+            String name = SqlBeanUtil.getTableFieldName(fields[i]);
             if (SqlBeanUtil.isFilter(filterFields, name)) {
                 continue;
             }
-            filterAfterList.add(fields[i]);
-        }
-        Date date = new Date();
-        for (int i = 0; i < filterAfterList.size(); i++) {
-            String name = SqlBeanUtil.getTableFieldName(filterAfterList.get(i));
-            Object objectValue = ReflectUtil.instance().get(bean.getClass(), bean, filterAfterList.get(i).getName());
+            Object objectValue = ReflectUtil.instance().get(bean.getClass(), bean, fields[i].getName());
+            if (update.isUpdateNotNull() && objectValue == null && !fields[i].isAnnotationPresent(SqlUpdateTime.class)) {
+                continue;
+            }
             setSql.append(transferred);
             setSql.append(SqlBeanUtil.isToUpperCase(update) ? name.toUpperCase() : name);
             setSql.append(transferred);
             setSql.append(SqlConstant.EQUAL_TO);
-            if (update.isOptimisticLock() && filterAfterList.get(i).isAnnotationPresent(SqlVersion.class)) {
-                Object o = SqlBeanUtil.updateVersion(filterAfterList.get(i).getType().getName(), objectValue);
+            if (update.isOptimisticLock() && fields[i].isAnnotationPresent(SqlVersion.class)) {
+                Object o = SqlBeanUtil.updateVersion(fields[i].getType().getName(), objectValue);
                 setSql.append(SqlBeanUtil.getSqlValue(update, o));
-            } else if (filterAfterList.get(i).isAnnotationPresent(SqlUpdateTime.class) && SqlBeanUtil.whatType(filterAfterList.get(i).getType().getName()) == WhatType.DATE_TYPE) {
+            } else if (fields[i].isAnnotationPresent(SqlUpdateTime.class) && SqlBeanUtil.whatType(fields[i].getType().getName()) == WhatType.DATE_TYPE) {
                 setSql.append(SqlBeanUtil.getSqlValue(update, date));
             } else {
                 setSql.append(SqlBeanUtil.getSqlValue(update, objectValue));
@@ -874,7 +866,7 @@ public class SqlHelper {
      * @return
      */
     private static String versionCondition(Common common, Object bean) {
-        if ((common instanceof Update && ((Update) common).isLogicallyDelete()) || common instanceof Update && !((Update) common).isLogicallyDelete()) {
+        if ((common instanceof Update && ((Update) common).isLogicallyDelete()) || common instanceof Update && !((Update) common).isOptimisticLock()) {
             return "";
         }
         StringBuffer versionConditionSql = new StringBuffer();

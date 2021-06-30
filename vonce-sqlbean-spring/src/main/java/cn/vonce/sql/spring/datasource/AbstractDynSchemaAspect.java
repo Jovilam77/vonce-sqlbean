@@ -8,7 +8,7 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 
 /**
- * 数据源切换切点
+ * 动态Schema切换切点
  *
  * @author Jovi
  * @version 1.0
