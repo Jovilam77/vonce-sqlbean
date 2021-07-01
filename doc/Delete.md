@@ -1,114 +1,104 @@
-## Delete
-##### Delete对象的方法请看代码中的文档描述
-#### 方法和示例
+#### Delete使用示例
+```java
+    Delete delete = new Delete();
+	
+    //delete.setTable("t_essay"); 表名
+    delete.setTable(Essay.class);
+	
+    //id 大于 1  这里的id建议用SqlEssay.id 常量替代 这里演示多种写法特意不写
+    delete.where("id", 1, SqlOperator.GREATER_THAN);
+	
+    //并且 内容等于222 这里的content建议用SqlEssay.content 常量替代 这里演示多种写法特意不写
+    delete.wAND("content", "222");
+	
+    //条件也可用包装器 复杂条件推荐使用
+    //delete.setWhere(Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
+    //也可使用表达式 如果这三种条件同时出现 那么此方式优先级最高 上面包装器次之
+    //delete.setWhere("& = ? AND & = ?", SqlEssay.id, 1, SqlEssay.content, "222");
+	
+    essayService.delete(delete);
+```
+#### DeleteService接口文档
 ###### 1：根据id条件删除
 ```java
-long deleteById(Object... id);
-```
-```java
-@RequestMapping(value = "delete", method = RequestMethod.DELETE)
-@ResponseBody
-public RS delete() {
-	long i = essayService.deleteById(1);
-	if(i > 0){
-		super.successHint("删除成功");
-	}
-	return super.othersHint("删除失败");
-}
+  /**
+   * 根据id条件删除
+   *
+   * @param id 单个id或数组
+   * @return
+   */
+   int deleteById(ID... id);
 ```
 ###### 2：根据条件删除
 ```java
-long deleteByCondition(String where, Object... args);
+  /**
+   * 根据条件删除
+   *
+   * @param where 条件表达式
+   * @param args  条件参数
+   * @return
+   */
+   int deleteByCondition(String where, Object... args);
 ```
+###### 3：根据条件删除
 ```java
-@RequestMapping(value = "delete", method = RequestMethod.DELETE)
-@ResponseBody
-public RS delete() {
-	long i = essayService.deleteByCondition("id > ? and id < ?" ,1 ,10);
-	if(i > 0){
-		super.successHint("删除成功");
-	}
-	return super.othersHint("删除失败");
-}
+  /**
+   * 根据条件删除
+   *
+   * @param where 条件包装器
+   * @return
+   */
+   int deleteByCondition(Wrapper where);
 ```
-###### 3：删除（where条件为空会抛异常，因为删除全部非常危险）
+###### 4：删除
 ```java
-long delete(Delete delete);
+  /**
+    * 删除(where条件为空会抛异常，因为删除全部非常危险)
+    *
+    * @param delete 删除对象
+    * @return
+    */
+    int delete(Delete delete);
 ```
+###### 5：删除
 ```java
-@RequestMapping(value = "delete", method = RequestMethod.DELETE)
-@ResponseBody
-public RS delete() {
-	Delete delete = new Delete();
-	delete.setDeleteBable(Essay.class);
-	delete.where("id", 1);
-	long i = essayService.delete(delete);
-	if(i > 0){
-		super.successHint("删除成功");
-	}
-	return super.othersHint("删除失败");
-}
+  /**
+    * 删除
+    *
+    * @param delete 删除对象
+    * @param ignore 如果为true则不指定where条件也能执行，false则抛异常
+    * @return
+    */
+    int delete(Delete delete, boolean ignore);
 ```
-###### 3：删除（如果要删除全部可以用这个）
+###### 6：逻辑删除根据id条件（需在实体类标记逻辑删除字段@SqlLogically）
 ```java
-long delete(Delete delete, boolean ignore);
+  /**
+    * 逻辑删除根据id条件
+    *
+    * @param id 单个id或数组
+    * @return
+    */
+    int logicallyDeleteById(ID... id);
 ```
+###### 7：根据id条件逻辑删除（需在实体类标记逻辑删除字段@SqlLogically）
 ```java
-@RequestMapping(value = "delete", method = RequestMethod.Delete)
-@ResponseBody
-public RS delete() {
-	Delete delete = new Delete();
-	delete.setDeleteBable(Essay.class);
-	//如果这里为false则抛异常
-	long i = essayService.delete(delete,true);
-	if(i > 0){
-		super.successHint("删除成功");
-	}
-	return super.othersHint("删除失败");
-}
+  /**
+    * 根据条件逻辑删除
+    *
+    * @param where 条件表达式
+    * @param args  条件参数
+    * @return
+    */
+    int logicallyDeleteByCondition(String where, Object... args);
 ```
-###### 4：逻辑删除根据id条件
+###### 8：根据条件逻辑删除（需在实体类标记逻辑删除字段@SqlLogically）
 ```java
-long logicallyDeleteById(Object id);
-```
-```java
-@RequestMapping(value = "delete", method = RequestMethod.DELETE)
-@ResponseBody
-public RS delete() {
-	long i = essayService.logicallyDeleteById(1);
-	if(i > 0){
-		super.successHint("删除成功");
-	}
-	return super.othersHint("删除失败");
-}
-```
-###### 5：根据id条件逻辑删除（需在实体类标记某个字段为逻辑删除字段，[请看注解文档](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Annotation.md "请看注解文档")）
-```java
-long logicallyDeleteById(Object id);
-```
-```java
-@RequestMapping(value = "delete", method = RequestMethod.DELETE)
-@ResponseBody
-public RS delete() {
-	long i = essayService.logicallyDeleteById(1);
-	if(i > 0){
-		super.successHint("删除成功");
-	}
-	return super.othersHint("删除失败");
-}
-```
-###### 6：根据条件逻辑删除（需在实体类标记某个字段为逻辑删除字段，[请看注解文档](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Annotation.md "请看注解文档")）
-```java
-long logicallyDeleteByCondition(String where, Object... args);
-```
-```java
-@RequestMapping(value = "delete", method = RequestMethod.DELETE)
-@ResponseBody
-public RS delete() {
-	long i = essayService.logicallyDeleteByCondition("id > ? and id < ?" ,1 ,10);
-	if(i > 0){
-		super.successHint("删除成功");
-	}
-	return super.othersHint("删除失败");
-}
+  /**
+    * 根据条件逻辑删除
+    *
+    * @param where 条件包装器
+    * @return
+    */
+    int logicallyDeleteByCondition(Wrapper where);
 ```
