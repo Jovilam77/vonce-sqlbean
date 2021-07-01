@@ -690,7 +690,7 @@ public class SqlHelper {
                 continue;
             }
             Object objectValue = ReflectUtil.instance().get(bean.getClass(), bean, fields[i].getName());
-            if (update.isUpdateNotNull() && objectValue == null && !fields[i].isAnnotationPresent(SqlUpdateTime.class)) {
+            if (update.isUpdateNotNull() && objectValue == null && !fields[i].isAnnotationPresent(SqlUpdateTime.class) && !fields[i].isAnnotationPresent(SqlVersion.class)) {
                 continue;
             }
             setSql.append(transferred);
