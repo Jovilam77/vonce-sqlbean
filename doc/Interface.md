@@ -1,7 +1,7 @@
 ## Service接口和实现类
-##### 增删查改接口
+##### 增删查改接口 + 表操作接口
 ```java
-public interface EssayService extends SqlBeanService<Essay, String> {
+public interface EssayService extends SqlBeanService<Essay, String>, TableService {
 
 }
 ```
@@ -28,6 +28,12 @@ public interface EssayService extends DeleteService {
 ##### 仅更新接口
 ```java
 public interface EssayService extends UpdateService<Essay, String> {
+
+}
+```
+##### 仅表操作接口
+```java
+public interface EssayService extends TableService {
 
 }
 ```
