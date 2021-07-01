@@ -197,14 +197,38 @@ public class SqlBeanMapper {
                 case "byte":
                     value = resultSet.getByte(fieldName);
                     break;
+                case "java.lang.Byte":
+                    value = resultSet.getObject(fieldName);
+                    if (value != null) {
+                        value = resultSet.getByte(fieldName);
+                    }
+                    break;
                 case "short":
                     value = resultSet.getShort(fieldName);
+                    break;
+                case "java.lang.Short":
+                    value = resultSet.getObject(fieldName);
+                    if (value != null) {
+                        value = resultSet.getShort(fieldName);
+                    }
                     break;
                 case "int":
                     value = resultSet.getInt(fieldName);
                     break;
+                case "java.lang.Integer":
+                    value = resultSet.getObject(fieldName);
+                    if (value != null) {
+                        value = resultSet.getInt(fieldName);
+                    }
+                    break;
                 case "float":
                     value = resultSet.getFloat(fieldName);
+                    break;
+                case "java.lang.Float":
+                    value = resultSet.getObject(fieldName);
+                    if (value != null) {
+                        value = resultSet.getFloat(fieldName);
+                    }
                     break;
                 case "double":
                     value = resultSet.getDouble(fieldName);
@@ -217,8 +241,10 @@ public class SqlBeanMapper {
                     break;
                 case "char":
                 case "java.lang.Character":
+                    value = resultSet.getObject(fieldName, Character.class);
+                    break;
                 case "java.lang.String":
-                    value = resultSet.getString(fieldName) + "";
+                    value = resultSet.getString(fieldName);
                     break;
                 case "java.sql.Date":
                     value = resultSet.getDate(fieldName);

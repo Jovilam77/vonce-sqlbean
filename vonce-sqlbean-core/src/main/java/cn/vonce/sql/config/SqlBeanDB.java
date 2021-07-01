@@ -25,7 +25,9 @@ public class SqlBeanDB {
     }
 
     public void setDbType(DbType dbType) {
-        this.dbType = dbType;
+        if (this.dbType == null) {
+            this.dbType = dbType;
+        }
     }
 
     public SqlBeanConfig getSqlBeanConfig() {
@@ -33,6 +35,8 @@ public class SqlBeanDB {
     }
 
     public void setSqlBeanConfig(SqlBeanConfig sqlBeanConfig) {
-        this.sqlBeanConfig = sqlBeanConfig;
+        if (this.sqlBeanConfig == null) {
+            this.sqlBeanConfig = sqlBeanConfig;
+        }
     }
 }
