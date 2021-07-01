@@ -387,6 +387,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return mybatisSqlBeanDao.logicallyDeleteByCondition(getSqlBeanDB(), clazz, where, args);
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public int logicallyDeleteByCondition(Wrapper where) {
         return mybatisSqlBeanDao.logicallyDeleteByWrapper(getSqlBeanDB(), clazz, where);
@@ -513,6 +514,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, null, targetTableName, null, null);
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(String targetSchema, String targetTableName) {
         mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, targetSchema, targetTableName, null, null);
@@ -524,6 +526,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, null, targetTableName, columns, wrapper);
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper) {
         mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, targetSchema, targetTableName, columns, wrapper);
@@ -535,6 +538,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, null, targetTableName, null, wrapper);
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public int copy(String targetSchema, String targetTableName, Wrapper wrapper) {
         return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, targetSchema, targetTableName, null, wrapper);
@@ -546,6 +550,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, null, targetTableName, columns, wrapper);
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public int copy(String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper) {
         return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, targetSchema, targetTableName, columns, wrapper);
