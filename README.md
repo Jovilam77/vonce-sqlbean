@@ -1,9 +1,9 @@
-## Sqlbean(Sql生成助手)
+## Sqlbean
 #### 介绍
-###### 这是一款使用Java面向对象思想来编写并生成Sql语句的工具，并在此基础上同时对Mybatis和Spring Jdbc实现了类似于JPA的轻量级插件支持。插件中内置大量常用Sql执行的方法，目的是为了提高开发效率，减少大量的Sql语句编写，让开发者更专注于业务代码的编写。
+###### Sqlbean是一款使用Java面向对象思想来编写并生成Sql语句的工具，在此基础上对Mybatis和Spring Jdbc实现了类似于JPA的轻量级插件支持。其中内置大量常用SQL执行的方法，可以非常方便的达到你想要的目的，相对复杂的SQL语句也得以支持，在常规的项目开发几乎做到不写DAO层，可以有效的提高项目开发的效率，让开发者更专注于业务代码的编写。
 
-###### 特点：零配置，自动建表，连表查询，乐观锁，分页，支持Mybatis、Spring Jdbc
-###### 环境：JDK7+，Mybatis3.2.4+，(Spring MVC 4.1.2+ 或 Spring Boot 1x 或 Spring Boot 2x)
+###### 特点：零入侵、动态数据源、动态Schema、读写分离、自动建表、连表查询、乐观锁、分页、支持Mybatis和Spring Jdbc
+###### 环境：JDK7+，Mybatis3.2.4+，(Spring MVC 4.1.2+ 或 Spring Boot 1.x 或 Spring Boot 2.x)
 ###### 数据库：Mysql，MariaDB，Oracle，Sqlserver2008+，PostgreSQL，DB2，Derby，Sqlite，HSQL，H2
 
 ###### Sqlbean For Android请移步这里👉 [gitee](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")， [github](https://github.com/Jovilam77/vonce-sqlbean-android "vonce-sqlbean-android")
@@ -14,7 +14,7 @@
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
-		<version>1.4.2</version>
+		<version>1.5.0-beta</version>
 	</dependency>
 ###### 2：标注实体类
 ```java
@@ -53,6 +53,7 @@ public interface EssayService extends SqlBeanService<Essay,String> {
 ```
 ###### 4：Service实现类只需继承MybatisSqlBeanServiceImpl<实体类,ID>和实现你的Service接口
 ```java
+//使用Spring Jdbc的话将继承的父类改成SpringJdbcSqlBeanServiceImpl即可
 @Service
 public class EssayServiceImpl extends MybatisSqlBeanServiceImpl<Essay,String> implements EssayService {
 
@@ -182,10 +183,9 @@ public class EssayController {
 }
 // 更多用法请查看下方详细文档...
 ```
-###### 如果使用的是Spring JDBC那么将“MybatisSqlBeanServiceImpl”改为“SpringJdbcSqlBeanServiceImpl”即可
-[========]
 
-##### ↓更多用法请查看下方文档↓
+
+##### ↓↓↓更多用法请查看下方文档↓↓↓
 
 #### [注解与用法（含ID生成、表生成、乐观锁、逻辑删除、连表查询）](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Annotation.md "注解与用法（含ID生成、乐观锁、逻辑删除、连表查询）")
 #### [内置Select相关方法](https://github.com/Jovilam77/vonce-sqlbean/blob/develop/doc/Select.md "内置Select相关方法")
