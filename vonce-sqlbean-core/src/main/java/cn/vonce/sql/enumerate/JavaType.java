@@ -2,6 +2,13 @@ package cn.vonce.sql.enumerate;
 
 import java.math.BigDecimal;
 
+/**
+ * Java类型对应的SQL类型枚举类
+ *
+ * @author Jovi
+ * @version 1.0
+ * @email 766255988@qq.com
+ */
 public enum JavaType {
 
     INTEGER(new Class[]{int.class, Integer.class}),
@@ -10,12 +17,14 @@ public enum JavaType {
     FLOAT(new Class[]{float.class, Float.class}),
     DOUBLE(new Class[]{double.class, Double.class}),
     NUMERIC(new Class[]{BigDecimal.class}),
+    CHAR(new Class[]{char.class, Character.class}),
     VARCHAR(new Class[]{String.class}),
     TINYINT(new Class[]{byte.class, Byte.class}),
     BIT(new Class[]{boolean.class, Boolean.class}),
     DATE(new Class[]{java.sql.Date.class}),
     TIME(new Class[]{java.sql.Time.class}),
-    TIMESTAMP(new Class[]{java.sql.Timestamp.class, java.util.Date.class}),
+    TIMESTAMP(new Class[]{java.sql.Timestamp.class}),
+    DATETIME(new Class[]{java.util.Date.class}),
     CLOB(new Class[]{java.sql.Clob.class}),
     BLOB(new Class[]{java.sql.Blob.class});
 

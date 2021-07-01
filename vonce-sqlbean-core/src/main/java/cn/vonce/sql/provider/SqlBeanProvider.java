@@ -1,12 +1,13 @@
 package cn.vonce.sql.provider;
 
 import cn.vonce.sql.bean.*;
-import cn.vonce.sql.config.SqlBeanConfig;
-import cn.vonce.sql.constant.SqlHelperCons;
+import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.SqlOperator;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.SqlHelper;
+import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
@@ -30,8 +31,8 @@ public class SqlBeanProvider {
      * @param id
      * @return
      */
-    public String selectByIdSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object id) {
-        return selectByIdsSql(sqlBeanConfig, clazz, new Object[]{id});
+    public static String selectByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object id) {
+        return selectByIdsSql(sqlBeanDB, clazz, new Object[]{id});
     }
 
     /**
@@ -41,11 +42,11 @@ public class SqlBeanProvider {
      * @param ids
      * @return
      */
-    public String selectByIdsSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object... ids) {
+    public static String selectByIdsSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object... ids) {
         Select select;
         Field idField;
         try {
-            select = newSelect(sqlBeanConfig, clazz, false);
+            select = newSelect(sqlBeanDB, clazz, false);
             idField = SqlBeanUtil.getIdField(clazz);
         } catch (SqlBeanException e) {
             e.printStackTrace();
@@ -68,8 +69,8 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public String selectByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Paging paging, String where, Object... args) {
-        Select select = newSelect(sqlBeanConfig, clazz, false);
+    public static String selectByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Paging paging, String where, Object... args) {
+        Select select = newSelect(sqlBeanDB, clazz, false);
         select.setWhere(where, args);
         setPaging(select, paging, clazz);
         return SqlHelper.buildSelectSql(select);
@@ -83,8 +84,8 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public String selectCountByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String where, Object[] args) {
-        Select select = newSelect(sqlBeanConfig, clazz, true);
+    public static String selectCountByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
+        Select select = newSelect(sqlBeanDB, clazz, true);
         select.setWhere(where, args);
         return SqlHelper.buildSelectSql(select);
     }
@@ -95,8 +96,8 @@ public class SqlBeanProvider {
      * @param clazz
      * @return
      */
-    public String selectAllSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Paging paging) {
-        Select select = newSelect(sqlBeanConfig, clazz, false);
+    public static String selectAllSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Paging paging) {
+        Select select = newSelect(sqlBeanDB, clazz, false);
         setPaging(select, paging, clazz);
         return SqlHelper.buildSelectSql(select);
     }
@@ -104,19 +105,19 @@ public class SqlBeanProvider {
     /**
      * 根据自定义条件查询（可自动分页）
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      * @param clazz
      * @param select
      * @return
      */
-    public String selectSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Select select) {
-        if (select.getSqlBeanConfig() == null) {
-            select.setSqlBeanConfig(sqlBeanConfig);
+    public static String selectSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Select select) {
+        if (select.getSqlBeanDB() == null) {
+            select.setSqlBeanDB(sqlBeanDB);
         }
         if (select.getColumnList().isEmpty()) {
             try {
                 select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
-                if (select.getPage() != null && select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
+                if (select.getPage() != null && select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
                     select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)));
                 }
             } catch (SqlBeanException e) {
@@ -124,24 +125,30 @@ public class SqlBeanProvider {
                 return null;
             }
         }
+//        if (select.getBeanClass() == null) {
+//            select.setBeanClass(clazz);
+//        }
         return setSelectAndBuild(clazz, select);
     }
 
     /**
      * 根据自定义条件统计
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      * @param clazz
      * @param select
      * @return
      */
-    public String countSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Select select) {
-        if (select.getSqlBeanConfig() == null) {
-            select.setSqlBeanConfig(sqlBeanConfig);
+    public static String countSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Select select) {
+        if (select.getSqlBeanDB() == null) {
+            select.setSqlBeanDB(sqlBeanDB);
         }
         if (select.getColumnList() == null || select.getColumnList().isEmpty()) {
-            select.column(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET);
+            select.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
         }
+//        if (select.getBeanClass() == null) {
+//            select.setBeanClass(clazz);
+//        }
         return setSelectAndBuild(clazz, select);
     }
 
@@ -152,7 +159,7 @@ public class SqlBeanProvider {
      * @param id
      * @return
      */
-    public String deleteByIdSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object id) {
+    public static String deleteByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object id) {
         if (StringUtil.isEmpty(id)) {
             try {
                 throw new SqlBeanException("deleteByIdSql id不能为空");
@@ -162,8 +169,10 @@ public class SqlBeanProvider {
             }
         }
         Delete delete = new Delete();
-        delete.setSqlBeanConfig(sqlBeanConfig);
+        delete.setSqlBeanDB(sqlBeanDB);
         delete.setTable(clazz);
+//        delete.setBeanClass(clazz);
+        setSchema(delete);
         Field idField;
         try {
             idField = SqlBeanUtil.getIdField(clazz);
@@ -183,11 +192,13 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public String deleteByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String where, Object[] args) {
+    public static String deleteByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
         Delete delete = new Delete();
-        delete.setSqlBeanConfig(sqlBeanConfig);
+        delete.setSqlBeanDB(sqlBeanDB);
         delete.setTable(clazz);
+//        delete.setBeanClass(clazz);
         delete.setWhere(where, args);
+        setSchema(delete);
         return SqlHelper.buildDeleteSql(delete);
     }
 
@@ -199,14 +210,18 @@ public class SqlBeanProvider {
      * @param ignore
      * @return
      */
-    public String deleteSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Delete delete, boolean ignore) {
-        if (delete.getSqlBeanConfig() == null) {
-            delete.setSqlBeanConfig(sqlBeanConfig);
+    public static String deleteSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Delete delete, boolean ignore) {
+        if (delete.getSqlBeanDB() == null) {
+            delete.setSqlBeanDB(sqlBeanDB);
         }
-        if (delete.getTable() == null || StringUtil.isEmpty(delete.getTable().getName())) {
+        if (delete.getTable().isNotSet()) {
             delete.setTable(clazz);
         }
-        if (ignore || !delete.getWhereMap().isEmpty()) {
+//        if (delete.getBeanClass() == null) {
+//            delete.setBeanClass(clazz);
+//        }
+        setSchema(delete);
+        if (ignore || (!delete.getWhereMap().isEmpty() || StringUtil.isNotEmpty(delete.getWhere()) || !delete.getWhereWrapper().getDataList().isEmpty())) {
             return SqlHelper.buildDeleteSql(delete);
         } else {
             try {
@@ -225,15 +240,18 @@ public class SqlBeanProvider {
      * @param id
      * @return
      */
-    public String logicallyDeleteByIdSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, Object id) {
+    public static String logicallyDeleteByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object id) {
         Update update = new Update();
-        update.setSqlBeanConfig(sqlBeanConfig);
         Object bean;
         try {
             bean = newLogicallyDeleteBean(clazz);
+            update.setSqlBeanDB(sqlBeanDB);
+            update.setTable(clazz);
+//            update.setBeanClass(clazz);
             update.setUpdateBean(bean);
             Field idField = SqlBeanUtil.getIdField(bean.getClass());
             update.where(SqlBeanUtil.getTableFieldName(idField), id);
+            setSchema(update);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -249,12 +267,38 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public String logicallyDeleteByConditionSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz, String where, Object[] args) {
+    public static String logicallyDeleteByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
         Update update = new Update();
-        update.setSqlBeanConfig(sqlBeanConfig);
         try {
+            update.setSqlBeanDB(sqlBeanDB);
+            update.setTable(clazz);
+//            update.setBeanClass(clazz);
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
             update.setWhere(where, args);
+            setSchema(update);
+        } catch (SqlBeanException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return SqlHelper.buildUpdateSql(update);
+    }
+
+    /**
+     * 逻辑删除
+     *
+     * @param clazz
+     * @param wrapper
+     * @return
+     */
+    public static String logicallyDeleteByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Wrapper wrapper) {
+        Update update = new Update();
+        try {
+            update.setSqlBeanDB(sqlBeanDB);
+            update.setTable(clazz);
+//            update.setBeanClass(clazz);
+            update.setUpdateBean(newLogicallyDeleteBean(clazz));
+            update.setWhere(wrapper);
+            setSchema(update);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -265,16 +309,24 @@ public class SqlBeanProvider {
     /**
      * 更新
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
+     * @param clazz
      * @param update
      * @param ignore
      * @return
      */
-    public String updateSql(SqlBeanConfig sqlBeanConfig, Update update, boolean ignore) {
-        if (update.getSqlBeanConfig() == null) {
-            update.setSqlBeanConfig(sqlBeanConfig);
+    public static String updateSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Update update, boolean ignore) {
+        if (update.getSqlBeanDB() == null) {
+            update.setSqlBeanDB(sqlBeanDB);
         }
-        if (ignore || (!update.getWhereMap().isEmpty() || StringUtil.isNotEmpty(update.getWhere()))) {
+        if (update.getTable().isNotSet()) {
+            update.setTable(clazz);
+        }
+//        if (update.getBeanClass() == null) {
+//            update.setBeanClass(clazz);
+//        }
+        setSchema(update);
+        if (ignore || (!update.getWhereMap().isEmpty() || StringUtil.isNotEmpty(update.getWhere()) || !update.getWhereWrapper().getDataList().isEmpty())) {
             return SqlHelper.buildUpdateSql(update);
         } else {
             try {
@@ -289,12 +341,15 @@ public class SqlBeanProvider {
     /**
      * 根据实体类id条件更新
      *
+     * @param sqlBeanDB
+     * @param clazz
      * @param bean
      * @param updateNotNull
+     * @param optimisticLock
      * @param filterFields
      * @return
      */
-    public String updateByIdSql(SqlBeanConfig sqlBeanConfig, Object bean, Object id, boolean updateNotNull, String[] filterFields) {
+    public static String updateByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, Object id, boolean updateNotNull, boolean optimisticLock, String[] filterFields) {
         if (StringUtil.isEmpty(id)) {
             try {
                 throw new SqlBeanException("updateByIdSql id不能为空");
@@ -303,7 +358,7 @@ public class SqlBeanProvider {
                 return null;
             }
         }
-        Update update = newUpdate(sqlBeanConfig, bean, updateNotNull);
+        Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
         update.setFilterFields(filterFields);
         Field idField;
         try {
@@ -319,13 +374,16 @@ public class SqlBeanProvider {
     /**
      * 根据实体类id条件更新
      *
+     * @param sqlBeanDB
+     * @param clazz
      * @param bean
      * @param updateNotNull
+     * @param optimisticLock
      * @param filterFields
      * @return
      */
-    public String updateByBeanIdSql(SqlBeanConfig sqlBeanConfig, Object bean, boolean updateNotNull, String[] filterFields) {
-        Update update = newUpdate(sqlBeanConfig, bean, updateNotNull);
+    public static String updateByBeanIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields) {
+        Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
         update.setFilterFields(filterFields);
         Field idField;
         try {
@@ -350,15 +408,18 @@ public class SqlBeanProvider {
     /**
      * 根据条件更新
      *
+     * @param sqlBeanDB
+     * @param clazz
      * @param bean
      * @param updateNotNull
+     * @param optimisticLock
      * @param filterFields
      * @param where
      * @param args
      * @return
      */
-    public String updateByConditionSql(SqlBeanConfig sqlBeanConfig, Object bean, boolean updateNotNull, String[] filterFields, String where, Object[] args) {
-        Update update = newUpdate(sqlBeanConfig, bean, updateNotNull);
+    public static String updateByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where, Object[] args) {
+        Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
         update.setFilterFields(filterFields);
         update.setWhere(where, args);
         return SqlHelper.buildUpdateSql(update);
@@ -367,14 +428,17 @@ public class SqlBeanProvider {
     /**
      * 根据实体类字段条件更新
      *
+     * @param sqlBeanDB
+     * @param clazz
      * @param bean
      * @param updateNotNull
+     * @param optimisticLock
      * @param filterFields
      * @param where
      * @return
      */
-    public String updateByBeanConditionSql(SqlBeanConfig sqlBeanConfig, Object bean, boolean updateNotNull, String[] filterFields, String where) {
-        Update update = newUpdate(sqlBeanConfig, bean, updateNotNull);
+    public static String updateByBeanConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where) {
+        Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
         update.setFilterFields(filterFields);
         update.setWhere(where, null);
         return SqlHelper.buildUpdateSql(update);
@@ -386,63 +450,82 @@ public class SqlBeanProvider {
      * @param bean
      * @return
      */
-    public String insertBeanSql(SqlBeanConfig sqlBeanConfig, Object bean) {
+    public static String insertBeanSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean) {
         Insert insert = new Insert();
-        insert.setSqlBeanConfig(sqlBeanConfig);
-        insert.setInsertBean(bean);
+        insert.setSqlBeanDB(sqlBeanDB);
+        insert.setTable(clazz);
+//        insert.setBeanClass(clazz);
+        insert.setInsertBean(SqlBeanUtil.getObjectArray(bean));
+        setSchema(insert);
         return SqlHelper.buildInsertSql(insert);
     }
 
     /**
      * 插入数据
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
+     * @param clazz
      * @param insert
      * @return
      */
-    public String insertSql(SqlBeanConfig sqlBeanConfig, Insert insert) {
-        if (insert.getSqlBeanConfig() == null) {
-            insert.setSqlBeanConfig(sqlBeanConfig);
+    public static String insertSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Insert insert) {
+        if (insert.getSqlBeanDB() == null) {
+            insert.setSqlBeanDB(sqlBeanDB);
         }
+        if (insert.getTable().isNotSet()) {
+            insert.setTable(clazz);
+        }
+//        if (insert.getBeanClass() == null) {
+//            insert.setBeanClass(clazz);
+//        }
+        setSchema(insert);
         return SqlHelper.buildInsertSql(insert);
     }
 
     /**
      * 删除表
      *
+     * @param sqlBeanDB
      * @param clazz
      * @return
      */
-    public String dropTableSql(Class<?> clazz) {
-        return "DROP TABLE IF EXISTS " + SqlBeanUtil.getTable(clazz).getName();
+    public static String dropTableSql(SqlBeanDB sqlBeanDB, Class<?> clazz) {
+        Drop drop = new Drop();
+        drop.setSqlBeanDB(sqlBeanDB);
+        drop.setTable(clazz);
+//        drop.setBeanClass(clazz);
+        setSchema(drop);
+        return SqlHelper.buildDrop(drop);
     }
 
     /**
      * 创建表
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      * @param clazz
      * @return
      */
-    public String createTableSql(SqlBeanConfig sqlBeanConfig, Class<?> clazz) {
+    public static String createTableSql(SqlBeanDB sqlBeanDB, Class<?> clazz) {
         Create create = new Create();
-        create.setSqlBeanConfig(sqlBeanConfig);
+        create.setSqlBeanDB(sqlBeanDB);
+        create.setTable(clazz);
         create.setBeanClass(clazz);
+        setSchema(create);
         return SqlHelper.buildCreateSql(create);
     }
 
     /**
      * 获取表名列表
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      * @return
      */
-    public String selectTableListSql(SqlBeanConfig sqlBeanConfig) {
-        switch (sqlBeanConfig.getDbType()) {
+    public static String selectTableListSql(SqlBeanDB sqlBeanDB) {
+        switch (sqlBeanDB.getDbType()) {
             case MySQL:
             case MariaDB:
                 return "select table_name as `name` from information_schema.tables where table_schema = database() and table_type = 'BASE TABLE'";
-            case SQLServer2008:
+            case SQLServer:
                 return "select name from sysobjects where xtype='U'";
             case Oracle:
                 return "select table_name as \"name\" from user_tables";
@@ -465,6 +548,49 @@ public class SqlBeanProvider {
     }
 
     /**
+     * 备份表和数据
+     *
+     * @param sqlBeanDB
+     * @param clazz
+     * @param targetTableName
+     * @param columns
+     * @param wrapper
+     * @return
+     */
+    public static String backupSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String targetTableName, Column[] columns, Wrapper wrapper) {
+        Backup backup = new Backup();
+        backup.setSqlBeanDB(sqlBeanDB);
+        backup.setTable(clazz);
+//        backup.setBeanClass(clazz);
+        backup.setColumns(columns);
+        backup.setTargetTableName(targetTableName);
+        backup.setWhere(wrapper);
+        setSchema(backup);
+        return SqlHelper.buildBackup(backup);
+    }
+
+    /**
+     * 复制数据到指定表
+     *
+     * @param sqlBeanDB
+     * @param clazz
+     * @param targetTableName
+     * @param columns
+     * @param wrapper
+     * @return
+     */
+    public static String copySql(SqlBeanDB sqlBeanDB, Class<?> clazz, String targetTableName, Column[] columns, Wrapper wrapper) {
+        Copy copy = new Copy();
+        copy.setSqlBeanDB(sqlBeanDB);
+        copy.setTable(clazz);
+//        copy.setBeanClass(clazz);
+        copy.setColumns(columns);
+        copy.setTargetTableName(targetTableName);
+        copy.setWhere(wrapper);
+        return SqlHelper.buildCopy(copy);
+    }
+
+    /**
      * 实例化Select
      *
      * @param clazz
@@ -472,17 +598,19 @@ public class SqlBeanProvider {
      * @return
      * @throws SqlBeanException
      */
-    private Select newSelect(SqlBeanConfig sqlBeanConfig, Class<?> clazz, boolean isCount) {
+    private static Select newSelect(SqlBeanDB sqlBeanDB, Class<?> clazz, boolean isCount) {
         Select select = new Select();
-        select.setSqlBeanConfig(sqlBeanConfig);
+        select.setSqlBeanDB(sqlBeanDB);
         select.setTable(clazz);
+//        select.setBeanClass(clazz);
         try {
             if (isCount) {
-                select.column(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET);
+                select.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
             } else {
                 select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
             }
             SqlBeanUtil.setJoin(select, clazz);
+            setSchema(select);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -498,7 +626,7 @@ public class SqlBeanProvider {
      * @return
      * @throws SqlBeanException
      */
-    private String setSelectAndBuild(Class<?> clazz, Select select) {
+    private static String setSelectAndBuild(Class<?> clazz, Select select) {
         if (StringUtil.isEmpty(select.getTable().getName())) {
             Table table = SqlBeanUtil.getTable(clazz);
             select.getTable().setName(table.getName());
@@ -506,6 +634,7 @@ public class SqlBeanProvider {
                 select.getTable().setAlias(table.getAlias());
             }
         }
+        setSchema(select);
         try {
             SqlBeanUtil.setJoin(select, clazz);
         } catch (SqlBeanException e) {
@@ -529,7 +658,7 @@ public class SqlBeanProvider {
      * @return
      * @throws IllegalAccessException
      */
-    private Object newLogicallyDeleteBean(Class<?> clazz) throws SqlBeanException {
+    private static Object newLogicallyDeleteBean(Class<?> clazz) throws SqlBeanException {
         Object bean = null;
         try {
             bean = clazz.newInstance();
@@ -544,18 +673,24 @@ public class SqlBeanProvider {
     }
 
     /**
-     * 实例化Select
+     * 实例化Update
      *
      * @param bean
+     * @param clazz
      * @param updateNotNull
+     * @param optimisticLock
      * @return
      * @throws SqlBeanException
      */
-    private Update newUpdate(SqlBeanConfig sqlBeanConfig, Object bean, boolean updateNotNull) {
+    private static Update newUpdate(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock) {
         Update update = new Update();
-        update.setSqlBeanConfig(sqlBeanConfig);
+        update.setSqlBeanDB(sqlBeanDB);
+        update.setTable(clazz);
+//        update.setBeanClass(clazz);
         update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
+        update.setOptimisticLock(optimisticLock);
+        setSchema(update);
         return update;
     }
 
@@ -566,9 +701,9 @@ public class SqlBeanProvider {
      * @param paging
      * @param clazz
      */
-    private void setPaging(Select select, Paging paging, Class<?> clazz) {
+    private static void setPaging(Select select, Paging paging, Class<?> clazz) {
         if (paging != null) {
-            if (select.getSqlBeanConfig().getDbType() == DbType.SQLServer2008) {
+            if (select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
                 try {
                     select.setPage(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)), paging.getPagenum(), paging.getPagesize());
                 } catch (SqlBeanException e) {
@@ -578,6 +713,19 @@ public class SqlBeanProvider {
                 select.setPage(null, paging.getPagenum(), paging.getPagesize());
             }
             select.orderBy(paging.getOrders());
+        }
+    }
+
+    /**
+     * 统一设置Schema
+     */
+    private static void setSchema(Common common) {
+        //自主设置优先级高
+        if (StringUtil.isEmpty(common.getTable().getSchema())) {
+            String schema = DynSchemaContextHolder.getSchema();
+            if (StringUtil.isNotEmpty(schema)) {
+                common.getTable().setSchema(schema);
+            }
         }
     }
 

@@ -1,6 +1,6 @@
 package cn.vonce.sql.constant;
 
-public class SqlHelperCons {
+public class SqlConstant {
 
     // sql
     public static final String SELECT = "SELECT ";

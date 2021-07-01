@@ -14,7 +14,7 @@ public class ReflectAsmUtil extends ReflectUtil {
 
     private final Map<Class<?>, MethodAccess> methodAccessMap = new WeakHashMap<>();
     private final Map<Class<?>, ConstructorAccess> constructorAccessMap = new WeakHashMap<>();
-    private static ReflectAsmUtil reflectAsmUtil;
+    private static volatile ReflectAsmUtil reflectAsmUtil;
 
     public static ReflectAsmUtil instance() {
         if (reflectAsmUtil == null) {

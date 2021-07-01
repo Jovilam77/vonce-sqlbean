@@ -17,14 +17,23 @@ public class Join implements Serializable {
     public Join() {
     }
 
-    public Join(JoinType joinType, String schema, String tableName, String tableAlias, String tableKeyword, String mainKeyword) {
+    public Join(JoinType joinType, String schema, String tableName, String tableAlias, String tableKeyword, String mainKeyword, String on) {
         this.joinType = joinType;
         this.schema = schema;
         this.tableName = tableName;
         this.tableAlias = tableAlias;
         this.tableKeyword = tableKeyword;
         this.mainKeyword = mainKeyword;
+        this.on = on;
     }
+
+//    public Join(JoinType joinType, String schema, String tableName, String tableAlias, String on) {
+//        this.joinType = joinType;
+//        this.schema = schema;
+//        this.tableName = tableName;
+//        this.tableAlias = tableAlias;
+//        this.on = on;
+//    }
 
     private JoinType joinType;
     private String schema;
@@ -32,6 +41,7 @@ public class Join implements Serializable {
     private String tableAlias;
     private String tableKeyword;
     private String mainKeyword;
+    private String on;
 
     public JoinType getJoinType() {
         return joinType;
@@ -81,6 +91,27 @@ public class Join implements Serializable {
         this.mainKeyword = mainKeyword;
     }
 
+    public String getOn() {
+        return on;
+    }
+
+    public void setOn(String on) {
+        this.on = on;
+    }
+
+//    @Override
+//    public String toString() {
+//        return "Join{" +
+//                "joinType=" + joinType +
+//                ", schema='" + schema + '\'' +
+//                ", tableName='" + tableName + '\'' +
+//                ", tableAlias='" + tableAlias + '\'' +
+//                ", tableKeyword='" + tableKeyword + '\'' +
+//                ", mainKeyword='" + mainKeyword + '\'' +
+//                '}';
+//    }
+
+
     @Override
     public String toString() {
         return "Join{" +
@@ -88,8 +119,7 @@ public class Join implements Serializable {
                 ", schema='" + schema + '\'' +
                 ", tableName='" + tableName + '\'' +
                 ", tableAlias='" + tableAlias + '\'' +
-                ", tableKeyword='" + tableKeyword + '\'' +
-                ", mainKeyword='" + mainKeyword + '\'' +
+                ", on='" + on + '\'' +
                 '}';
     }
 }

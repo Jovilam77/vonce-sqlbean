@@ -2,8 +2,9 @@ package cn.vonce.sql.uitls;
 
 import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.bean.*;
-import cn.vonce.sql.constant.SqlHelperCons;
+import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.DbType;
+import cn.vonce.sql.enumerate.JdbcType;
 import cn.vonce.sql.enumerate.WhatType;
 import cn.vonce.sql.exception.SqlBeanException;
 
@@ -18,23 +19,37 @@ import java.util.*;
 public class SqlBeanUtil {
 
     /**
+     * 获取SqlTable注解
+     *
+     * @param clazz
+     * @return
+     */
+    public static SqlTable getSqlTable(Class<?> clazz) {
+        if (clazz == null) {
+            return null;
+        }
+        SqlUnion sqlUnion = clazz.getAnnotation(SqlUnion.class);
+        SqlTable sqlTable;
+        if (sqlUnion != null) {
+            sqlTable = clazz.getSuperclass().getAnnotation(SqlTable.class);
+        } else {
+            sqlTable = clazz.getAnnotation(SqlTable.class);
+        }
+        return sqlTable;
+    }
+
+    /**
      * 根据类名获取表名信息
      *
      * @param clazz
      * @return
      */
     public static Table getTable(Class<?> clazz) {
-        SqlUnion sqlUnion = clazz.getAnnotation(SqlUnion.class);
-        SqlTable sqlTable;
+        SqlTable sqlTable = getSqlTable(clazz);
         String className = "";
         String schema = "";
         String tableName = "";
         String tableAlias = "";
-        if (sqlUnion != null) {
-            sqlTable = clazz.getSuperclass().getAnnotation(SqlTable.class);
-        } else {
-            sqlTable = clazz.getAnnotation(SqlTable.class);
-        }
         if (sqlTable != null) {
             schema = sqlTable.schema();
             tableName = sqlTable.value();
@@ -79,6 +94,43 @@ public class SqlBeanUtil {
     }
 
     /**
+     * 返回带转义表名,优先级 tableName第一，注解第二，类名第三
+     *
+     * @param table
+     * @param common
+     * @return
+     */
+    public static String getTableName(Table table, Common common) {
+        String schema = table.getSchema();
+        String tableName = table.getName();
+        if (StringUtil.isNotEmpty(schema)) {
+            tableName = schema + SqlConstant.POINT + tableName;
+        }
+        return SqlBeanUtil.isToUpperCase(common) ? tableName.toUpperCase() : tableName;
+    }
+
+//    /**
+//     * 获取Bean字段中实际对于的表字段
+//     *
+//     * @param field
+//     * @param clazz
+//     * @return
+//     */
+//    public static String getTableFieldName(Field field, Class<?> clazz) {
+//        SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
+//        String name = field.getName();
+//        if (sqlColumn != null) {
+//            name = sqlColumn.value();
+//        } else {
+//            SqlTable sqlTable = getSqlTable(clazz);
+//            if (sqlTable != null && sqlTable.mapUsToCc()) {
+//                name = StringUtil.humpToUnderline(name);
+//            }
+//        }
+//        return name;
+//    }
+
+    /**
      * 获取Bean字段中实际对于的表字段
      *
      * @param field
@@ -89,6 +141,11 @@ public class SqlBeanUtil {
         String name = field.getName();
         if (sqlColumn != null) {
             name = sqlColumn.value();
+        } else {
+            SqlTable sqlTable = getSqlTable(field.getDeclaringClass());
+            if (sqlTable != null && sqlTable.mapUsToCc()) {
+                name = StringUtil.humpToUnderline(name);
+            }
         }
         return name;
     }
@@ -405,7 +462,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static String getColumnAlias(String tableAlias, String fieldName) {
-        return tableAlias + SqlHelperCons.UNDERLINE + fieldName;
+        return tableAlias + SqlConstant.UNDERLINE + fieldName;
     }
 
     /**
@@ -422,12 +479,12 @@ public class SqlBeanUtil {
         StringBuffer fullName = new StringBuffer();
         if (StringUtil.isNotEmpty(schema)) {
             fullName.append(schema);
-            fullName.append(SqlHelperCons.POINT);
+            fullName.append(SqlConstant.POINT);
         }
         fullName.append(transferred);
         fullName.append(tableAlias);
         fullName.append(transferred);
-        fullName.append(SqlHelperCons.POINT);
+        fullName.append(SqlConstant.POINT);
         fullName.append(tableFieldName);
         return fullName.toString();
     }
@@ -462,9 +519,9 @@ public class SqlBeanUtil {
                 if (objects != null) {
                     for (int i = 0; i < objects.length; i++) {
                         value.append(getSqlValue(common, objects[i]));
-                        value.append(SqlHelperCons.COMMA);
+                        value.append(SqlConstant.COMMA);
                     }
-                    value.deleteCharAt(value.length() - SqlHelperCons.COMMA.length());
+                    value.delete(value.length() - SqlConstant.COMMA.length(), value.length());
                 }
                 conditionSql.append(value);
                 index++;
@@ -556,6 +613,58 @@ public class SqlBeanUtil {
     }
 
     /**
+     * 获取字段类型
+     *
+     * @param jdbcType
+     * @return
+     */
+    public static WhatType whatType(JdbcType jdbcType) {
+        WhatType whatType;
+        switch (jdbcType) {
+            case CHAR:
+            case NCHAR:
+            case VARCHAR:
+            case VARCHAR2:
+            case NVARCHAR:
+            case TINYTEXT:
+            case TEXT:
+            case NTEXT:
+            case LONGTEXT:
+            case CLOB:
+            case NCLOB:
+                whatType = WhatType.STRING_TYPE;
+                break;
+            case BIT:
+                whatType = WhatType.BOOL_TYPE;
+                break;
+            case TINYINT:
+            case SMALLINT:
+            case INTEGER:
+            case BIGINT:
+            case LONG:
+            case FLOAT:
+            case DOUBLE:
+            case DECIMAL:
+            case NUMERIC:
+            case MONEY:
+            case SMALLMONEY:
+                whatType = WhatType.VALUE_TYPE;
+                break;
+            case DATE:
+            case TIME:
+            case DATETIME:
+            case DATETIME2:
+            case TIMESTAMP:
+                whatType = WhatType.DATE_TYPE;
+                break;
+            default:
+                whatType = WhatType.OBJECT_TYPE;
+                break;
+        }
+        return whatType;
+    }
+
+    /**
      * 该类型是否为基本类型
      *
      * @param typeName
@@ -611,24 +720,52 @@ public class SqlBeanUtil {
      * @return
      */
     public static String getSqlValue(Common common, Object value) {
+        return getSqlValue(common, value, null);
+    }
+
+    /**
+     * 获取sql实际值(过滤sql注入)
+     *
+     * @param value
+     * @return
+     */
+    public static String getSqlValue(Common common, Object value, JdbcType jdbcType) {
         if (value == null) {
-            return SqlHelperCons.NULL_VALUE;
+            return SqlConstant.NULL_VALUE;
         }
-        String single_quotation_mark = SqlHelperCons.SINGLE_QUOTATION_MARK;
-        String sqlValue = "";
-        switch (whatType(value.getClass().getName())) {
+        String single_quotation_mark = SqlConstant.SINGLE_QUOTATION_MARK;
+        String sqlValue;
+        WhatType whatType;
+        if (jdbcType == null) {
+            whatType = whatType(value.getClass().getName());
+        } else {
+            whatType = whatType(jdbcType);
+        }
+        switch (whatType) {
             case VALUE_TYPE:
-            case BOOL_TYPE:
                 sqlValue = value.toString();
                 break;
+            case BOOL_TYPE:
+                if (jdbcType != null) {
+                    sqlValue = (String) value;
+                } else {
+                    sqlValue = Boolean.parseBoolean(value.toString()) == true ? "1" : "0";
+                }
+                break;
             case DATE_TYPE:
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-                switch (common.getSqlBeanConfig().getDbType()) {
+                String dateString;
+                if (jdbcType != null) {
+                    dateString = (String) value;
+                } else {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                    dateString = sdf.format(value);
+                }
+                switch (common.getSqlBeanDB().getDbType()) {
                     case Oracle:
-                        sqlValue = "to_timestamp(" + single_quotation_mark + sdf.format(value) + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
+                        sqlValue = "to_timestamp(" + single_quotation_mark + dateString + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
                         break;
                     default:
-                        sqlValue = single_quotation_mark + sdf.format(value) + single_quotation_mark;
+                        sqlValue = single_quotation_mark + dateString + single_quotation_mark;
                         break;
                 }
                 break;
@@ -647,7 +784,7 @@ public class SqlBeanUtil {
      */
     public static boolean isCount(Select select) {
         boolean isTrue = true;
-        if (select.getColumnList() != null && !select.getColumnList().contains(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET)) {
+        if (select.getColumnList() != null && !select.getColumnList().contains(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET)) {
             isTrue = false;
         }
         return isTrue;
@@ -683,10 +820,10 @@ public class SqlBeanUtil {
      * @return
      */
     public static String getTransferred(Common common) {
-        String transferred = SqlHelperCons.DOUBLE_ESCAPE_CHARACTER;
-        DbType dbType = common.getSqlBeanConfig().getDbType();
+        String transferred = SqlConstant.DOUBLE_ESCAPE_CHARACTER;
+        DbType dbType = common.getSqlBeanDB().getDbType();
         if (dbType == DbType.MySQL || dbType == DbType.MariaDB) {
-            transferred = SqlHelperCons.SINGLE_ESCAPE_CHARACTER;
+            transferred = SqlConstant.SINGLE_ESCAPE_CHARACTER;
         }
         return transferred;
     }
@@ -698,7 +835,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean isToUpperCase(Common common) {
-        if (common.getSqlBeanConfig().getToUpperCase() != null && common.getSqlBeanConfig().getToUpperCase()) {
+        if (common.getSqlBeanDB().getSqlBeanConfig().getToUpperCase() != null && common.getSqlBeanDB().getSqlBeanConfig().getToUpperCase()) {
             return true;
         }
         return false;
@@ -748,6 +885,25 @@ public class SqlBeanUtil {
                 return true;
         }
         return false;
+    }
+
+    /**
+     * 获取object数组
+     *
+     * @param bean
+     * @return
+     */
+    public static Object[] getObjectArray(Object bean) {
+        Object[] objects;
+        if (bean.getClass().isArray()) {
+            objects = (Object[]) bean;
+        } else if (bean instanceof Collection) {
+            Collection<Object> list = (Collection<Object>) bean;
+            objects = list.toArray();
+        } else {
+            objects = new Object[]{bean};
+        }
+        return objects;
     }
 
 }

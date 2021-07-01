@@ -10,8 +10,6 @@ import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.plugin.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -26,7 +24,6 @@ import java.util.*;
  * @date 2018年5月15日上午9:21:48
  */
 @Intercepts(@Signature(method = "handleResultSets", type = ResultSetHandler.class, args = {Statement.class}))
-@Component
 public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements Interceptor {
 
     private Logger logger = LoggerFactory.getLogger(MybatisSqlBeanMapperInterceptor.class);
@@ -159,7 +156,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
                 while (resultSet.next()) {
                     Object value = super.baseHandleResultSet(resultSet);
                     if (value != null && !value.getClass().getName().equals(resultType.getName())) {
-                        value = super.getValueConvert(resultType.getName(), value);
+                        value = getValueConvert(resultType.getName(), value);
                     }
                     resultList.add(value);
                 }

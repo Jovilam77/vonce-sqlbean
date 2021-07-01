@@ -1,14 +1,15 @@
 package cn.vonce.sql.bean;
 
-import cn.vonce.sql.constant.SqlHelperCons;
+import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.SqlLogic;
 import cn.vonce.sql.enumerate.SqlOperator;
 import cn.vonce.sql.helper.SqlHelper;
+import cn.vonce.sql.helper.Wrapper;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
 
 /**
- * 条件
+ * where条件
  *
  * @author Jovi
  * @version 1.0
@@ -20,6 +21,7 @@ public class Condition extends Common {
     private String where = "";//条件
     private Object[] agrs = null;
     private ListMultimap<String, ConditionInfo> whereMap = LinkedListMultimap.create();//where条件包含的逻辑
+    private Wrapper whereWrapper = new Wrapper();
 
     /**
      * 获取where sql 内容
@@ -178,7 +180,7 @@ public class Condition extends Common {
             if (sqlOperator == SqlOperator.IN || sqlOperator == SqlOperator.NOT_IN) {
                 value = new Original(SqlHelper.buildSelectSql((Select) value));
             } else {
-                value = new Original(SqlHelperCons.BEGIN_BRACKET + SqlHelper.buildSelectSql((Select) value) + SqlHelperCons.END_BRACKET);
+                value = new Original(SqlConstant.BEGIN_BRACKET + SqlHelper.buildSelectSql((Select) value) + SqlConstant.END_BRACKET);
             }
         }
         whereMap.put(tableAlias + field, new ConditionInfo(sqlLogic, schema, tableAlias, field, value, sqlOperator));
@@ -428,6 +430,24 @@ public class Condition extends Common {
      */
     public Condition wORBracket(String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
         return where(SqlLogic.ORBracket, schema, tableAlias, field, value, sqlOperator);
+    }
+
+    /**
+     * 获得where包装器
+     *
+     * @return
+     */
+    public Wrapper getWhereWrapper() {
+        return whereWrapper;
+    }
+
+    /**
+     * 设置Where条件包装器
+     *
+     * @param wrapper
+     */
+    public void setWhere(Wrapper wrapper) {
+        this.whereWrapper = wrapper;
     }
 
 }

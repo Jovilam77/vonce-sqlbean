@@ -2,11 +2,15 @@ package cn.vonce.sql.test;
 
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
+import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.enumerate.*;
+import cn.vonce.sql.helper.Cond;
 import cn.vonce.sql.helper.SqlHelper;
+import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.model.User;
 import cn.vonce.sql.model.sql.SqlEssay;
 import cn.vonce.sql.model.sql.SqlUser;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,35 +22,40 @@ import java.util.List;
 public class SqlHelperTest {
 
     public static void main(String[] args) {
+        SqlBeanDB sqlBeanDB = new SqlBeanDB();
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig();
-        sqlBeanConfig.setDbType(DbType.MySQL);
         sqlBeanConfig.setToUpperCase(false);
+        sqlBeanDB.setDbType(DbType.MySQL);
+        sqlBeanDB.setSqlBeanConfig(sqlBeanConfig);
 
         long startTime = System.currentTimeMillis();
 
         // select1
-        select1(sqlBeanConfig);
+        select1(sqlBeanDB);
 
         // select2
-        select2(sqlBeanConfig);
+        select2(sqlBeanDB);
 
         // select3
-        select3(sqlBeanConfig);
+        select3(sqlBeanDB);
 
         // select4
-        select4(sqlBeanConfig);
+        select4(sqlBeanDB);
+
+        // select5
+        select5(sqlBeanDB);
 
         // insert1
-        insert1(sqlBeanConfig);
+        insert1(sqlBeanDB);
 
         // insert2
-        insert2(sqlBeanConfig);
+        insert2(sqlBeanDB);
 
         // update
-        update(sqlBeanConfig);
+        update(sqlBeanDB);
 
         // delete
-        delete(sqlBeanConfig);
+        delete(sqlBeanDB);
 
         float excTime = (float) (System.currentTimeMillis() - startTime) / 1000;
         System.out.println("耗时：" + excTime + "秒");
@@ -55,11 +64,11 @@ public class SqlHelperTest {
     /**
      * 查询1
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      */
-    private static void select1(SqlBeanConfig sqlBeanConfig) {
+    private static void select1(SqlBeanDB sqlBeanDB) {
         Select select = new Select();
-        select.setSqlBeanConfig(sqlBeanConfig);
+        select.setSqlBeanDB(sqlBeanDB);
         select.setColumn(SqlEssay._all);
         select.column(SqlUser.headPortrait, "头像");
         select.column(SqlUser.nickname, "昵称");
@@ -76,11 +85,11 @@ public class SqlHelperTest {
     /**
      * 查询2
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      */
-    private static void select2(SqlBeanConfig sqlBeanConfig) {
+    private static void select2(SqlBeanDB sqlBeanDB) {
         Select select2 = new Select();
-        select2.setSqlBeanConfig(sqlBeanConfig);
+        select2.setSqlBeanDB(sqlBeanDB);
         select2.column(SqlEssay.id, "序号")
                 .column(SqlEssay.content, "文章内容")
                 .column(SqlEssay.creationTime, "创建时间")
@@ -96,11 +105,11 @@ public class SqlHelperTest {
     /**
      * 查询3
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      */
-    private static void select3(SqlBeanConfig sqlBeanConfig) {
+    private static void select3(SqlBeanDB sqlBeanDB) {
         Select select3 = new Select();
-        select3.setSqlBeanConfig(sqlBeanConfig);
+        select3.setSqlBeanDB(sqlBeanDB);
         select3.column(SqlEssay._all, "count")
                 .column(SqlEssay.categoryId);
         select3.setTable(SqlEssay._tableName);
@@ -113,11 +122,11 @@ public class SqlHelperTest {
     /**
      * 查询4
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      */
-    private static void select4(SqlBeanConfig sqlBeanConfig) {
+    private static void select4(SqlBeanDB sqlBeanDB) {
         Select select4 = new Select();
-        select4.setSqlBeanConfig(sqlBeanConfig);
+        select4.setSqlBeanDB(sqlBeanDB);
         select4.setColumn(SqlUser._all);
         select4.setTable(SqlUser._tableName);
         Integer[] between = {2, 6};
@@ -133,13 +142,28 @@ public class SqlHelperTest {
     }
 
     /**
+     * 查询5
+     *
+     * @param sqlBeanDB
+     */
+    private static void select5(SqlBeanDB sqlBeanDB) {
+        Select select5 = new Select();
+        select5.setSqlBeanDB(sqlBeanDB);
+        select5.setColumn(SqlUser._all);
+        select5.setTable(SqlUser._tableName);
+        select5.setWhere(Wrapper.where(Cond.eq(SqlUser.id, 1)).and(Wrapper.where(Cond.eq(SqlUser.gender, "1")).or(Cond.eq(SqlUser.nickname, 1))));
+        System.out.println("---select5---");
+        System.out.println(SqlHelper.buildSelectSql(select5));
+    }
+
+    /**
      * 插入1
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      */
-    private static void insert1(SqlBeanConfig sqlBeanConfig) {
+    private static void insert1(SqlBeanDB sqlBeanDB) {
         Insert insert = new Insert();
-        insert.setSqlBeanConfig(sqlBeanConfig);
+        insert.setSqlBeanDB(sqlBeanDB);
         User user = new User();
         user.setId("10000");
         user.setUsername("10000");
@@ -154,11 +178,11 @@ public class SqlHelperTest {
     /**
      * 插入2
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      */
-    private static void insert2(SqlBeanConfig sqlBeanConfig) {
+    private static void insert2(SqlBeanDB sqlBeanDB) {
         Insert insert = new Insert();
-        insert.setSqlBeanConfig(sqlBeanConfig);
+        insert.setSqlBeanDB(sqlBeanDB);
         List<User> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             User user = new User();
@@ -177,15 +201,15 @@ public class SqlHelperTest {
     /**
      * 更新
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      */
-    private static void update(SqlBeanConfig sqlBeanConfig) {
+    private static void update(SqlBeanDB sqlBeanDB) {
         User user = new User();
         user.setHeadPortrait("logo.png");
         user.setUsername("123");
         user.setGender(1);
         Update update = new Update();
-        update.setSqlBeanConfig(sqlBeanConfig);
+        update.setSqlBeanDB(sqlBeanDB);
         update.setFilterFields("username");//java字段名
         update.setUpdateBean(user);
         update.setUpdateNotNull(true);
@@ -198,11 +222,11 @@ public class SqlHelperTest {
     /**
      * 删除
      *
-     * @param sqlBeanConfig
+     * @param sqlBeanDB
      */
-    private static void delete(SqlBeanConfig sqlBeanConfig) {
+    private static void delete(SqlBeanDB sqlBeanDB) {
         Delete delete = new Delete();
-        delete.setSqlBeanConfig(sqlBeanConfig);
+        delete.setSqlBeanDB(sqlBeanDB);
         delete.where(SqlUser.id, 1, SqlOperator.GREATER_THAN);
         delete.wOR(SqlUser.nickname, "jovi");
         delete.setTable(User.class);

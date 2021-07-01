@@ -1,10 +1,7 @@
 package cn.vonce.sql.config;
 
-import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.processor.DefaultUniqueIdProcessor;
 import cn.vonce.sql.processor.UniqueIdProcessor;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import java.io.Serializable;
 
 /**
@@ -21,24 +18,9 @@ public class SqlBeanConfig implements Serializable {
 
     }
 
-    public SqlBeanConfig(DbType dbType) {
-        this.dbType = dbType;
-    }
-
-    private DbType dbType;
     private Boolean toUpperCase;
     private UniqueIdProcessor uniqueIdProcessor;
     private Boolean autoCreate;
-
-    public DbType getDbType() {
-        return dbType;
-    }
-
-    public void setDbType(DbType dbType) {
-        if (this.dbType == null) {
-            this.dbType = dbType;
-        }
-    }
 
     public Boolean getToUpperCase() {
         return toUpperCase;

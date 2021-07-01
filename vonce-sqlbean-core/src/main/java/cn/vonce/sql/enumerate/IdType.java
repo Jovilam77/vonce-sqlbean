@@ -12,7 +12,7 @@ package cn.vonce.sql.enumerate;
  * @email imjovi@qq.com
  * @date 2020/2/28 9:15
  */
-public enum GenerateType {
+public enum IdType {
 
     NORMAL, AUTO, UUID, SNOWFLAKE_ID_16, SNOWFLAKE_ID_18
 

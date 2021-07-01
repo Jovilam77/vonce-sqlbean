@@ -2,6 +2,7 @@ package cn.vonce.sql.service;
 
 import cn.vonce.sql.bean.Paging;
 import cn.vonce.sql.bean.Select;
+import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.page.PagingService;
 
 import java.util.List;
@@ -100,10 +101,36 @@ public interface SelectService<T, ID> extends PagingService {
      * 根据条件查询
      *
      * @param where
+     * @return
+     */
+    T selectOneByCondition(Wrapper where);
+
+    /**
+     * 根据条件查询
+     *
+     * @param returnType
+     * @param where
+     * @param <O>
+     * @return
+     */
+    <O> O selectOneByCondition(Class<O> returnType, Wrapper where);
+
+    /**
+     * 根据条件查询
+     *
+     * @param where
      * @param args
      * @return
      */
     List<T> selectByCondition(String where, Object... args);
+
+    /**
+     * 根据条件查询
+     *
+     * @param where
+     * @return
+     */
+    List<T> selectByCondition(Wrapper where);
 
     /**
      * 根据条件查询
@@ -114,6 +141,15 @@ public interface SelectService<T, ID> extends PagingService {
      * @return
      */
     List<T> selectByCondition(Paging paging, String where, Object... args);
+
+    /**
+     * 根据条件查询
+     *
+     * @param paging
+     * @param where
+     * @return
+     */
+    List<T> selectByCondition(Paging paging, Wrapper where);
 
     /**
      * 根据条件查询(可指定返回类型、查询的表)
@@ -129,6 +165,16 @@ public interface SelectService<T, ID> extends PagingService {
      * 根据条件查询(可指定返回类型、查询的表)
      *
      * @param returnType
+     * @param where
+     * @param <O>
+     * @return
+     */
+    <O> List<O> selectByCondition(Class<O> returnType, Wrapper where);
+
+    /**
+     * 根据条件查询(可指定返回类型、查询的表)
+     *
+     * @param returnType
      * @param paging
      * @param where
      * @param args
@@ -137,20 +183,39 @@ public interface SelectService<T, ID> extends PagingService {
     <O> List<O> selectByCondition(Class<O> returnType, Paging paging, String where, Object... args);
 
     /**
+     * 根据条件查询(可指定返回类型、查询的表)
+     *
+     * @param returnType
+     * @param paging
+     * @param where
+     * @param <O>
+     * @return
+     */
+    <O> List<O> selectByCondition(Class<O> returnType, Paging paging, Wrapper where);
+
+    /**
      * 根据条件查询统计
      *
      * @param where
      * @param args
      * @return
      */
-    long selectCountByCondition(String where, Object... args);
+    int selectCountByCondition(String where, Object... args);
+
+    /**
+     * 根据条件查询统计
+     *
+     * @param where
+     * @return
+     */
+    int selectCountByCondition(Wrapper where);
 
     /**
      * 统计全部
      *
      * @return
      */
-    long countAll();
+    int countAll();
 
     /**
      * 查询全部
@@ -215,7 +280,7 @@ public interface SelectService<T, ID> extends PagingService {
      * @param select
      * @return
      */
-    long count(Select select);
+    int count(Select select);
 
     /**
      * 根据自定义条件统计
@@ -224,6 +289,6 @@ public interface SelectService<T, ID> extends PagingService {
      * @param select
      * @return
      */
-    long count(Class<?> clazz, Select select);
+    int count(Class<?> clazz, Select select);
 
 }

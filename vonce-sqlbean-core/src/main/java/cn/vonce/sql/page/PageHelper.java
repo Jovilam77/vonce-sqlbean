@@ -4,7 +4,7 @@ package cn.vonce.sql.page;
 import cn.vonce.sql.bean.Order;
 import cn.vonce.sql.bean.Paging;
 import cn.vonce.sql.bean.Select;
-import cn.vonce.sql.constant.SqlHelperCons;
+import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.SqlSort;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.StringUtil;
@@ -204,9 +204,9 @@ public class PageHelper<T> {
      *
      * @param count
      */
-    public void dispose(long count) {
+    public void dispose(int count) {
         // 保存总数
-        this.totalRecords = (int) count;
+        this.totalRecords = count;
         // 计算最多有几页
         int countPage = totalRecords % pagesize == 0 ? totalRecords / pagesize : totalRecords / pagesize + 1;
         // 返回总页数
@@ -243,18 +243,18 @@ public class PageHelper<T> {
             Select sqlBeanSelect = (Select) select.copy();
             // 预防设置了查询字段，故将查询字段换位统计字段
             select.getColumnList().clear();
-            select.column(SqlHelperCons.COUNT + SqlHelperCons.BEGIN_BRACKET + SqlHelperCons.ALL + SqlHelperCons.END_BRACKET);
+            select.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
             //设置分页
             sqlBeanSelect.setPage(pagenum, pagesize);
             sqlBeanSelect.orderBy(orders);
             // 先统计数量
-            long count;
+            int count;
             Object obj;
             if (tClazz != null) {
-                count = (long) ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getCount(), new Class[]{Class.class, Select.class}, new Object[]{tClazz, select});
+                count = (int) ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getCount(), new Class[]{Class.class, Select.class}, new Object[]{tClazz, select});
                 obj = ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getSelect(), new Class[]{Class.class, Select.class}, new Object[]{tClazz, sqlBeanSelect});
             } else {
-                count = (long) ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getCount(), new Class[]{Select.class}, new Object[]{select});
+                count = (int) ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getCount(), new Class[]{Select.class}, new Object[]{select});
                 obj = ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getSelect(), new Class[]{Select.class}, new Object[]{sqlBeanSelect});
             }
             // 计算共有几页
@@ -285,8 +285,8 @@ public class PageHelper<T> {
                     sort = sortorders[i];
                 } catch (Exception e) {
                 }
-                if (StringUtil.isNotEmpty(field) && field.indexOf(SqlHelperCons.POINT) > -1) {
-                    String[] tableNameAndField = field.split("\\" + SqlHelperCons.POINT);
+                if (StringUtil.isNotEmpty(field) && field.indexOf(SqlConstant.POINT) > -1) {
+                    String[] tableNameAndField = field.split("\\" + SqlConstant.POINT);
                     order = new Order("", tableNameAndField[0], tableNameAndField[1], SqlSort.get(sort));
                 } else {
                     order = new Order(field, SqlSort.get(sort));

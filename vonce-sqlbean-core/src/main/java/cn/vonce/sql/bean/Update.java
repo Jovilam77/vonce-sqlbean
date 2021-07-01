@@ -10,14 +10,21 @@ import java.io.Serializable;
  * @email 766255988@qq.com
  * @date 2017年8月18日上午9:00:19
  */
-public class Update extends Condition implements Serializable {
+public class Update<T> extends Condition implements Serializable {
 
-    private boolean updateNotNull = true;//默认只更新不为空的字段
-    private Object updateBean = null;//更新的实体对象
-    private String[] filterFields = null;//需要过滤的字段
+    //更新的实体对象
+    private T updateBean = null;
+    //需要过滤的字段
+    private String[] filterFields = null;
+    //默认只更新不为空的字段
+    private boolean updateNotNull = true;
+    //是否使用乐观锁
+    private boolean optimisticLock = false;
+    //是否为逻辑删除
+    private boolean logicallyDelete = false;
 
     /**
-     * 设置是否只更新不为null的字段
+     * 是否只更新不为null的字段
      *
      * @return
      */
@@ -35,11 +42,29 @@ public class Update extends Condition implements Serializable {
     }
 
     /**
+     * 是否使用乐观锁
+     *
+     * @return
+     */
+    public boolean isOptimisticLock() {
+        return optimisticLock;
+    }
+
+    /**
+     * 设置是否使用乐观锁
+     *
+     * @param optimisticLock
+     */
+    public void setOptimisticLock(boolean optimisticLock) {
+        this.optimisticLock = optimisticLock;
+    }
+
+    /**
      * 获取更新实体类
      *
      * @return
      */
-    public Object getUpdateBean() {
+    public T getUpdateBean() {
         return updateBean;
     }
 
@@ -48,7 +73,7 @@ public class Update extends Condition implements Serializable {
      *
      * @param updateBean
      */
-    public void setUpdateBean(Object updateBean) {
+    public void setUpdateBean(T updateBean) {
         this.updateBean = updateBean;
     }
 
@@ -70,5 +95,11 @@ public class Update extends Condition implements Serializable {
         this.filterFields = filterField;
     }
 
+    public boolean isLogicallyDelete() {
+        return logicallyDelete;
+    }
 
+    public void setLogicallyDelete(boolean logicallyDelete) {
+        this.logicallyDelete = logicallyDelete;
+    }
 }

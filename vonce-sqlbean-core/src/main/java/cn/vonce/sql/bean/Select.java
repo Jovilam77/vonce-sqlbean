@@ -1,13 +1,8 @@
 package cn.vonce.sql.bean;
 
 import cn.vonce.sql.enumerate.JoinType;
-import cn.vonce.sql.enumerate.SqlLogic;
-import cn.vonce.sql.enumerate.SqlOperator;
 import cn.vonce.sql.enumerate.SqlSort;
 import cn.vonce.sql.helper.SqlHelper;
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.ListMultimap;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +16,7 @@ import java.util.List;
  * @email 766255988@qq.com
  * @date 2017年8月18日上午9:00:19
  */
-public class Select extends SpecialCondition implements Serializable {
+public class Select extends SelectCondition implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -31,9 +26,6 @@ public class Select extends SpecialCondition implements Serializable {
     private List<Group> groupByList = new ArrayList<>();//分组
     private List<Order> orderByList = new ArrayList<>();//排序
     private Page page = null;
-    private String having = null;
-    private Object[] havingArgs = null;
-    private ListMultimap<String, ConditionInfo> havingMap = LinkedListMultimap.create();//having条件包含的逻辑
     private String[] filterFields = null;//需要过滤的列字段
 
     /**
@@ -213,7 +205,41 @@ public class Select extends SpecialCondition implements Serializable {
      * @param mainKeyword  主表关键列字段
      */
     public Select join(JoinType joinType, String schema, String table, String tableAlias, String tableKeyword, String mainKeyword) {
-        joinList.add(new Join(joinType, schema, table, tableAlias, tableKeyword, mainKeyword));
+        joinList.add(new Join(joinType, schema, table, tableAlias, tableKeyword, mainKeyword, ""));
+        return this;
+    }
+
+    /**
+     * 添加表连接
+     *
+     * @param table 关联的表名
+     * @param on    连接条件
+     */
+    public Select join(String table, String on) {
+        return join(JoinType.INNER_JOIN, "", table, table, on);
+    }
+
+    /**
+     * 添加表连接
+     *
+     * @param joinType 连接类型
+     * @param table    关联的表名
+     * @param on       连接条件
+     */
+    public Select join(JoinType joinType, String table, String on) {
+        return join(joinType, "", table, table, on);
+    }
+
+    /**
+     * 添加表连接
+     *
+     * @param joinType 连接类型
+     * @param schema   schema
+     * @param table    关联的表名
+     * @param on       连接条件
+     */
+    public Select join(JoinType joinType, String schema, String table, String tableAlias, String on) {
+        joinList.add(new Join(joinType, schema, table, tableAlias, "", "", on));
         return this;
     }
 
@@ -258,61 +284,7 @@ public class Select extends SpecialCondition implements Serializable {
         return this;
     }
 
-    /**
-     * 获取where sql 内容
-     *
-     * @return
-     */
-    public String getHaving() {
-        return having;
-    }
 
-    /**
-     * 设置having sql 内容
-     *
-     * @param having
-     */
-    public void setHaving(String having) {
-        this.having = having;
-    }
-
-    /**
-     * 设置having sql 内容
-     *
-     * @param having
-     * @param args
-     */
-    public void setHaving(String having, Object... args) {
-        this.having = having;
-        this.havingArgs = args;
-    }
-
-    /**
-     * 获取Having
-     *
-     * @return
-     */
-    public Object[] getHavingArgs() {
-        return havingArgs;
-    }
-
-    /**
-     * 设置Having
-     *
-     * @param havingArgs
-     */
-    public void setHavingArgs(Object[] havingArgs) {
-        this.havingArgs = havingArgs;
-    }
-
-    /**
-     * 获取having条件值映射
-     *
-     * @return
-     */
-    public ListMultimap<String, ConditionInfo> getHavingMap() {
-        return havingMap;
-    }
 
     /**
      * 获取orderBy排序列字段
@@ -399,106 +371,6 @@ public class Select extends SpecialCondition implements Serializable {
      */
     public Page getPage() {
         return this.page;
-    }
-
-    /**
-     * 添加having条件
-     *
-     * @param field 列字段
-     * @param value 列字段值
-     * @return
-     */
-    public Select having(String field, Object value) {
-        return having(field, value, SqlOperator.EQUAL_TO);
-    }
-
-    /**
-     * 添加having条件
-     *
-     * @param column 列字段信息
-     * @param value  列字段值
-     * @return
-     */
-    public Select having(Column column, Object value) {
-        return having(SqlLogic.AND, column.getSchema(), column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
-    }
-
-
-    /**
-     * 添加having条件
-     *
-     * @param field       列字段
-     * @param value       列字段值
-     * @param sqlOperator 操作符
-     * @return
-     */
-    public Select having(String field, Object value, SqlOperator sqlOperator) {
-        return having(SqlLogic.AND, "", "", field, value, sqlOperator);
-    }
-
-    /**
-     * @param sqlLogic   该条件与下一条件之间的逻辑关系
-     * @param tableAlias 表别名
-     * @param field      列字段
-     * @param value      列字段值
-     * @return
-     */
-    public Select having(SqlLogic sqlLogic, String tableAlias, String field, Object value) {
-        return having(sqlLogic, "", tableAlias, field, value, SqlOperator.EQUAL_TO);
-    }
-
-    /**
-     * 添加having条件
-     *
-     * @param tableAlias  表别名
-     * @param field       列字段
-     * @param value       列字段值
-     * @param sqlOperator 操作符
-     * @return
-     */
-    public Select having(String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        return having(SqlLogic.AND, "", tableAlias, field, value, sqlOperator);
-    }
-
-    /**
-     * 添加having条件
-     *
-     * @param column      列字段信息
-     * @param value       列字段值
-     * @param sqlOperator 操作符
-     * @return
-     */
-    public Select having(Column column, Object value, SqlOperator sqlOperator) {
-        return having(SqlLogic.AND, column.getSchema(), column.getTableAlias(), column.name(), value, sqlOperator);
-    }
-
-    /**
-     * 添加having条件
-     *
-     * @param sqlLogic    该条件与下一条件之间的逻辑关系
-     * @param column      列字段信息
-     * @param value       列字段值
-     * @param sqlOperator 操作符
-     * @return
-     */
-    public Select having(SqlLogic sqlLogic, Column column, Object value, SqlOperator sqlOperator) {
-        return having(sqlLogic, column.getSchema(), column.getTableAlias(), column.name(), value, sqlOperator);
-    }
-
-    /**
-     * 添加having条件
-     *
-     * @param sqlLogic    该条件与下一条件之间的逻辑关系
-     * @param schema      schema
-     * @param tableAlias  表别名
-     * @param field       列字段
-     * @param value       列字段值
-     * @param sqlOperator 操作符
-     * @return
-     */
-    public Select having(SqlLogic sqlLogic, String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        havingMap.put(tableAlias + field, new ConditionInfo(sqlLogic, schema, tableAlias, field, value, sqlOperator));
-        return this;
     }
 
     /**
