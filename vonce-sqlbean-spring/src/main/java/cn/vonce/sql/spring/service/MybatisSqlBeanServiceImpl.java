@@ -377,7 +377,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int logicallyDeleteById(ID id) {
+    public int logicallyDeleteById(ID... id) {
         return mybatisSqlBeanDao.logicallyDeleteById(getSqlBeanDB(), clazz, id);
     }
 
@@ -499,7 +499,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     public String backup() {
         String targetTableName = SqlBeanUtil.getTable(clazz).getName() + "_" + DateUtil.dateToString(new Date(), "yyyyMMddHHmmssSSS");
         try {
-            mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, targetTableName, null, null);
+            mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, null, targetTableName, null, null);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return null;
@@ -510,25 +510,45 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(String targetTableName) {
-        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, targetTableName, null, null);
+        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, null, targetTableName, null, null);
+    }
+
+    @Override
+    public void backup(String targetSchema, String targetTableName) {
+        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, targetSchema, targetTableName, null, null);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(String targetTableName, Column[] columns, Wrapper wrapper) {
-        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, targetTableName, columns, wrapper);
+        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, null, targetTableName, columns, wrapper);
+    }
+
+    @Override
+    public void backup(String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper) {
+        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, targetSchema, targetTableName, columns, wrapper);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int copy(String targetTableName, Wrapper wrapper) {
-        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, targetTableName, null, wrapper);
+        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, null, targetTableName, null, wrapper);
+    }
+
+    @Override
+    public int copy(String targetSchema, String targetTableName, Wrapper wrapper) {
+        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, targetSchema, targetTableName, null, wrapper);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int copy(String targetTableName, Column[] columns, Wrapper wrapper) {
-        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, targetTableName, columns, wrapper);
+        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, null, targetTableName, columns, wrapper);
+    }
+
+    @Override
+    public int copy(String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper) {
+        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, targetSchema, targetTableName, columns, wrapper);
     }
 
     @DbSwitch(DbRole.MASTER)
