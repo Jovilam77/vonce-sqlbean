@@ -17,7 +17,7 @@ public interface DeleteService<ID> {
     /**
      * 根据id条件删除
      *
-     * @param id
+     * @param id 单个id或数组
      * @return
      */
     int deleteById(ID... id);
@@ -25,8 +25,8 @@ public interface DeleteService<ID> {
     /**
      * 根据条件删除
      *
-     * @param where
-     * @param args
+     * @param where 条件表达式
+     * @param args  条件参数
      * @return
      */
     int deleteByCondition(String where, Object... args);
@@ -34,7 +34,7 @@ public interface DeleteService<ID> {
     /**
      * 根据条件删除
      *
-     * @param where
+     * @param where 条件包装器
      * @return
      */
     int deleteByCondition(Wrapper where);
@@ -42,7 +42,7 @@ public interface DeleteService<ID> {
     /**
      * 删除(where条件为空会抛异常，因为删除全部非常危险)
      *
-     * @param delete
+     * @param delete 删除对象
      * @return
      */
     int delete(Delete delete);
@@ -50,7 +50,7 @@ public interface DeleteService<ID> {
     /**
      * 删除
      *
-     * @param delete
+     * @param delete 删除对象
      * @param ignore 如果为true则不指定where条件也能执行，false则抛异常
      * @return
      */
@@ -59,16 +59,16 @@ public interface DeleteService<ID> {
     /**
      * 逻辑删除根据id条件
      *
-     * @param id
+     * @param id 单个id或数组
      * @return
      */
-    int logicallyDeleteById(ID id);
+    int logicallyDeleteById(ID... id);
 
     /**
      * 根据条件逻辑删除
      *
-     * @param where
-     * @param args
+     * @param where 条件表达式
+     * @param args  条件参数
      * @return
      */
     int logicallyDeleteByCondition(String where, Object... args);
@@ -76,7 +76,7 @@ public interface DeleteService<ID> {
     /**
      * 根据条件逻辑删除
      *
-     * @param where
+     * @param where 条件包装器
      * @return
      */
     int logicallyDeleteByCondition(Wrapper where);
