@@ -535,7 +535,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int logicallyDeleteById(ID id) {
+    public int logicallyDeleteById(ID... id) {
         return jdbcTemplate.update(SqlBeanProvider.logicallyDeleteByIdSql(getSqlBeanDB(), clazz, id));
     }
 
@@ -656,7 +656,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public String backup() {
         String targetTableName = SqlBeanUtil.getTable(clazz).getName() + "_" + DateUtil.dateToString(new Date(), "yyyyMMddHHmmssSSS");
         try {
-            jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, targetTableName, null, null));
+            jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, null, targetTableName, null, null));
         } catch (Exception e) {
             return null;
         }
@@ -666,25 +666,45 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(String targetTableName) {
-        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, targetTableName, null, null));
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, null, targetTableName, null, null));
+    }
+
+    @Override
+    public void backup(String targetSchema, String targetTableName) {
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, targetSchema, targetTableName, null, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(String targetTableName, Column[] columns, Wrapper wrapper) {
-        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, targetTableName, columns, wrapper));
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, null, targetTableName, columns, wrapper));
+    }
+
+    @Override
+    public void backup(String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper) {
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, targetSchema, targetTableName, columns, wrapper));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int copy(String targetTableName, Wrapper wrapper) {
-        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetTableName, null, wrapper));
+        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, null, targetTableName, null, wrapper));
+    }
+
+    @Override
+    public int copy(String targetSchema, String targetTableName, Wrapper wrapper) {
+        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetSchema, targetTableName, null, wrapper));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int copy(String targetTableName, Column[] columns, Wrapper wrapper) {
-        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetTableName, columns, wrapper));
+        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, null, targetTableName, columns, wrapper));
+    }
+
+    @Override
+    public int copy(String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper) {
+        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetSchema, targetTableName, columns, wrapper));
     }
 
     @DbSwitch(DbRole.MASTER)
