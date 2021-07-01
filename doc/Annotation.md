@@ -1,22 +1,24 @@
+#### 注解说明和使用
 ```java
 1：@SqlTable     //标识表名
 ```
 属性  | 解释  | 默认 | 必须
  :----: | :-----: | :-----: | :------:  
- autoCreate  | 如果表不存在则自动创建表（SqlBeanConfig中含有总开关，默认开启） | true | 否
- generate  | 生成实体类生成对应表的字段常量 | true | 否
+ autoCreate  | 是否表不存在则自动创建（SqlBeanConfig中含有总开关，默认开启） | true | 否
+ constant  | 是否生成实体类对应表的字段常量 | true | 否
+ mapUsToCc  | 是否开启Java字段驼峰命名转Sql字段下划线命名 | true | 否
  isView  | 是否为视图 | false | 否
  value  | 表名 |  | 是
  alias  | 别名 | "" | 否
  schema  | schema | "" | 否
 
 ```java
-2：@SqlId     //标识id，目前仅支持UUID, SNOWFLAKE_ID_16, SNOWFLAKE_ID_18，请查看GenerateType枚举类
+2：@SqlId     //标识id，目前仅支持UUID, SNOWFLAKE_ID_16, SNOWFLAKE_ID_18，请查看IdType枚举类
 ```
 
 属性  | 解释  | 默认 | 必须
  :----: | :-----: | :-----: | :------: 
- generateType  | 生成类型 | GenerateType.NORMAL | 否
+ type  | 生成类型 | IdType.NORMAL | 否
 
 ```java
 3：@SqlColumn     //标识字段名
@@ -60,42 +62,54 @@
 7：@SqlLogically //标识逻辑删除，请配合logicallyDeleteById、logicallyDeleteByCondition这两个方法使用，请查看内置Delete文档
 ```
 
+```java
+8：SqlInsertTime //标识插入时间，标识的字段在插入时为null将自动赋值
+```
 
-#### 示例：单表用法（该例子已包含表生成、常量生成、id生成、乐观锁）
+```java
+9：SqlUpdateTime //标识更新时间，标识的字段在更新时为null将自动赋值
+```
+
+#### 示例：单表用法（该例子已包含表生成、常量生成、id生成、乐观锁、插入时间、更新时间）
 ```java
 @SqlTable("d_essay") //表名
 public class Essay {
 
-	@SqlId(generateType = GenerateType.UUID) //id生成方式
+	@SqlId(type = IdType.UUID) //id生成方式
 	@SqlColumn("id") //列字段名
 	private String id;
 
-	@SqlColumn("userId" ) //列字段名
+	@SqlColumn("user_id" ) //列字段名, 默认情况下可不写
 	private String userId;
 	
-	@SqlColumn("originalAuthorId" ) //列字段名
+	@SqlColumn("original_author_id" ) //列字段名, 默认情况下可不写
 	private String originalAuthorId;
 
-	@SqlColumn("content" ) //列字段名
+	@SqlColumn("content" ) //列字段名, 默认情况下可不写
 	private String content;
-
-	@SqlColumn("creationTime" ) //列字段名
-	private Date creationTime;
 	
 	@SqlLogically //逻辑删除
-	@SqlColumn("isDeleted" ) //列字段名
+	@SqlColumn("is_deleted" ) //列字段名, 默认情况下可不写
 	private Integer isDeleted;
 	
 	@SqlVersion //乐观锁
-	@SqlColumn("version" ) //列字段名
+	@SqlColumn("version" ) //列字段名, 默认情况下可不写
 	private Long version;
+	
+	@SqlInsertTime
+	@SqlColumn("creation_time" ) //列字段名, 默认情况下可不写
+	private Date creationTime;
+	
+	@SqlUpdateTime
+	@SqlColumn("update_time" ) //列字段名, 默认情况下可不写
+	private Date updateTime;
 	
 	/**省略get set方法*/
 	
 }
 ```
 
-#### 示例：生成的Sql常量（maven编译之后自动生成，命名为Sql + 实体类名）
+#### 示例：生成的Sql常量（maven编译之后自动生成，不会存在项目中，命名为Sql + 实体类名）
 ```java
 package com.xxx.xxx.model.sql;
 
@@ -115,17 +129,19 @@ public class SqlEssay {
 
   public static final Column id = new Column(_schema,_tableAlias,"id","");
 
-  public static final Column userId = new Column(_schema,_tableAlias,"userId","");
+  public static final Column userId = new Column(_schema,_tableAlias,"user_id","");
   
-  public static final Column originalAuthorId = new Column(_schema,_tableAlias,"originalAuthorId","");
+  public static final Column originalAuthorId = new Column(_schema,_tableAlias,"original_author_id","");
 
   public static final Column content = new Column(_schema,_tableAlias,"content","");
 
-  public static final Column creationTime = new Column(_schema,_tableAlias,"creationTime","");
-
-  public static final Column isDeleted = new Column(_schema,_tableAlias,"isDeleted","");
+  public static final Column isDeleted = new Column(_schema,_tableAlias,"v","");
   
   public static final Column version = new Column(_schema,_tableAlias,"version","");
+  
+  public static final Column creationTime = new Column(_schema,_tableAlias,"creation_time","");
+  
+  public static final Column updateTime = new Column(_schema,_tableAlias,"update_time","");
 }
 ```
 #### 示例：主外键联表查询的用法
