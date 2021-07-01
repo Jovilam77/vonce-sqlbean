@@ -2,7 +2,7 @@
 ```
 本插件所有内置方法内部均通过SqlBean + SqlHelper来生成的Sql语句交给Mybatis或Spring JDBC执行，
 所以以下例子使用方式同样适用于内置的方法，传递给内置方法的SqlBean可以不设置Sql语句的table，
-因为在内部处理的时候发现table不存在的话会自动查找设置，Select语句连表查询的话仅支持自动补充主表的table。
+内部处理的时候发现table不存在的话会自动配置，Select语句连表查询的话仅支持自动补充主表的table。
 
 ```
 ## SqlHelper 生成Sql语句
@@ -13,20 +13,18 @@
    String deleteSql =  SqlHelper.buildDeleteSql(delete);
 ```
 
-## SqlBeanConfig
+## SqlBeanDB
 ```java
-    //在项目启动时会自动配置为你配置好SqlBeanConfig，
-	//所以在项目中如需生成Sql语句可通过自动注入即可。
-	
-	@Autowired
-    private SqlBeanConfig sqlBeanConfig;
+    SqlBeanDB sqlBeanDB = new SqlBeanDB();
+    sqlBeanDB.setDbType(DbType.MySQL);
+    sqlBeanDB.setSqlBeanConfig(new SqlBeanConfig());
 ```
 
 ## SqlBean - Select
 ```java
-    private static void select1(SqlBeanConfig sqlBeanConfig) {
+    private static void select1(SqlBeanDB sqlBeanDB) {
         Select select = new Select();
-        select.setSqlBeanConfig(sqlBeanConfig);
+        select.setSqlBeanDB(sqlBeanDB);
         select.setColumn(SqlEssay._all);
         select.column(SqlUser.headPortrait, "头像");
         select.column(SqlUser.nickname, "昵称");
@@ -39,9 +37,9 @@
         System.out.println(SqlHelper.buildSelectSql(select));
     }
 
-    private static void select2(SqlBeanConfig sqlBeanConfig) {
+    private static void select2(SqlBeanDB sqlBeanDB) {
         Select select2 = new Select();
-        select2.setSqlBeanConfig(sqlBeanConfig);
+        select2.setSqlBeanDB(sqlBeanDB);
         select2.column(SqlEssay.id, "序号")
                 .column(SqlEssay.content, "文章内容")
                 .column(SqlEssay.creationTime, "创建时间")
@@ -53,9 +51,9 @@
         System.out.println(SqlHelper.buildSelectSql(select2));
     }
 
-    private static void select3(SqlBeanConfig sqlBeanConfig) {
+    private static void select3(SqlBeanDB sqlBeanDB) {
         Select select3 = new Select();
-        select3.setSqlBeanConfig(sqlBeanConfig);
+        select3.setSqlBeanDB(sqlBeanDB);
         select3.column(SqlEssay._all, "count")
                 .column(SqlEssay.categoryId);
         select3.setTable(SqlEssay._tableName);
@@ -64,9 +62,9 @@
         System.out.println(SqlHelper.buildSelectSql(select3));
     }
 
-    private static void select4(SqlBeanConfig sqlBeanConfig) {
+    private static void select4(SqlBeanDB sqlBeanDB) {
         Select select4 = new Select();
-        select4.setSqlBeanConfig(sqlBeanConfig);
+        select4.setSqlBeanDB(sqlBeanDB);
         select4.setColumn(SqlUser._all);
         select4.setTable(SqlUser._tableName);
         Integer[] between = {2, 6};
@@ -83,9 +81,9 @@
 
 ## SqlBean - Insert
 ```java
-    private static void insert1(SqlBeanConfig sqlBeanConfig) {
+    private static void insert1(SqlBeanDB sqlBeanDB) {
         Insert insert = new Insert();
-        insert.setSqlBeanConfig(sqlBeanConfig);
+        insert.setSqlBeanDB(sqlBeanDB);
         User user = new User();
         user.setId("10000");
         user.setUsername("10000");
@@ -97,9 +95,9 @@
         System.out.println(SqlHelper.buildInsertSql(insert));
     }
 
-    private static void insert2(SqlBeanConfig sqlBeanConfig) {
+    private static void insert2(SqlBeanDB sqlBeanDB) {
         Insert insert = new Insert();
-        insert.setSqlBeanConfig(sqlBeanConfig);
+        insert.setSqlBeanDB(sqlBeanDB);
         List<User> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             User user = new User();
@@ -117,13 +115,13 @@
 
 ## SqlBean - Update
 ```java
-    private static void update(SqlBeanConfig sqlBeanConfig) {
+    private static void update(SqlBeanDB sqlBeanDB) {
         User user = new User();
         user.setHeadPortrait("logo.png");
         user.setUsername("123");
         user.setGender(1);
         Update update = new Update();
-        update.setSqlBeanConfig(sqlBeanConfig);
+        update.setSqlBeanDB(sqlBeanDB);
         update.setTable(User.class);
         update.setFilterFields("username");//java字段名
         update.setUpdateBean(user);
@@ -136,9 +134,9 @@
 
 ## SqlBean - Delete
 ```java
-    private static void delete(SqlBeanConfig sqlBeanConfig) {
+    private static void delete(SqlBeanDB sqlBeanDB) {
         Delete delete = new Delete();
-        delete.setSqlBeanConfig(sqlBeanConfig);
+        delete.setSqlBeanDB(sqlBeanDB);
         delete.where(SqlUser.id, 1, SqlOperator.GREATER_THAN);
         delete.wOR(SqlUser.nickname, "jovi");
         delete.setTable(User.class);

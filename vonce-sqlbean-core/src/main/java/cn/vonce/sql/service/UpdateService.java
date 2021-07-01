@@ -132,7 +132,7 @@ public interface UpdateService<T, ID> {
     /**
      * 更新(where条件为空会抛异常，因为更新全部非常危险)
      *
-     * @param update
+     * @param update 更新对象
      * @return
      */
     int update(Update<T> update);
@@ -140,7 +140,7 @@ public interface UpdateService<T, ID> {
     /**
      * 更新
      *
-     * @param update
+     * @param update 更新对象
      * @param ignore 如果为true则不指定where条件也能执行，false则抛异常
      * @return
      */

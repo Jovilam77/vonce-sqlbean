@@ -439,7 +439,7 @@ public interface MybatisSqlBeanDao<T> {
      * @return
      */
     @InsertProvider(type = MybatisSqlBeanProvider.class, method = "backup")
-    int backup(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("targetTableName") String targetTableName, @Param("columns") Column[] columns, @Param("wrapper") Wrapper wrapper);
+    int backup(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("targetSchema") String targetSchema, @Param("targetTableName") String targetTableName, @Param("columns") Column[] columns, @Param("wrapper") Wrapper wrapper);
 
     /**
      * 复制数据到指定表
@@ -452,6 +452,6 @@ public interface MybatisSqlBeanDao<T> {
      * @return
      */
     @InsertProvider(type = MybatisSqlBeanProvider.class, method = "copy")
-    int copy(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("targetTableName") String targetTableName, @Param("columns") Column[] columns, @Param("wrapper") Wrapper wrapper);
+    int copy(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("targetSchema") String targetSchema, @Param("targetTableName") String targetTableName, @Param("columns") Column[] columns, @Param("wrapper") Wrapper wrapper);
 
 }

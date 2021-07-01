@@ -866,27 +866,25 @@ public class SqlHelper {
      * @return
      */
     private static String versionCondition(Common common, Object bean) {
-        if ((common instanceof Update && ((Update) common).isLogicallyDelete()) || common instanceof Update && !((Update) common).isOptimisticLock()) {
+        if (!(common instanceof Update) || (common instanceof Update && ((Update) common).isLogicallyDelete()) || common instanceof Update && !((Update) common).isOptimisticLock()) {
             return "";
         }
         StringBuffer versionConditionSql = new StringBuffer();
         Field versionField = null;
         //更新时乐观锁处理
-        if (common instanceof Update) {
-            if (bean != null) {
-                versionField = SqlBeanUtil.getVersionField(bean.getClass());
-            }
-            if (versionField != null) {
-                boolean versionEffectiveness = SqlBeanUtil.versionEffectiveness(versionField.getType().getName());
-                if (versionEffectiveness) {
-                    versionConditionSql.append(SqlConstant.BEGIN_BRACKET);
-                    versionConditionSql.append(SqlBeanUtil.getTableFieldName(versionField));
-                    Object versionValue = ReflectUtil.instance().get(bean.getClass(), bean, versionField.getName());
-                    versionConditionSql.append(versionValue == null ? SqlConstant.IS : SqlConstant.EQUAL_TO);
-                    versionConditionSql.append(SqlBeanUtil.getSqlValue(common, versionValue));
-                    versionConditionSql.append(SqlConstant.END_BRACKET);
-                    versionConditionSql.append(SqlConstant.AND);
-                }
+        if (bean != null) {
+            versionField = SqlBeanUtil.getVersionField(bean.getClass());
+        }
+        if (versionField != null) {
+            boolean versionEffectiveness = SqlBeanUtil.versionEffectiveness(versionField.getType().getName());
+            if (versionEffectiveness) {
+                versionConditionSql.append(SqlConstant.BEGIN_BRACKET);
+                versionConditionSql.append(SqlBeanUtil.getTableFieldName(versionField));
+                Object versionValue = ReflectUtil.instance().get(bean.getClass(), bean, versionField.getName());
+                versionConditionSql.append(versionValue == null ? SqlConstant.IS : SqlConstant.EQUAL_TO);
+                versionConditionSql.append(SqlBeanUtil.getSqlValue(common, versionValue));
+                versionConditionSql.append(SqlConstant.END_BRACKET);
+                versionConditionSql.append(SqlConstant.AND);
             }
         }
         return versionConditionSql.toString();

@@ -282,7 +282,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String backup(Map<String, Object> map) {
-        return SqlBeanProvider.backupSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("targetTableName"), (Column[]) map.get("columns"), (Wrapper) map.get("wrapper"));
+        return SqlBeanProvider.backupSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("targetSchema"), (String) map.get("targetTableName"), (Column[]) map.get("columns"), (Wrapper) map.get("wrapper"));
     }
 
     /**
@@ -292,7 +292,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String copy(Map<String, Object> map) {
-        return SqlBeanProvider.copySql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("targetTableName"), (Column[]) map.get("columns"), (Wrapper) map.get("wrapper"));
+        return SqlBeanProvider.copySql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("targetSchema"), (String) map.get("targetTableName"), (Column[]) map.get("columns"), (Wrapper) map.get("wrapper"));
     }
 
 }

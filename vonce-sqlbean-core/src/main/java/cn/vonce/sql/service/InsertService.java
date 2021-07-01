@@ -1,6 +1,7 @@
 package cn.vonce.sql.service;
 
 import cn.vonce.sql.bean.Insert;
+
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ public interface InsertService<T> {
     /**
      * 插入数据
      *
-     * @param bean
+     * @param bean 单个实体或数组
      * @return
      */
     @SuppressWarnings("unchecked")
@@ -26,7 +27,7 @@ public interface InsertService<T> {
     /**
      * 插入数据
      *
-     * @param beanList
+     * @param beanList 实体列表
      * @return
      */
     @SuppressWarnings("unchecked")
@@ -35,7 +36,7 @@ public interface InsertService<T> {
     /**
      * 插入数据
      *
-     * @param insert
+     * @param insert 插入对象
      * @return
      */
     int inset(Insert<T> insert);

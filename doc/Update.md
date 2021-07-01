@@ -1,200 +1,157 @@
-## Update
-##### Update对象的方法请看代码中的文档描述
-#### 方法和示例
+#### Update使用示例
 ###### 1：根据id条件更新
 ```java
-long updateById(T bean, Object id, boolean updateNotNull);
-```
-```java
-@RequestMapping(value = "update", method = RequestMethod.PUT)
-@ResponseBody
-public RS update() {
-	long i = essayService.updateById(1);
-	if(i > 0){
-		super.successHint("更新成功");
-	}
-	return super.othersHint("更新失败");
-}
+  /**
+    * 根据id条件更新
+    *
+    * @param bean           更新的bean实体
+    * @param id             id条件
+    * @param updateNotNull  是否仅更新不为null的字段
+    * @param optimisticLock 是否使用乐观锁
+    * @return
+    */
+    int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock);
 ```
 ###### 2：根据实体类id条件更新
 ```java
-long updateByBeanId(T bean, boolean updateNotNull);
+  /**
+    * 根据实体类id条件更新
+    *
+    * @param bean           更新的bean实体
+    * @param updateNotNull  是否仅更新不为null的字段
+    * @param optimisticLock 是否使用乐观锁
+    * @return
+    */
+    int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock);
 ```
+###### 3：根据实体类id条件更新
 ```java
-@RequestMapping(value = "update", method = RequestMethod.PUT)
-@ResponseBody
-public RS update() {
-	Essay essay = new Essay();
-	essay.setId(1);
-	essay.setTitle("测试");
-	essay.setContent("测试123");
-	//true仅更新不为null的字段
-	long i = essayService.updateByBeanId(essay, ture);
-	if(i > 0){
-		super.successHint("更新成功");
-	}
-	return super.othersHint("更新失败");
-}
+  /**
+    * 根据实体类id条件更新
+    *
+    * @param bean           更新的bean实体
+    * @param updateNotNull  是否仅更新不为null的字段
+    * @param optimisticLock 是否使用乐观锁
+    * @param filterFields   过滤不需更新的字段
+    * @return
+    */
+    int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields);
 ```
-###### 3：根据实体类id条件更新（可过滤某些字段）
+###### 4：根据实体类id条件更新
 ```java
-long updateByBeanId(T bean, boolean updateNotNull, String[] filterFields);
-```
-```java
-@RequestMapping(value = "update", method = RequestMethod.PUT)
-@ResponseBody
-public RS update() {
-	Essay essay = new Essay();
-	essay.setId(1);
-	essay.setTitle("测试");
-	essay.setContent("测试123");
-	//true仅更新不为null的字段，filterFields过滤某些字段
-	long i = essayService.updateByBeanId(essay, ture, new String[]{"title"});
-	if(i > 0){
-		super.successHint("更新成功");
-	}
-	return super.othersHint("更新失败");
-}
-```
-###### 4：根据外部id条件更新（可过滤某些字段）
-```java
-long updateById(T bean, Object id, boolean updateNotNull, String[] filterFields);
-```
-```java
-@RequestMapping(value = "update", method = RequestMethod.PUT)
-@ResponseBody
-public RS update() {
-	Essay essay = new Essay();
-	essay.setTitle("测试");
-	essay.setContent("测试123");
-	//true仅更新不为null的字段，filterFields过滤某些字段
-	long i = essayService.updateById(essay, 20, ture, new String[]{"title"});
-	if(i > 0){
-		super.successHint("更新成功");
-	}
-	return super.othersHint("更新失败");
-}
+  /**
+    * 根据实体类id条件更新
+    *
+    * @param bean           更新的bean实体
+    * @param id             id条件
+    * @param updateNotNull  是否仅更新不为null的字段
+    * @param optimisticLock 是否使用乐观锁
+    * @param filterFields   过滤不需更新的字段
+    * @return
+    */
+    int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, String[] filterFields);
 ```
 ###### 5：根据条件更新
 ```java
-long updateByCondition(T bean, boolean updateNotNull, String where, Object... args);
+  /**
+    * 根据条件更新
+    *
+    * @param bean           更新的bean实体
+    * @param updateNotNull  是否仅更新不为null的字段
+    * @param optimisticLock 是否使用乐观锁
+    * @param where          条件字符串表达式
+    * @param args           条件参数
+    * @return
+    */
+    int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, String where, Object... args);
 ```
+###### 6：根据条件更新
 ```java
-@RequestMapping(value = "update", method = RequestMethod.PUT)
-@ResponseBody
-public RS update() {
-	Essay essay = new Essay();
-	essay.setTitle("测试");
-	essay.setContent("测试123");
-	//true仅更新不为null的字段
-	long i = essayService.updateByCondition(essay, ture, "id > ? and id < ?", 1 ,10);
-	if(i > 0){
-		super.successHint("更新成功");
-	}
-	return super.othersHint("更新失败");
-}
+  /**
+    * 根据条件更新
+    *
+    * @param bean           更新的bean实体
+    * @param updateNotNull  是否仅更新不为null的字段
+    * @param optimisticLock 是否使用乐观锁
+    * @param where          条件包装器
+    * @return
+    */
+    int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper where);
 ```
-###### 6：根据条件更新（可过滤某些字段）
+###### 7：根据条件更新
 ```java
-long updateByCondition(T bean, boolean updateNotNull, String[] filterFields, String where, Object... args);
+  /**
+    * 根据条件更新
+    *
+    * @param bean           更新的bean实体
+    * @param updateNotNull  是否仅更新不为null的字段
+    * @param optimisticLock 是否使用乐观锁
+    * @param filterFields   过滤不需更新的字段
+    * @param where          条件字符串表达式
+    * @param args           条件参数
+    * @return
+    */
+    int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where, Object... args);
 ```
+###### 8：根据条件更新
 ```java
-@RequestMapping(value = "update", method = RequestMethod.PUT)
-@ResponseBody
-public RS update() {
-	Essay essay = new Essay();
-	essay.setId(1);
-	essay.setTitle("测试");
-	essay.setContent("测试123");
-	//true仅更新不为null的字段，filterFields过滤某些字段
-	long i = essayService.updateByCondition(essay, ture, new String[]{"id"},
-	"id > ? and id < ?", 1 ,10);
-	if(i > 0){
-		super.successHint("更新成功");
-	}
-	return super.othersHint("更新失败");
-}
+  /**
+    * 根据条件更新
+    *
+    * @param bean           更新的bean实体
+    * @param updateNotNull  是否仅更新不为null的字段
+    * @param optimisticLock 是否使用乐观锁
+    * @param filterFields   过滤不需更新的字段
+    * @param where          条件包装器
+    * @return
+    */
+    int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, Wrapper where);
 ```
-###### 7：根据实体类字段条件更新
+###### 9：根据实体类字段条件更新
 ```java
-long updateByBeanCondition(T bean, boolean updateNotNull, String where);
+  /**
+    * 根据实体类字段条件更新
+    *
+    * @param bean           更新的bean实体
+    * @param updateNotNull  是否仅更新不为null的字段
+    * @param optimisticLock 是否使用乐观锁
+    * @param where          条件字符串表达式
+    * @return
+    */
+    int updateByBeanCondition(T bean, boolean updateNotNull, boolean optimisticLock, String where);
 ```
+###### 10：根据实体类字段条件更新
 ```java
-@RequestMapping(value = "update", method = RequestMethod.PUT)
-@ResponseBody
-public RS update() {
-	Essay essay = new Essay();
-	essay.setId(1);
-	essay.setTitle("测试");
-	essay.setContent("测试123");
-	//true仅更新不为null的字段，${为你实体类中的字段名}
-	long i = essayService.updateByBeanCondition(essay, ture, "id = ${id}");
-	if(i > 0){
-		super.successHint("更新成功");
-	}
-	return super.othersHint("更新失败");
-}
+  /**
+    * 根据实体类字段条件更新
+    *
+    * @param bean           更新的bean实体
+    * @param updateNotNull  是否仅更新不为null的字段
+    * @param optimisticLock 是否使用乐观锁
+    * @param filterFields   过滤不需更新的字段
+    * @param where          条件字符串表达式
+    * @return
+    */
+    int updateByBeanCondition(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where);
 ```
-###### 8：根据实体类字段条件更新（可过滤某些字段）
+###### 11：更新
 ```java
-long updateByBeanCondition(T bean, boolean updateNotNull, String[] filterFields, String where);
+  /**
+    * 更新(where条件为空会抛异常，因为更新全部非常危险)
+    *
+    * @param update 更新对象
+    * @return
+    */
+    int update(Update<T> update);
 ```
+###### 12：更新
 ```java
-@RequestMapping(value = "update", method = RequestMethod.PUT)
-@ResponseBody
-public RS update() {
-	Essay essay = new Essay();
-	essay.setId(1);
-	essay.setTitle("测试");
-	essay.setContent("测试123");
-	//true仅更新不为null的字段，filterFields过滤某些字段，${为你实体类中的字段名}
-	long i = essayService.updateByBeanCondition(essay, ture, new String[]{"title"},
-	"id = ${id}");
-	if(i > 0){
-		super.successHint("更新成功");
-	}
-	return super.othersHint("更新失败");
-}
-```
-###### 9：更新（where条件为空会抛异常，因为更新全部非常危险）
-```java
-long update(Update update);
-```
-```java
-@RequestMapping(value = "update", method = RequestMethod.PUT)
-@ResponseBody
-public RS update() {
-	Essay essay = new Essay();
-	essay.setTitle("测试");
-	essay.setContent("测试123");
-	Update update = new Update();
-	update.setUpdateBean(essay);
-	update.where("id", 1);//必须有where条件
-	essayService.update(update);
-	if(i > 0){
-		super.successHint("更新成功");
-	}
-	return super.othersHint("更新失败");
-}
-```
-###### 10：更新（如果要更新全部可以用这个）
-```java
-long update(Update update, boolean ignore);
-```
-```java
-@RequestMapping(value = "update", method = RequestMethod.PUT)
-@ResponseBody
-public RS update() {
-	Essay essay = new Essay();
-	essay.setTitle("测试");
-	essay.setContent("测试123");
-	Update update = new Update();
-	update.setUpdateBean(essay);
-	//如果这里为false并且没有where条件则抛异常
-	essayService.update(update, true);
-	if(i > 0){
-		super.successHint("更新成功");
-	}
-	return super.othersHint("更新失败");
-}
+  /**
+    * 更新
+    *
+    * @param update 更新对象
+    * @param ignore 如果为true则不指定where条件也能执行，false则抛异常
+    * @return
+    */
+    int update(Update<T> update, boolean ignore);
 ```
