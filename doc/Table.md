@@ -1,38 +1,21 @@
-## 表结构操作
-#### 方法和示例
-###### 1：删除表结构
+#### DeleteService接口文档
+###### 1：获取Bean类型
 ```java
 void dropTable();
 ```
+###### 2：删除表结构
 ```java
-public void dropTable() {
-	sqlBeanService.getTableService().dropTable();
-}
+void dropTable();
 ```
-###### 2：创建表结构
+###### 3：创建表结构
 ```java
 void createTable();
 ```
-```java
-public void createTable() {
-	sqlBeanService.getTableService().createTable();
-}
-```
-###### 3：删除并创建表结构
+###### 4：删除并创建表结构
 ```java
 void dropAndCreateTable();
 ```
-```java
-public void dropAndCreateTable() {
-	sqlBeanService.getTableService().dropAndCreateTable();
-}
-```
-###### 4：获取表名列表
+###### 5：获取表名列表
 ```java
 List<String> getTableList();
-```
-```java
-public void getTableList() {
-	List<String> list = sqlBeanService.getTableService().createTable();
-}
 ```
