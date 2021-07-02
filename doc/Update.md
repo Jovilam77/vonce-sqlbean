@@ -20,6 +20,8 @@
     //其他写法
     //update.setWhere(Wrapper.where(Cond.eq(SqlEssay.id, essay.getId())));
     //update.setWhere("& = ?", SqlEssay.id, essay.getId());
+    
+    essayService.update(update);
 ```
 #### UpdateService接口文档
 ###### 1：根据id条件更新
