@@ -34,8 +34,8 @@ public class Essay {
 	//@SqlColumn("creation_time" ) 常规情况下可不写
 	private Date creationTime;
 
-    @SqlVersion //标识乐观锁字段
-    //@SqlColumn("update_time" ) 常规情况下可不写
+        @SqlVersion //标识乐观锁字段
+        //@SqlColumn("update_time" ) 常规情况下可不写
 	private Date updateTime;
 	
 	/**省略get set方法*/
@@ -73,7 +73,7 @@ public class EssayController {
 	//查询
 	@GetMapping("select")
 	public RS select() {
-		//查询列表  全部
+	//查询列表  全部
         List<Essay> list = essayService.selectAll();
         //查询列表  根据条件查询 方式一
         list = essayService.selectByCondition("& > ?", SqlEssay.id, 20);
@@ -109,20 +109,20 @@ public class EssayController {
 
         //用于查询Map 多条结果时会报错
         Map<String, Object> map = essayService.selectMap(select);
-		//用于查询Map列表
+	//用于查询Map列表
         List<Map<String, Object>> mapList = essayService.selectMapList(select);
 
         //用于查询对象列表
         list = essayService.select(select);
 		
         return super.successHint("获取成功", list);
-		//更多用法请查看下方详细文档...
+	//更多用法请查看下方详细文档...
 	}
 
 	//分页
 	@GetMapping("getList")
 	public RS getList(HttpServletRequest request) {
-		// 查询对象
+	// 查询对象
         Select select = new Select();
         // 分页助手ReqPageHelper
         ReqPageHelper<Essay> pageHelper = new ReqPageHelper<>(request);
@@ -142,42 +142,42 @@ public class EssayController {
 	@PostMapping("update")
 	public RS update(Essay essay) {
 	    //根据bean内部id更新
-		long i = essayService.updateByBeanId(essay);
-		//根据外部id更新 参数3的true代表仅更新不为null字段 参数4的true代表使用乐观锁
-        //i = essayService.updateById(essay,20,true,true);
-		//根据条件更新 参数2的true代表仅更新不为null字段 参数3的true代表使用乐观锁
-        //i = essayService.updateByCondition(essay,true,true,Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
-		//更多用法请查看下方详细文档...
-        if (i > 0) {
-			return super.successHint("更新成功");
-		}
-		return super.othersHint("更新失败");
+	    long i = essayService.updateByBeanId(essay);
+	    //根据外部id更新 参数3的true代表仅更新不为null字段 参数4的true代表使用乐观锁
+            //i = essayService.updateById(essay,20,true,true);
+	    //根据条件更新 参数2的true代表仅更新不为null字段 参数3的true代表使用乐观锁
+            //i = essayService.updateByCondition(essay,true,true,Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
+	    //更多用法请查看下方详细文档...
+            if (i > 0) {
+		return super.successHint("更新成功");
+	    }
+	    return super.othersHint("更新失败");
 	}
 
 	//删除
 	@PostMapping("deleteById")
 	public RS deleteById(Integer[] id) {
 	    //根据id删除
-		long i = essayService.deleteById(id);
-		//根据条件删除
-        //i = essayService.deleteByCondition(Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
-        //更多用法请查看下方详细文档...
-        if (i > 0) {
-			return super.successHint("删除成功");
-		}
-		return super.othersHint("删除失败");
+	    long i = essayService.deleteById(id);
+	    //根据条件删除
+	    //i = essayService.deleteByCondition(Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
+	    //更多用法请查看下方详细文档...
+	    if (i > 0) {
+	        return super.successHint("删除成功");
+	    }
+	    return super.othersHint("删除失败");
 	}
 
 	//插入
 	@PostMapping("add")
 	public RS add() {
-		List<Essay> essayList = new ArrayList<>();
-		for (int i = 0; i < 100; i++) {
-			Essay essay = new Essay(i, "name" + i);
-			essayList.add(essay);
-		}
-		essayService.insert(essayList);
-		return successHint("成功");
+	     List<Essay> essayList = new ArrayList<>();
+	     for (int i = 0; i < 100; i++) {
+		  Essay essay = new Essay(i, "name" + i);
+		  essayList.add(essay);
+	     }
+	     essayService.insert(essayList);
+	     return successHint("成功");
 	}
 
 }
