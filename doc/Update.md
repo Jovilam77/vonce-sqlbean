@@ -1,4 +1,27 @@
-#### Update使用示例
+#### Update对象使用示例（常规情况下不使用该方式，查看下方文档使用更简便方式）
+```java
+    Essay essay = essayService.selectById(1L);
+
+    Update<Essay> update = new Update<>();
+    //delete.setTable("t_essay");
+    update.setTable(Essay.class);
+    //作为更新的数据模板对象
+    update.setUpdateBean(essay);
+    //是否仅更新不为null的字段
+    update.setUpdateNotNull(true);
+    //是否使用乐观锁
+    update.setOptimisticLock(false);
+    //需要过滤不更新的表字段
+    //update.setFilterFields(new String[]{"user_id"});
+    update.setFilterFields(new String[]{SqlEssay.user_id.name()});
+
+    //根据id更新
+    update.where(SqlEssay.id, essay.getId());
+    //其他写法
+    //update.setWhere(Wrapper.where(Cond.eq(SqlEssay.id, essay.getId())));
+    //update.setWhere("& = ?", SqlEssay.id, essay.getId());
+```
+#### UpdateService接口文档
 ###### 1：根据id条件更新
 ```java
   /**
