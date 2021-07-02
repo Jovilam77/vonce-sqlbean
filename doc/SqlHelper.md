@@ -26,8 +26,8 @@
         Select select = new Select();
         select.setSqlBeanDB(sqlBeanDB);
         select.setColumn(SqlEssay._all);
-        select.column(SqlUser.headPortrait, "头像");
-        select.column(SqlUser.nickname, "昵称");
+        select.column(SqlUser.headPortrait);
+        select.column(SqlUser.nickname);
         select.setTable(SqlEssay._tableName);
         select.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id.name(), SqlEssay.userId.name());
         select.where(SqlEssay.userId, "1111");
@@ -40,10 +40,10 @@
     private static void select2(SqlBeanDB sqlBeanDB) {
         Select select2 = new Select();
         select2.setSqlBeanDB(sqlBeanDB);
-        select2.column(SqlEssay.id, "序号")
-                .column(SqlEssay.content, "文章内容")
-                .column(SqlEssay.creationTime, "创建时间")
-                .column(SqlUser.nickname, "用户昵称");
+        select2.column(SqlEssay.id)
+                .column(SqlEssay.content)
+                .column(SqlEssay.creationTime)
+                .column(SqlUser.nickname);
         select2.setTable(SqlEssay._tableName);
         select2.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id.name(), SqlEssay.userId.name());
         select2.where("date_format(" + SqlEssay.creationTime + ",'%y%m%m ')", "2020-01-01 00:00:00", SqlOperator.GREATER_THAN);
