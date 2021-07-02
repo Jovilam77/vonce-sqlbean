@@ -1,8 +1,8 @@
-#### Delete使用示例
+#### Delete对象使用示例（常规情况下不使用该方式，查看下方文档使用更简便方式）
 ```java
     Delete delete = new Delete();
 	
-    //delete.setTable("t_essay"); 表名
+    //delete.setTable("t_essay");
     delete.setTable(Essay.class);
 	
     //id 大于 1  这里的id建议用SqlEssay.id 常量替代 这里演示多种写法特意不写

@@ -491,7 +491,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int inset(Insert<T> insert) {
+    public int insert(Insert<T> insert) {
         return mybatisSqlBeanDao.insert(getSqlBeanDB(), clazz, insert);
     }
 

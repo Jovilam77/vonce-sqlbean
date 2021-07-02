@@ -39,6 +39,6 @@ public interface InsertService<T> {
      * @param insert 插入对象
      * @return
      */
-    int inset(Insert<T> insert);
+    int insert(Insert<T> insert);
 
 }
