@@ -4,7 +4,7 @@
     //指定查询的列
     select.column(SqlEssay._all).column(SqlUser.headPortrait).column(SqlUser.nickname);
     //指定查询的表
-	//select.setTable(SqlEssay._tableName);
+    //select.setTable(SqlEssay._tableName);
     select.setTable(Essay.class);
     //指定连表
     select.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id.name(), SqlEssay.user_id.name());
@@ -14,8 +14,8 @@
     //select.wAND("DATE_FORMAT( " + SqlEssay.creation_time + ", '%Y-%m-%d' )", new Original("DATE_FORMAT( '2021-01-01 00:00:00', '%Y-%m-%d' ) "), SqlOperator.EQUAL_TO);
     select.setWhere(Wrapper.where(Cond.eq(SqlEssay.user_id, "1111")).and(Cond.eq("DATE_FORMAT( " + SqlEssay.creation_time + ", '%Y-%m-%d' )", new Original("DATE_FORMAT( '2021-01-01 00:00:00', '%Y-%m-%d' ) "))));
     select.orderBy(SqlEssay.id, SqlSort.DESC);
-	
-	essayService.select(select);
+    
+    essayService.select(select);
 ```
 #### SelectService接口文档
 ###### 1：根据id条件查询
