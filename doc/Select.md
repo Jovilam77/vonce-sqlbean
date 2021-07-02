@@ -1,384 +1,351 @@
-## Select
-##### Select对象的方法请看代码中的文档描述
-#### 方法和示例
+#### Select对象使用示例（复杂查询或灵活性较高时使用，查看下方文档使用更简便方式）
+```java
+    Select select = new Select();
+    //指定查询的列
+    select.column(SqlEssay._all).column(SqlUser.headPortrait).column(SqlUser.nickname);
+    //指定查询的表
+	//select.setTable(SqlEssay._tableName);
+    select.setTable(Essay.class);
+    //指定连表
+    select.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id.name(), SqlEssay.user_id.name());
+    //查询条件
+    //select.where(SqlEssay.user_id, "1111");
+    //value 直接输入字符串 会当作字符串处理，sql中会带''，如果希望不被做处理则使用Original
+    //select.wAND("DATE_FORMAT( " + SqlEssay.creation_time + ", '%Y-%m-%d' )", new Original("DATE_FORMAT( '2021-01-01 00:00:00', '%Y-%m-%d' ) "), SqlOperator.EQUAL_TO);
+    select.setWhere(Wrapper.where(Cond.eq(SqlEssay.user_id, "1111")).and(Cond.eq("DATE_FORMAT( " + SqlEssay.creation_time + ", '%Y-%m-%d' )", new Original("DATE_FORMAT( '2021-01-01 00:00:00', '%Y-%m-%d' ) "))));
+    select.orderBy(SqlEssay.id, SqlSort.DESC);
+	
+	essayService.select(select);
+```
+#### SelectService接口文档
 ###### 1：根据id条件查询
 ```java
-T selectById(Object id);
+  /**
+    * 根据id条件查询
+    *
+    * @param id id主键
+    * @return
+    */
+    T selectById(ID id);
 ```
+###### 2：根据id条件查询
 ```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	Essay essay = essayService.selectById(1);
-	return super.successHint("获取成功",essay);
-}
-```
-###### 2：根据id条件查询（指定返回类型）
-```java
-<O> O selectById(Class<O> returnType, Object id);
-```
-```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	EssayUnion essayUnion = essayService.selectById(EssayUnion.class,1);
-	//也可以这样使用
-	//返回第一个字段内容，可以用你想要的类型接收
-	//String id = essayService.selectById(String.class,1);
-	//返回Map
-	//Map<String,Object> map = essayService.selectById(Map.class,1);
-	return super.successHint("获取成功",essayUnion);
-}
+  /**
+    * 根据id条件查询
+    *
+    * @param returnType 指定返回类型，如简化的实体类、或者基本类型、Map
+    * @param id         id主键
+    * @return
+    */
+    <O> O selectById(Class<O> returnType, ID id);
 ```
 ###### 3：根据ids条件查询
 ```java
-List<T> selectByIds(Object... ids);
+  /**
+    * 根据ids条件查询
+    *
+    * @param ids 单个id主键或数组
+    * @return
+    */
+    List<T> selectByIds(ID... ids);
 ```
+###### 4：根据ids条件查询
 ```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	List<Essay> essayList = essayService.selectByIds(1,2,3);
-	return super.successHint("获取成功",essayList);
-}
+  /**
+    * 根据id条件查询
+    *
+    * @param returnType 指定返回类型，如简化的实体类、或者基本类型、Map
+    * @param ids        单个id主键或数组
+    * @return
+    */
+    <O> List<O> selectByIds(Class<O> returnType, ID... ids);
 ```
-###### 4：根据ids条件查询（指定返回类型）
+###### 5：根据自定义条件查询
 ```java
-<O> List<O> selectByIds(Class<O> returnType, Object... ids);
+  /**
+    * 根据自定义条件查询
+    *
+    * @param select 查询对象
+    * @return
+    */
+    T selectOne(Select select);
 ```
+###### 6：根据自定义条件查询
 ```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	List<EssayUnion> essayUnionList = essayService.selectByIds(EssayUnion.class, 1,2,3);
-	//也可以这样使用
-	//返回第一个字段内容，可以用你想要的类型接收
-	//String id = essayService.selectByIds(String.class, 1,2,3);
-	//返回Map
-	//Map<String,Object> map = essayService.selectByIds(Map.class, 1,2,3);
-	return super.successHint("获取成功",essayUnionList);
-}
+  /**
+    * 根据自定义条件查询
+    *
+    * @param returnType 指定返回类型，如简化的实体类、或者基本类型、Map
+    * @param select     查询对象
+    * @return
+    */
+    <O> O selectOne(Class<O> returnType, Select select);
 ```
-###### 5：根据自定义条件查询 只返回一条记录
+###### 7：根据自定义条件查询返回Map
 ```java
-T selectOne(Select select);
-```
-```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	Select select = new Select();
-	select.column("id");
-	select.column("title");
-	select.where("id",1);
-	Essay essay = essayService.selectOne(select);
-	return super.successHint("获取成功",essay);
-}
-```
-###### 6：根据自定义条件查询 只返回一条记录（指定返回类型）
-```java
-<O> O selectOne(Class<O> returnType, Select select);
-```
-```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	Select select = new Select();
-	select.column("id");
-	select.column("title");
-	select.where("id",1);
-	EssayUnion essayUnion = essayService.selectOne(EssayUnion.class, select);	//也可以这样使用
-	//返回第一个字段内容,column("你想要的字段")，可以用你想要的类型接收
-	//String id = essayService.selectOne(String.class, select);
-	//返回Map
-	//Map<String,Object> map = essayService.selectOne(Map.class, select);
-	return super.successHint("获取成功",essayUnion);
-}
-```
-###### 7：根据自定义条件查询 返回Map
-```java
-Map<String, Object> selectMap(Select select);
-```
-```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	Select select = new Select();
-	select.column("id");
-	select.column("title");
-	select.where("id",1);
-	Map<String,Object> map = essayService.selectMap(select);
-	return super.successHint("获取成功",map);
-}
+  /**
+    * 根据自定义条件查询返回Map
+    *
+    * @param select 查询对象
+    * @return
+    */
+    Map<String, Object> selectMap(Select select);
 ```
 ###### 8：根据条件查询
 ```java
-T selectOneByCondition(String where, Object... args);
+  /**
+    * 根据条件查询
+    *
+    * @param where 条件字符串表达式
+    * @param args  条件参数
+    * @return
+    */
+    T selectOneByCondition(String where, Object... args);
 ```
+###### 9：根据条件查询
 ```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	Essay essay = essayService.selectOneByCondition("id = ?",1);
-	return super.successHint("获取成功",essay);
-}
-```
-###### 9：根据条件查询（指定返回类型）
-```java
-<O> O selectOneByCondition(Class<O> returnType, String where, Object... args);
-```
-```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	EssayUnion essayUnion = essayService.selectOneByCondition(EssayUnion.class, "id = ?",1);
-	//也可以这样使用
-	//返回第一个字段内容，可以用你想要的类型接收
-	//String id = essayService.selectOneByCondition(String.class, "id = ?",1);
-	//返回Map
-	//Map<String,Object> map = essayService.selectOneByCondition(Map.class, "id = ?",1);
-	return super.successHint("获取成功",essayUnion);
-}
+  /**
+    * 根据条件查询
+    *
+    * @param returnType 指定返回类型，如简化的实体类、或者基本类型、Map
+    * @param where      条件字符串表达式
+    * @param args       条件参数
+    * @return
+    */
+    <O> O selectOneByCondition(Class<O> returnType, String where, Object... args);
 ```
 ###### 10：根据条件查询
 ```java
-List<T> selectByCondition(String where, Object... args);
+  /**
+    * 根据条件查询
+    *
+    * @param where 条件包装器
+    * @return
+    */
+    T selectOneByCondition(Wrapper where);
 ```
+###### 11：根据条件查询
 ```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	List<Essay> essayList = essayService.selectByCondition("userId = ?",888);
-	return super.successHint("获取成功",essayList);
-}
+  /**
+    * 根据条件查询
+    *
+    * @param returnType 指定返回类型，如简化的实体类、或者基本类型、Map
+    * @param where      条件包装器
+    * @return
+    */
+    <O> O selectOneByCondition(Class<O> returnType, Wrapper where);
 ```
-###### 11：根据条件查询 分页
+###### 12：根据条件查询
 ```java
-List<T> selectByCondition(Paging paging, String where, Object... args);
+  /**
+    * 根据条件查询
+    *
+    * @param where 条件字符串表达式
+    * @param args  条件参数
+    * @return
+    */
+    List<T> selectByCondition(String where, Object... args);
 ```
+###### 13：根据条件查询
 ```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	//查询第1页，一页显示10条，根据创建时间降序
-	Paging paging = new Paging(0,10,"creationTime","desc");
-	//PageHelper<Essay> pageHelper = new PageHelper<>(request);
-	//Paging paging = pageHelper.getPaging()
-	List<Essay> essayList = essayService.selectByCondition(paging,"userId = ?",888);
-	return super.successHint("获取成功",essayList);
-}
+  /**
+    * 根据条件查询
+    *
+    * @param where 条件包装器
+    * @return
+    */
+    List<T> selectByCondition(Wrapper where);
 ```
-###### 12：根据条件查询（指定返回类型）
+###### 14：根据条件查询
 ```java
-<O> List<O> selectByCondition(Class<O> returnType, String where, Object... args);
+  /**
+    * 根据条件查询
+    *
+    * @param paging 分页对象
+    * @param where  条件字符串表达式
+    * @param args   条件参数
+    * @return
+    */
+    List<T> selectByCondition(Paging paging, String where, Object... args);
 ```
+###### 15：根据条件查询
 ```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	List<EssayUnion> essayUnionList = essayService.selectByCondition(EssayUnion.class,
-	"userId = ?",888);
-	//也可以这样使用
-	//返回第一个字段内容，可以用你想要的类型接收
-	//List<String> idList = essayService.selectByCondition(String.class,
-	"userId = ?",888);
-	//返回Map
-	//List<Map<String,Object>> mapList = essayService.selectByCondition(Map.class,
-	"userId = ?",888);
-	return super.successHint("获取成功",essayUnionList);
-}
+  /**
+    * 根据条件查询
+    *
+    * @param paging 分页对象
+    * @param where  条件包装器
+    * @return
+    */
+    List<T> selectByCondition(Paging paging, Wrapper where);
 ```
-###### 13：根据条件查询 分页（指定返回类型）
+###### 16：根据条件查询
 ```java
-<O> List<O> selectByCondition(Class<O> returnType, Paging paging, String where, Object... args);
+  /**
+    * 根据条件查询
+    *
+    * @param returnType 指定返回类型，如简化的实体类、或者基本类型、Map
+    * @param where      条件字符串表达式
+    * @param args       条件参数
+    * @return
+    */
+    <O> List<O> selectByCondition(Class<O> returnType, String where, Object... args);
 ```
+###### 17：根据条件查询
 ```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	//查询第1页，一页显示10条，根据创建时间降序
-	Paging paging = new Paging(0,10,"creationTime","desc");
-	//PageHelper<Essay> pageHelper = new PageHelper<>(request);
-	//Paging paging = pageHelper.getPaging()
-	List<EssayUnion> essayUnionList = essayService.selectByCondition(EssayUnion.class, paging, 
-	"userId = ?",888);
-	//也可以这样使用
-	//返回第一个字段内容，可以用你想要的类型接收
-	//List<String> idList = essayService.selectByCondition(String.class, paging, 
-	"userId = ?",888);
-	//返回Map
-	//List<Map<String,Object>> mapList = essayService.selectByCondition(Map.class, paging, 
-	"userId = ?",888);
-	return super.successHint("获取成功",essayUnionList);
-}
+  /**
+    * 根据条件查询
+    *
+    * @param returnType 指定返回类型，如简化的实体类、或者基本类型、Map
+    * @param where      条件包装器
+    * @return
+    */
+    <O> List<O> selectByCondition(Class<O> returnType, Wrapper where);
 ```
-###### 14：根据条件查询统计
+###### 18：根据条件查询
 ```java
-long selectCountByCondition(String where, Object... args);
+  /**
+    * 根据条件查询
+    *
+    * @param returnType 指定返回类型，如简化的实体类、或者基本类型、Map
+    * @param paging     分页对象
+    * @param where      条件字符串表达式
+    * @param args       条件参数
+    * @return
+    */
+    <O> List<O> selectByCondition(Class<O> returnType, Paging paging, String where, Object... args);
 ```
+###### 19：根据条件查询
 ```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	long count = essayService.selectCountByCondition("userId = ?",888);
-	return super.successHint("获取成功",count);
-}
+  /**
+    * 根据条件查询
+    *
+    * @param returnType 指定返回类型，如简化的实体类、或者基本类型、Map
+    * @param paging     分页对象
+    * @param where      条件包装器
+    * @return
+    */
+    <O> List<O> selectByCondition(Class<O> returnType, Paging paging, Wrapper where);
 ```
-###### 15：统计全部
+###### 20：根据条件查询统计
 ```java
-long countAll();
+  /**
+    * 根据条件查询统计
+    *
+    * @param where 条件字符串表达式
+    * @param args  条件参数
+    * @return
+    */
+    int selectCountByCondition(String where, Object... args);
 ```
+###### 21：根据条件查询统计
 ```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	long count = essayService.countAll();
-	return super.successHint("获取成功",count);
-}
+  /**
+    * 根据条件查询统计
+    *
+    * @param where 条件包装器
+    * @return
+    */
+    int selectCountByCondition(Wrapper where);
 ```
-###### 16：查询全部
+###### 22：统计全部
 ```java
-List<T> selectAll();
+  /**
+    * 统计全部
+    *
+    * @return
+    */
+    int countAll();
 ```
+###### 23：查询全部
 ```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	List<Essay> essayList = essayService.selectAll();
-	return super.successHint("获取成功",essayList);
-}
+  /**
+    * 查询全部
+    *
+    * @return
+    */
+    List<T> selectAll();
 ```
-###### 17：查询全部（指定返回类型）
+###### 24：查询全部
 ```java
-<O> List<O> selectAll(Class<O> returnType);
+  /**
+    * 查询全部
+    *
+    * @param returnType 指定返回类型，如简化的实体类、或者基本类型、Map
+    * @return
+    */
+    <O> List<O> selectAll(Class<O> returnType);
 ```
+###### 25：查询全部
 ```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	List<EssayUnion> essayUnionList = essayService.selectAll(EssayUnion.class);
-	//也可以这样使用
-	//返回第一个字段内容，可以用你想要的类型接收
-	//List<String> idList = essayService.selectAll(String.class);
-	//返回Map
-	//List<Map<String,Object>> mapList = essayService.selectAll(Map.class);
-	return super.successHint("获取成功",essayUnionList);
-}
+  /**
+    * 查询全部
+    *
+    * @param paging 分页对象
+    * @return
+    */
+    List<T> selectAll(Paging paging);
 ```
-###### 18：查询全部 分页
+###### 26：查询全部
 ```java
-List<T> selectAll(Paging paging);
+  /**
+    * 查询全部
+    *
+    * @param returnType 指定返回类型，如简化的实体类、或者基本类型、Map
+    * @param paging     分页对象
+    * @return
+    */
+    <O> List<O> selectAll(Class<O> returnType, Paging paging);
 ```
+###### 27：根据自定义条件查询返回Map List
 ```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	//查询第1页，一页显示10条，根据创建时间降序
-	Paging paging = new Paging(0,10,"creationTime","desc");
-	//PageHelper<Essay> pageHelper = new PageHelper<>(request);
-	//Paging paging = pageHelper.getPaging()
-	List<Essay> essayList = essayService.selectAll(paging);
-	return super.successHint("获取成功",essayList);
-}
+  /**
+    * 根据自定义条件查询返回Map List
+    *
+    * @param select 查询对象
+    * @return
+    */
+    List<Map<String, Object>> selectMapList(Select select);
 ```
-###### 19：查询全部 分页（指定返回类型）
+###### 28：根据自定义条件查询
 ```java
-<O> List<O> selectAll(Class<O> returnType, Paging paging);
+  /**
+    * 根据自定义条件查询
+    *
+    * @param select 查询对象
+    * @return
+    */
+    List<T> select(Select select);
 ```
+###### 28：根据自定义条件查询
 ```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	//查询第1页，一页显示10条，根据创建时间降序
-	Paging paging = new Paging(0,10,"creationTime","desc");
-	//PageHelper<Essay> pageHelper = new PageHelper<>(request);
-	//Paging paging = pageHelper.getPaging()
-	List<EssayUnion> essayUnionList = essayService.selectAll(EssayUnion.class,paging);
-	//也可以这样使用
-	//返回第一个字段内容，可以用你想要的类型接收
-	//List<String> idList = essayService.selectAll(String.class,paging);
-	//返回Map
-	//List<Map<String,Object>> mapList = essayService.selectAll(Map.class,paging);
-	return super.successHint("获取成功",essayUnionList);
-}
+  /**
+    * 根据自定义条件查询
+    *
+    * @param returnType 指定返回类型，如简化的实体类、或者基本类型、Map
+    * @param select     查询对象
+    * @return
+    */
+    <O> List<O> select(Class<O> returnType, Select select);
 ```
-###### 20：根据自定义条件查询 返回Map
+###### 29：根据自定义条件统计
 ```java
-List<Map<String, Object>> selectMapList(Select select);
+  /**
+    * 根据自定义条件统计
+    *
+    * @param select 查询对象
+    * @return
+    */
+    int count(Select select);
 ```
+###### 30：根据自定义条件统计
 ```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	Select select = new Select();
-	select.column("id");
-	select.column("title");
-	List<Map<String, Object>> mapList = essayService.selectMapList(select);
-	return super.successHint("获取成功",mapList);
-}
-```
-###### 21：根据自定义条件查询
-```java
-List<T> select(Select select);
-```
-```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	Select select = new Select();
-	select.column("id");
-	select.column("title");
-	List<Essay> essayList = essayService.select(select);
-	return super.successHint("获取成功",essayList);
-}
-```
-###### 22：根据自定义条件查询
-```java
-<O> List<O> select(Class<O> returnType, Select select);
-```
-```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	Select select = new Select();
-	select.column("id");
-	select.column("title");
-	List<EssayUnion> essayUnionList = essayService.select(EssayUnion.class, select);
-	//也可以这样使用
-	//返回第一个字段内容,column("你想要的字段")，可以用你想要的类型接收
-	//List<String> idList = essayService.select(String.class,select);
-	//返回Map
-	//List<Map<String,Object>> mapList = essayService.select(Map.class,select);
-	return super.successHint("获取成功",essayUnionList);
-}
-```
-###### 23：根据自定义条件查询
-```java
-long count(Select select);
-```
-```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	Select select = new Select();
-	select.column("id");
-	select.column("title");
-	long count = essayService.select(select);
-	return super.successHint("获取成功",count);
-}
-```
-###### 24：根据自定义条件查询（插件内部使用）
-```java
-long count(Class<?> clazz, Select select);
-```
-```java
-@RequestMapping(value = "getEssay", method = RequestMethod.GET)
-@ResponseBody
-public RS getEssay() {
-	Select select = new Select();
-	select.column("id");
-	select.column("title");
-	long count = essayService.select(EssayUnion.class, select);
-	return super.successHint("获取成功",count);
-}
+  /**
+    * 根据自定义条件统计(内置方法使用)
+    *
+    * @param clazz
+    * @param select 查询对象
+    * @return
+    */
+    int count(Class<?> clazz, Select select);
 ```
