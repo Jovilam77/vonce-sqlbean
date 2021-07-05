@@ -241,7 +241,10 @@ public class SqlBeanMapper {
                     break;
                 case "char":
                 case "java.lang.Character":
-                    value = resultSet.getObject(fieldName, Character.class);
+                    value = resultSet.getString(fieldName);
+                    if (StringUtil.isNotEmpty(value)) {
+                        value = value.toString().charAt(0);
+                    }
                     break;
                 case "java.lang.String":
                     value = resultSet.getString(fieldName);

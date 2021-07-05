@@ -189,14 +189,14 @@ public class EssayController {
 
 #### 文档说明
 
-###### [1. 注解详情与使用](doc/Annotation.md "注解与用法")
-###### [2. Select](doc/Select.md "内置Select相关方法")
-###### [3. Insert](doc/Insert.md "内置Insert相关方法")
-###### [4. Delete](doc/Delete.md "内置Delete相关方法")
-###### [5. Update](doc/Update.md "内置Update相关方法")
-###### [6. 表操作相关](doc/Table.md "表结构操作相关方法")
+###### [1. 注解详情与使用](doc/Annotation.md "注解详情与使用")
+###### [2. Select](doc/Select.md "Select")
+###### [3. Insert](doc/Insert.md "Insert")
+###### [4. Delete](doc/Delete.md "Delete")
+###### [5. Update](doc/Update.md "Update")
+###### [6. 表操作相关](doc/Table.md "表操作相关")
 ###### [7. 分页查询](doc/Paging.md "分页查询")
 ###### [8. Service接口和实现类](doc/Interface.md "Service接口和实现类")
 ###### [9. SqlBean和SqlHelper](doc/SqlHelper.md "SqlBean和SqlHelper")
-###### [10. Where条件和占位符](doc/Where.md "Where条件和占位符")
-###### [11. 数据源相关配置](doc/SqlBeanConfig.md "SqlBeanConfig配置")
+###### [10. Where条件和包装器](doc/Where.md "Where条件和包装器")
+###### [11. 数据源相关配置](doc/SqlBeanConfig.md "数据源相关配置")
