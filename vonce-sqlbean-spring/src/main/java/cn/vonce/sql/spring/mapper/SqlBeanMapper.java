@@ -233,11 +233,29 @@ public class SqlBeanMapper {
                 case "double":
                     value = resultSet.getDouble(fieldName);
                     break;
+                case "java.lang.Double":
+                    value = resultSet.getObject(fieldName);
+                    if (value != null) {
+                        value = resultSet.getDouble(fieldName);
+                    }
+                    break;
                 case "long":
                     value = resultSet.getLong(fieldName);
                     break;
+                case "java.lang.Long":
+                    value = resultSet.getObject(fieldName);
+                    if (value != null) {
+                        value = resultSet.getLong(fieldName);
+                    }
+                    break;
                 case "boolean":
                     value = resultSet.getBoolean(fieldName);
+                    break;
+                case "java.lang.Boolean":
+                    value = resultSet.getObject(fieldName);
+                    if (value != null) {
+                        value = resultSet.getBoolean(fieldName);
+                    }
                     break;
                 case "char":
                 case "java.lang.Character":
