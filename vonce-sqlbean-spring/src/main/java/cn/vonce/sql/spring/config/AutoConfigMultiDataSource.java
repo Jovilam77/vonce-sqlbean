@@ -35,7 +35,6 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
     private Environment environment;
 
     static {
-        fieldList.add("type");
         fieldList.add("driverClassName");
         fieldList.add("url");
         fieldList.add("username");
@@ -87,8 +86,7 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
                 Map<Object, Object> dataSourceMap = new HashMap<>(8);
                 BeanDefinitionBuilder definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(DynamicDataSource.class);
                 StandardEnvironment env = (StandardEnvironment) environment;
-                String type = env.getProperty(MULTI_DATA_SOURCE_TYPE);
-                Class<?> typeClass = getTypeClass(type);
+                Class<?> typeClass = getTypeClass(env.getProperty(MULTI_DATA_SOURCE_TYPE));
                 for (String dataSourceName : dataSourceNameList) {
                     Map<String, Method> methodMap = getMethodMap(typeClass);
                     Object dataSource = null;
@@ -100,17 +98,15 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
                         e.printStackTrace();
                     }
                     for (String fieldName : fieldList) {
-                        if (!fieldName.equals("type")) {
-                            String propertyValue = env.getProperty(MULTI_DATA_SOURCE_PREFIX + "." + dataSourceName + "." + fieldName);
-                            if (StringUtil.isNotEmpty(propertyValue)) {
-                                try {
-                                    Method method = methodMap.get("set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1));
-                                    method.invoke(dataSource, getValueConvert(method.getParameterTypes()[0].getName(), propertyValue));
-                                } catch (IllegalAccessException e) {
-                                    e.printStackTrace();
-                                } catch (InvocationTargetException e) {
-                                    e.printStackTrace();
-                                }
+                        String propertyValue = env.getProperty(MULTI_DATA_SOURCE_PREFIX + "." + dataSourceName + "." + fieldName);
+                        if (StringUtil.isNotEmpty(propertyValue)) {
+                            try {
+                                Method method = methodMap.get("set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1));
+                                method.invoke(dataSource, getValueConvert(method.getParameterTypes()[0].getName(), propertyValue));
+                            } catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                            } catch (InvocationTargetException e) {
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -124,7 +120,6 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
                 for (Map<String, Method> map : classMethodMap.values()) {
                     map.clear();
                 }
-                classMap.clear();
                 classMethodMap.clear();
             }
         }
@@ -166,16 +161,15 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
      * @return
      */
     private Class<?> getTypeClass(String type) {
-        if (typeClass == null) {
-            try {
-                if (StringUtil.isEmpty(type)) {
-                    typeClass = Class.forName(DRUID_DATA_SOURCE_CLASS);
-                } else {
-                    typeClass = Class.forName(type);
-                }
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+        Class<?> typeClass = null;
+        try {
+            if (StringUtil.isEmpty(type)) {
+                typeClass = Class.forName(DRUID_DATA_SOURCE_CLASS);
+            } else {
+                typeClass = Class.forName(type);
             }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
         return typeClass;
     }
