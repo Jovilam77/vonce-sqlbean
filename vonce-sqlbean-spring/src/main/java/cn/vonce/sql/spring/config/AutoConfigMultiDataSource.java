@@ -28,9 +28,9 @@ import java.util.*;
 public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar, EnvironmentAware {
 
     private final static List<String> fieldList = new ArrayList<>();
+    private final static String MULTI_DATA_SOURCE_TYPE = "spring.datasource.type";
     private final static String MULTI_DATA_SOURCE_PREFIX = "spring.datasource.sqlbean";
     private final static String DRUID_DATA_SOURCE_CLASS = "com.alibaba.druid.pool.DruidDataSource";
-    private final static Map<String, Class<?>> classMap = new WeakHashMap<>(8);
     private final static Map<Class<?>, Map<String, Method>> classMethodMap = new WeakHashMap<>(8);
     private Environment environment;
 
@@ -87,9 +87,9 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
                 Map<Object, Object> dataSourceMap = new HashMap<>(8);
                 BeanDefinitionBuilder definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(DynamicDataSource.class);
                 StandardEnvironment env = (StandardEnvironment) environment;
+                String type = env.getProperty(MULTI_DATA_SOURCE_TYPE);
+                Class<?> typeClass = getTypeClass(type);
                 for (String dataSourceName : dataSourceNameList) {
-                    String type = env.getProperty(MULTI_DATA_SOURCE_PREFIX + "." + dataSourceName + ".type");
-                    Class<?> typeClass = getTypeClass(dataSourceName, type);
                     Map<String, Method> methodMap = getMethodMap(typeClass);
                     Object dataSource = null;
                     try {
@@ -162,12 +162,10 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
     /**
      * 获取数据库连接类型
      *
-     * @param dataSourceName
      * @param type
      * @return
      */
-    private Class<?> getTypeClass(String dataSourceName, String type) {
-        Class<?> typeClass = classMap.get(dataSourceName);
+    private Class<?> getTypeClass(String type) {
         if (typeClass == null) {
             try {
                 if (StringUtil.isEmpty(type)) {
@@ -178,7 +176,6 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            classMap.put(dataSourceName, typeClass);
         }
         return typeClass;
     }
