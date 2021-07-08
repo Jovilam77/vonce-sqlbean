@@ -14,7 +14,7 @@
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
-		<version>1.5.0-beta</version>
+		<version>1.5.0-beta3</version>
 	</dependency>
 ###### 2：标注实体类
 ```java
@@ -34,8 +34,8 @@ public class Essay {
 	//@SqlColumn("creation_time" ) 常规情况下可不写
 	private Date creationTime;
 
-    @SqlVersion //标识乐观锁字段
-    //@SqlColumn("update_time" ) 常规情况下可不写
+        @SqlVersion //标识乐观锁字段
+        //@SqlColumn("update_time" ) 常规情况下可不写
 	private Date updateTime;
 	
 	/**省略get set方法*/
@@ -73,7 +73,7 @@ public class EssayController {
 	//查询
 	@GetMapping("select")
 	public RS select() {
-		//查询列表  全部
+	//查询列表  全部
         List<Essay> list = essayService.selectAll();
         //查询列表  根据条件查询 方式一
         list = essayService.selectByCondition("& > ?", SqlEssay.id, 20);
@@ -109,20 +109,20 @@ public class EssayController {
 
         //用于查询Map 多条结果时会报错
         Map<String, Object> map = essayService.selectMap(select);
-		//用于查询Map列表
+	//用于查询Map列表
         List<Map<String, Object>> mapList = essayService.selectMapList(select);
 
         //用于查询对象列表
         list = essayService.select(select);
 		
         return super.successHint("获取成功", list);
-		//更多用法请查看下方详细文档...
+	//更多用法请查看下方详细文档...
 	}
 
 	//分页
 	@GetMapping("getList")
 	public RS getList(HttpServletRequest request) {
-		// 查询对象
+	// 查询对象
         Select select = new Select();
         // 分页助手ReqPageHelper
         ReqPageHelper<Essay> pageHelper = new ReqPageHelper<>(request);
@@ -142,42 +142,42 @@ public class EssayController {
 	@PostMapping("update")
 	public RS update(Essay essay) {
 	    //根据bean内部id更新
-		long i = essayService.updateByBeanId(essay);
-		//根据外部id更新 参数3的true代表仅更新不为null字段 参数4的true代表使用乐观锁
-        //i = essayService.updateById(essay,20,true,true);
-		//根据条件更新 参数2的true代表仅更新不为null字段 参数3的true代表使用乐观锁
-        //i = essayService.updateByCondition(essay,true,true,Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
-		//更多用法请查看下方详细文档...
-        if (i > 0) {
-			return super.successHint("更新成功");
-		}
-		return super.othersHint("更新失败");
+	    long i = essayService.updateByBeanId(essay);
+	    //根据外部id更新 参数3的true代表仅更新不为null字段 参数4的true代表使用乐观锁
+            //i = essayService.updateById(essay,20,true,true);
+	    //根据条件更新 参数2的true代表仅更新不为null字段 参数3的true代表使用乐观锁
+            //i = essayService.updateByCondition(essay,true,true,Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
+	    //更多用法请查看下方详细文档...
+            if (i > 0) {
+		return super.successHint("更新成功");
+	    }
+	    return super.othersHint("更新失败");
 	}
 
 	//删除
 	@PostMapping("deleteById")
 	public RS deleteById(Integer[] id) {
 	    //根据id删除
-		long i = essayService.deleteById(id);
-		//根据条件删除
-        //i = essayService.deleteByCondition(Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
-        //更多用法请查看下方详细文档...
-        if (i > 0) {
-			return super.successHint("删除成功");
-		}
-		return super.othersHint("删除失败");
+	    long i = essayService.deleteById(id);
+	    //根据条件删除
+	    //i = essayService.deleteByCondition(Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
+	    //更多用法请查看下方详细文档...
+	    if (i > 0) {
+	        return super.successHint("删除成功");
+	    }
+	    return super.othersHint("删除失败");
 	}
 
 	//插入
 	@PostMapping("add")
 	public RS add() {
-		List<Essay> essayList = new ArrayList<>();
-		for (int i = 0; i < 100; i++) {
-			Essay essay = new Essay(i, "name" + i);
-			essayList.add(essay);
-		}
-		essayService.insert(essayList);
-		return successHint("成功");
+	     List<Essay> essayList = new ArrayList<>();
+	     for (int i = 0; i < 100; i++) {
+		  Essay essay = new Essay(i, "name" + i);
+		  essayList.add(essay);
+	     }
+	     essayService.insert(essayList);
+	     return successHint("成功");
 	}
 
 }
@@ -189,14 +189,14 @@ public class EssayController {
 
 #### 文档说明
 
-###### [1. 注解详情与使用](doc/Annotation.md "注解与用法")
-###### [2. Select](doc/Select.md "内置Select相关方法")
-###### [3. Insert](doc/Insert.md "内置Insert相关方法")
-###### [4. Delete](doc/Delete.md "内置Delete相关方法")
-###### [5. Update](doc/Update.md "内置Update相关方法")
-###### [6. 表操作相关](doc/Table.md "表结构操作相关方法")
+###### [1. 注解详情与使用](doc/Annotation.md "注解详情与使用")
+###### [2. Select](doc/Select.md "Select")
+###### [3. Insert](doc/Insert.md "Insert")
+###### [4. Delete](doc/Delete.md "Delete")
+###### [5. Update](doc/Update.md "Update")
+###### [6. 表操作相关](doc/Table.md "表操作相关")
 ###### [7. 分页查询](doc/Paging.md "分页查询")
 ###### [8. Service接口和实现类](doc/Interface.md "Service接口和实现类")
 ###### [9. SqlBean和SqlHelper](doc/SqlHelper.md "SqlBean和SqlHelper")
-###### [10. Where条件和占位符](doc/Where.md "Where条件和占位符")
-###### [11. 数据源相关配置](doc/SqlBeanConfig.md "SqlBeanConfig配置")
+###### [10. Where条件和包装器](doc/Where.md "Where条件和包装器")
+###### [11. 多数据源动态Schema读写分离相关配置](doc/DataSourceConfig.md "多数据源动态Schema读写分离相关配置")
