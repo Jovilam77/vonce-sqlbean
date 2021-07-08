@@ -199,4 +199,4 @@ public class EssayController {
 ###### [8. Service接口和实现类](doc/Interface.md "Service接口和实现类")
 ###### [9. SqlBean和SqlHelper](doc/SqlHelper.md "SqlBean和SqlHelper")
 ###### [10. Where条件和包装器](doc/Where.md "Where条件和包装器")
-###### [11. 数据源相关配置](doc/SqlBeanConfig.md "数据源相关配置")
+###### [11. 多数据源动态Schema读写分离相关配置](doc/DataSourceConfig.md "多数据源动态Schema读写分离相关配置")
