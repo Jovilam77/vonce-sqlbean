@@ -1,6 +1,6 @@
-#### 注解说明和使用
+#### 一. 注解说明和使用
 ```java
-1：@SqlTable     //标识表名
+1.@SqlTable     //标识表名
 ```
 属性  | 解释  | 默认 | 必须
  :----: | :-----: | :-----: | :------:  
@@ -13,7 +13,7 @@
  schema  | schema | "" | 否
 
 ```java
-2：@SqlId     //标识id，目前仅支持UUID, SNOWFLAKE_ID_16, SNOWFLAKE_ID_18，请查看IdType枚举类
+2.@SqlId     //标识id，目前仅支持UUID, SNOWFLAKE_ID_16, SNOWFLAKE_ID_18，请查看IdType枚举类
 ```
 
 属性  | 解释  | 默认 | 必须
@@ -21,7 +21,7 @@
  type  | 生成类型 | IdType.NORMAL | 否
 
 ```java
-3：@SqlColumn     //标识字段名
+3.@SqlColumn     //标识字段名
 ```
 
 属性  | 解释  | 默认 | 必须
@@ -35,11 +35,11 @@
  ignore  | 是否忽略该字段 | false | 否
 
 ```java
-4：@SqlUnion     //标识表连接并继承于某个实体类（主表）
+4.@SqlUnion     //标识表连接并继承于某个实体类（主表）
 ```
 
 ```java
-5：@SqlJoin       //标识表连接
+5.@SqlJoin       //标识表连接
 ```
 
 属性  | 解释  | 默认 | 必须
@@ -55,22 +55,22 @@
 
 
 ```java
-6：@SqlVersion   //标识乐观锁版本，仅支持int、long、Date、Timestamp类型
+6.@SqlVersion   //标识乐观锁版本，仅支持int、long、Date、Timestamp类型
 ```
 
 ```java
-7：@SqlLogically //标识逻辑删除，请配合logicallyDeleteById、logicallyDeleteByCondition这两个方法使用，请查看内置Delete文档
+7.@SqlLogically //标识逻辑删除，请配合logicallyDeleteById、logicallyDeleteByCondition这两个方法使用，请查看内置Delete文档
 ```
 
 ```java
-8：@SqlInsertTime //标识插入时间，标识的字段在插入时为null将自动赋值
+8.@SqlInsertTime //标识插入时间，标识的字段在插入时为null将自动赋值
 ```
 
 ```java
-9：@SqlUpdateTime //标识更新时间，标识的字段在更新时为null将自动赋值
+9.@SqlUpdateTime //标识更新时间，标识的字段在更新时为null将自动赋值
 ```
 
-#### 示例：单表用法（该例子已包含表生成、常量生成、id生成、乐观锁、插入时间、更新时间）
+#### 二. 示例.单表用法（该例子已包含表生成、常量生成、id生成、乐观锁、插入时间、更新时间）
 ```java
 @SqlTable("d_essay") //表名
 public class Essay {
@@ -109,7 +109,7 @@ public class Essay {
 }
 ```
 
-#### 示例：生成的Sql常量（maven编译之后自动生成，不会存在项目中，命名为Sql + 实体类名）
+#### 三. 示例.生成的Sql常量（maven编译之后自动生成，不会存在项目中，命名为Sql + 实体类名）
 ```java
 package com.xxx.xxx.model.sql;
 
@@ -144,7 +144,7 @@ public class SqlEssay {
   public static final Column updateTime = new Column(_schema,_tableAlias,"update_time","");
 }
 ```
-#### 示例：主外键联表查询的用法
+#### 四. 示例.主外键联表查询的用法
 ```java
 @SqlUnion//标识该类是个包装类并继承于某个实体类（主表）
 public class EssayUnion extends Essay {
@@ -159,7 +159,7 @@ public class EssayUnion extends Essay {
 
 }
 ```
-#### 示例：指定某字段关联查询的用法
+#### 五. 示例.指定某字段关联查询的用法
 ```java
 @SqlUnion//标识该类是个包装类并继承于某个实体类（主表）
 public class EssayUnion extends Essay {
@@ -175,23 +175,23 @@ public class EssayUnion extends Essay {
 
 }
 ```
-#### 示例：关联不同字段查询多个字段的用法
+#### 六. 示例.关联不同字段查询多个字段的用法
 ```java
 @SqlUnion//标识该类是个包装类并继承于某个实体类（主表），该例子连表查询了两个用户信息，所以需要使用表别名
 public class EssayUnion extends Essay {
 
 	//查询文章发布者名称
-	//注意：这里用到了表别名d_user0
+	//注意.这里用到了表别名d_user0
 	@SqlJoin(value = "nickname", table = "d_user", tableAlias = "d_user0", tableKeyword = "id", mainKeyword = "userId")
 	private String userNickname;
 
 	//查询文章发布者的头像
-	//注意：这里用到了表别名d_user0
+	//注意.这里用到了表别名d_user0
 	@SqlJoin(value = "headPortrait", table = "d_user" tableAlias = "d_user0", tableKeyword = "id", mainKeyword = "userId")
 	private String userHeadPortrait;
 
 	//查询文章原作者名称（可能不是同一个人）
-	//注意：这里用到了表别名d_user1
+	//注意.这里用到了表别名d_user1
 	@SqlJoin(value = "nickname", type = JoinType.LEFT_JOIN, table = "d_user", tableAlias = "d_user1", tableKeyword = "id", mainKeyword = "originalAuthorId")
 	private String originalAuthorName;
 
