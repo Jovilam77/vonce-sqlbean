@@ -1,4 +1,4 @@
-#### Insert对象使用示例（常规情况下不使用该方式，查看下方文档使用更简便方式）
+#### 一. Insert对象使用示例（常规情况下不使用该方式，查看下方文档使用更简便方式）
 ```java
     Date date = new Date();
     //单条插入
@@ -31,7 +31,7 @@
     insert2.setInsertBean(essay);
     essayService.insert(insert2);
 ```
-#### InsertService接口文档
+#### 二. InsertService接口文档
 ###### 1：插入单条或多条数组形式的数据
 ```java
   /**
