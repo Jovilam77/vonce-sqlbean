@@ -1,4 +1,4 @@
-#### Select对象使用示例（复杂查询或灵活性较高时使用，查看下方文档使用更简便方式）
+#### 一. Select对象使用示例（复杂查询或灵活性较高时使用，查看下方文档使用更简便方式）
 ```java
     Select select = new Select();
     //指定查询的列
@@ -17,8 +17,8 @@
     
     essayService.select(select);
 ```
-#### SelectService接口文档
-###### 1：根据id条件查询
+#### 二. SelectService接口文档
+###### 1.根据id条件查询
 ```java
   /**
     * 根据id条件查询
@@ -28,7 +28,7 @@
     */
     T selectById(ID id);
 ```
-###### 2：根据id条件查询
+###### 2.根据id条件查询
 ```java
   /**
     * 根据id条件查询
@@ -39,7 +39,7 @@
     */
     <O> O selectById(Class<O> returnType, ID id);
 ```
-###### 3：根据ids条件查询
+###### 3.根据ids条件查询
 ```java
   /**
     * 根据ids条件查询
@@ -47,9 +47,9 @@
     * @param ids 单个id主键或数组
     * @return
     */
-    List<T> selectByIds(ID... ids);
+    List<T> selectByIds(ID...ids);
 ```
-###### 4：根据ids条件查询
+###### 4.根据ids条件查询
 ```java
   /**
     * 根据id条件查询
@@ -58,9 +58,9 @@
     * @param ids        单个id主键或数组
     * @return
     */
-    <O> List<O> selectByIds(Class<O> returnType, ID... ids);
+    <O> List<O> selectByIds(Class<O> returnType, ID...ids);
 ```
-###### 5：根据自定义条件查询
+###### 5.根据自定义条件查询
 ```java
   /**
     * 根据自定义条件查询
@@ -70,7 +70,7 @@
     */
     T selectOne(Select select);
 ```
-###### 6：根据自定义条件查询
+###### 6.根据自定义条件查询
 ```java
   /**
     * 根据自定义条件查询
@@ -81,7 +81,7 @@
     */
     <O> O selectOne(Class<O> returnType, Select select);
 ```
-###### 7：根据自定义条件查询返回Map
+###### 7.根据自定义条件查询返回Map
 ```java
   /**
     * 根据自定义条件查询返回Map
@@ -91,7 +91,7 @@
     */
     Map<String, Object> selectMap(Select select);
 ```
-###### 8：根据条件查询
+###### 8.根据条件查询
 ```java
   /**
     * 根据条件查询
@@ -100,9 +100,9 @@
     * @param args  条件参数
     * @return
     */
-    T selectOneByCondition(String where, Object... args);
+    T selectOneByCondition(String where, Object...args);
 ```
-###### 9：根据条件查询
+###### 9.根据条件查询
 ```java
   /**
     * 根据条件查询
@@ -112,9 +112,9 @@
     * @param args       条件参数
     * @return
     */
-    <O> O selectOneByCondition(Class<O> returnType, String where, Object... args);
+    <O> O selectOneByCondition(Class<O> returnType, String where, Object...args);
 ```
-###### 10：根据条件查询
+###### 10.根据条件查询
 ```java
   /**
     * 根据条件查询
@@ -124,7 +124,7 @@
     */
     T selectOneByCondition(Wrapper where);
 ```
-###### 11：根据条件查询
+###### 11.根据条件查询
 ```java
   /**
     * 根据条件查询
@@ -135,7 +135,7 @@
     */
     <O> O selectOneByCondition(Class<O> returnType, Wrapper where);
 ```
-###### 12：根据条件查询
+###### 12.根据条件查询
 ```java
   /**
     * 根据条件查询
@@ -144,9 +144,9 @@
     * @param args  条件参数
     * @return
     */
-    List<T> selectByCondition(String where, Object... args);
+    List<T> selectByCondition(String where, Object...args);
 ```
-###### 13：根据条件查询
+###### 13.根据条件查询
 ```java
   /**
     * 根据条件查询
@@ -156,7 +156,7 @@
     */
     List<T> selectByCondition(Wrapper where);
 ```
-###### 14：根据条件查询
+###### 14.根据条件查询
 ```java
   /**
     * 根据条件查询
@@ -166,9 +166,9 @@
     * @param args   条件参数
     * @return
     */
-    List<T> selectByCondition(Paging paging, String where, Object... args);
+    List<T> selectByCondition(Paging paging, String where, Object...args);
 ```
-###### 15：根据条件查询
+###### 15.根据条件查询
 ```java
   /**
     * 根据条件查询
@@ -179,7 +179,7 @@
     */
     List<T> selectByCondition(Paging paging, Wrapper where);
 ```
-###### 16：根据条件查询
+###### 16.根据条件查询
 ```java
   /**
     * 根据条件查询
@@ -189,9 +189,9 @@
     * @param args       条件参数
     * @return
     */
-    <O> List<O> selectByCondition(Class<O> returnType, String where, Object... args);
+    <O> List<O> selectByCondition(Class<O> returnType, String where, Object...args);
 ```
-###### 17：根据条件查询
+###### 17.根据条件查询
 ```java
   /**
     * 根据条件查询
@@ -202,7 +202,7 @@
     */
     <O> List<O> selectByCondition(Class<O> returnType, Wrapper where);
 ```
-###### 18：根据条件查询
+###### 18.根据条件查询
 ```java
   /**
     * 根据条件查询
@@ -213,9 +213,9 @@
     * @param args       条件参数
     * @return
     */
-    <O> List<O> selectByCondition(Class<O> returnType, Paging paging, String where, Object... args);
+    <O> List<O> selectByCondition(Class<O> returnType, Paging paging, String where, Object...args);
 ```
-###### 19：根据条件查询
+###### 19.根据条件查询
 ```java
   /**
     * 根据条件查询
@@ -227,7 +227,7 @@
     */
     <O> List<O> selectByCondition(Class<O> returnType, Paging paging, Wrapper where);
 ```
-###### 20：根据条件查询统计
+###### 20.根据条件查询统计
 ```java
   /**
     * 根据条件查询统计
@@ -236,9 +236,9 @@
     * @param args  条件参数
     * @return
     */
-    int selectCountByCondition(String where, Object... args);
+    int selectCountByCondition(String where, Object...args);
 ```
-###### 21：根据条件查询统计
+###### 21.根据条件查询统计
 ```java
   /**
     * 根据条件查询统计
@@ -248,7 +248,7 @@
     */
     int selectCountByCondition(Wrapper where);
 ```
-###### 22：统计全部
+###### 22.统计全部
 ```java
   /**
     * 统计全部
@@ -257,7 +257,7 @@
     */
     int countAll();
 ```
-###### 23：查询全部
+###### 23.查询全部
 ```java
   /**
     * 查询全部
@@ -266,7 +266,7 @@
     */
     List<T> selectAll();
 ```
-###### 24：查询全部
+###### 24.查询全部
 ```java
   /**
     * 查询全部
@@ -276,7 +276,7 @@
     */
     <O> List<O> selectAll(Class<O> returnType);
 ```
-###### 25：查询全部
+###### 25.查询全部
 ```java
   /**
     * 查询全部
@@ -286,7 +286,7 @@
     */
     List<T> selectAll(Paging paging);
 ```
-###### 26：查询全部
+###### 26.查询全部
 ```java
   /**
     * 查询全部
@@ -297,7 +297,7 @@
     */
     <O> List<O> selectAll(Class<O> returnType, Paging paging);
 ```
-###### 27：根据自定义条件查询返回Map List
+###### 27.根据自定义条件查询返回Map List
 ```java
   /**
     * 根据自定义条件查询返回Map List
@@ -307,7 +307,7 @@
     */
     List<Map<String, Object>> selectMapList(Select select);
 ```
-###### 28：根据自定义条件查询
+###### 28.根据自定义条件查询
 ```java
   /**
     * 根据自定义条件查询
@@ -317,7 +317,7 @@
     */
     List<T> select(Select select);
 ```
-###### 28：根据自定义条件查询
+###### 29.根据自定义条件查询
 ```java
   /**
     * 根据自定义条件查询
@@ -328,7 +328,7 @@
     */
     <O> List<O> select(Class<O> returnType, Select select);
 ```
-###### 29：根据自定义条件统计
+###### 30.根据自定义条件统计
 ```java
   /**
     * 根据自定义条件统计
@@ -338,7 +338,7 @@
     */
     int count(Select select);
 ```
-###### 30：根据自定义条件统计
+###### 31.根据自定义条件统计
 ```java
   /**
     * 根据自定义条件统计(内置方法使用)

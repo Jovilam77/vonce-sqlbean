@@ -1,24 +1,24 @@
 ## Sqlbean
 #### 介绍
 ###### Sqlbean是一款使用Java面向对象思想来编写并生成Sql语句的工具，在此基础上对Mybatis和Spring Jdbc实现了类似于JPA的轻量级插件支持。其中内置大量常用SQL执行的方法，可以非常方便的达到你想要的目的，相对复杂的SQL语句也得以支持，在常规的项目开发几乎做到不写DAO层，可以有效的提高项目开发的效率，让开发者更专注于业务代码的编写。
+ 
+###### 🚀特点: 0入侵, 多数据源, 动态Schema, 读写分离, 自动建表, 连表查询, 乐观锁, 分页, 支持Mybatis和Spring Jdbc
+###### 💻环境: JDK7+, Mybatis3.2.4+, (Spring MVC 4.1.2+, Spring Boot 1.x, Spring Boot 2.x)
+###### 💿数据库: Mysql, MariaDB, Oracle, Sqlserver2008+, PostgreSQL, DB2, Derby, Sqlite, HSQL, H2
 
-###### 特点：零入侵、多数据源、动态Schema、读写分离、自动建表、连表查询、乐观锁、分页、支持Mybatis和Spring Jdbc
-###### 环境：JDK7+，Mybatis3.2.4+，(Spring MVC 4.1.2+ 或 Spring Boot 1.x 或 Spring Boot 2.x)
-###### 数据库：Mysql，MariaDB，Oracle，Sqlserver2008+，PostgreSQL，DB2，Derby，Sqlite，HSQL，H2
-
-###### Sqlbean For Android请移步这里👉 [gitee](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")， [github](https://github.com/Jovilam77/vonce-sqlbean-android "vonce-sqlbean-android")
+###### Sqlbean For Android请移步这里👉 [gitee](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android"), [github](https://github.com/Jovilam77/vonce-sqlbean-android "vonce-sqlbean-android")
 
 
 #### 简单上手
-###### 1：引入Maven依赖
+###### 1.引入Maven依赖
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
 		<version>1.5.0-beta3</version>
 	</dependency>
-###### 2：标注实体类
+###### 2.标注实体类
 ```java
-@SqlTable("d_essay")
+@SqlTable("d_essay") //标识表名
 public class Essay {
 
 	@SqlId(type = IdType.SNOWFLAKE_ID_16) //标识id字段
@@ -42,26 +42,26 @@ public class Essay {
 	
 }
 ```
-###### 3：无需Dao层，Service层接口只需继承SqlBeanService<实体类,ID>
+###### 3.无需Dao层，Service层接口只需继承SqlBeanService<实体类, ID>
 
 ```java
-public interface EssayService extends SqlBeanService<Essay,String> {
+public interface EssayService extends SqlBeanService<Essay, Long> {
 
 	//已内置大量常用查询、更新、删除、插入方法，这里可以写自己封装的方法
 
 }
 ```
-###### 4：Service实现类只需继承MybatisSqlBeanServiceImpl<实体类,ID>和实现你的Service接口
+###### 4.Service实现类只需继承MybatisSqlBeanServiceImpl<实体类, ID>和实现你的Service接口
 ```java
 //使用Spring Jdbc的话将继承的父类改成SpringJdbcSqlBeanServiceImpl即可
 @Service
-public class EssayServiceImpl extends MybatisSqlBeanServiceImpl<Essay,String> implements EssayService {
+public class EssayServiceImpl extends MybatisSqlBeanServiceImpl<Essay, Long> implements EssayService {
 
 	
 
 }
 ```
-###### 5：Controller层
+###### 5.Controller层
 ```java
 @RequestMapping("essay")
 @RestController
@@ -185,18 +185,18 @@ public class EssayController {
 ```
 
 
-##### ↓↓↓更多用法请查看下方文档↓↓↓
+##### 👇👇👇更多用法请查看下方文档👇👇👇
 
 #### 文档说明
 
-###### [1. 注解详情与使用](doc/Annotation.md "注解详情与使用")
-###### [2. Select](doc/Select.md "Select")
-###### [3. Insert](doc/Insert.md "Insert")
-###### [4. Delete](doc/Delete.md "Delete")
-###### [5. Update](doc/Update.md "Update")
-###### [6. 表操作相关](doc/Table.md "表操作相关")
-###### [7. 分页查询](doc/Paging.md "分页查询")
-###### [8. Service接口和实现类](doc/Interface.md "Service接口和实现类")
-###### [9. SqlBean和SqlHelper](doc/SqlHelper.md "SqlBean和SqlHelper")
-###### [10. Where条件和包装器](doc/Where.md "Where条件和包装器")
-###### [11. 多数据源动态Schema读写分离相关配置](doc/DataSourceConfig.md "多数据源动态Schema读写分离相关配置")
+###### [0️⃣. 注解详情与使用](doc/Annotation.md "注解详情与使用")
+###### [1️⃣. Select](doc/Select.md "Select")
+###### [2️⃣. Insert](doc/Insert.md "Insert")
+###### [3️⃣. Delete](doc/Delete.md "Delete")
+###### [4️⃣. Update](doc/Update.md "Update")
+###### [5️⃣. 表操作相关](doc/Table.md "表操作相关")
+###### [6️⃣. 分页查询](doc/Paging.md "分页查询")
+###### [7️⃣. Service接口和实现类](doc/Interface.md "Service接口和实现类")
+###### [8️⃣. SqlBean和SqlHelper](doc/SqlHelper.md "SqlBean和SqlHelper")
+###### [9️⃣. Where条件和包装器](doc/Where.md "Where条件和包装器")
+###### [🔟. 多数据源动态Schema读写分离相关配置](doc/DataSourceConfig.md "多数据源动态Schema读写分离相关配置")

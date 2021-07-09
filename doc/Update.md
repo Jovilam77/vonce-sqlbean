@@ -1,4 +1,4 @@
-#### Update对象使用示例（常规情况下不使用该方式，查看下方文档使用更简便方式）
+#### 一. Update对象使用示例（常规情况下不使用该方式，查看下方文档使用更简便方式）
 ```java
     Essay essay = essayService.selectById(1L);
 
@@ -23,7 +23,7 @@
     
     essayService.update(update);
 ```
-#### UpdateService接口文档
+#### 二. UpdateService接口文档
 ###### 1：根据id条件更新
 ```java
   /**

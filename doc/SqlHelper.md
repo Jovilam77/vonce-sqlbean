@@ -1,11 +1,11 @@
-## 说明
+#### 说明
 ```
 本插件所有内置方法内部均通过SqlBean + SqlHelper来生成的Sql语句交给Mybatis或Spring JDBC执行，
 所以以下例子使用方式同样适用于内置的方法，传递给内置方法的SqlBean可以不设置Sql语句的table，
 内部处理的时候发现table不存在的话会自动配置，Select语句连表查询的话仅支持自动补充主表的table。
 
 ```
-## SqlHelper 生成Sql语句
+#### 一. SqlHelper 生成Sql语句
 ```java
    String selectSql =  SqlHelper.buildSelectSql(select);
    String insertSql =  SqlHelper.buildInsertSql(insert);
@@ -13,14 +13,14 @@
    String deleteSql =  SqlHelper.buildDeleteSql(delete);
 ```
 
-## SqlBeanDB
+#### 二. SqlBeanDB
 ```java
     SqlBeanDB sqlBeanDB = new SqlBeanDB();
     sqlBeanDB.setDbType(DbType.MySQL);
     sqlBeanDB.setSqlBeanConfig(new SqlBeanConfig());
 ```
 
-## SqlBean - Select
+#### 三. Select查询对象
 ```java
     private static void select1(SqlBeanDB sqlBeanDB) {
         Select select = new Select();
@@ -79,7 +79,7 @@
     }
 ```
 
-## SqlBean - Insert
+#### 四. Insert插入对象
 ```java
     private static void insert1(SqlBeanDB sqlBeanDB) {
         Insert insert = new Insert();
@@ -113,7 +113,7 @@
     }
 ```
 
-## SqlBean - Update
+#### 五. Update更新对象
 ```java
     private static void update(SqlBeanDB sqlBeanDB) {
         User user = new User();
@@ -132,7 +132,7 @@
     }
 ```
 
-## SqlBean - Delete
+#### 六. Delete删除对象
 ```java
     private static void delete(SqlBeanDB sqlBeanDB) {
         Delete delete = new Delete();
