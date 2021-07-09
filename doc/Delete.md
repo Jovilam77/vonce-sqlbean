@@ -1,4 +1,4 @@
-#### Delete对象使用示例（常规情况下不使用该方式，查看下方文档使用更简便方式）
+#### 一. Delete对象使用示例（常规情况下不使用该方式，查看下方文档使用更简便方式）
 ```java
     Delete delete = new Delete();
 	
@@ -18,7 +18,7 @@
 	
     essayService.delete(delete);
 ```
-#### DeleteService接口文档
+#### 二. DeleteService接口文档
 ###### 1：根据id条件删除
 ```java
   /**
