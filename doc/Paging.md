@@ -1,4 +1,4 @@
-##分页查询
+#### 说明
 ###### 分页属性，请求时将需要的参数拼上传给后台，new PageHelper<>(request)会自动获取，pagenum从0开始做为第1页
 ```java
 //当前页
@@ -12,8 +12,7 @@ private String sortorder;
 //时间戳
 private String timestamp;
 ```
-#### 方法一
-##### 返回分页数据包含页数总数信息
+#### 一. 返回分页数据包含页数总数信息
 ```java
 @RequestMapping(value = "getList", method = RequestMethod.GET)
 @ResponseBody
@@ -29,8 +28,7 @@ public RS getList(HttpServletRequest request) {
 	return super.customHint(pageHelper.toResult("获取文章列表成功"));//返回结果
 }
 ```
-#### 方法二
-##### 返回分页数据包含页数总数信息
+#### 二. 返回分页数据包含页数总数信息
 ```java
 @RequestMapping(value = "getList", method = RequestMethod.GET)
 @ResponseBody
@@ -46,8 +44,7 @@ public RS getList(HttpServletRequest request) {
 	return super.customHint(pageHelper.toResult("获取文章列表成功"));
 }
 ```
-#### 方法三
-##### 仅返回分页数据
+#### 三. 仅返回分页数据
 ```java
 @RequestMapping(value = "getList", method = RequestMethod.GET)
 @ResponseBody
