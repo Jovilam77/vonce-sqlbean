@@ -123,7 +123,9 @@ public class SqlBeanMapper {
                         }
                         fieldName = subTableAlias + SqlConstant.UNDERLINE + fieldName;
                     }
-                    setFieldValue(bean, field, fieldName, resultSet);
+                    if (columnNameList.contains(fieldName)) {
+                        setFieldValue(bean, field, fieldName, resultSet);
+                    }
                 }
             } else {
                 //优先使用 表别名+字段名才方式匹配
@@ -136,7 +138,9 @@ public class SqlBeanMapper {
                         newFieldName = fieldName;
                     }
                 }
-                setFieldValue(bean, field, newFieldName, resultSet);
+                if (columnNameList.contains(newFieldName)) {
+                    setFieldValue(bean, field, newFieldName, resultSet);
+                }
             }
         }
         return bean;
