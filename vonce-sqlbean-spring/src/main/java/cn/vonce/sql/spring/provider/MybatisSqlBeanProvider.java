@@ -272,7 +272,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String selectTableList(Map<String, Object> map) {
-        return SqlBeanProvider.selectTableListSql((SqlBeanDB) map.get("sqlBeanDB"));
+        return SqlBeanProvider.selectTableListSql((SqlBeanDB) map.get("sqlBeanDB"), (String) map.get("name"));
     }
 
     /**
