@@ -559,7 +559,14 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.MASTER)
     @Override
     public void dropTable() {
-        mybatisSqlBeanDao.drop(getSqlBeanDB(), clazz);
+        SqlBeanDB sqlBeanDB = getSqlBeanDB();
+        if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.PostgreSQL && sqlBeanDB.getDbType() != DbType.SQLServer) {
+            List<String> nameList = mybatisSqlBeanDao.selectTableList(getSqlBeanDB(), SqlBeanUtil.getTable(clazz));
+            if (nameList == null || nameList.isEmpty()) {
+                return;
+            }
+        }
+        mybatisSqlBeanDao.drop(sqlBeanDB, clazz);
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -578,6 +585,6 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<String> getTableList() {
-        return mybatisSqlBeanDao.selectTableList(getSqlBeanDB());
+        return mybatisSqlBeanDao.selectTableList(getSqlBeanDB(), null);
     }
 }
