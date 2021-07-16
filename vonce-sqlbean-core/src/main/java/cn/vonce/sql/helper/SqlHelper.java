@@ -345,8 +345,17 @@ public class SqlHelper {
      */
     public static String buildDrop(Drop drop) {
         StringBuffer dropSql = new StringBuffer();
-        dropSql.append("DROP TABLE IF EXISTS ");
-        dropSql.append(getTableName(drop.getTable(), drop));
+        String tableName = getTableName(drop.getTable(), drop);
+        if (drop.getSqlBeanDB().getDbType() == DbType.MySQL || drop.getSqlBeanDB().getDbType() == DbType.MariaDB || drop.getSqlBeanDB().getDbType() == DbType.PostgreSQL) {
+            dropSql.append("DROP TABLE IF EXISTS ");
+            dropSql.append(tableName);
+        } else if (drop.getSqlBeanDB().getDbType() == DbType.MySQL) {
+            dropSql.append("IF OBJECT_ID(N'" + tableName + "', N'U') IS NOT NULL ");
+            dropSql.append("DROP TABLE " + tableName + " ");
+        } else {
+            dropSql.append("DROP TABLE ");
+            dropSql.append(tableName);
+        }
         return dropSql.toString();
     }
 
