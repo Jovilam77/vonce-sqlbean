@@ -498,28 +498,28 @@ public class SqlBeanProvider {
      * @param sqlBeanDB
      * @return
      */
-    public static String selectTableListSql(SqlBeanDB sqlBeanDB) {
+    public static String selectTableListSql(SqlBeanDB sqlBeanDB, String name) {
         switch (sqlBeanDB.getDbType()) {
             case MySQL:
             case MariaDB:
-                return "select table_name as `name` from information_schema.tables where table_schema = database() and table_type = 'BASE TABLE'";
+                return "select table_name as `name` from information_schema.tables where table_schema = database() and table_type = 'BASE TABLE'" + (StringUtil.isNotEmpty(name) ? " and table_name = '" + name + "'" : "");
             case SQLServer:
-                return "select name from sysobjects where xtype='U'";
+                return "select name from sysobjects where xtype='U'" + (StringUtil.isNotEmpty(name) ? " and name = '" + name + "'" : "");
             case Oracle:
-                return "select table_name as \"name\" from user_tables";
+                return "select table_name as \"name\" from user_tables" + (StringUtil.isNotEmpty(name) ? " and table_name = '" + name + "'" : "");
             case PostgreSQL:
-                return "select tablename as \"name\" from pg_tables where schemaname = 'public'";
+                return "select tablename as \"name\" from pg_tables where schemaname = 'public'" + (StringUtil.isNotEmpty(name) ? " and tablename = '" + name + "'" : "");
             case DB2:
-//                return "select tabname AS \"table\" from syscat.tables where tabschema = current schema";
-                return "select name from sysibm.systables where type = 'T' and creator = current user";
+//                return "select tabname AS \"name\" from syscat.tables where tabschema = current schema" + (StringUtil.isNotEmpty(name) ? " and tabname = '" + name + "'" : "");
+                return "select name from sysibm.systables where type = 'T' and creator = current user" + (StringUtil.isNotEmpty(name) ? " and name = '" + name + "'" : "") + (StringUtil.isNotEmpty(name) ? " and table_name = '" + name + "'" : "");
             case H2:
-                return "select table_name as \"name\" from information_schema.tables where table_type = 'TABLE'";
+                return "select table_name as \"name\" from information_schema.tables where table_type = 'TABLE'" + (StringUtil.isNotEmpty(name) ? " and table_name = '" + name + "'" : "");
             case Hsql:
-                return "select table_name as \"name\" from information_schema.tables where table_type = 'BASE TABLE'";
+                return "select table_name as \"name\" from information_schema.tables where table_type = 'BASE TABLE'" + (StringUtil.isNotEmpty(name) ? " and table_name = '" + name + "'" : "");
             case Derby:
-                return "select tablename as \"name\" from SYS.systables where tabletype = 'T'";
+                return "select tablename as \"name\" from SYS.systables where tabletype = 'T'" + (StringUtil.isNotEmpty(name) ? " and tablename = '" + name + "'" : "");
             case SQLite:
-                return "select name from sqlite_master where type='table'";
+                return "select name from sqlite_master where type='table'" + (StringUtil.isNotEmpty(name) ? " and name = '" + name + "'" : "");
             default:
                 throw new SqlBeanException("请配置正确的数据库");
         }
