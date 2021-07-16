@@ -714,7 +714,14 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void dropTable() {
-        jdbcTemplate.update(SqlBeanProvider.dropTableSql(getSqlBeanDB(), clazz));
+        SqlBeanDB sqlBeanDB = getSqlBeanDB();
+        if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.PostgreSQL && sqlBeanDB.getDbType() != DbType.SQLServer) {
+            List<String> nameList = jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(sqlBeanDB, SqlBeanUtil.getTable(clazz)), String.class);
+            if (nameList == null || nameList.isEmpty()) {
+                return;
+            }
+        }
+        jdbcTemplate.update(SqlBeanProvider.dropTableSql(sqlBeanDB, clazz));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -733,6 +740,6 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<String> getTableList() {
-        return jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(getSqlBeanDB()), String.class);
+        return jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(getSqlBeanDB(), null), String.class);
     }
 }
