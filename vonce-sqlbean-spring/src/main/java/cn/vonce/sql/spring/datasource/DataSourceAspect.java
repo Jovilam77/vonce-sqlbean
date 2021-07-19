@@ -22,6 +22,7 @@ import java.util.Random;
  * @date 2020/10/29 21:24
  */
 @Aspect
+@Repository
 public class DataSourceAspect {
 
     @Pointcut("target(cn.vonce.sql.service.SqlBeanService)")
