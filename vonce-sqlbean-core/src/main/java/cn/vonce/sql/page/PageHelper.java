@@ -240,7 +240,7 @@ public class PageHelper<T> {
         try {
             Class<?> clazz = pageService.getClass();
             // 衍生一个对象用于select查询
-            Select sqlBeanSelect = (Select) select.copy();
+            Select sqlBeanSelect = select.copy();
             // 预防设置了查询字段，故将查询字段换位统计字段
             select.getColumnList().clear();
             select.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
