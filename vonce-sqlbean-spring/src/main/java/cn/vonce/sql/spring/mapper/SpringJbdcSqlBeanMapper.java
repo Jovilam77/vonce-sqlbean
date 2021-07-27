@@ -24,15 +24,18 @@ public class SpringJbdcSqlBeanMapper<T> extends SqlBeanMapper implements RowMapp
 
     @Override
     public T mapRow(ResultSet resultSet, int index) {
-        Object object;
+        Object value;
         if (SqlBeanUtil.isMap(returnType.getName())) {
-            object = super.mapHandleResultSet(resultSet);
+            value = super.mapHandleResultSet(resultSet);
         } else if (!SqlBeanUtil.isBaseType(returnType.getName())) {
-            object = super.beanHandleResultSet(clazz, resultSet, super.getColumnNameList(resultSet));
+            value = super.beanHandleResultSet(clazz, resultSet, super.getColumnNameList(resultSet));
         } else {
-            object = super.baseHandleResultSet(resultSet);
+            value = super.baseHandleResultSet(resultSet);
+            if (value != null && !value.getClass().getName().equals(returnType.getName())) {
+                value = getValueConvert(returnType.getName(), value);
+            }
         }
-        return (T) object;
+        return (T) value;
     }
 
 }
