@@ -142,6 +142,16 @@ public class SqlBeanProvider {
         }
         if (select.getColumnList() == null || select.getColumnList().isEmpty()) {
             select.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
+        } else if (select.getColumnList().size() > 1 || select.getColumnList().get(0).getName().toLowerCase().indexOf("count") == -1) {
+            try {
+                select = select.copy();
+            } catch (IOException e) {
+                p.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                p.printStackTrace();
+            }
+            select.getColumnList().clear();
+            select.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
         }
         return setSelectAndBuild(clazz, select);
     }
