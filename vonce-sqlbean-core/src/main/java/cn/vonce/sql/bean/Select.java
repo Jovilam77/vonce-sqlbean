@@ -398,12 +398,12 @@ public class Select extends SelectCondition implements Serializable {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public Object copy() throws IOException, ClassNotFoundException {
+    public Select copy() throws IOException, ClassNotFoundException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(this);
         ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bos.toByteArray()));
-        return ois.readObject();
+        return (Select)ois.readObject();
     }
 
 }
