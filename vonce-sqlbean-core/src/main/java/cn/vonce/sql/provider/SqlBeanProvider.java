@@ -12,6 +12,7 @@ import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 /**
@@ -146,9 +147,9 @@ public class SqlBeanProvider {
             try {
                 select = select.copy();
             } catch (IOException e) {
-                p.printStackTrace();
+                e.printStackTrace();
             } catch (ClassNotFoundException e) {
-                p.printStackTrace();
+                e.printStackTrace();
             }
             select.getColumnList().clear();
             select.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);

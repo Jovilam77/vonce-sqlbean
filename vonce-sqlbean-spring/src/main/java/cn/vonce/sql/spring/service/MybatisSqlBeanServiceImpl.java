@@ -2,6 +2,8 @@ package cn.vonce.sql.spring.service;
 
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
+import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.service.TableService;
 import cn.vonce.sql.spring.annotation.DbSwitch;
@@ -561,7 +563,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     public void dropTable() {
         SqlBeanDB sqlBeanDB = getSqlBeanDB();
         if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.PostgreSQL && sqlBeanDB.getDbType() != DbType.SQLServer) {
-            List<String> nameList = mybatisSqlBeanDao.selectTableList(getSqlBeanDB(), SqlBeanUtil.getTable(clazz));
+            List<String> nameList = mybatisSqlBeanDao.selectTableList(getSqlBeanDB(), SqlBeanUtil.getTable(clazz).getName());
             if (nameList == null || nameList.isEmpty()) {
                 return;
             }

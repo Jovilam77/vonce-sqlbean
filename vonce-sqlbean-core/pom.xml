@@ -119,7 +119,7 @@
 
     <groupId>cn.vonce</groupId>
     <artifactId>vonce-sqlbean-core</artifactId>
-    <version>1.0.2-beta</version>
+    <version>1.0.2-beta4</version>
 
     <!-- 版本信息 -->
     <properties>
