@@ -93,7 +93,7 @@ public class SelectCondition extends Condition {
      * @return
      */
     public SelectCondition having(SqlField sqlField, Object value) {
-        return having(SqlLogic.AND, sqlField.getSchema(), sqlField.getTableAlias(), sqlField.getName(), value, SqlOperator.EQUAL_TO);
+        return having(SqlLogic.AND, sqlField.getTableAlias(), sqlField.getName(), value, SqlOperator.EQUAL_TO);
     }
 
 
@@ -106,7 +106,7 @@ public class SelectCondition extends Condition {
      * @return
      */
     public SelectCondition having(String field, Object value, SqlOperator sqlOperator) {
-        return having(SqlLogic.AND, "", "", field, value, sqlOperator);
+        return having(SqlLogic.AND, "", field, value, sqlOperator);
     }
 
     /**
@@ -117,7 +117,7 @@ public class SelectCondition extends Condition {
      * @return
      */
     public SelectCondition having(SqlLogic sqlLogic, String tableAlias, String field, Object value) {
-        return having(sqlLogic, "", tableAlias, field, value, SqlOperator.EQUAL_TO);
+        return having(sqlLogic, tableAlias, field, value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -130,7 +130,7 @@ public class SelectCondition extends Condition {
      * @return
      */
     public SelectCondition having(String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        return having(SqlLogic.AND, "", tableAlias, field, value, sqlOperator);
+        return having(SqlLogic.AND, tableAlias, field, value, sqlOperator);
     }
 
     /**
@@ -142,7 +142,7 @@ public class SelectCondition extends Condition {
      * @return
      */
     public SelectCondition having(SqlField sqlField, Object value, SqlOperator sqlOperator) {
-        return having(SqlLogic.AND, sqlField.getSchema(), sqlField.getTableAlias(), sqlField.getName(), value, sqlOperator);
+        return having(SqlLogic.AND, sqlField.getTableAlias(), sqlField.getName(), value, sqlOperator);
     }
 
     /**
@@ -155,22 +155,21 @@ public class SelectCondition extends Condition {
      * @return
      */
     public SelectCondition having(SqlLogic sqlLogic, SqlField sqlField, Object value, SqlOperator sqlOperator) {
-        return having(sqlLogic, sqlField.getSchema(), sqlField.getTableAlias(), sqlField.getName(), value, sqlOperator);
+        return having(sqlLogic, sqlField.getTableAlias(), sqlField.getName(), value, sqlOperator);
     }
 
     /**
      * 添加having条件
      *
      * @param sqlLogic    该条件与下一条件之间的逻辑关系
-     * @param schema      schema
      * @param tableAlias  表别名
      * @param field       列字段
      * @param value       列字段值
      * @param sqlOperator 操作符
      * @return
      */
-    public SelectCondition having(SqlLogic sqlLogic, String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        havingMap.put(tableAlias + field, new ConditionInfo(sqlLogic, schema, tableAlias, field, value, sqlOperator));
+    public SelectCondition having(SqlLogic sqlLogic, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
+        havingMap.put(tableAlias + field, new ConditionInfo(sqlLogic, tableAlias, field, value, sqlOperator));
         return this;
     }
 

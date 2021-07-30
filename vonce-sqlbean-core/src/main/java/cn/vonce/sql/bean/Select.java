@@ -105,7 +105,7 @@ public class Select extends SelectCondition implements Serializable {
      * @return
      */
     public Select column(String columnName) {
-        return column("", "", columnName, "");
+        return column("", columnName, "");
     }
 
     /**
@@ -116,7 +116,7 @@ public class Select extends SelectCondition implements Serializable {
      * @return
      */
     public Select column(String columnName, String columnAlias) {
-        return column("", "", columnName, columnAlias);
+        return column("", columnName, columnAlias);
     }
 
     /**
@@ -137,20 +137,19 @@ public class Select extends SelectCondition implements Serializable {
      * @return
      */
     public Select column(Column column, String columnAlias) {
-        return column(column.getSchema(), column.getTableAlias(), column.name(), columnAlias);
+        return column(column.getTableAlias(), column.name(), columnAlias);
     }
 
     /**
      * 添加column列字段
      *
-     * @param schema      schema
      * @param tableAlias  表别名
      * @param columnName  列列字段名
      * @param columnAlias 别名
      * @return
      */
-    public Select column(String schema, String tableAlias, String columnName, String columnAlias) {
-        columnList.add(new Column(schema, tableAlias, columnName, columnAlias));
+    public Select column(String tableAlias, String columnName, String columnAlias) {
+        columnList.add(new Column(tableAlias, columnName, columnAlias));
         return this;
     }
 
@@ -259,7 +258,7 @@ public class Select extends SelectCondition implements Serializable {
      * @return
      */
     public Select groupBy(String columNname) {
-        return groupBy("", "", columNname);
+        return groupBy("", columNname);
     }
 
     /**
@@ -269,7 +268,7 @@ public class Select extends SelectCondition implements Serializable {
      * @return
      */
     public Select groupBy(Column column) {
-        return groupBy(column.getSchema(), column.getTableAlias(), column.name());
+        return groupBy(column.getTableAlias(), column.name());
     }
 
     /**
@@ -279,8 +278,8 @@ public class Select extends SelectCondition implements Serializable {
      * @param columNname 列字段名
      * @return
      */
-    public Select groupBy(String schema, String tableAlias, String columNname) {
-        groupByList.add(new Group(schema, tableAlias, columNname));
+    public Select groupBy(String tableAlias, String columNname) {
+        groupByList.add(new Group(tableAlias, columNname));
         return this;
     }
 
@@ -302,7 +301,7 @@ public class Select extends SelectCondition implements Serializable {
      * @param sqlSort    排序方式
      */
     public Select orderBy(String columNname, SqlSort sqlSort) {
-        return orderBy("", "", columNname, sqlSort);
+        return orderBy("", columNname, sqlSort);
     }
 
     /**
@@ -313,20 +312,19 @@ public class Select extends SelectCondition implements Serializable {
      * @return
      */
     public Select orderBy(Column column, SqlSort sqlSort) {
-        return orderBy(column.getSchema(), column.getTableAlias(), column.name(), sqlSort);
+        return orderBy(column.getTableAlias(), column.name(), sqlSort);
     }
 
     /**
      * 添加列字段排序
      *
-     * @param schema     schema
      * @param tableAlias 表别名
      * @param columNname 列字段名
      * @param sqlSort    排序方式
      * @return
      */
-    public Select orderBy(String schema, String tableAlias, String columNname, SqlSort sqlSort) {
-        orderByList.add(new Order(schema, tableAlias, columNname, sqlSort));
+    public Select orderBy(String tableAlias, String columNname, SqlSort sqlSort) {
+        orderByList.add(new Order(tableAlias, columNname, sqlSort));
         return this;
     }
 

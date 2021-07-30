@@ -82,7 +82,7 @@ public class SqlConstantProcessor extends AbstractProcessor {
                                         sqlFieldName = StringUtil.humpToUnderline(sqlFieldName);
                                     }
                                 }
-                                code.append(String.format("\tpublic static final Column %s = new Column(_schema,_tableAlias,\"%s\",\"\");\n", sqlFieldName, sqlFieldName));
+                                code.append(String.format("\tpublic static final Column %s = new Column(_tableAlias,\"%s\",\"\");\n", sqlFieldName, sqlFieldName));
                             }
                         }
 

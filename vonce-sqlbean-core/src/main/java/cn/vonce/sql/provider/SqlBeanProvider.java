@@ -176,7 +176,7 @@ public class SqlBeanProvider {
         Delete delete = new Delete();
         delete.setSqlBeanDB(sqlBeanDB);
         delete.setTable(clazz);
-        setSchema(delete);
+        setSchema(delete, clazz);
         Field idField;
         try {
             idField = SqlBeanUtil.getIdField(clazz);
@@ -201,7 +201,7 @@ public class SqlBeanProvider {
         delete.setSqlBeanDB(sqlBeanDB);
         delete.setTable(clazz);
         delete.setWhere(where, args);
-        setSchema(delete);
+        setSchema(delete, clazz);
         return SqlHelper.buildDeleteSql(delete);
     }
 
@@ -220,7 +220,7 @@ public class SqlBeanProvider {
         if (delete.getTable().isNotSet()) {
             delete.setTable(clazz);
         }
-        setSchema(delete);
+        setSchema(delete, clazz);
         if (ignore || (!delete.getWhereMap().isEmpty() || StringUtil.isNotEmpty(delete.getWhere()) || !delete.getWhereWrapper().getDataList().isEmpty())) {
             return SqlHelper.buildDeleteSql(delete);
         } else {
@@ -250,7 +250,7 @@ public class SqlBeanProvider {
             update.setUpdateBean(bean);
             Field idField = SqlBeanUtil.getIdField(bean.getClass());
             update.where(SqlBeanUtil.getTableFieldName(idField), id, SqlOperator.IN);
-            setSchema(update);
+            setSchema(update, clazz);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -273,7 +273,7 @@ public class SqlBeanProvider {
             update.setTable(clazz);
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
             update.setWhere(where, args);
-            setSchema(update);
+            setSchema(update, clazz);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -295,7 +295,7 @@ public class SqlBeanProvider {
             update.setTable(clazz);
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
             update.setWhere(wrapper);
-            setSchema(update);
+            setSchema(update, clazz);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -319,7 +319,7 @@ public class SqlBeanProvider {
         if (update.getTable().isNotSet()) {
             update.setTable(clazz);
         }
-        setSchema(update);
+        setSchema(update, clazz);
         if (ignore || (!update.getWhereMap().isEmpty() || StringUtil.isNotEmpty(update.getWhere()) || !update.getWhereWrapper().getDataList().isEmpty())) {
             return SqlHelper.buildUpdateSql(update);
         } else {
@@ -449,7 +449,7 @@ public class SqlBeanProvider {
         insert.setSqlBeanDB(sqlBeanDB);
         insert.setTable(clazz);
         insert.setInsertBean(SqlBeanUtil.getObjectArray(bean));
-        setSchema(insert);
+        setSchema(insert, clazz);
         return SqlHelper.buildInsertSql(insert);
     }
 
@@ -468,7 +468,7 @@ public class SqlBeanProvider {
         if (insert.getTable().isNotSet()) {
             insert.setTable(clazz);
         }
-        setSchema(insert);
+        setSchema(insert, clazz);
         return SqlHelper.buildInsertSql(insert);
     }
 
@@ -483,7 +483,7 @@ public class SqlBeanProvider {
         Drop drop = new Drop();
         drop.setSqlBeanDB(sqlBeanDB);
         drop.setTable(clazz);
-        setSchema(drop);
+        setSchema(drop, clazz);
         return SqlHelper.buildDrop(drop);
     }
 
@@ -499,7 +499,7 @@ public class SqlBeanProvider {
         create.setSqlBeanDB(sqlBeanDB);
         create.setTable(clazz);
         create.setBeanClass(clazz);
-        setSchema(create);
+        setSchema(create, clazz);
         return SqlHelper.buildCreateSql(create);
     }
 
@@ -554,7 +554,7 @@ public class SqlBeanProvider {
         backup.setTargetSchema(targetSchema);
         backup.setTargetTableName(targetTableName);
         backup.setWhere(wrapper);
-        setSchema(backup);
+        setSchema(backup, clazz);
         return SqlHelper.buildBackup(backup);
     }
 
@@ -598,7 +598,7 @@ public class SqlBeanProvider {
                 select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
             }
             SqlBeanUtil.setJoin(select, clazz);
-            setSchema(select);
+            setSchema(select, clazz);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -622,7 +622,7 @@ public class SqlBeanProvider {
                 select.getTable().setAlias(table.getAlias());
             }
         }
-        setSchema(select);
+        setSchema(select, clazz);
         try {
             SqlBeanUtil.setJoin(select, clazz);
         } catch (SqlBeanException e) {
@@ -677,7 +677,7 @@ public class SqlBeanProvider {
         update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
         update.setOptimisticLock(optimisticLock);
-        setSchema(update);
+        setSchema(update, clazz);
         return update;
     }
 
@@ -705,13 +705,18 @@ public class SqlBeanProvider {
 
     /**
      * 统一设置Schema
+     *
+     * @param common
+     * @param clazz
      */
-    private static void setSchema(Common common) {
+    private static void setSchema(Common common, Class<?> clazz) {
         //自主设置优先级高
         if (StringUtil.isEmpty(common.getTable().getSchema())) {
             String schema = DynSchemaContextHolder.getSchema();
             if (StringUtil.isNotEmpty(schema)) {
                 common.getTable().setSchema(schema);
+            } else {
+                common.getTable().setSchema(SqlBeanUtil.getTable(clazz).getSchema());
             }
         }
     }

@@ -469,18 +469,13 @@ public class SqlBeanUtil {
      * 获得新的表字段名
      *
      * @param common
-     * @param schema
      * @param tableAlias
      * @param tableFieldName
      * @return
      */
-    public static String getTableFieldFullName(Common common, String schema, String tableAlias, String tableFieldName) {
+    public static String getTableFieldFullName(Common common, String tableAlias, String tableFieldName) {
         String transferred = getTransferred(common);
         StringBuffer fullName = new StringBuffer();
-        if (StringUtil.isNotEmpty(schema)) {
-            fullName.append(schema);
-            fullName.append(SqlConstant.POINT);
-        }
         fullName.append(transferred);
         fullName.append(tableAlias);
         fullName.append(transferred);

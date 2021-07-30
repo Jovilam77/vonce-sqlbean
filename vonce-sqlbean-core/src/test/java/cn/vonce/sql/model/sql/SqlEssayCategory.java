@@ -14,9 +14,9 @@ public class SqlEssayCategory {
 
     public static final String _count = "COUNT(*)";
 
-    public static final Column id = new Column(_schema,_tableAlias,"id","");
+    public static final Column id = new Column(_tableAlias,"id","");
 
-    public static final Column name = new Column(_schema,_tableAlias,"name","");
+    public static final Column name = new Column(_tableAlias,"name","");
 
-    public static final Column creationTime = new Column(_schema,_tableAlias,"creationTime","");
+    public static final Column creationTime = new Column(_tableAlias,"creationTime","");
 }

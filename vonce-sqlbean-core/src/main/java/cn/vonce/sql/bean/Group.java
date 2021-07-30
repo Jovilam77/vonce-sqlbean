@@ -9,8 +9,8 @@ public class Group extends SqlField {
         super();
     }
 
-    public Group(String schema, String tableAlias, String name) {
-        super(schema, tableAlias, name);
+    public Group(String tableAlias, String name) {
+        super(tableAlias, name);
     }
 
 }

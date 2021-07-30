@@ -14,13 +14,13 @@ public class SqlUser {
 
     public static final String _count = "COUNT(*)";
 
-    public static final Column id = new Column(_schema,_tableAlias,"id","");
+    public static final Column id = new Column(_tableAlias,"id","");
 
-    public static final Column username = new Column(_schema,_tableAlias,"username","");
+    public static final Column username = new Column(_tableAlias,"username","");
 
-    public static final Column headPortrait = new Column(_schema,_tableAlias,"headPortrait","");
+    public static final Column headPortrait = new Column(_tableAlias,"headPortrait","");
 
-    public static final Column nickname = new Column(_schema,_tableAlias,"nickname","");
+    public static final Column nickname = new Column(_tableAlias,"nickname","");
 
-    public static final Column gender = new Column(_schema,_tableAlias,"gender","");
+    public static final Column gender = new Column(_tableAlias,"gender","");
 }

@@ -287,7 +287,7 @@ public class PageHelper<T> {
                 }
                 if (StringUtil.isNotEmpty(field) && field.indexOf(SqlConstant.POINT) > -1) {
                     String[] tableNameAndField = field.split("\\" + SqlConstant.POINT);
-                    order = new Order("", tableNameAndField[0], tableNameAndField[1], SqlSort.get(sort));
+                    order = new Order(tableNameAndField[0], tableNameAndField[1], SqlSort.get(sort));
                 } else {
                     order = new Order(field, SqlSort.get(sort));
                 }

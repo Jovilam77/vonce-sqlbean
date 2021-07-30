@@ -25,19 +25,19 @@ public class ConditionInfo extends SqlField implements Serializable {
     }
 
     public ConditionInfo(String field, Object value) {
-        this(null, "", "", field, value, null);
+        this(null, "", field, value, null);
     }
 
     public ConditionInfo(String tableAlias, String field, Object value) {
-        this(null, "", tableAlias, field, value, null);
+        this(null, tableAlias, field, value, null);
     }
 
-    public ConditionInfo(String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        this(null, schema, tableAlias, field, value, sqlOperator);
+    public ConditionInfo(String tableAlias, String field, Object value, SqlOperator sqlOperator) {
+        this(null, tableAlias, field, value, sqlOperator);
     }
 
-    public ConditionInfo(SqlLogic sqlLogic, String schema, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        super(schema, tableAlias, field);
+    public ConditionInfo(SqlLogic sqlLogic, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
+        super(tableAlias, field);
         this.sqlLogic = sqlLogic;
         this.value = value;
         this.sqlOperator = sqlOperator;

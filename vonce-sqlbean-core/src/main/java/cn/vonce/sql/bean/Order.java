@@ -18,15 +18,15 @@ public class Order extends SqlField implements Serializable {
     }
 
     public Order(String name, SqlSort sqlSort) {
-        this("", "", name, sqlSort);
+        this("", name, sqlSort);
     }
 
     public Order(SqlField sqlField, SqlSort sqlSort) {
-        this(sqlField.getSchema(), sqlField.getTableAlias(), sqlField.getName(), sqlSort);
+        this(sqlField.getTableAlias(), sqlField.getName(), sqlSort);
     }
 
-    public Order(String schema, String tableAlias, String name, SqlSort sqlSort) {
-        super(schema, tableAlias, name);
+    public Order(String tableAlias, String name, SqlSort sqlSort) {
+        super(tableAlias, name);
         this.sqlSort = sqlSort;
     }
 

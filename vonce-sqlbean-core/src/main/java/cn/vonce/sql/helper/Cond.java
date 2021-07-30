@@ -395,11 +395,11 @@ public class Cond extends ConditionInfo {
     }
 
     public Cond(String name, SqlOperator sqlOperator, Object value) {
-        super(null, null, null, name, value, sqlOperator);
+        super(null, null, name, value, sqlOperator);
     }
 
     public Cond(SqlField sqlField, SqlOperator sqlOperator, Object value) {
-        super(null, sqlField.getSchema(), sqlField.getTableAlias(), sqlField.getName(), value, sqlOperator);
+        super(null, sqlField.getTableAlias(), sqlField.getName(), value, sqlOperator);
     }
 
 }

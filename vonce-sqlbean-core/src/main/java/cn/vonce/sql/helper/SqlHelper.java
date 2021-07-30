@@ -433,12 +433,10 @@ public class SqlHelper {
         StringBuffer columnSql = new StringBuffer();
         if (select.getColumnList() != null && select.getColumnList().size() != 0) {
             for (int i = 0; i < select.getColumnList().size(); i++) {
-                String schema = select.getColumnList().get(i).getSchema();
                 String tableAlias = select.getColumnList().get(i).getTableAlias();
                 String columnName = select.getColumnList().get(i).getName();
                 String transferred = SqlBeanUtil.getTransferred(select);
                 if (SqlBeanUtil.isToUpperCase(select)) {
-                    schema = schema.toUpperCase();
                     columnName = columnName.toUpperCase();
                 }
                 boolean existAlias = StringUtil.isNotEmpty(select.getColumnList().get(i).getAlias());
@@ -446,7 +444,7 @@ public class SqlHelper {
                     columnSql.append(SqlConstant.BEGIN_BRACKET);
                 }
                 if (StringUtil.isNotEmpty(tableAlias)) {
-                    columnSql.append(SqlBeanUtil.getTableFieldFullName(select, schema, tableAlias, columnName));
+                    columnSql.append(SqlBeanUtil.getTableFieldFullName(select, tableAlias, columnName));
                 } else {
                     columnSql.append(columnName);
                 }
@@ -519,8 +517,8 @@ public class SqlHelper {
                 String schema = join.getSchema();
                 String tableName = join.getTableName();
                 String tableAlias = join.getTableAlias();
-                String tableKeyword = SqlBeanUtil.getTableFieldFullName(select, schema, tableAlias, join.getTableKeyword());
-                String mainKeyword = SqlBeanUtil.getTableFieldFullName(select, select.getTable().getSchema(), select.getTable().getAlias(), join.getMainKeyword());
+                String tableKeyword = SqlBeanUtil.getTableFieldFullName(select, tableAlias, join.getTableKeyword());
+                String mainKeyword = SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), join.getMainKeyword());
                 if (SqlBeanUtil.isToUpperCase(select)) {
                     schema = schema.toUpperCase();
                     tableName = tableName.toUpperCase();
@@ -780,10 +778,6 @@ public class SqlHelper {
             for (int i = 0; i < sqlFields.length; i++) {
                 SqlField sqlField = sqlFields[i];
                 if (StringUtil.isNotEmpty(sqlField.getTableAlias())) {
-                    if (StringUtil.isNotEmpty(sqlField.getSchema())) {
-                        groupByAndOrderBySql.append(sqlField.getSchema());
-                        groupByAndOrderBySql.append(SqlConstant.POINT);
-                    }
                     groupByAndOrderBySql.append(sqlField.getTableAlias());
                     groupByAndOrderBySql.append(SqlConstant.POINT);
                 }
@@ -799,7 +793,7 @@ public class SqlHelper {
         } else {
             if (SqlConstant.ORDER_BY.equals(type) && select.getSqlBeanDB().getDbType() == DbType.SQLServer && SqlBeanUtil.isUsePage(select) && !SqlBeanUtil.isCount(select)) {
                 groupByAndOrderBySql.append(type);
-                String tableFieldFullName = SqlBeanUtil.getTableFieldFullName(select, select.getTable().getSchema(), select.getTable().getAlias(), select.getPage().getIdName());
+                String tableFieldFullName = SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), select.getPage().getIdName());
                 groupByAndOrderBySql.append(SqlBeanUtil.isToUpperCase(select) ? tableFieldFullName.toUpperCase() : tableFieldFullName);
             }
         }
@@ -1066,11 +1060,6 @@ public class SqlHelper {
         }
         //表别名
         if (StringUtil.isNotEmpty(conditionInfo.getTableAlias())) {
-            //schema
-            if (StringUtil.isNotEmpty(conditionInfo.getSchema())) {
-                sql.append(conditionInfo.getSchema());
-                sql.append(SqlConstant.POINT);
-            }
             sql.append(transferred);
             sql.append(conditionInfo.getTableAlias());
             sql.append(transferred);
