@@ -616,6 +616,9 @@ public class SqlHelper {
                         fieldSql.append(SqlConstant.COMMA);
                     }
                 }
+                if (sqlId != null && sqlId.type() == IdType.AUTO) {
+                    continue;
+                }
                 Object value = ReflectUtil.instance().get(objects[i].getClass(), objects[i], field.getName());
                 //如果此字段为id且需要生成唯一id
                 if (sqlId != null && sqlId.type() != IdType.AUTO && sqlId.type() != IdType.NORMAL) {
