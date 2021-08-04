@@ -2,6 +2,8 @@ package cn.vonce.sql.processor;
 
 import cn.vonce.sql.enumerate.IdType;
 
+import java.io.Serializable;
+
 /**
  * 唯一id处理器接口
  *
@@ -10,7 +12,7 @@ import cn.vonce.sql.enumerate.IdType;
  * @email imjovi@qq.com
  * @date 2020/2/28 15:31
  */
-public interface UniqueIdProcessor {
+public interface UniqueIdProcessor extends Serializable {
 
     /**
      * 生成唯一id

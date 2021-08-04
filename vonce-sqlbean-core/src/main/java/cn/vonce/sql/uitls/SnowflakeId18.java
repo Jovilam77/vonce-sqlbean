@@ -1,5 +1,6 @@
 package cn.vonce.sql.uitls;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -35,7 +36,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * @author lry
  * @version 3.0
  */
-public final class SnowflakeId18 {
+public final class SnowflakeId18 implements Serializable {
 
     /**
      * 起始时间戳

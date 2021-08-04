@@ -501,12 +501,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Override
     public String backup() {
         String targetTableName = SqlBeanUtil.getTable(clazz).getName() + "_" + DateUtil.dateToString(new Date(), "yyyyMMddHHmmssSSS");
-        try {
-            mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, null, targetTableName, null, null);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return null;
-        }
+        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, null, targetTableName, null, null);
         return targetTableName;
     }
 
