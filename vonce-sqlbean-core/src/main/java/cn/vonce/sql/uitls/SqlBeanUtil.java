@@ -263,7 +263,7 @@ public class SqlBeanUtil {
      * @param sqlJoin
      * @return
      */
-    public static boolean sqlBeanJoinIsNotEmpty(SqlJoin sqlJoin) {
+    public static boolean sqlJoinIsNotEmpty(SqlJoin sqlJoin) {
         return StringUtil.isNotEmpty(sqlJoin.table()) && StringUtil.isNotEmpty(sqlJoin.tableKeyword()) && StringUtil.isNotEmpty(sqlJoin.mainKeyword());
     }
 
@@ -332,7 +332,7 @@ public class SqlBeanUtil {
             if (sqlJoin != null && sqlJoin.isBean()) {
                 Class<?> subBeanClazz = field.getType();
                 //如果有指定查询的字段
-                if (sqlBeanJoinIsNotEmpty(sqlJoin) && sqlJoin.value().length > 0 && !sqlJoin.value()[0].equals("")) {
+                if (sqlJoinIsNotEmpty(sqlJoin) && sqlJoin.value().length > 0 && !sqlJoin.value()[0].equals("")) {
                     List<Field> subBeanFieldList = getBeanAllField(subBeanClazz);
                     for (String fieldName : sqlJoin.value()) {
                         Field javaField = getFieldByTableFieldName(subBeanFieldList, fieldName);
@@ -360,7 +360,7 @@ public class SqlBeanUtil {
                     }
                 }
             } else if (sqlJoin != null) {
-                if (sqlBeanJoinIsNotEmpty(sqlJoin)) {
+                if (sqlJoinIsNotEmpty(sqlJoin)) {
                     //获取SqlBeanJoin 注解中的查询字段
                     String tableFieldName = sqlJoin.value()[0];
                     if (StringUtil.isEmpty(tableFieldName)) {
@@ -393,7 +393,7 @@ public class SqlBeanUtil {
             }
             SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
             Join join = new Join();
-            if (sqlJoin != null && sqlBeanJoinIsNotEmpty(sqlJoin)) {
+            if (sqlJoin != null && sqlJoinIsNotEmpty(sqlJoin)) {
                 join.setJoinType(sqlJoin.type());
                 join.setSchema(sqlJoin.schema());
                 join.setTableName(sqlJoin.table());
