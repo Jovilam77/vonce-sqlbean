@@ -1,4 +1,4 @@
-package cn.vonce.sql.spring.mapper;
+package cn.vonce.sql.mapper;
 
 
 import cn.vonce.sql.annotation.SqlJoin;
@@ -6,9 +6,6 @@ import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
@@ -23,8 +20,6 @@ import java.util.Map;
  * SqlBean 结果映射
  */
 public class SqlBeanMapper {
-
-    private Logger logger = LoggerFactory.getLogger(SqlBeanMapper.class);
 
     /**
      * 基础对象映射
@@ -42,7 +37,6 @@ public class SqlBeanMapper {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            logger.error("基础对象映射异常SQLException，{}", e.getMessage());
         }
         return value;
     }
@@ -68,7 +62,6 @@ public class SqlBeanMapper {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            logger.error("map对象映射异常SQLException，{}", e.getMessage());
         }
         return map;
     }
@@ -165,7 +158,6 @@ public class SqlBeanMapper {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            logger.error("bean对象映射SQLException，Sql语句执行异常：{}", e.getMessage());
         }
         return columnNameList;
     }
@@ -289,7 +281,6 @@ public class SqlBeanMapper {
                     break;
             }
         } catch (SQLException e) {
-            //logger.warn(e.getMessage());
         }
         return value;
 
@@ -344,7 +335,6 @@ public class SqlBeanMapper {
                     break;
             }
         } catch (SQLException e) {
-            //logger.warn(e.getMessage());
         }
         return value;
 

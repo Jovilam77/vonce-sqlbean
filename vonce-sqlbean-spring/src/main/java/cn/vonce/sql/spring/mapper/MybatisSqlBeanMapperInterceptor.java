@@ -1,6 +1,7 @@
 package cn.vonce.sql.spring.mapper;
 
 import cn.vonce.common.utils.ReflectUtil;
+import cn.vonce.sql.mapper.SqlBeanMapper;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.resultset.DefaultResultSetHandler;
