@@ -1,7 +1,7 @@
 package cn.vonce.sql.helper;
 
+import cn.vonce.sql.bean.Column;
 import cn.vonce.sql.bean.ConditionInfo;
-import cn.vonce.sql.bean.SqlField;
 import cn.vonce.sql.enumerate.SqlOperator;
 
 /**
@@ -28,12 +28,12 @@ public class Cond extends ConditionInfo {
     /**
      * 等于
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond eq(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.EQUAL_TO, value);
+    public static Cond eq(Column column, Object value) {
+        return new Cond(column, SqlOperator.EQUAL_TO, value);
     }
 
     /**
@@ -50,12 +50,12 @@ public class Cond extends ConditionInfo {
     /**
      * 不等于
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond notEq(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.NOT_EQUAL_TO, value);
+    public static Cond notEq(Column column, Object value) {
+        return new Cond(column, SqlOperator.NOT_EQUAL_TO, value);
     }
 
     /**
@@ -72,12 +72,12 @@ public class Cond extends ConditionInfo {
     /**
      * 小于
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond lt(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.LESS_THAN, value);
+    public static Cond lt(Column column, Object value) {
+        return new Cond(column, SqlOperator.LESS_THAN, value);
     }
 
     /**
@@ -94,12 +94,12 @@ public class Cond extends ConditionInfo {
     /**
      * 大于
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond gt(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.GREATER_THAN, value);
+    public static Cond gt(Column column, Object value) {
+        return new Cond(column, SqlOperator.GREATER_THAN, value);
     }
 
     /**
@@ -116,12 +116,12 @@ public class Cond extends ConditionInfo {
     /**
      * 小于等于
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond ltEq(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.LESS_THAN_OR_EQUAL_TO, value);
+    public static Cond ltEq(Column column, Object value) {
+        return new Cond(column, SqlOperator.LESS_THAN_OR_EQUAL_TO, value);
     }
 
     /**
@@ -138,12 +138,12 @@ public class Cond extends ConditionInfo {
     /**
      * 大于等于
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond gtEq(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.GREAT_THAN_OR_EQUAL_TO, value);
+    public static Cond gtEq(Column column, Object value) {
+        return new Cond(column, SqlOperator.GREAT_THAN_OR_EQUAL_TO, value);
     }
 
     /**
@@ -160,12 +160,12 @@ public class Cond extends ConditionInfo {
     /**
      * 全模糊 包含
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond like(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.LIKE, value);
+    public static Cond like(Column column, Object value) {
+        return new Cond(column, SqlOperator.LIKE, value);
     }
 
     /**
@@ -182,12 +182,12 @@ public class Cond extends ConditionInfo {
     /**
      * 左模糊 包含
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond likeL(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.LIKE_L, value);
+    public static Cond likeL(Column column, Object value) {
+        return new Cond(column, SqlOperator.LIKE_L, value);
     }
 
     /**
@@ -204,12 +204,12 @@ public class Cond extends ConditionInfo {
     /**
      * 右模糊 包含
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond likeR(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.LIKE_R, value);
+    public static Cond likeR(Column column, Object value) {
+        return new Cond(column, SqlOperator.LIKE_R, value);
     }
 
     /**
@@ -226,12 +226,12 @@ public class Cond extends ConditionInfo {
     /**
      * 全模糊 不包含
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond notLike(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.NOT_LIKE, value);
+    public static Cond notLike(Column column, Object value) {
+        return new Cond(column, SqlOperator.NOT_LIKE, value);
     }
 
     /**
@@ -248,12 +248,12 @@ public class Cond extends ConditionInfo {
     /**
      * 左模糊 不包含
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond notLikeL(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.NOT_LIKE_L, value);
+    public static Cond notLikeL(Column column, Object value) {
+        return new Cond(column, SqlOperator.NOT_LIKE_L, value);
     }
 
     /**
@@ -270,12 +270,12 @@ public class Cond extends ConditionInfo {
     /**
      * 右模糊 不包含
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond notLikeR(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.NOT_LIKE_R, value);
+    public static Cond notLikeR(Column column, Object value) {
+        return new Cond(column, SqlOperator.NOT_LIKE_R, value);
     }
 
     /**
@@ -292,12 +292,12 @@ public class Cond extends ConditionInfo {
     /**
      * 是
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond is(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.IS, value);
+    public static Cond is(Column column, Object value) {
+        return new Cond(column, SqlOperator.IS, value);
     }
 
     /**
@@ -314,12 +314,12 @@ public class Cond extends ConditionInfo {
     /**
      * 不是
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond isNot(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.IS_NOT, value);
+    public static Cond isNot(Column column, Object value) {
+        return new Cond(column, SqlOperator.IS_NOT, value);
     }
 
     /**
@@ -336,12 +336,12 @@ public class Cond extends ConditionInfo {
     /**
      * 包含
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond in(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.IN, value);
+    public static Cond in(Column column, Object value) {
+        return new Cond(column, SqlOperator.IN, value);
     }
 
     /**
@@ -358,12 +358,12 @@ public class Cond extends ConditionInfo {
     /**
      * 不包含
      *
-     * @param sqlField
+     * @param column
      * @param value
      * @return
      */
-    public static Cond notIn(SqlField sqlField, Object value) {
-        return new Cond(sqlField, SqlOperator.NOT_IN, value);
+    public static Cond notIn(Column column, Object value) {
+        return new Cond(column, SqlOperator.NOT_IN, value);
     }
 
     /**
@@ -381,13 +381,13 @@ public class Cond extends ConditionInfo {
     /**
      * 介于
      *
-     * @param sqlField
+     * @param column
      * @param value1
      * @param value2
      * @return
      */
-    public static Cond between(SqlField sqlField, Object value1, Object value2) {
-        return new Cond(sqlField, SqlOperator.BETWEEN, new Object[]{value1, value2});
+    public static Cond between(Column column, Object value1, Object value2) {
+        return new Cond(column, SqlOperator.BETWEEN, new Object[]{value1, value2});
     }
 
     public Cond() {
@@ -398,8 +398,8 @@ public class Cond extends ConditionInfo {
         super(null, null, name, value, sqlOperator);
     }
 
-    public Cond(SqlField sqlField, SqlOperator sqlOperator, Object value) {
-        super(null, sqlField.getTableAlias(), sqlField.getName(), value, sqlOperator);
+    public Cond(Column column, SqlOperator sqlOperator, Object value) {
+        super(null, column.getTableAlias(), column.getName(), value, sqlOperator);
     }
 
 }

@@ -125,8 +125,8 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (ids == null || ids.length == 0) {
             return null;
         }
-        return jdbcTemplate.queryForObject(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, ids),
-                new SpringJbdcSqlBeanMapper<List<T>>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, ids),
+                new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -138,8 +138,8 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
             clazz = returnType;
         }
-        return jdbcTemplate.queryForObject(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, ids),
-                new SpringJbdcSqlBeanMapper<List<O>>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, ids),
+                new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)

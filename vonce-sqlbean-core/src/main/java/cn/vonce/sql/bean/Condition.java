@@ -97,7 +97,7 @@ public class Condition extends Common {
      * @author Jovi
      */
     public Condition where(Column column, Object value) {
-        return where(SqlLogic.AND, column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
+        return where(SqlLogic.AND, column.getTableAlias(), column.getName(), value, SqlOperator.EQUAL_TO);
     }
 
 
@@ -147,7 +147,7 @@ public class Condition extends Common {
      * @author Jovi
      */
     public Condition where(Column column, Object value, SqlOperator sqlOperator) {
-        return where(SqlLogic.AND, column.getTableAlias(), column.name(), value, sqlOperator);
+        return where(SqlLogic.AND, column.getTableAlias(), column.getName(), value, sqlOperator);
     }
 
     /**
@@ -161,7 +161,7 @@ public class Condition extends Common {
      * @author Jovi
      */
     public Condition where(SqlLogic sqlLogic, Column column, Object value, SqlOperator sqlOperator) {
-        return where(sqlLogic, column.getTableAlias(), column.name(), value, sqlOperator);
+        return where(sqlLogic, column.getTableAlias(), column.getName(), value, sqlOperator);
     }
 
     /**
@@ -206,7 +206,7 @@ public class Condition extends Common {
      * @author Jovi
      */
     public Condition wAND(Column column, Object value) {
-        return wAND(column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
+        return wAND(column.getTableAlias(), column.getName(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -231,7 +231,7 @@ public class Condition extends Common {
      * @author Jovi
      */
     public Condition wAND(Column column, Object value, SqlOperator sqlOperator) {
-        return wAND(column.getTableAlias(), column.name(), value, sqlOperator);
+        return wAND(column.getTableAlias(), column.getName(), value, sqlOperator);
     }
 
     /**
@@ -267,7 +267,7 @@ public class Condition extends Common {
      * @author Jovi
      */
     public Condition wOR(Column column, Object value) {
-        return wOR(column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
+        return wOR(column.getTableAlias(), column.getName(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -291,7 +291,7 @@ public class Condition extends Common {
      * @return
      */
     public Condition wOR(Column column, Object value, SqlOperator sqlOperator) {
-        return wOR(column.getTableAlias(), column.name(), value, sqlOperator);
+        return wOR(column.getTableAlias(), column.getName(), value, sqlOperator);
     }
 
     /**
@@ -327,7 +327,7 @@ public class Condition extends Common {
      * @author Jovi
      */
     public Condition wANDBracket(Column column, Object value) {
-        return wANDBracket(column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
+        return wANDBracket(column.getTableAlias(), column.getName(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -351,7 +351,7 @@ public class Condition extends Common {
      * @return
      */
     public Condition wANDBracket(Column column, Object value, SqlOperator sqlOperator) {
-        return wANDBracket(column.getTableAlias(), column.name(), value, sqlOperator);
+        return wANDBracket(column.getTableAlias(), column.getName(), value, sqlOperator);
     }
 
     /**
@@ -387,7 +387,7 @@ public class Condition extends Common {
      * @author Jovi
      */
     public Condition wORBracket(Column column, Object value) {
-        return wORBracket(column.getTableAlias(), column.name(), value, SqlOperator.EQUAL_TO);
+        return wORBracket(column.getTableAlias(), column.getName(), value, SqlOperator.EQUAL_TO);
     }
 
     /**
@@ -411,7 +411,7 @@ public class Condition extends Common {
      * @return
      */
     public Condition wORBracket(Column column, Object value, SqlOperator sqlOperator) {
-        return wORBracket(column.getTableAlias(), column.name(), value, sqlOperator);
+        return wORBracket(column.getTableAlias(), column.getName(), value, sqlOperator);
     }
 
     /**

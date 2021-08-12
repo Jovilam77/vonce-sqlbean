@@ -73,7 +73,7 @@ public class SqlHelperTest {
         select.column(SqlUser.headPortrait, "头像");
         select.column(SqlUser.nickname, "昵称");
         select.setTable(SqlEssay._tableName);
-        select.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id.name(), SqlEssay.userId.name());
+        select.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id.getName(), SqlEssay.userId.getName());
         select.where(SqlEssay.userId, "1111");
         //value 直接输入字符串 会当作字符串处理，sql中会带''，如果希望不被做处理则使用Original
         select.where("DATE_FORMAT( " + SqlEssay.creationTime + ", '%Y-%m-%d' )", new Original("DATE_FORMAT( '2018-01-19 20:24:19', '%Y-%m-%d' ) "), SqlOperator.EQUAL_TO);
@@ -95,7 +95,7 @@ public class SqlHelperTest {
                 .column(SqlEssay.creationTime, "创建时间")
                 .column(SqlUser.nickname, "用户昵称");
         select2.setTable(SqlEssay._tableName);
-        select2.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id.name(), SqlEssay.userId.name());
+        select2.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id.getName(), SqlEssay.userId.getName());
         select2.where("date_format(" + SqlEssay.creationTime + ",'%y%m%m ')", "2020-01-01 00:00:00", SqlOperator.GREATER_THAN);
         select2.wAND(SqlUser.nickname, "vicky", SqlOperator.EQUAL_TO);
         System.out.println("---select2---");

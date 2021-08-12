@@ -137,7 +137,7 @@ public class Select extends SelectCondition implements Serializable {
      * @return
      */
     public Select column(Column column, String columnAlias) {
-        return column(column.getTableAlias(), column.name(), columnAlias);
+        return column(column.getTableAlias(), column.getName(), columnAlias);
     }
 
     /**
@@ -268,7 +268,7 @@ public class Select extends SelectCondition implements Serializable {
      * @return
      */
     public Select groupBy(Column column) {
-        return groupBy(column.getTableAlias(), column.name());
+        return groupBy(column.getTableAlias(), column.getName());
     }
 
     /**
@@ -312,7 +312,7 @@ public class Select extends SelectCondition implements Serializable {
      * @return
      */
     public Select orderBy(Column column, SqlSort sqlSort) {
-        return orderBy(column.getTableAlias(), column.name(), sqlSort);
+        return orderBy(column.getTableAlias(), column.getName(), sqlSort);
     }
 
     /**

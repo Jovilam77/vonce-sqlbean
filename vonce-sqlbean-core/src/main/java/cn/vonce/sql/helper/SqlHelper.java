@@ -139,7 +139,7 @@ public class SqlHelper {
         check(update);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlConstant.UPDATE);
-        sqlSb.append(getTableName(update.getTable(), update));
+        sqlSb.append(update.getSqlBeanDB().getDbType() == DbType.H2 ? fromFullName(update) : getTableName(update.getTable(), update));
         sqlSb.append(SqlConstant.SET);
         sqlSb.append(setSql(update));
         sqlSb.append(whereSql(update, update.getUpdateBean()));
@@ -174,7 +174,7 @@ public class SqlHelper {
         check(delete);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlConstant.DELETE_FROM);
-        sqlSb.append(getTableName(delete.getTable(), delete));
+        sqlSb.append(delete.getSqlBeanDB().getDbType() == DbType.H2 ? fromFullName(delete) : getTableName(delete.getTable(), delete));
         sqlSb.append(whereSql(delete, null));
         return sqlSb.toString();
     }
@@ -468,15 +468,15 @@ public class SqlHelper {
     /**
      * 返回from的表名包括别名
      *
-     * @param select
+     * @param common
      * @return
      */
-    private static String fromFullName(Select select) {
-        String transferred = SqlBeanUtil.getTransferred(select);
+    private static String fromFullName(Common common) {
+        String transferred = SqlBeanUtil.getTransferred(common);
         StringBuffer fromSql = new StringBuffer();
-        String tableName = select.getTable().getName();
-        String schema = select.getTable().getSchema();
-        if (SqlBeanUtil.isToUpperCase(select)) {
+        String tableName = common.getTable().getName();
+        String schema = common.getTable().getSchema();
+        if (SqlBeanUtil.isToUpperCase(common)) {
             tableName = tableName.toUpperCase();
             schema = schema.toUpperCase();
         }
@@ -487,7 +487,7 @@ public class SqlHelper {
         fromSql.append(tableName);
         fromSql.append(SqlConstant.SPACES);
         fromSql.append(transferred);
-        fromSql.append(select.getTable().getAlias());
+        fromSql.append(common.getTable().getAlias());
         fromSql.append(transferred);
         return fromSql.toString();
     }
@@ -526,8 +526,6 @@ public class SqlHelper {
                     schema = schema.toUpperCase();
                     tableName = tableName.toUpperCase();
                     tableAlias = tableAlias.toUpperCase();
-//                    tableKeyword = tableKeyword.toUpperCase();
-//                    mainKeyword = mainKeyword.toUpperCase();
                 }
                 if (StringUtil.isNotEmpty(schema)) {
                     joinSql.append(schema);
@@ -773,21 +771,21 @@ public class SqlHelper {
      */
     private static String groupByAndOrderBySql(String type, Select select) {
         StringBuffer groupByAndOrderBySql = new StringBuffer();
-        SqlField[] sqlFields;
+        Column[] columns;
         if (SqlConstant.ORDER_BY.equals(type)) {
-            sqlFields = select.getOrderBy().toArray(new SqlField[]{});
+            columns = select.getOrderBy().toArray(new Column[]{});
         } else {
-            sqlFields = select.getGroupBy().toArray(new SqlField[]{});
+            columns = select.getGroupBy().toArray(new Column[]{});
         }
-        if (sqlFields != null && sqlFields.length != 0) {
+        if (columns != null && columns.length != 0) {
             groupByAndOrderBySql.append(type);
-            for (int i = 0; i < sqlFields.length; i++) {
-                SqlField sqlField = sqlFields[i];
-                if (StringUtil.isNotEmpty(sqlField.getTableAlias())) {
-                    groupByAndOrderBySql.append(sqlField.getTableAlias());
+            for (int i = 0; i < columns.length; i++) {
+                Column column = columns[i];
+                if (StringUtil.isNotEmpty(column.getTableAlias())) {
+                    groupByAndOrderBySql.append(column.getTableAlias());
                     groupByAndOrderBySql.append(SqlConstant.POINT);
                 }
-                groupByAndOrderBySql.append(sqlField.getName());
+                groupByAndOrderBySql.append(column.getName());
                 if (SqlConstant.ORDER_BY.equals(type)) {
                     groupByAndOrderBySql.append(SqlConstant.SPACES);
                     groupByAndOrderBySql.append(select.getOrderBy().get(i).getSqlSort().name());

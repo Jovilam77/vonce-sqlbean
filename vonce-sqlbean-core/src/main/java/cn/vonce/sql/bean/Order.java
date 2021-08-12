@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * Order By
  */
-public class Order extends SqlField implements Serializable {
+public class Order extends Column implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -21,8 +21,8 @@ public class Order extends SqlField implements Serializable {
         this("", name, sqlSort);
     }
 
-    public Order(SqlField sqlField, SqlSort sqlSort) {
-        this(sqlField.getTableAlias(), sqlField.getName(), sqlSort);
+    public Order(Column column, SqlSort sqlSort) {
+        this(column.getTableAlias(), column.getName(), sqlSort);
     }
 
     public Order(String tableAlias, String name, SqlSort sqlSort) {
