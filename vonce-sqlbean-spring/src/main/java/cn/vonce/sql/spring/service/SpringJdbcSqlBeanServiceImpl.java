@@ -584,7 +584,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @Override
     public void dropTable() {
         SqlBeanDB sqlBeanDB = getSqlBeanDB();
-        if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.PostgreSQL && sqlBeanDB.getDbType() != DbType.SQLServer) {
+        if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.PostgreSQL && sqlBeanDB.getDbType() != DbType.SQLServer && sqlBeanDB.getDbType() != DbType.H2) {
             List<String> nameList = jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(sqlBeanDB, SqlBeanUtil.getTable(clazz).getName()), String.class);
             if (nameList == null || nameList.isEmpty()) {
                 return;

@@ -2,6 +2,8 @@ package cn.vonce.sql.config;
 
 import cn.vonce.sql.enumerate.DbType;
 
+import java.io.Serializable;
+
 /**
  * 数据库信息
  *
@@ -9,7 +11,7 @@ import cn.vonce.sql.enumerate.DbType;
  * @version 1.0
  * @email 766255988@qq.com
  */
-public class SqlBeanDB {
+public class SqlBeanDB implements Serializable {
 
     /**
      * 数据库类型

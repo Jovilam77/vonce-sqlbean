@@ -109,26 +109,6 @@ public class SqlBeanUtil {
         return SqlBeanUtil.isToUpperCase(common) ? tableName.toUpperCase() : tableName;
     }
 
-//    /**
-//     * 获取Bean字段中实际对于的表字段
-//     *
-//     * @param field
-//     * @param clazz
-//     * @return
-//     */
-//    public static String getTableFieldName(Field field, Class<?> clazz) {
-//        SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
-//        String name = field.getName();
-//        if (sqlColumn != null) {
-//            name = sqlColumn.value();
-//        } else {
-//            SqlTable sqlTable = getSqlTable(clazz);
-//            if (sqlTable != null && sqlTable.mapUsToCc()) {
-//                name = StringUtil.humpToUnderline(name);
-//            }
-//        }
-//        return name;
-//    }
 
     /**
      * 获取Bean字段中实际对于的表字段

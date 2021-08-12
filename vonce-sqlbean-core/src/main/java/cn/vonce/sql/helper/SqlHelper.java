@@ -213,7 +213,7 @@ public class SqlHelper {
                 columnName = sqlColumn.value();
             }
             sqlSb.append(transferred);
-            sqlSb.append(columnName);
+            sqlSb.append(SqlBeanUtil.isToUpperCase(create) ? columnName.toUpperCase() : columnName);
             sqlSb.append(transferred);
             sqlSb.append(SqlConstant.SPACES);
             sqlSb.append(columnInfo.getType().name());
@@ -240,9 +240,10 @@ public class SqlHelper {
         }
         //主键
         if (idField != null) {
+            String id = SqlBeanUtil.getTableFieldName(idField);
             sqlSb.append(SqlConstant.PRIMARY_KEY);
             sqlSb.append(SqlConstant.BEGIN_BRACKET);
-            sqlSb.append(SqlBeanUtil.getTableFieldName(idField));
+            sqlSb.append(SqlBeanUtil.isToUpperCase(create) ? id.toUpperCase() : id);
             sqlSb.append(SqlConstant.END_BRACKET);
         } else {
             sqlSb.deleteCharAt(sqlSb.length() - 1);
@@ -346,7 +347,7 @@ public class SqlHelper {
     public static String buildDrop(Drop drop) {
         StringBuffer dropSql = new StringBuffer();
         String tableName = getTableName(drop.getTable(), drop);
-        if (drop.getSqlBeanDB().getDbType() == DbType.MySQL || drop.getSqlBeanDB().getDbType() == DbType.MariaDB || drop.getSqlBeanDB().getDbType() == DbType.PostgreSQL) {
+        if (drop.getSqlBeanDB().getDbType() == DbType.MySQL || drop.getSqlBeanDB().getDbType() == DbType.MariaDB || drop.getSqlBeanDB().getDbType() == DbType.PostgreSQL || drop.getSqlBeanDB().getDbType() == DbType.H2) {
             dropSql.append("DROP TABLE IF EXISTS ");
             dropSql.append(tableName);
         } else if (drop.getSqlBeanDB().getDbType() == DbType.MySQL) {
