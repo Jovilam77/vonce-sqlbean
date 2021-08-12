@@ -243,7 +243,9 @@ public class SqlHelper {
             String id = SqlBeanUtil.getTableFieldName(idField);
             sqlSb.append(SqlConstant.PRIMARY_KEY);
             sqlSb.append(SqlConstant.BEGIN_BRACKET);
+            sqlSb.append(transferred);
             sqlSb.append(SqlBeanUtil.isToUpperCase(create) ? id.toUpperCase() : id);
+            sqlSb.append(transferred);
             sqlSb.append(SqlConstant.END_BRACKET);
         } else {
             sqlSb.deleteCharAt(sqlSb.length() - 1);
