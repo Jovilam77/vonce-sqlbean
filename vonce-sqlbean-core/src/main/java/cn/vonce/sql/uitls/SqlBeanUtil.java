@@ -486,7 +486,23 @@ public class SqlBeanUtil {
                 conditionSql.append(value);
                 index++;
             } else if ('&' == c) {
-                conditionSql.append(args[index]);
+                Object object = args[index];
+                Column column = null;
+                if (object instanceof Column) {
+                    column = (Column) object;
+                }
+                if (column != null) {
+                    String transferred = getTransferred(common);
+                    if (StringUtil.isNotEmpty(column.getTableAlias())) {
+                        conditionSql.append(transferred);
+                        conditionSql.append(column.getTableAlias());
+                        conditionSql.append(transferred);
+                        conditionSql.append(SqlConstant.POINT);
+                    }
+                    conditionSql.append(column.getName());
+                }else {
+                    conditionSql.append(object);
+                }
                 index++;
             } else {
                 conditionSql.append(c);

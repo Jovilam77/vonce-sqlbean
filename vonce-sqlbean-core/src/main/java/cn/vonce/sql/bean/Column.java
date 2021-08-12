@@ -51,10 +51,6 @@ public class Column extends SqlField implements Serializable {
         return ec + name() + ec;
     }
 
-    public String fullName() {
-        return fullName(null);
-    }
-
     public String fullName(EscapeChar escapeChar) {
         String ec = es(escapeChar);
         if (StringUtil.isNotEmpty(super.getTableAlias())) {
@@ -70,7 +66,8 @@ public class Column extends SqlField implements Serializable {
 
     public String count(EscapeChar escapeChar) {
         String ec = es(escapeChar);
-        return "COUNT(" + ec + fullName() + ec + ")";
+        String name = escapeChar == null ? name() : fullName(escapeChar);
+        return "COUNT(" + ec + name + ec + ")";
     }
 
     public String avg() {
@@ -79,7 +76,8 @@ public class Column extends SqlField implements Serializable {
 
     public String avg(EscapeChar escapeChar) {
         String ec = es(escapeChar);
-        return "AVG(" + ec + fullName() + ec + ")";
+        String name = escapeChar == null ? name() : fullName(escapeChar);
+        return "AVG(" + ec + name + ec + ")";
     }
 
     public String max() {
@@ -88,7 +86,8 @@ public class Column extends SqlField implements Serializable {
 
     public String max(EscapeChar escapeChar) {
         String ec = es(escapeChar);
-        return "MAX(" + ec + fullName() + ec + ")";
+        String name = escapeChar == null ? name() : fullName(escapeChar);
+        return "MAX(" + ec + name + ec + ")";
     }
 
     public String min() {
@@ -97,7 +96,8 @@ public class Column extends SqlField implements Serializable {
 
     public String min(EscapeChar escapeChar) {
         String ec = es(escapeChar);
-        return "MIN(" + ec + fullName() + ec + ")";
+        String name = escapeChar == null ? name() : fullName(escapeChar);
+        return "MIN(" + ec + name + ec + ")";
     }
 
     public String sum() {
@@ -106,7 +106,8 @@ public class Column extends SqlField implements Serializable {
 
     public String sum(EscapeChar escapeChar) {
         String ec = es(escapeChar);
-        return "SUM(" + ec + fullName() + ec + ")";
+        String name = escapeChar == null ? name() : fullName(escapeChar);
+        return "SUM(" + ec + name + ec + ")";
     }
 
     private String es(EscapeChar escapeChar) {
@@ -122,7 +123,7 @@ public class Column extends SqlField implements Serializable {
 
     @Override
     public String toString() {
-        return fullName();
+        return name();
     }
 
 }
