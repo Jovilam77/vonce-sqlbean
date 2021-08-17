@@ -510,6 +510,9 @@ public class SqlBeanProvider {
      * @return
      */
     public static String selectTableListSql(SqlBeanDB sqlBeanDB, String name) {
+        if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase() && StringUtil.isNotEmpty(name)) {
+            name = name.toUpperCase();
+        }
         switch (sqlBeanDB.getDbType()) {
             case MySQL:
             case MariaDB:
@@ -517,7 +520,7 @@ public class SqlBeanProvider {
             case SQLServer:
                 return "select name from sysobjects where xtype='U'" + (StringUtil.isNotEmpty(name) ? " and name = '" + name + "'" : "");
             case Oracle:
-                return "select table_name as \"name\" from user_tables" + (StringUtil.isNotEmpty(name) ? " and table_name = '" + name + "'" : "");
+                return "select table_name as \"name\" from user_tables" + (StringUtil.isNotEmpty(name) ? " where table_name = '" + name + "'" : "");
             case PostgreSQL:
                 return "select tablename as \"name\" from pg_tables where schemaname = 'public'" + (StringUtil.isNotEmpty(name) ? " and tablename = '" + name + "'" : "");
             case DB2:
