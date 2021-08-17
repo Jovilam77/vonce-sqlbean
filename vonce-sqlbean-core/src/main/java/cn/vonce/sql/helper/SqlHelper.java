@@ -139,7 +139,11 @@ public class SqlHelper {
         check(update);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlConstant.UPDATE);
-        sqlSb.append(update.getSqlBeanDB().getDbType() == DbType.H2 ? fromFullName(update) : getTableName(update.getTable(), update));
+        if (update.getSqlBeanDB().getDbType() == DbType.H2 || update.getSqlBeanDB().getDbType() == DbType.Oracle) {
+            sqlSb.append(fromFullName(update));
+        } else {
+            sqlSb.append(getTableName(update.getTable(), update));
+        }
         sqlSb.append(SqlConstant.SET);
         sqlSb.append(setSql(update));
         sqlSb.append(whereSql(update, update.getUpdateBean()));
@@ -174,7 +178,11 @@ public class SqlHelper {
         check(delete);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlConstant.DELETE_FROM);
-        sqlSb.append(delete.getSqlBeanDB().getDbType() == DbType.H2 ? fromFullName(delete) : getTableName(delete.getTable(), delete));
+        if (delete.getSqlBeanDB().getDbType() == DbType.H2 || delete.getSqlBeanDB().getDbType() == DbType.Oracle) {
+            sqlSb.append(fromFullName(delete));
+        } else {
+            sqlSb.append(getTableName(delete.getTable(), delete));
+        }
         sqlSb.append(whereSql(delete, null));
         return sqlSb.toString();
     }
@@ -702,6 +710,9 @@ public class SqlHelper {
             }
             Object objectValue = ReflectUtil.instance().get(bean.getClass(), bean, fields[i].getName());
             if (update.isUpdateNotNull() && objectValue == null && !fields[i].isAnnotationPresent(SqlUpdateTime.class) && !fields[i].isAnnotationPresent(SqlVersion.class)) {
+                continue;
+            }
+            if (!update.isOptimisticLock() && objectValue == null && fields[i].isAnnotationPresent(SqlVersion.class)) {
                 continue;
             }
             setSql.append(transferred);
