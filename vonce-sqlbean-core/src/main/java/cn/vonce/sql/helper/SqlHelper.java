@@ -201,6 +201,7 @@ public class SqlHelper {
         sqlSb.append(SqlConstant.BEGIN_BRACKET);
         Field idField = null;
         Field[] fields = create.getBeanClass().getDeclaredFields();
+        SqlTable sqlTable = create.getBeanClass().getAnnotation(SqlTable.class);
         String transferred = SqlBeanUtil.getTransferred(create);
         for (Field field : fields) {
             if (Modifier.isStatic(field.getModifiers())) {
@@ -219,6 +220,10 @@ public class SqlHelper {
             String columnName = field.getName();
             if (sqlColumn != null) {
                 columnName = sqlColumn.value();
+            } else {
+                if (sqlTable != null && sqlTable.mapUsToCc()) {
+                    columnName = StringUtil.humpToUnderline(columnName);
+                }
             }
             sqlSb.append(transferred);
             sqlSb.append(SqlBeanUtil.isToUpperCase(create) ? columnName.toUpperCase() : columnName);
