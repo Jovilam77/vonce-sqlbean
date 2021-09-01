@@ -3,7 +3,7 @@
 ###### 1. 数据源相关属性yml格式（注解自动配置必须准守，手动配置可自定义）
 ```
 #使用注解配置必须遵守spring.datasource.type否则找不到或不配将默认使用druid，如未导包会报错
-#使用注解配置必须遵守spring.datasource.sqlite前缀
+#使用注解配置必须遵守spring.datasource.sqlbean前缀
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
