@@ -88,12 +88,12 @@ public class SelectCondition extends Condition {
     /**
      * 添加having条件
      *
-     * @param sqlField 列字段信息
+     * @param column 列字段信息
      * @param value  列字段值
      * @return
      */
-    public SelectCondition having(SqlField sqlField, Object value) {
-        return having(SqlLogic.AND, sqlField.getTableAlias(), sqlField.getName(), value, SqlOperator.EQUAL_TO);
+    public SelectCondition having(Column column, Object value) {
+        return having(SqlLogic.AND, column.getTableAlias(), column.getName(), value, SqlOperator.EQUAL_TO);
     }
 
 
@@ -136,26 +136,26 @@ public class SelectCondition extends Condition {
     /**
      * 添加having条件
      *
-     * @param sqlField      列字段信息
+     * @param column      列字段信息
      * @param value       列字段值
      * @param sqlOperator 操作符
      * @return
      */
-    public SelectCondition having(SqlField sqlField, Object value, SqlOperator sqlOperator) {
-        return having(SqlLogic.AND, sqlField.getTableAlias(), sqlField.getName(), value, sqlOperator);
+    public SelectCondition having(Column column, Object value, SqlOperator sqlOperator) {
+        return having(SqlLogic.AND, column.getTableAlias(), column.getName(), value, sqlOperator);
     }
 
     /**
      * 添加having条件
      *
      * @param sqlLogic    该条件与下一条件之间的逻辑关系
-     * @param sqlField      列字段信息
+     * @param column      列字段信息
      * @param value       列字段值
      * @param sqlOperator 操作符
      * @return
      */
-    public SelectCondition having(SqlLogic sqlLogic, SqlField sqlField, Object value, SqlOperator sqlOperator) {
-        return having(sqlLogic, sqlField.getTableAlias(), sqlField.getName(), value, sqlOperator);
+    public SelectCondition having(SqlLogic sqlLogic, Column column, Object value, SqlOperator sqlOperator) {
+        return having(sqlLogic, column.getTableAlias(), column.getName(), value, sqlOperator);
     }
 
     /**

@@ -109,26 +109,6 @@ public class SqlBeanUtil {
         return SqlBeanUtil.isToUpperCase(common) ? tableName.toUpperCase() : tableName;
     }
 
-//    /**
-//     * 获取Bean字段中实际对于的表字段
-//     *
-//     * @param field
-//     * @param clazz
-//     * @return
-//     */
-//    public static String getTableFieldName(Field field, Class<?> clazz) {
-//        SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
-//        String name = field.getName();
-//        if (sqlColumn != null) {
-//            name = sqlColumn.value();
-//        } else {
-//            SqlTable sqlTable = getSqlTable(clazz);
-//            if (sqlTable != null && sqlTable.mapUsToCc()) {
-//                name = StringUtil.humpToUnderline(name);
-//            }
-//        }
-//        return name;
-//    }
 
     /**
      * 获取Bean字段中实际对于的表字段
@@ -258,28 +238,13 @@ public class SqlBeanUtil {
     }
 
     /**
-     * 判断SqlBeanJoin 是否为空
+     * 判断SqlJoin 是否为空
      *
      * @param sqlJoin
      * @return
      */
-    public static boolean sqlBeanJoinIsNotEmpty(SqlJoin sqlJoin) {
-        return joinIsNotEmpty(sqlJoin.table(), sqlJoin.tableKeyword(), sqlJoin.mainKeyword());
-    }
-
-    /**
-     * 判断Join 是否为空
-     *
-     * @param table
-     * @param tableKeyword
-     * @param mainKeyword
-     * @return
-     */
-    public static boolean joinIsNotEmpty(String table, String tableKeyword, String mainKeyword) {
-        if (table != null && !table.equals("") && tableKeyword != null && !tableKeyword.equals("") && mainKeyword != null && !mainKeyword.equals("")) {
-            return true;
-        }
-        return false;
+    public static boolean sqlJoinIsNotEmpty(SqlJoin sqlJoin) {
+        return StringUtil.isNotEmpty(sqlJoin.table()) && StringUtil.isNotEmpty(sqlJoin.tableKeyword()) && StringUtil.isNotEmpty(sqlJoin.mainKeyword());
     }
 
     /**
@@ -347,16 +312,16 @@ public class SqlBeanUtil {
             if (sqlJoin != null && sqlJoin.isBean()) {
                 Class<?> subBeanClazz = field.getType();
                 //如果有指定查询的字段
-                if (sqlBeanJoinIsNotEmpty(sqlJoin) && sqlJoin.value().length > 0 && !sqlJoin.value()[0].equals("")) {
+                if (sqlJoinIsNotEmpty(sqlJoin) && sqlJoin.value().length > 0 && !sqlJoin.value()[0].equals("")) {
                     List<Field> subBeanFieldList = getBeanAllField(subBeanClazz);
                     for (String fieldName : sqlJoin.value()) {
                         Field javaField = getFieldByTableFieldName(subBeanFieldList, fieldName);
                         if (javaField == null) {
-                            throw new SqlBeanException("该类的表连接查询字段未与java字段关联：" + clazz.getName() + ">" + field.getName() + ">" + fieldName);
+                            throw new SqlBeanException("该表连接查询的字段未与java字段关联：" + subBeanClazz.getName() + "类中找不到" + fieldName);
                         }
                         //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
                         Table subTable = getTable(subBeanClazz, sqlJoin);
-                        columnSet.add(new Column(/*sqlJoin.schema(), */sqlJoin.table(), fieldName, getColumnAlias(subTable.getAlias(), javaField.getName())));
+                        columnSet.add(new Column(sqlJoin.table(), fieldName, getColumnAlias(subTable.getAlias(), javaField.getName())));
                     }
                 }
                 //没有指定查询的字段则查询所有字段
@@ -371,22 +336,22 @@ public class SqlBeanUtil {
                         if (isIgnore(field)) {
                             continue;
                         }
-                        columnSet.add(new Column(/*subTable.getSchema(), */subTable.getAlias(), getTableFieldName(subBeanField), getColumnAlias(subTable.getAlias(), subBeanField.getName())));
+                        columnSet.add(new Column(subTable.getAlias(), getTableFieldName(subBeanField), getColumnAlias(subTable.getAlias(), subBeanField.getName())));
                     }
                 }
             } else if (sqlJoin != null) {
-                if (sqlBeanJoinIsNotEmpty(sqlJoin)) {
+                if (sqlJoinIsNotEmpty(sqlJoin)) {
                     //获取SqlBeanJoin 注解中的查询字段
                     String tableFieldName = sqlJoin.value()[0];
                     if (StringUtil.isEmpty(tableFieldName)) {
-                        throw new SqlBeanException("该类的表连接查询字段未与java字段关联：");
+                        throw new SqlBeanException("需指定连接查询的字段：@SqlJoin > value = {“xxx”}");
                     }
                     //可能会连同一个表，但连接条件不一样（这时表需要区分别名），所以查询的字段可能是同一个，但属于不同表别名下，所以用java字段名当sql字段别名不会出错
                     String subTableAlias = StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias();
-                    columnSet.add(new Column(/*sqlJoin.schema(), */subTableAlias, tableFieldName, getColumnAlias(subTableAlias, field.getName())));
+                    columnSet.add(new Column(subTableAlias, tableFieldName, getColumnAlias(subTableAlias, field.getName())));
                 }
             } else {
-                columnSet.add(new Column(/*table.getSchema(), */tableAlias, getTableFieldName(field), getColumnAlias(tableAlias, field.getName())));
+                columnSet.add(new Column(tableAlias, getTableFieldName(field), getColumnAlias(tableAlias, field.getName())));
             }
         }
         return new ArrayList<>(columnSet);
@@ -408,7 +373,7 @@ public class SqlBeanUtil {
             }
             SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
             Join join = new Join();
-            if (sqlJoin != null && sqlBeanJoinIsNotEmpty(sqlJoin)) {
+            if (sqlJoin != null && sqlJoinIsNotEmpty(sqlJoin)) {
                 join.setJoinType(sqlJoin.type());
                 join.setSchema(sqlJoin.schema());
                 join.setTableName(sqlJoin.table());
@@ -521,7 +486,23 @@ public class SqlBeanUtil {
                 conditionSql.append(value);
                 index++;
             } else if ('&' == c) {
-                conditionSql.append(args[index]);
+                Object object = args[index];
+                Column column = null;
+                if (object instanceof Column) {
+                    column = (Column) object;
+                }
+                if (column != null) {
+                    String transferred = getTransferred(common);
+                    if (StringUtil.isNotEmpty(column.getTableAlias())) {
+                        conditionSql.append(transferred);
+                        conditionSql.append(column.getTableAlias());
+                        conditionSql.append(transferred);
+                        conditionSql.append(SqlConstant.POINT);
+                    }
+                    conditionSql.append(column.getName());
+                }else {
+                    conditionSql.append(object);
+                }
                 index++;
             } else {
                 conditionSql.append(c);

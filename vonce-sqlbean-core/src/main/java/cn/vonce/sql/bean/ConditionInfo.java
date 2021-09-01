@@ -13,7 +13,7 @@ import java.io.Serializable;
  * @email 766255988@qq.com
  * @date 2018年4月16日下午7:15:10
  */
-public class ConditionInfo extends SqlField implements Serializable {
+public class ConditionInfo extends Column implements Serializable {
 
     /**
      *
@@ -24,20 +24,20 @@ public class ConditionInfo extends SqlField implements Serializable {
         super();
     }
 
-    public ConditionInfo(String field, Object value) {
-        this(null, "", field, value, null);
+    public ConditionInfo(String columnName, Object value) {
+        this(null, "", columnName, value, null);
     }
 
-    public ConditionInfo(String tableAlias, String field, Object value) {
-        this(null, tableAlias, field, value, null);
+    public ConditionInfo(String tableAlias, String columnName, Object value) {
+        this(null, tableAlias, columnName, value, null);
     }
 
-    public ConditionInfo(String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        this(null, tableAlias, field, value, sqlOperator);
+    public ConditionInfo(String tableAlias, String columnName, Object value, SqlOperator sqlOperator) {
+        this(null, tableAlias, columnName, value, sqlOperator);
     }
 
-    public ConditionInfo(SqlLogic sqlLogic, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
-        super(tableAlias, field);
+    public ConditionInfo(SqlLogic sqlLogic, String tableAlias, String columnName, Object value, SqlOperator sqlOperator) {
+        super(tableAlias, columnName, "");
         this.sqlLogic = sqlLogic;
         this.value = value;
         this.sqlOperator = sqlOperator;

@@ -32,8 +32,8 @@ public class Paging implements Serializable {
         this(pagenum, pagesize, new Order[]{new Order(field, sqlSort)});
     }
 
-    public Paging(Integer pagenum, Integer pagesize, SqlField sqlField, SqlSort sqlSort) {
-        this(pagenum, pagesize, new Order[]{new Order(sqlField, sqlSort)});
+    public Paging(Integer pagenum, Integer pagesize, Column column, SqlSort sqlSort) {
+        this(pagenum, pagesize, new Order[]{new Order(column, sqlSort)});
     }
 
     public Paging(Integer pagenum, Integer pagesize, Order[] orders) {

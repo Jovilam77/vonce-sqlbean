@@ -4,6 +4,7 @@ import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.enumerate.DbType;
+import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.service.TableService;
 import cn.vonce.sql.spring.annotation.DbSwitch;
@@ -18,12 +19,14 @@ import cn.vonce.sql.uitls.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -99,13 +102,8 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (id == null) {
             return null;
         }
-        try {
-            return jdbcTemplate.queryForObject(SqlBeanProvider.selectByIdSql(getSqlBeanDB(), clazz, id),
-                    new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectByIdSql(getSqlBeanDB(), clazz, id),
+                new SpringJbdcSqlBeanMapper<T>(clazz, clazz)));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -114,16 +112,11 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (id == null) {
             return null;
         }
-        try {
-            if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-                clazz = returnType;
-            }
-            return jdbcTemplate.queryForObject(SqlBeanProvider.selectByIdSql(getSqlBeanDB(), clazz, id),
-                    new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
+        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+            clazz = returnType;
         }
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectByIdSql(getSqlBeanDB(), clazz, id),
+                new SpringJbdcSqlBeanMapper<O>(clazz, returnType)));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -132,13 +125,8 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (ids == null || ids.length == 0) {
             return null;
         }
-        try {
-            return jdbcTemplate.queryForObject(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, ids),
-                    new SpringJbdcSqlBeanMapper<List<T>>(clazz, clazz));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
+        return jdbcTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, ids),
+                new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -147,233 +135,153 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (ids == null || ids.length == 0) {
             return null;
         }
-        try {
-            if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-                clazz = returnType;
-            }
-            return jdbcTemplate.queryForObject(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, ids),
-                    new SpringJbdcSqlBeanMapper<List<O>>(clazz, returnType));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
+        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+            clazz = returnType;
         }
+        return jdbcTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, ids),
+                new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public T selectOne(Select select) {
-        try {
-            return jdbcTemplate.queryForObject(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
-                    new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return null;
-        }
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                new SpringJbdcSqlBeanMapper<T>(clazz, clazz)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <O> O selectOne(Class<O> returnType, Select select) {
-        try {
-            if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-                clazz = returnType;
-            }
-            return jdbcTemplate.queryForObject(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
-                    new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
+        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+            clazz = returnType;
         }
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                new SpringJbdcSqlBeanMapper<O>(clazz, returnType)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public Map<String, Object> selectMap(Select select) {
-        try {
-            return jdbcTemplate.queryForObject(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
-                    new SpringJbdcSqlBeanMapper<Map<String, Object>>(clazz, Map.class));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                new SpringJbdcSqlBeanMapper<Map<String, Object>>(clazz, Map.class)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public T selectOneByCondition(String where, Object... args) {
-        try {
-            return jdbcTemplate.queryForObject(SqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args),
-                    new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args),
+                new SpringJbdcSqlBeanMapper<T>(clazz, clazz)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <O> O selectOneByCondition(Class<O> returnType, String where, Object... args) {
-        try {
-            if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-                clazz = returnType;
-            }
-            return jdbcTemplate.queryForObject(SqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args),
-                    new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
+        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+            clazz = returnType;
         }
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args),
+                new SpringJbdcSqlBeanMapper<O>(clazz, returnType)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public T selectOneByCondition(Wrapper where) {
-        try {
-            Select select = new Select();
-            select.setWhere(where);
-            return jdbcTemplate.queryForObject(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
-                    new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
+        Select select = new Select();
+        select.setWhere(where);
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                new SpringJbdcSqlBeanMapper<T>(clazz, clazz)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <O> O selectOneByCondition(Class<O> returnType, Wrapper where) {
-        try {
-            Select select = new Select();
-            select.setWhere(where);
-            if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-                clazz = returnType;
-            }
-            return jdbcTemplate.queryForObject(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
-                    new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
+        Select select = new Select();
+        select.setWhere(where);
+        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+            clazz = returnType;
         }
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                new SpringJbdcSqlBeanMapper<O>(clazz, returnType)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <O> List<O> selectByCondition(Class<O> returnType, String where, Object... args) {
-        try {
-            if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-                clazz = returnType;
-            }
-            return jdbcTemplate.query(SqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args),
-                    new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
+        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+            clazz = returnType;
         }
+        return jdbcTemplate.query(SqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args),
+                new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <O> List<O> selectByCondition(Class<O> returnType, Wrapper where) {
-        try {
-            Select select = new Select();
-            select.setWhere(where);
-            if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-                clazz = returnType;
-            }
-            return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
-                    new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
+        Select select = new Select();
+        select.setWhere(where);
+        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+            clazz = returnType;
         }
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <O> List<O> selectByCondition(Class<O> returnType, Paging paging, String where, Object... args) {
-        try {
-            if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-                clazz = returnType;
-            }
-            return jdbcTemplate.query(SqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, paging, where, args),
-                    new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
+        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+            clazz = returnType;
         }
+        return jdbcTemplate.query(SqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, paging, where, args),
+                new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <O> List<O> selectByCondition(Class<O> returnType, Paging paging, Wrapper where) {
-        try {
-            Select select = new Select();
-            select.setWhere(where);
-            select.setPage(paging.getPagenum(), paging.getPagesize());
-            select.orderBy(paging.getOrders());
-            if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-                clazz = returnType;
-            }
-            return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
-                    new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
+        Select select = new Select();
+        select.setWhere(where);
+        select.setPage(paging.getPagenum(), paging.getPagesize());
+        select.orderBy(paging.getOrders());
+        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+            clazz = returnType;
         }
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> selectByCondition(String where, Object... args) {
-        try {
-            return jdbcTemplate.query(SqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args),
-                    new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
+        return jdbcTemplate.query(SqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args),
+                new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> selectByCondition(Wrapper where) {
-        try {
-            Select select = new Select();
-            select.setWhere(where);
-            return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
-                    new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
+        Select select = new Select();
+        select.setWhere(where);
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> selectByCondition(Paging paging, String where, Object... args) {
-        try {
-            return jdbcTemplate.query(SqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, paging, where, args),
-                    new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
+        return jdbcTemplate.query(SqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, paging, where, args),
+                new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> selectByCondition(Paging paging, Wrapper where) {
-        try {
-            Select select = new Select();
-            select.setWhere(where);
-            select.setPage(paging.getPagenum(), paging.getPagesize());
-            select.orderBy(paging.getOrders());
-            return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
-                    new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
+        Select select = new Select();
+        select.setWhere(where);
+        select.setPage(paging.getPagenum(), paging.getPagesize());
+        select.orderBy(paging.getOrders());
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -399,96 +307,59 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> selectAll() {
-        try {
-            return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, null),
-                    new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
+        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, null),
+                new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> selectAll(Paging paging) {
-        try {
-            return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, paging),
-                    new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
+        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, paging),
+                new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <O> List<O> selectAll(Class<O> returnType) {
-        try {
-            if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-                clazz = returnType;
-            }
-            return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, null),
-                    new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
+        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+            clazz = returnType;
         }
+        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, null),
+                new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <O> List<O> selectAll(Class<O> returnType, Paging paging) {
-        try {
-            if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-                clazz = returnType;
-            }
-            return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, paging),
-                    new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
+        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+            clazz = returnType;
         }
+        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, paging),
+                new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<Map<String, Object>> selectMapList(Select select) {
-        try {
-            return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
-                    new SpringJbdcSqlBeanMapper<Map<String, Object>>(clazz, Map.class));
-        } catch (
-                Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
-
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                new SpringJbdcSqlBeanMapper<Map<String, Object>>(clazz, Map.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <O> List<O> select(Class<O> returnType, Select select) {
-        try {
-            if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-                clazz = returnType;
-            }
-            return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
-                    new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
+        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+            clazz = returnType;
         }
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                new SpringJbdcSqlBeanMapper<O>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> select(Select select) {
-        try {
-            return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
-                    new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
+                new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -657,12 +528,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @Override
     public String backup() {
         String targetTableName = SqlBeanUtil.getTable(clazz).getName() + "_" + DateUtil.dateToString(new Date(), "yyyyMMddHHmmssSSS");
-        try {
-            jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, null, targetTableName, null, null));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return null;
-        }
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, null, targetTableName, null, null));
         return targetTableName;
     }
 
@@ -718,7 +584,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @Override
     public void dropTable() {
         SqlBeanDB sqlBeanDB = getSqlBeanDB();
-        if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.PostgreSQL && sqlBeanDB.getDbType() != DbType.SQLServer) {
+        if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.PostgreSQL && sqlBeanDB.getDbType() != DbType.SQLServer && sqlBeanDB.getDbType() != DbType.H2) {
             List<String> nameList = jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(sqlBeanDB, SqlBeanUtil.getTable(clazz).getName()), String.class);
             if (nameList == null || nameList.isEmpty()) {
                 return;
@@ -745,4 +611,17 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public List<String> getTableList() {
         return jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(getSqlBeanDB(), null), String.class);
     }
+
+    private static <T> T singleResult(Collection<T> results) {
+        int size = results != null ? results.size() : 0;
+        if (size == 0) {
+            return null;
+        } else if (results.size() > 1) {
+            throw new SqlBeanException("执行返回的结果不止一条, size: " + results.size());
+        } else {
+            return results.iterator().next();
+        }
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package cn.vonce.sql.spring.mapper;
 
+import cn.vonce.sql.mapper.SqlBeanMapper;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.springframework.jdbc.core.RowMapper;
 

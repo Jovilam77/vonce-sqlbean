@@ -139,7 +139,11 @@ public class SqlHelper {
         check(update);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlConstant.UPDATE);
-        sqlSb.append(getTableName(update.getTable(), update));
+        if (update.getSqlBeanDB().getDbType() == DbType.H2 || update.getSqlBeanDB().getDbType() == DbType.Oracle) {
+            sqlSb.append(fromFullName(update));
+        } else {
+            sqlSb.append(getTableName(update.getTable(), update));
+        }
         sqlSb.append(SqlConstant.SET);
         sqlSb.append(setSql(update));
         sqlSb.append(whereSql(update, update.getUpdateBean()));
@@ -174,7 +178,11 @@ public class SqlHelper {
         check(delete);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlConstant.DELETE_FROM);
-        sqlSb.append(getTableName(delete.getTable(), delete));
+        if (delete.getSqlBeanDB().getDbType() == DbType.H2 || delete.getSqlBeanDB().getDbType() == DbType.Oracle) {
+            sqlSb.append(fromFullName(delete));
+        } else {
+            sqlSb.append(getTableName(delete.getTable(), delete));
+        }
         sqlSb.append(whereSql(delete, null));
         return sqlSb.toString();
     }
@@ -193,6 +201,7 @@ public class SqlHelper {
         sqlSb.append(SqlConstant.BEGIN_BRACKET);
         Field idField = null;
         Field[] fields = create.getBeanClass().getDeclaredFields();
+        SqlTable sqlTable = create.getBeanClass().getAnnotation(SqlTable.class);
         String transferred = SqlBeanUtil.getTransferred(create);
         for (Field field : fields) {
             if (Modifier.isStatic(field.getModifiers())) {
@@ -211,9 +220,13 @@ public class SqlHelper {
             String columnName = field.getName();
             if (sqlColumn != null) {
                 columnName = sqlColumn.value();
+            } else {
+                if (sqlTable != null && sqlTable.mapUsToCc()) {
+                    columnName = StringUtil.humpToUnderline(columnName);
+                }
             }
             sqlSb.append(transferred);
-            sqlSb.append(columnName);
+            sqlSb.append(SqlBeanUtil.isToUpperCase(create) ? columnName.toUpperCase() : columnName);
             sqlSb.append(transferred);
             sqlSb.append(SqlConstant.SPACES);
             sqlSb.append(columnInfo.getType().name());
@@ -240,9 +253,12 @@ public class SqlHelper {
         }
         //主键
         if (idField != null) {
+            String id = SqlBeanUtil.getTableFieldName(idField);
             sqlSb.append(SqlConstant.PRIMARY_KEY);
             sqlSb.append(SqlConstant.BEGIN_BRACKET);
-            sqlSb.append(SqlBeanUtil.getTableFieldName(idField));
+            sqlSb.append(transferred);
+            sqlSb.append(SqlBeanUtil.isToUpperCase(create) ? id.toUpperCase() : id);
+            sqlSb.append(transferred);
             sqlSb.append(SqlConstant.END_BRACKET);
         } else {
             sqlSb.deleteCharAt(sqlSb.length() - 1);
@@ -346,7 +362,7 @@ public class SqlHelper {
     public static String buildDrop(Drop drop) {
         StringBuffer dropSql = new StringBuffer();
         String tableName = getTableName(drop.getTable(), drop);
-        if (drop.getSqlBeanDB().getDbType() == DbType.MySQL || drop.getSqlBeanDB().getDbType() == DbType.MariaDB || drop.getSqlBeanDB().getDbType() == DbType.PostgreSQL) {
+        if (drop.getSqlBeanDB().getDbType() == DbType.MySQL || drop.getSqlBeanDB().getDbType() == DbType.MariaDB || drop.getSqlBeanDB().getDbType() == DbType.PostgreSQL || drop.getSqlBeanDB().getDbType() == DbType.H2) {
             dropSql.append("DROP TABLE IF EXISTS ");
             dropSql.append(tableName);
         } else if (drop.getSqlBeanDB().getDbType() == DbType.MySQL) {
@@ -465,15 +481,15 @@ public class SqlHelper {
     /**
      * 返回from的表名包括别名
      *
-     * @param select
+     * @param common
      * @return
      */
-    private static String fromFullName(Select select) {
-        String transferred = SqlBeanUtil.getTransferred(select);
+    private static String fromFullName(Common common) {
+        String transferred = SqlBeanUtil.getTransferred(common);
         StringBuffer fromSql = new StringBuffer();
-        String tableName = select.getTable().getName();
-        String schema = select.getTable().getSchema();
-        if (SqlBeanUtil.isToUpperCase(select)) {
+        String tableName = common.getTable().getName();
+        String schema = common.getTable().getSchema();
+        if (SqlBeanUtil.isToUpperCase(common)) {
             tableName = tableName.toUpperCase();
             schema = schema.toUpperCase();
         }
@@ -484,7 +500,7 @@ public class SqlHelper {
         fromSql.append(tableName);
         fromSql.append(SqlConstant.SPACES);
         fromSql.append(transferred);
-        fromSql.append(select.getTable().getAlias());
+        fromSql.append(common.getTable().getAlias());
         fromSql.append(transferred);
         return fromSql.toString();
     }
@@ -523,8 +539,6 @@ public class SqlHelper {
                     schema = schema.toUpperCase();
                     tableName = tableName.toUpperCase();
                     tableAlias = tableAlias.toUpperCase();
-//                    tableKeyword = tableKeyword.toUpperCase();
-//                    mainKeyword = mainKeyword.toUpperCase();
                 }
                 if (StringUtil.isNotEmpty(schema)) {
                     joinSql.append(schema);
@@ -616,6 +630,9 @@ public class SqlHelper {
                         fieldSql.append(SqlConstant.COMMA);
                     }
                 }
+                if (sqlId != null && sqlId.type() == IdType.AUTO) {
+                    continue;
+                }
                 Object value = ReflectUtil.instance().get(objects[i].getClass(), objects[i], field.getName());
                 //如果此字段为id且需要生成唯一id
                 if (sqlId != null && sqlId.type() != IdType.AUTO && sqlId.type() != IdType.NORMAL) {
@@ -700,6 +717,9 @@ public class SqlHelper {
             if (update.isUpdateNotNull() && objectValue == null && !fields[i].isAnnotationPresent(SqlUpdateTime.class) && !fields[i].isAnnotationPresent(SqlVersion.class)) {
                 continue;
             }
+            if (!update.isOptimisticLock() && objectValue == null && fields[i].isAnnotationPresent(SqlVersion.class)) {
+                continue;
+            }
             setSql.append(transferred);
             setSql.append(SqlBeanUtil.isToUpperCase(update) ? name.toUpperCase() : name);
             setSql.append(transferred);
@@ -767,21 +787,21 @@ public class SqlHelper {
      */
     private static String groupByAndOrderBySql(String type, Select select) {
         StringBuffer groupByAndOrderBySql = new StringBuffer();
-        SqlField[] sqlFields;
+        Column[] columns;
         if (SqlConstant.ORDER_BY.equals(type)) {
-            sqlFields = select.getOrderBy().toArray(new SqlField[]{});
+            columns = select.getOrderBy().toArray(new Column[]{});
         } else {
-            sqlFields = select.getGroupBy().toArray(new SqlField[]{});
+            columns = select.getGroupBy().toArray(new Column[]{});
         }
-        if (sqlFields != null && sqlFields.length != 0) {
+        if (columns != null && columns.length != 0) {
             groupByAndOrderBySql.append(type);
-            for (int i = 0; i < sqlFields.length; i++) {
-                SqlField sqlField = sqlFields[i];
-                if (StringUtil.isNotEmpty(sqlField.getTableAlias())) {
-                    groupByAndOrderBySql.append(sqlField.getTableAlias());
+            for (int i = 0; i < columns.length; i++) {
+                Column column = columns[i];
+                if (StringUtil.isNotEmpty(column.getTableAlias())) {
+                    groupByAndOrderBySql.append(column.getTableAlias());
                     groupByAndOrderBySql.append(SqlConstant.POINT);
                 }
-                groupByAndOrderBySql.append(sqlField.getName());
+                groupByAndOrderBySql.append(column.getName());
                 if (SqlConstant.ORDER_BY.equals(type)) {
                     groupByAndOrderBySql.append(SqlConstant.SPACES);
                     groupByAndOrderBySql.append(select.getOrderBy().get(i).getSqlSort().name());

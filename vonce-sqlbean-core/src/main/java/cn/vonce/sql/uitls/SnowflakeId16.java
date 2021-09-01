@@ -3,6 +3,7 @@ package cn.vonce.sql.uitls;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.regex.Matcher;
@@ -28,7 +29,7 @@ import java.util.regex.Pattern;
  * <p>
  * It can generate 64k unique id per IP and up to 2106-02-07T06:28:15Z.
  */
-public final class SnowflakeId16 {
+public final class SnowflakeId16 implements Serializable {
 
 //    private static final Logger logger = LoggerFactory.getLogger(cn.vonce.common.utils.SnowflakeId16.class);
 
