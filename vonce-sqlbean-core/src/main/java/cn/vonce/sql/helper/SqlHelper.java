@@ -4,15 +4,12 @@ import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.StringUtil;
 import com.google.common.collect.ListMultimap;
-
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.uitls.SqlBeanUtil;
-
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -200,11 +197,11 @@ public class SqlHelper {
         sqlSb.append(getTableName(create.getTable(), create));
         sqlSb.append(SqlConstant.BEGIN_BRACKET);
         Field idField = null;
-        Field[] fields = create.getBeanClass().getDeclaredFields();
+        List<Field> fieldList = SqlBeanUtil.getBeanAllField(create.getBeanClass());
         SqlTable sqlTable = create.getBeanClass().getAnnotation(SqlTable.class);
         String transferred = SqlBeanUtil.getTransferred(create);
-        for (Field field : fields) {
-            if (Modifier.isStatic(field.getModifiers())) {
+        for (Field field : fieldList) {
+            if (SqlBeanUtil.isIgnore(field)) {
                 continue;
             }
             if (idField == null) {
@@ -213,9 +210,6 @@ public class SqlHelper {
                 }
             }
             SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
-            if (sqlColumn != null && sqlColumn.ignore()) {
-                continue;
-            }
             ColumnInfo columnInfo = getColumnInfo(create.getSqlBeanDB().getDbType(), field.getType(), sqlColumn);
             String columnName = field.getName();
             if (sqlColumn != null) {
@@ -582,12 +576,7 @@ public class SqlHelper {
         List<String> valueSqlList = new ArrayList<>();
         String transferred = SqlBeanUtil.getTransferred(common);
         //获取sqlbean的全部字段
-        Field[] fields;
-        if (objects[0].getClass().getAnnotation(SqlUnion.class) != null) {
-            fields = objects[0].getClass().getSuperclass().getDeclaredFields();
-        } else {
-            fields = objects[0].getClass().getDeclaredFields();
-        }
+        List<Field> fieldList = SqlBeanUtil.getBeanAllField(objects[0].getClass());
         if (common.getSqlBeanDB().getDbType() == DbType.Oracle) {
             if (objects != null && objects.length > 1) {
                 fieldAndValuesSql.append(SqlConstant.INSERT_ALL_INTO);
@@ -607,10 +596,7 @@ public class SqlHelper {
             }
             valueSql.append(SqlConstant.BEGIN_BRACKET);
             int existId = 0;
-            for (Field field : fields) {
-                if (Modifier.isStatic(field.getModifiers())) {
-                    continue;
-                }
+            for (Field field : fieldList) {
                 if (SqlBeanUtil.isIgnore(field)) {
                     continue;
                 }
@@ -695,39 +681,31 @@ public class SqlHelper {
         String transferred = SqlBeanUtil.getTransferred(update);
         String[] filterFields = update.getFilterFields();
         Object bean = update.getUpdateBean();
-        Field[] fields;
-        if (bean.getClass().getAnnotation(SqlUnion.class) != null) {
-            fields = bean.getClass().getSuperclass().getDeclaredFields();
-        } else {
-            fields = bean.getClass().getDeclaredFields();
-        }
+        List<Field> fieldList = SqlBeanUtil.getBeanAllField(bean.getClass());
         Date date = new Date();
-        for (int i = 0; i < fields.length; i++) {
-            if (Modifier.isStatic(fields[i].getModifiers())) {
+        for (Field field : fieldList) {
+            if (SqlBeanUtil.isIgnore(field)) {
                 continue;
             }
-            if (SqlBeanUtil.isIgnore(fields[i])) {
-                continue;
-            }
-            String name = SqlBeanUtil.getTableFieldName(fields[i]);
+            String name = SqlBeanUtil.getTableFieldName(field);
             if (SqlBeanUtil.isFilter(filterFields, name)) {
                 continue;
             }
-            Object objectValue = ReflectUtil.instance().get(bean.getClass(), bean, fields[i].getName());
-            if (update.isUpdateNotNull() && objectValue == null && !fields[i].isAnnotationPresent(SqlUpdateTime.class) && !fields[i].isAnnotationPresent(SqlVersion.class)) {
+            Object objectValue = ReflectUtil.instance().get(bean.getClass(), bean, field.getName());
+            if (update.isUpdateNotNull() && objectValue == null && !field.isAnnotationPresent(SqlUpdateTime.class) && !field.isAnnotationPresent(SqlVersion.class)) {
                 continue;
             }
-            if (!update.isOptimisticLock() && objectValue == null && fields[i].isAnnotationPresent(SqlVersion.class)) {
+            if (!update.isOptimisticLock() && objectValue == null && field.isAnnotationPresent(SqlVersion.class)) {
                 continue;
             }
             setSql.append(transferred);
             setSql.append(SqlBeanUtil.isToUpperCase(update) ? name.toUpperCase() : name);
             setSql.append(transferred);
             setSql.append(SqlConstant.EQUAL_TO);
-            if (update.isOptimisticLock() && fields[i].isAnnotationPresent(SqlVersion.class)) {
-                Object o = SqlBeanUtil.updateVersion(fields[i].getType().getName(), objectValue);
+            if (update.isOptimisticLock() && field.isAnnotationPresent(SqlVersion.class)) {
+                Object o = SqlBeanUtil.updateVersion(field.getType().getName(), objectValue);
                 setSql.append(SqlBeanUtil.getSqlValue(update, o));
-            } else if (fields[i].isAnnotationPresent(SqlUpdateTime.class) && SqlBeanUtil.whatType(fields[i].getType().getName()) == WhatType.DATE_TYPE) {
+            } else if (field.isAnnotationPresent(SqlUpdateTime.class) && SqlBeanUtil.whatType(field.getType().getName()) == WhatType.DATE_TYPE) {
                 setSql.append(SqlBeanUtil.getSqlValue(update, date));
             } else {
                 setSql.append(SqlBeanUtil.getSqlValue(update, objectValue));
