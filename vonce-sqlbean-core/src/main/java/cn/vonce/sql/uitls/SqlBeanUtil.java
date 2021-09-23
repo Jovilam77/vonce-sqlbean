@@ -212,6 +212,13 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean isIgnore(Field field) {
+        if (Modifier.isStatic(field.getModifiers())) {
+            return true;
+        }
+        SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
+        if (sqlJoin != null) {
+            return true;
+        }
         SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
         if (sqlColumn != null) {
             return sqlColumn.ignore();
@@ -256,10 +263,16 @@ public class SqlBeanUtil {
     public static List<Field> getBeanAllField(Class<?> clazz) {
         List<Field> fieldList = new ArrayList<>();
         fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
-        SqlUnion sqlUnion = clazz.getAnnotation(SqlUnion.class);
-        if (sqlUnion != null) {
-            fieldList.addAll(Arrays.asList(clazz.getSuperclass().getDeclaredFields()));
-        }
+        Class<?> superClass = clazz.getSuperclass();
+        do {
+            if (!superClass.getName().equals("java.lang.Object")) {
+                fieldList.addAll(Arrays.asList(superClass.getDeclaredFields()));
+                superClass = superClass.getSuperclass();
+            }
+            if (superClass.getName().equals("java.lang.Object")) {
+                break;
+            }
+        } while (!superClass.getName().equals("java.lang.Object"));
         return fieldList;
     }
 
@@ -326,10 +339,10 @@ public class SqlBeanUtil {
                 }
                 //没有指定查询的字段则查询所有字段
                 else {
-                    Field[] subBeanFields = subBeanClazz.getDeclaredFields();
+                    List<Field> subBeanFieldList = getBeanAllField(subBeanClazz);
                     //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
                     Table subTable = getTable(subBeanClazz, sqlJoin);
-                    for (Field subBeanField : subBeanFields) {
+                    for (Field subBeanField : subBeanFieldList) {
                         if (Modifier.isStatic(subBeanField.getModifiers())) {
                             continue;
                         }
@@ -500,7 +513,7 @@ public class SqlBeanUtil {
                         conditionSql.append(SqlConstant.POINT);
                     }
                     conditionSql.append(column.getName());
-                }else {
+                } else {
                     conditionSql.append(object);
                 }
                 index++;
