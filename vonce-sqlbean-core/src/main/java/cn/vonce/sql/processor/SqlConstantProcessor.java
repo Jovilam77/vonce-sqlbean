@@ -9,9 +9,13 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -44,6 +48,26 @@ public class SqlConstantProcessor extends AbstractProcessor {
                     if (sqlTable != null && !sqlTable.constant()) {
                         continue;
                     }
+                    List<Element> subElementList = new ArrayList<>();
+                    DeclaredType superClassDeclaredType = (DeclaredType) ((TypeElement) element).getSuperclass();
+                    do {
+                        if (!superClassDeclaredType.toString().equals("java.lang.Object")) {
+                            for (Element e : superClassDeclaredType.asElement().getEnclosedElements()) {
+                                if (e.getKind().isField() && !e.getModifiers().contains(Modifier.STATIC)) {
+                                    subElementList.add(e);
+                                }
+                            }
+                            superClassDeclaredType = (DeclaredType) ((TypeElement) superClassDeclaredType.asElement()).getSuperclass();
+                        }
+                        if (superClassDeclaredType.toString().equals("java.lang.Object")) {
+                            break;
+                        }
+                    } while (!superClassDeclaredType.toString().equals("java.lang.Object"));
+                    for (Element e : element.getEnclosedElements()) {
+                        if (e.getKind().isField() && !e.getModifiers().contains(Modifier.STATIC)) {
+                            subElementList.add(e);
+                        }
+                    }
                     Element enclosingElement = element.getEnclosingElement();
                     //获取父元素的全类名,用来生成包名
                     String packageName = ((PackageElement) enclosingElement).getQualifiedName().toString() + ".sql";
@@ -72,18 +96,16 @@ public class SqlConstantProcessor extends AbstractProcessor {
                         code.append("\tpublic static final String _count = \"COUNT(*)\";\n");
 
                         for (Element subElement : element.getEnclosedElements()) {
-                            if (subElement.getKind().isField() && !subElement.getModifiers().contains(Modifier.STATIC)) {
-                                String sqlFieldName = subElement.getSimpleName().toString();
-                                SqlColumn sqlColumn = subElement.getAnnotation(SqlColumn.class);
-                                if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.value())) {
-                                    sqlFieldName = sqlColumn.value();
-                                } else {
-                                    if (sqlTable != null && sqlTable.mapUsToCc()) {
-                                        sqlFieldName = StringUtil.humpToUnderline(sqlFieldName);
-                                    }
+                            String sqlFieldName = subElement.getSimpleName().toString();
+                            SqlColumn sqlColumn = subElement.getAnnotation(SqlColumn.class);
+                            if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.value())) {
+                                sqlFieldName = sqlColumn.value();
+                            } else {
+                                if (sqlTable != null && sqlTable.mapUsToCc()) {
+                                    sqlFieldName = StringUtil.humpToUnderline(sqlFieldName);
                                 }
-                                code.append(String.format("\tpublic static final Column %s = new Column(_tableAlias,\"%s\",\"\");\n", sqlFieldName, sqlFieldName));
                             }
+                            code.append(String.format("\tpublic static final Column %s = new Column(_tableAlias,\"%s\",\"\");\n", sqlFieldName, sqlFieldName));
                         }
 
                         code.append("\n}");
