@@ -95,7 +95,7 @@ public class SqlConstantProcessor extends AbstractProcessor {
                         code.append(String.format("\tpublic static final String _all = \"%s.*\";\n", tableAlias));
                         code.append("\tpublic static final String _count = \"COUNT(*)\";\n");
 
-                        for (Element subElement : element.getEnclosedElements()) {
+                        for (Element subElement : subElementList) {
                             String sqlFieldName = subElement.getSimpleName().toString();
                             SqlColumn sqlColumn = subElement.getAnnotation(SqlColumn.class);
                             if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.value())) {
@@ -105,7 +105,8 @@ public class SqlConstantProcessor extends AbstractProcessor {
                                     sqlFieldName = StringUtil.humpToUnderline(sqlFieldName);
                                 }
                             }
-                            code.append(String.format("\tpublic static final Column %s = new Column(_tableAlias,\"%s\",\"\");\n", sqlFieldName, sqlFieldName));
+                            code.append(String.format("\tpublic static final String %s = \"%s\";\n", sqlFieldName, sqlFieldName));
+                            code.append(String.format("\tpublic static final Column $%s = new Column(_tableAlias,%s,\"\");\n", sqlFieldName, sqlFieldName));
                         }
 
                         code.append("\n}");
