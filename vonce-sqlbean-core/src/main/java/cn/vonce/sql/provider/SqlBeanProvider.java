@@ -540,6 +540,88 @@ public class SqlBeanProvider {
     }
 
     /**
+     * 获取列信息列表
+     *
+     * @param sqlBeanDB
+     * @return
+     */
+    public static String selectColumnListSql(SqlBeanDB sqlBeanDB, String name) {
+        if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase() && StringUtil.isNotEmpty(name)) {
+            name = name.toUpperCase();
+        }
+        switch (sqlBeanDB.getDbType()) {
+            case MySQL:
+            case MariaDB:
+                return mysqlColumnInfoSql("");
+            case SQLServer:
+                return sqlServerColumnInfoSql("");
+            case Oracle:
+                return oracleColumnInfoSql("");
+            case PostgreSQL:
+            case DB2:
+            case H2:
+            case Hsql:
+            case Derby:
+                return "";
+            case SQLite:
+                return sqliteColumnInfoSql("");
+            default:
+                throw new SqlBeanException("请配置正确的数据库");
+        }
+    }
+
+    private static String mysqlColumnInfoSql(String tableName) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT ordinal_position cid, table_name name, data_type type, ");
+        sql.append("(case is_nullable when 'NO' then 1 else 0 end) notnull, column_default dflt_value, ");
+        sql.append("(case IFNULL(column_key,'') when '' then 0 else 1 end) pk, column_comment comm ");
+        sql.append("FROM information_schema.columns ");
+        sql.append("WHERE table_schema = database() AND table_name = '");
+        sql.append(tableName);
+        sql.append("'");
+        return sql.toString();
+    }
+
+    private static String sqlServerColumnInfoSql(String tableName){
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT a.cid, a.name, a.type, a.notnull, (case when isnull(column_name, '') <> '' then 1 else 0 end) AS pk ");
+        sql.append("FROM (");
+        sql.append("SELECT syscolumns.colid AS cid, syscolumns.name AS name, systypes.name AS type, syscolumns.isnullable AS notnull, '");
+        sql.append(tableName);
+        sql.append("' AS table_name ");
+        sql.append("FROM syscolumns, systypes ");
+        sql.append("WHERE syscolumns.xusertype = systypes.xusertype AND syscolumns.id = object_id('");
+        sql.append(tableName);
+        sql.append("')) a ");
+        sql.append("LEFT JOIN information_schema.key_column_usage b ON a.name = b.column_name AND a.table_name = b.table_name ");
+        sql.append("ORDER BY a.cid");
+        return sql.toString();
+    }
+
+    private static String oracleColumnInfoSql(String tableName){
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT col.column_id AS cid, col.column_name, col.data_type type, ");
+        sql.append("(case col.nullable when 'N' then '1' else '0' end) AS notnull, col.data_default AS dflt_value, ");
+        sql.append("(case uc.constraint_type when 'P' then '1' else '0' end) AS pk, user_col_comments.comments comm ");
+        sql.append("FROM user_tab_columns col ");
+        sql.append("LEFT JOIN user_cons_columns ucc ON ucc.table_name = col.table_name AND ucc.column_name = col.column_name ");
+        sql.append("LEFT JOIN user_constraints uc ON uc.constraint_name = ucc.constraint_name AND uc.constraint_type = 'P' ");
+        sql.append("INNER JOIN user_col_comments ON user_col_comments.table_name = col.table_name AND user_col_comments.column_name = col.column_name ");
+        sql.append("WHERE col.table_name = '");
+        sql.append(tableName);
+        sql.append("')");
+        return sql.toString();
+    }
+
+    private static String sqliteColumnInfoSql(String tableName){
+        StringBuffer sql = new StringBuffer();
+        sql.append("pragma table_info('");
+        sql.append(tableName);
+        sql.append("')");
+        return sql.toString();
+    }
+
+    /**
      * 备份表和数据
      *
      * @param sqlBeanDB
