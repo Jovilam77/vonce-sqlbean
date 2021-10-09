@@ -7,13 +7,13 @@ import java.io.Serializable;
  */
 public class Original implements Serializable {
 
-    public Original(String value) {
+    public Original(Object value) {
         this.value = value;
     }
 
-    private String value;
+    private Object value;
 
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
