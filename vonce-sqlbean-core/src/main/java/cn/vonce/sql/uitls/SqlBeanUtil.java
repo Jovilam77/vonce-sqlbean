@@ -499,29 +499,41 @@ public class SqlBeanUtil {
                 conditionSql.append(value);
                 index++;
             } else if ('&' == c) {
-                Object object = args[index];
-                Column column = null;
-                if (object instanceof Column) {
-                    column = (Column) object;
-                }
-                if (column != null) {
-                    String transferred = getTransferred(common);
-                    if (StringUtil.isNotEmpty(column.getTableAlias())) {
-                        conditionSql.append(transferred);
-                        conditionSql.append(column.getTableAlias());
-                        conditionSql.append(transferred);
-                        conditionSql.append(SqlConstant.POINT);
-                    }
-                    conditionSql.append(column.getName());
-                } else {
-                    conditionSql.append(object);
-                }
+                conditionSql.append(getOriginal(common, args[index]));
                 index++;
             } else {
                 conditionSql.append(c);
             }
         }
         return conditionSql.toString();
+    }
+
+    /**
+     * 获取实际类型值
+     *
+     * @param common
+     * @param object
+     * @return
+     */
+    public static String getOriginal(Common common, Object object) {
+        StringBuffer value = new StringBuffer();
+        Column column = null;
+        if (object instanceof Column) {
+            column = (Column) object;
+        }
+        if (column != null) {
+            String transferred = getTransferred(common);
+            if (StringUtil.isNotEmpty(column.getTableAlias())) {
+                value.append(transferred);
+                value.append(column.getTableAlias());
+                value.append(transferred);
+                value.append(SqlConstant.POINT);
+            }
+            value.append(column.getName());
+        } else {
+            value.append(object);
+        }
+        return value.toString();
     }
 
     /**

@@ -9,6 +9,7 @@ import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.uitls.SqlBeanUtil;
+
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -1028,8 +1029,7 @@ public class SqlHelper {
             if (in_notInValues != null && in_notInValues.length > 0) {
                 for (int k = 0; k < in_notInValues.length; k++) {
                     if (in_notInValues[k] instanceof Original) {
-                        Original original = (Original) in_notInValues[k];
-                        in_notIn.append(original.getValue());
+                        in_notIn.append(SqlBeanUtil.getOriginal(common,((Original) in_notInValues[k]).getValue()));
                     } else {
                         in_notIn.append(SqlBeanUtil.getSqlValue(common, in_notInValues[k]));
                     }
