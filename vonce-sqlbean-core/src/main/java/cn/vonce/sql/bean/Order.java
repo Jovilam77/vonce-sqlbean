@@ -26,7 +26,7 @@ public class Order extends Column implements Serializable {
     }
 
     public Order(String tableAlias, String name, SqlSort sqlSort) {
-        super(tableAlias, name);
+        super(tableAlias, name, "");
         this.sqlSort = sqlSort;
     }
 

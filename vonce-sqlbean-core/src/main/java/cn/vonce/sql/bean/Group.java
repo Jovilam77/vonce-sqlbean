@@ -10,7 +10,7 @@ public class Group extends Column {
     }
 
     public Group(String tableAlias, String name) {
-        super(tableAlias, name);
+        super(tableAlias, name, "");
     }
 
 }
