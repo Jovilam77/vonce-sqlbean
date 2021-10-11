@@ -573,8 +573,9 @@ public class SqlBeanProvider {
     private static String mysqlColumnInfoSql(String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT ordinal_position cid, column_name name, data_type type, ");
-        sql.append("(case is_nullable when 'NO' then 1 else 0 end) notnull, column_default dflt_value, ");
-        sql.append("(case IFNULL(column_key,'') when '' then 0 else 1 end) pk, column_comment comm ");
+        sql.append("(CASE is_nullable WHEN 'NO' THEN 1 ELSE 0 END) notnull, column_default dflt_value, ");
+        sql.append("(CASE column_key WHEN 'PRI' THEN 1 ELSE 0 END) pk, ");
+        sql.append("(CASE column_key WHEN 'MUL' THEN 1 ELSE 0 END) fk, column_comment comm ");
         sql.append("FROM information_schema.columns ");
         sql.append("WHERE table_schema = database() AND table_name = '");
         sql.append(tableName);
@@ -584,9 +585,11 @@ public class SqlBeanProvider {
 
     private static String sqlServerColumnInfoSql(String tableName){
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT a.cid, a.name, a.type, a.notnull, (case when isnull(column_name, '') <> '' then 1 else 0 end) AS pk ");
+        sql.append("SELECT a.cid, a.name, a.type, (CASE a.notnull WHEN 0 THEN 1 ELSE 0 END) AS notnull, ");
+        sql.append("(CASE LEFT(constraint_name, 2) WHEN 'PK' THEN 1 ELSE 0 END) AS pk, ");
+        sql.append("(CASE LEFT(constraint_name, 2) WHEN 'FK' THEN 1 ELSE 0 END) AS fk, c.value AS comm ");
         sql.append("FROM (");
-        sql.append("SELECT syscolumns.colid AS cid, syscolumns.name AS name, systypes.name AS type, syscolumns.isnullable AS notnull, '");
+        sql.append("SELECT syscolumns.id, syscolumns.colid AS cid, syscolumns.name AS name, systypes.name AS type, syscolumns.isnullable AS notnull, '");
         sql.append(tableName);
         sql.append("' AS table_name ");
         sql.append("FROM syscolumns, systypes ");
@@ -594,6 +597,7 @@ public class SqlBeanProvider {
         sql.append(tableName);
         sql.append("')) a ");
         sql.append("LEFT JOIN information_schema.key_column_usage b ON a.name = b.column_name AND a.table_name = b.table_name ");
+        sql.append("LEFT JOIN sys.extended_properties c ON c.major_id = a.id AND c.minor_id = a.cid ");
         sql.append("ORDER BY a.cid");
         return sql.toString();
     }
@@ -601,15 +605,17 @@ public class SqlBeanProvider {
     private static String oracleColumnInfoSql(String tableName){
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT col.column_id AS cid, col.column_name, col.data_type type, ");
-        sql.append("(case col.nullable when 'N' then '1' else '0' end) AS notnull, col.data_default AS dflt_value, ");
-        sql.append("(case uc.constraint_type when 'P' then '1' else '0' end) AS pk, user_col_comments.comments comm ");
+        sql.append("(CASE col.nullable WHEN 'N' THEN '1' ELSE '0' END) AS notnull, col.data_default AS dflt_value, ");
+        sql.append("(CASE uc1.constraint_type WHEN 'P' THEN '1' ELSE '0' END) AS pk, ");
+        sql.append("(CASE uc2.constraint_type WHEN 'R' THEN '1' ELSE '0' END) AS fk, user_col_comments.comments comm ");
         sql.append("FROM user_tab_columns col ");
-        sql.append("LEFT JOIN user_cons_columns ucc ON ucc.table_name = col.table_name AND ucc.column_name = col.column_name ");
-        sql.append("LEFT JOIN user_constraints uc ON uc.constraint_name = ucc.constraint_name AND uc.constraint_type = 'P' ");
+        sql.append("LEFT JOIN user_cons_columns ucc ON ucc.table_name = col.table_name AND ucc.column_name = col.column_name AND ucc.position IS NOT NULL ");
+        sql.append("LEFT JOIN user_constraints uc1 ON uc1.constraint_name = ucc.constraint_name AND uc1.constraint_type = 'P' ");
+        sql.append("LEFT JOIN user_constraints uc2 ON uc2.constraint_name = ucc.constraint_name AND uc2.constraint_type = 'R' ");
         sql.append("INNER JOIN user_col_comments ON user_col_comments.table_name = col.table_name AND user_col_comments.column_name = col.column_name ");
         sql.append("WHERE col.table_name = '");
         sql.append(tableName);
-        sql.append("')");
+        sql.append("'");
         return sql.toString();
     }
 
