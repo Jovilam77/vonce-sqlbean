@@ -552,11 +552,11 @@ public class SqlBeanProvider {
         switch (sqlBeanDB.getDbType()) {
             case MySQL:
             case MariaDB:
-                return mysqlColumnInfoSql("");
+                return mysqlColumnInfoSql(name);
             case SQLServer:
-                return sqlServerColumnInfoSql("");
+                return sqlServerColumnInfoSql(name);
             case Oracle:
-                return oracleColumnInfoSql("");
+                return oracleColumnInfoSql(name);
             case PostgreSQL:
             case DB2:
             case H2:
@@ -564,7 +564,7 @@ public class SqlBeanProvider {
             case Derby:
                 return "";
             case SQLite:
-                return sqliteColumnInfoSql("");
+                return sqliteColumnInfoSql(name);
             default:
                 throw new SqlBeanException("请配置正确的数据库");
         }
@@ -572,7 +572,7 @@ public class SqlBeanProvider {
 
     private static String mysqlColumnInfoSql(String tableName) {
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT ordinal_position cid, table_name name, data_type type, ");
+        sql.append("SELECT ordinal_position cid, column_name name, data_type type, ");
         sql.append("(case is_nullable when 'NO' then 1 else 0 end) notnull, column_default dflt_value, ");
         sql.append("(case IFNULL(column_key,'') when '' then 0 else 1 end) pk, column_comment comm ");
         sql.append("FROM information_schema.columns ");

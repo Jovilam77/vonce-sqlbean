@@ -4,6 +4,7 @@ import cn.vonce.sql.bean.Column;
 import cn.vonce.sql.helper.Wrapper;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 表结构业务接口
@@ -47,6 +48,14 @@ public interface TableService {
      * @return
      */
     List<String> getTableList();
+
+    /**
+     * 获取列信息列表
+     *
+     * @param tableName
+     * @return
+     */
+    List<Map<String, Object>> getColumnInfoList(String tableName);
 
     /**
      * 备份表和数据到一张新表(表名_+时间)
