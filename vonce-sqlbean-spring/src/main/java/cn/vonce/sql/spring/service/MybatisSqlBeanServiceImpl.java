@@ -585,6 +585,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return mybatisSqlBeanDao.selectTableList(getSqlBeanDB(), null);
     }
 
+    @DbSwitch(DbRole.SLAVE)
     @Override
     public List<Map<String, Object>> getColumnInfoList(String tableName) {
         return mybatisSqlBeanDao.selectColumnInfoList(getSqlBeanDB(), tableName);
