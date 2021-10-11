@@ -612,6 +612,11 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(getSqlBeanDB(), null), String.class);
     }
 
+    @Override
+    public List<Map<String, Object>> getColumnInfoList(String tableName) {
+        return jdbcTemplate.queryForList(SqlBeanProvider.selectColumnListSql(getSqlBeanDB(), tableName));
+    }
+
     private static <T> T singleResult(Collection<T> results) {
         int size = results != null ? results.size() : 0;
         if (size == 0) {

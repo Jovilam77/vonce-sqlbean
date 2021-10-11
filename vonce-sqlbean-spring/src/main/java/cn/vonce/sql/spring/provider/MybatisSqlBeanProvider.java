@@ -276,6 +276,16 @@ public class MybatisSqlBeanProvider {
     }
 
     /**
+     * 获取列信息列表
+     *
+     * @param map
+     * @return
+     */
+    public String selectColumnInfoList(Map<String, Object> map) {
+        return SqlBeanProvider.selectColumnListSql((SqlBeanDB) map.get("sqlBeanDB"), (String) map.get("name"));
+    }
+
+    /**
      * 备份表和数据
      *
      * @param map
