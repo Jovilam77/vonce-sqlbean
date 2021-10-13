@@ -1,6 +1,7 @@
 package cn.vonce.sql.service;
 
 import cn.vonce.sql.bean.Column;
+import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.helper.Wrapper;
 
 import java.util.List;
@@ -55,7 +56,7 @@ public interface TableService {
      * @param tableName
      * @return
      */
-    List<Map<String, Object>> getColumnInfoList(String tableName);
+    List<ColumnInfo> getColumnInfoList(String tableName);
 
     /**
      * 备份表和数据到一张新表(表名_+时间)
