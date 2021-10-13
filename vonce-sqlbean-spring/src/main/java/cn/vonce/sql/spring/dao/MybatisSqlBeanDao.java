@@ -435,7 +435,7 @@ public interface MybatisSqlBeanDao<T> {
      * @return
      */
     @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectColumnInfoList")
-    List<Map<String, Object>> selectColumnInfoList(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
+    List<ColumnInfo> selectColumnInfoList(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
 
     /**
      * 备份表和数据

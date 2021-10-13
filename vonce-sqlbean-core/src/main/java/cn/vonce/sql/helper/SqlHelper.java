@@ -212,6 +212,7 @@ public class SqlHelper {
             }
             SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
             ColumnInfo columnInfo = getColumnInfo(create.getSqlBeanDB().getDbType(), field.getType(), sqlColumn);
+            JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
             String columnName = field.getName();
             if (sqlColumn != null) {
                 columnName = sqlColumn.value();
@@ -224,25 +225,25 @@ public class SqlHelper {
             sqlSb.append(SqlBeanUtil.isToUpperCase(create) ? columnName.toUpperCase() : columnName);
             sqlSb.append(transferred);
             sqlSb.append(SqlConstant.SPACES);
-            sqlSb.append(columnInfo.getType().name());
+            sqlSb.append(jdbcType.name());
             if (columnInfo.getLength() > 0) {
                 sqlSb.append(SqlConstant.BEGIN_BRACKET);
                 //字段长度
                 sqlSb.append(columnInfo.getLength());
-                if (columnInfo.getType().isFloat()) {
+                if (jdbcType.isFloat()) {
                     sqlSb.append(SqlConstant.COMMA);
                     sqlSb.append(columnInfo.getDecimal());
                 }
                 sqlSb.append(SqlConstant.END_BRACKET);
             }
             //是否为null
-            if (columnInfo.getNotNull()) {
+            if (columnInfo.getNotnull()) {
                 sqlSb.append(SqlConstant.NOT_NULL);
             }
             //默认值
-            if (StringUtil.isNotEmpty(columnInfo.getDef())) {
+            if (StringUtil.isNotEmpty(columnInfo.getDfltValue())) {
                 sqlSb.append(SqlConstant.DEFAULT);
-                sqlSb.append(SqlBeanUtil.getSqlValue(create, columnInfo.getDef(), columnInfo.getType()));
+                sqlSb.append(SqlBeanUtil.getSqlValue(create, columnInfo.getDfltValue(), jdbcType));
             }
             sqlSb.append(SqlConstant.COMMA);
         }
@@ -380,30 +381,33 @@ public class SqlHelper {
      */
     private static ColumnInfo getColumnInfo(DbType dbType, Class<?> clazz, SqlColumn sqlColumn) {
         ColumnInfo columnInfo = new ColumnInfo();
+        JdbcType jdbcType;
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
-            columnInfo.setType(sqlColumn.type());
-            columnInfo.setNotNull(sqlColumn.notNull());
+            jdbcType = JdbcType.getType(sqlColumn.type().name());
+            columnInfo.setType(jdbcType.name());
+            columnInfo.setNotnull(sqlColumn.notNull());
         } else {
             if (dbType == DbType.SQLite) {
-                columnInfo.setType(JdbcType.getType(SQLiteJavaType.getType(clazz).name()));
+                jdbcType = JdbcType.getType(SQLiteJavaType.getType(clazz).name());
             } else {
-                columnInfo.setType(JdbcType.getType(JavaType.getType(clazz).name()));
+                jdbcType = JdbcType.getType(JavaType.getType(clazz).name());
             }
-            columnInfo.setNotNull(false);
+            columnInfo.setType(jdbcType.name());
+            columnInfo.setNotnull(false);
         }
         if (sqlColumn != null && sqlColumn.length() != 0) {
             columnInfo.setLength(sqlColumn.length());
             columnInfo.setDecimal(sqlColumn.decimal());
         } else {
-            columnInfo.setLength(columnInfo.getType().getLength());
+            columnInfo.setLength(jdbcType.getLength());
         }
         if (sqlColumn != null && sqlColumn.decimal() != 0) {
             columnInfo.setDecimal(sqlColumn.decimal());
         } else {
-            columnInfo.setDecimal(columnInfo.getType().getDecimal());
+            columnInfo.setDecimal(jdbcType.getDecimal());
         }
         if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.def())) {
-            columnInfo.setDef(sqlColumn.def());
+            columnInfo.setDfltValue(sqlColumn.def());
         }
         return columnInfo;
     }
