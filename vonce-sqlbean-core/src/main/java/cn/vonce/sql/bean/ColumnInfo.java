@@ -45,6 +45,10 @@ public class ColumnInfo {
      * 字段小数点精度
      */
     private int decimal;
+    /**
+     * 备注
+     */
+    private String comm;
 
     public Integer getCid() {
         return cid;
@@ -116,5 +120,13 @@ public class ColumnInfo {
 
     public void setDecimal(int decimal) {
         this.decimal = decimal;
+    }
+
+    public String getComm() {
+        return comm;
+    }
+
+    public void setComm(String comm) {
+        this.comm = comm;
     }
 }
