@@ -2,6 +2,7 @@ package cn.vonce.sql.spring.config;
 
 import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.Table;
+import cn.vonce.sql.bean.TableInfo;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.service.TableService;
 import cn.vonce.sql.uitls.SqlBeanUtil;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * 自动创建表监听类
@@ -39,7 +41,7 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
             List<String> beanNameList = new ArrayList<>();
             beanNameList.addAll(Arrays.asList(evt.getApplicationContext().getBeanNamesForType(TableService.class)));
             if (!beanNameList.isEmpty()) {
-                List<String> tableList = evt.getApplicationContext().getBean(beanNameList.get(0), TableService.class).getTableList();
+                List<TableInfo> tableList = evt.getApplicationContext().getBean(beanNameList.get(0), TableService.class).getTableList(null);
                 for (String name : beanNameList) {
                     TableService tableService = evt.getApplicationContext().getBean(name, TableService.class);
                     Class<?> clazz = tableService.getBeanClass();
@@ -50,8 +52,10 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                     if (sqlTable != null && !sqlTable.isView() && sqlTable.autoCreate()) {
                         Table table = SqlBeanUtil.getTable(clazz);
                         if (tableList != null && !tableList.isEmpty()) {
-                            if (tableList.contains(table.getName()) || tableList.contains(table.getName().toUpperCase()) || tableList.contains(table.getName().toLowerCase())) {
-                                continue;
+                            for (TableInfo tableInfo: tableList) {
+                                if (tableInfo.getName().equalsIgnoreCase(table.getName())) {
+                                    continue;
+                                }
                             }
                         }
                         tableService.createTable();
