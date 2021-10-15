@@ -2,10 +2,10 @@ package cn.vonce.sql.service;
 
 import cn.vonce.sql.bean.Column;
 import cn.vonce.sql.bean.ColumnInfo;
+import cn.vonce.sql.bean.TableInfo;
 import cn.vonce.sql.helper.Wrapper;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 表结构业务接口
@@ -46,9 +46,10 @@ public interface TableService {
     /**
      * 获取表名列表
      *
+     * @param tableName 可以为null
      * @return
      */
-    List<String> getTableList();
+    List<TableInfo> getTableList(String tableName);
 
     /**
      * 获取列信息列表

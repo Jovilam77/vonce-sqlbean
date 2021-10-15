@@ -46,9 +46,9 @@ public class ColumnInfo {
      */
     private int decimal;
     /**
-     * 备注
+     * 注释
      */
-    private String comm;
+    private String comment;
 
     public Integer getCid() {
         return cid;
@@ -122,11 +122,11 @@ public class ColumnInfo {
         this.decimal = decimal;
     }
 
-    public String getComm() {
-        return comm;
+    public String getComment() {
+        return comment;
     }
 
-    public void setComm(String comm) {
-        this.comm = comm;
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

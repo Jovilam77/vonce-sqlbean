@@ -426,7 +426,7 @@ public interface MybatisSqlBeanDao<T> {
      * @return
      */
     @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectTableList")
-    List<String> selectTableList(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
+    List<TableInfo> selectTableList(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
 
     /**
      * 获取表名列表

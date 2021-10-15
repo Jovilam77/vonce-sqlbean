@@ -516,24 +516,24 @@ public class SqlBeanProvider {
         switch (sqlBeanDB.getDbType()) {
             case MySQL:
             case MariaDB:
-                return "select table_name as `name` from information_schema.tables where table_schema = database() and table_type = 'BASE TABLE'" + (StringUtil.isNotEmpty(name) ? " and table_name = '" + name + "'" : "");
+                return "SELECT table_name as `name`, table_comment as `comment` FROM information_schema.tables WHERE table_schema = database() AND table_type = 'BASE TABLE'" + (StringUtil.isNotEmpty(name) ? " AND table_name = '" + name + "'" : "");
             case SQLServer:
-                return "select name from sysobjects where xtype='U'" + (StringUtil.isNotEmpty(name) ? " and name = '" + name + "'" : "");
+                return "SELECT o.name, p.value FROM sysobjects o LEFT JOIN sys.extended_properties p ON p.major_id = o.id AND p.minor_id = 0 WHERE o.xtype='U'" + (StringUtil.isNotEmpty(name) ? " AND o.name = '" + name + "'" : "");
             case Oracle:
-                return "select table_name as \"name\" from user_tables" + (StringUtil.isNotEmpty(name) ? " where table_name = '" + name + "'" : "");
+                return "SELECT t.table_name as \"name\", c.comments as \"comment\"  FROM user_tables t LEFT JOIN user_tab_comments c ON c.table_name = t.table_name" + (StringUtil.isNotEmpty(name) ? " WHERE t.table_name = '" + name + "'" : "");
             case PostgreSQL:
-                return "select tablename as \"name\" from pg_tables where schemaname = 'public'" + (StringUtil.isNotEmpty(name) ? " and tablename = '" + name + "'" : "");
+                return "SELECT tablename as \"name\" FROM pg_tables WHERE schemaname = 'public'" + (StringUtil.isNotEmpty(name) ? " AND tablename = '" + name + "'" : "");
             case DB2:
 //                return "select tabname AS \"name\" from syscat.tables where tabschema = current schema" + (StringUtil.isNotEmpty(name) ? " and tabname = '" + name + "'" : "");
-                return "select name from sysibm.systables where type = 'T' and creator = current user" + (StringUtil.isNotEmpty(name) ? " and name = '" + name + "'" : "") + (StringUtil.isNotEmpty(name) ? " and table_name = '" + name + "'" : "");
+                return "SELECT name FROM sysibm.systables WHERE type = 'T' AND creator = current user" + (StringUtil.isNotEmpty(name) ? " AND name = '" + name + "'" : "") + (StringUtil.isNotEmpty(name) ? " AND table_name = '" + name + "'" : "");
             case H2:
-                return "select table_name as \"name\" from information_schema.tables where table_type = 'TABLE'" + (StringUtil.isNotEmpty(name) ? " and table_name = '" + name + "'" : "");
+                return "SELECT table_name as \"name\" FROM information_schema.tables WHERE table_type = 'TABLE'" + (StringUtil.isNotEmpty(name) ? " AND table_name = '" + name + "'" : "");
             case Hsql:
-                return "select table_name as \"name\" from information_schema.tables where table_type = 'BASE TABLE'" + (StringUtil.isNotEmpty(name) ? " and table_name = '" + name + "'" : "");
+                return "SELECT table_name as \"name\" FROM information_schema.tables WHERE table_type = 'BASE TABLE'" + (StringUtil.isNotEmpty(name) ? " AND table_name = '" + name + "'" : "");
             case Derby:
-                return "select tablename as \"name\" from SYS.systables where tabletype = 'T'" + (StringUtil.isNotEmpty(name) ? " and tablename = '" + name + "'" : "");
+                return "SELECT tablename as \"name\" FROM SYS.systables WHERE tabletype = 'T'" + (StringUtil.isNotEmpty(name) ? " AND tablename = '" + name + "'" : "");
             case SQLite:
-                return "select name from sqlite_master where type='table'" + (StringUtil.isNotEmpty(name) ? " and name = '" + name + "'" : "");
+                return "SELECT name FROM sqlite_master WHERE type='table'" + (StringUtil.isNotEmpty(name) ? " AND name = '" + name + "'" : "");
             default:
                 throw new SqlBeanException("请配置正确的数据库");
         }
@@ -575,7 +575,7 @@ public class SqlBeanProvider {
         sql.append("SELECT ordinal_position cid, column_name name, data_type type, ");
         sql.append("(CASE is_nullable WHEN 'NO' THEN 1 ELSE 0 END) notnull, column_default dflt_value, ");
         sql.append("(CASE column_key WHEN 'PRI' THEN 1 ELSE 0 END) pk, ");
-        sql.append("(CASE column_key WHEN 'MUL' THEN 1 ELSE 0 END) fk, column_comment comm ");
+        sql.append("(CASE column_key WHEN 'MUL' THEN 1 ELSE 0 END) fk, column_comment comment ");
         sql.append("FROM information_schema.columns ");
         sql.append("WHERE table_schema = database() AND table_name = '");
         sql.append(tableName);
@@ -587,7 +587,7 @@ public class SqlBeanProvider {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT a.cid, a.name, a.type, (CASE a.notnull WHEN 0 THEN 1 ELSE 0 END) AS notnull, ");
         sql.append("(CASE LEFT(constraint_name, 2) WHEN 'PK' THEN 1 ELSE 0 END) AS pk, ");
-        sql.append("(CASE LEFT(constraint_name, 2) WHEN 'FK' THEN 1 ELSE 0 END) AS fk, c.value AS comm ");
+        sql.append("(CASE LEFT(constraint_name, 2) WHEN 'FK' THEN 1 ELSE 0 END) AS fk, c.value AS comment ");
         sql.append("FROM (");
         sql.append("SELECT syscolumns.id, syscolumns.colid AS cid, syscolumns.name AS name, systypes.name AS type, syscolumns.isnullable AS notnull, '");
         sql.append(tableName);
@@ -607,7 +607,7 @@ public class SqlBeanProvider {
         sql.append("SELECT col.column_id AS cid, col.column_name, col.data_type type, ");
         sql.append("(CASE col.nullable WHEN 'N' THEN '1' ELSE '0' END) AS notnull, col.data_default AS dflt_value, ");
         sql.append("(CASE uc1.constraint_type WHEN 'P' THEN '1' ELSE '0' END) AS pk, ");
-        sql.append("(CASE uc2.constraint_type WHEN 'R' THEN '1' ELSE '0' END) AS fk, user_col_comments.comments comm ");
+        sql.append("(CASE uc2.constraint_type WHEN 'R' THEN '1' ELSE '0' END) AS fk, user_col_comments.comments comment ");
         sql.append("FROM user_tab_columns col ");
         sql.append("LEFT JOIN user_cons_columns ucc ON ucc.table_name = col.table_name AND ucc.column_name = col.column_name AND ucc.position IS NOT NULL ");
         sql.append("LEFT JOIN user_constraints uc1 ON uc1.constraint_name = ucc.constraint_name AND uc1.constraint_type = 'P' ");
