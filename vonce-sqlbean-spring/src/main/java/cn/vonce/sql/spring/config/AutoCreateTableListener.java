@@ -52,10 +52,15 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                     if (sqlTable != null && !sqlTable.isView() && sqlTable.autoCreate()) {
                         Table table = SqlBeanUtil.getTable(clazz);
                         if (tableList != null && !tableList.isEmpty()) {
-                            for (TableInfo tableInfo: tableList) {
+                            boolean isExist = false;
+                            for (TableInfo tableInfo : tableList) {
                                 if (tableInfo.getName().equalsIgnoreCase(table.getName())) {
-                                    continue;
+                                    isExist = true;
+                                    break;
                                 }
+                            }
+                            if (isExist) {
+                                continue;
                             }
                         }
                         tableService.createTable();
