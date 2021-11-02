@@ -17,7 +17,7 @@ public class TableInfo {
     /**
      * 注释
      */
-    private String comment;
+    private String comm;
 
     public String getName() {
         return name;
@@ -27,11 +27,11 @@ public class TableInfo {
         this.name = name;
     }
 
-    public String getComment() {
-        return comment;
+    public String getComm() {
+        return comm;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setComm(String comm) {
+        this.comm = comm;
     }
 }

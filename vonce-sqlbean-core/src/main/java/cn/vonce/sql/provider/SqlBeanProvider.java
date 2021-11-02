@@ -516,22 +516,22 @@ public class SqlBeanProvider {
         switch (sqlBeanDB.getDbType()) {
             case MySQL:
             case MariaDB:
-                return "SELECT table_name as `name`, table_comment as `comment` FROM information_schema.tables WHERE table_schema = database() AND table_type = 'BASE TABLE'" + (StringUtil.isNotEmpty(name) ? " AND table_name = '" + name + "'" : "");
+                return "SELECT table_name AS `name`, table_comment AS comm FROM information_schema.tables WHERE table_schema = database() AND table_type = 'BASE TABLE'" + (StringUtil.isNotEmpty(name) ? " AND table_name = '" + name + "'" : "");
             case SQLServer:
-                return "SELECT o.name, p.value FROM sysobjects o LEFT JOIN sys.extended_properties p ON p.major_id = o.id AND p.minor_id = 0 WHERE o.xtype='U'" + (StringUtil.isNotEmpty(name) ? " AND o.name = '" + name + "'" : "");
+                return "SELECT o.name, p.value AS comm FROM sysobjects o LEFT JOIN sys.extended_properties p ON p.major_id = o.id AND p.minor_id = 0 WHERE o.xtype='U'" + (StringUtil.isNotEmpty(name) ? " AND o.name = '" + name + "'" : "");
             case Oracle:
-                return "SELECT t.table_name as \"name\", c.comments as \"comment\"  FROM user_tables t LEFT JOIN user_tab_comments c ON c.table_name = t.table_name" + (StringUtil.isNotEmpty(name) ? " WHERE t.table_name = '" + name + "'" : "");
+                return "SELECT t.table_name AS \"name\", c.comments AS comm  FROM user_tables t LEFT JOIN user_tab_comments c ON c.table_name = t.table_name" + (StringUtil.isNotEmpty(name) ? " WHERE t.table_name = '" + name + "'" : "");
             case PostgreSQL:
-                return "SELECT tablename as \"name\" FROM pg_tables WHERE schemaname = 'public'" + (StringUtil.isNotEmpty(name) ? " AND tablename = '" + name + "'" : "");
+                return "SELECT tablename AS \"name\" FROM pg_tables WHERE schemaname = 'public'" + (StringUtil.isNotEmpty(name) ? " AND tablename = '" + name + "'" : "");
             case DB2:
 //                return "select tabname AS \"name\" from syscat.tables where tabschema = current schema" + (StringUtil.isNotEmpty(name) ? " and tabname = '" + name + "'" : "");
                 return "SELECT name FROM sysibm.systables WHERE type = 'T' AND creator = current user" + (StringUtil.isNotEmpty(name) ? " AND name = '" + name + "'" : "") + (StringUtil.isNotEmpty(name) ? " AND table_name = '" + name + "'" : "");
             case H2:
-                return "SELECT table_name as \"name\" FROM information_schema.tables WHERE table_type = 'TABLE'" + (StringUtil.isNotEmpty(name) ? " AND table_name = '" + name + "'" : "");
+                return "SELECT table_name AS \"name\" FROM information_schema.tables WHERE table_type = 'TABLE'" + (StringUtil.isNotEmpty(name) ? " AND table_name = '" + name + "'" : "");
             case Hsql:
-                return "SELECT table_name as \"name\" FROM information_schema.tables WHERE table_type = 'BASE TABLE'" + (StringUtil.isNotEmpty(name) ? " AND table_name = '" + name + "'" : "");
+                return "SELECT table_name AS \"name\" FROM information_schema.tables WHERE table_type = 'BASE TABLE'" + (StringUtil.isNotEmpty(name) ? " AND table_name = '" + name + "'" : "");
             case Derby:
-                return "SELECT tablename as \"name\" FROM SYS.systables WHERE tabletype = 'T'" + (StringUtil.isNotEmpty(name) ? " AND tablename = '" + name + "'" : "");
+                return "SELECT tablename AS \"name\" FROM SYS.systables WHERE tabletype = 'T'" + (StringUtil.isNotEmpty(name) ? " AND tablename = '" + name + "'" : "");
             case SQLite:
                 return "SELECT name FROM sqlite_master WHERE type='table'" + (StringUtil.isNotEmpty(name) ? " AND name = '" + name + "'" : "");
             default:
