@@ -51,7 +51,7 @@ public @interface SqlColumn {
      *
      * @return
      */
-    int decimal() default 0;
+    int scale() default 0;
 
     /**
      * 默认值

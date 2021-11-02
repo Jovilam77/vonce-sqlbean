@@ -44,11 +44,11 @@ public class ColumnInfo {
     /**
      * 字段小数点精度
      */
-    private int decimal;
+    private int scale;
     /**
      * 注释
      */
-    private String comment;
+    private String comm;
 
     public Integer getCid() {
         return cid;
@@ -114,19 +114,19 @@ public class ColumnInfo {
         this.length = length;
     }
 
-    public int getDecimal() {
-        return decimal;
+    public int getScale() {
+        return scale;
     }
 
-    public void setDecimal(int decimal) {
-        this.decimal = decimal;
+    public void setScale(int scale) {
+        this.scale = scale;
     }
 
-    public String getComment() {
-        return comment;
+    public String getComm() {
+        return comm;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setComm(String comm) {
+        this.comm = comm;
     }
 }

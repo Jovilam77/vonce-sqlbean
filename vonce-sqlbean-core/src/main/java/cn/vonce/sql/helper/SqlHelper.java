@@ -232,7 +232,7 @@ public class SqlHelper {
                 sqlSb.append(columnInfo.getLength());
                 if (jdbcType.isFloat()) {
                     sqlSb.append(SqlConstant.COMMA);
-                    sqlSb.append(columnInfo.getDecimal());
+                    sqlSb.append(columnInfo.getScale());
                 }
                 sqlSb.append(SqlConstant.END_BRACKET);
             }
@@ -397,14 +397,14 @@ public class SqlHelper {
         }
         if (sqlColumn != null && sqlColumn.length() != 0) {
             columnInfo.setLength(sqlColumn.length());
-            columnInfo.setDecimal(sqlColumn.decimal());
+            columnInfo.setScale(sqlColumn.scale());
         } else {
             columnInfo.setLength(jdbcType.getLength());
         }
-        if (sqlColumn != null && sqlColumn.decimal() != 0) {
-            columnInfo.setDecimal(sqlColumn.decimal());
+        if (sqlColumn != null && sqlColumn.scale() != 0) {
+            columnInfo.setScale(sqlColumn.scale());
         } else {
-            columnInfo.setDecimal(jdbcType.getDecimal());
+            columnInfo.setScale(jdbcType.getScale());
         }
         if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.def())) {
             columnInfo.setDfltValue(sqlColumn.def());

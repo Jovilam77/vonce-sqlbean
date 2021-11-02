@@ -572,10 +572,14 @@ public class SqlBeanProvider {
 
     private static String mysqlColumnInfoSql(String tableName) {
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT ordinal_position cid, column_name name, data_type type, ");
-        sql.append("(CASE is_nullable WHEN 'NO' THEN 1 ELSE 0 END) notnull, column_default dflt_value, ");
-        sql.append("(CASE column_key WHEN 'PRI' THEN 1 ELSE 0 END) pk, ");
-        sql.append("(CASE column_key WHEN 'MUL' THEN 1 ELSE 0 END) fk, column_comment comment ");
+        sql.append("SELECT ordinal_position AS cid, column_name AS name, data_type AS type, ");
+        sql.append("(CASE is_nullable WHEN 'NO' THEN 1 ELSE 0 END) AS notnull, column_default AS dflt_value, ");
+        sql.append("(CASE column_key WHEN 'PRI' THEN 1 ELSE 0 END) AS pk, ");
+        sql.append("(CASE column_key WHEN 'MUL' THEN 1 ELSE 0 END) AS fk, ");
+        sql.append("(CASE WHEN data_type = 'bit' OR data_type = 'tinyint' OR data_type = 'mediumint' OR data_type = 'int' OR data_type = 'bigint' OR ");
+        sql.append("data_type = 'float' OR data_type = 'double' OR data_type = 'decimal' THEN numeric_precision ELSE character_maximum_length END) AS length, ");
+        sql.append("numeric_scale AS scale, ");
+        sql.append("column_comment AS comm ");
         sql.append("FROM information_schema.columns ");
         sql.append("WHERE table_schema = database() AND table_name = '");
         sql.append(tableName);
@@ -587,9 +591,10 @@ public class SqlBeanProvider {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT a.cid, a.name, a.type, (CASE a.notnull WHEN 0 THEN 1 ELSE 0 END) AS notnull, ");
         sql.append("(CASE LEFT(constraint_name, 2) WHEN 'PK' THEN 1 ELSE 0 END) AS pk, ");
-        sql.append("(CASE LEFT(constraint_name, 2) WHEN 'FK' THEN 1 ELSE 0 END) AS fk, c.value AS comment ");
+        sql.append("(CASE LEFT(constraint_name, 2) WHEN 'FK' THEN 1 ELSE 0 END) AS fk, ");
+        sql.append("a.length, a.scale, c.value AS comm ");
         sql.append("FROM (");
-        sql.append("SELECT syscolumns.id, syscolumns.colid AS cid, syscolumns.name AS name, systypes.name AS type, syscolumns.isnullable AS notnull, '");
+        sql.append("SELECT syscolumns.id, syscolumns.colid AS cid, syscolumns.name AS name, syscolumns.length AS length, syscolumns.scale, systypes.name AS type, syscolumns.isnullable AS notnull, '");
         sql.append(tableName);
         sql.append("' AS table_name ");
         sql.append("FROM syscolumns, systypes ");
@@ -607,7 +612,10 @@ public class SqlBeanProvider {
         sql.append("SELECT col.column_id AS cid, col.column_name, col.data_type type, ");
         sql.append("(CASE col.nullable WHEN 'N' THEN '1' ELSE '0' END) AS notnull, col.data_default AS dflt_value, ");
         sql.append("(CASE uc1.constraint_type WHEN 'P' THEN '1' ELSE '0' END) AS pk, ");
-        sql.append("(CASE uc2.constraint_type WHEN 'R' THEN '1' ELSE '0' END) AS fk, user_col_comments.comments comment ");
+        sql.append("(CASE uc2.constraint_type WHEN 'R' THEN '1' ELSE '0' END) AS fk, ");
+        sql.append("(CASE WHEN col.data_type = 'FLOAT' OR col.data_type = 'DOUBLE' OR col.data_type = 'DECIMAL' OR col.data_type = 'NUMBER' THEN col.data_precision ELSE col.char_length END) AS length, ");
+        sql.append("col.data_scale AS scale, ");
+        sql.append("user_col_comments.comments AS comm ");
         sql.append("FROM user_tab_columns col ");
         sql.append("LEFT JOIN user_cons_columns ucc ON ucc.table_name = col.table_name AND ucc.column_name = col.column_name AND ucc.position IS NOT NULL ");
         sql.append("LEFT JOIN user_constraints uc1 ON uc1.constraint_name = ucc.constraint_name AND uc1.constraint_type = 'P' ");

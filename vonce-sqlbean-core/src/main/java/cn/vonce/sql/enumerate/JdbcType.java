@@ -76,13 +76,13 @@ public enum JdbcType {
     NBLOB(0, 0);
 
 
-    JdbcType(int length, int decimal) {
+    JdbcType(int length, int scale) {
         this.length = length;
-        this.decimal = decimal;
+        this.scale = scale;
     }
 
     private int length;
-    private int decimal;
+    private int scale;
 
     public static JdbcType getType(String name) {
         for (JdbcType jdbcType : values()) {
@@ -105,8 +105,8 @@ public enum JdbcType {
         return length;
     }
 
-    public int getDecimal() {
-        return decimal;
+    public int getScale() {
+        return scale;
     }
 
 }

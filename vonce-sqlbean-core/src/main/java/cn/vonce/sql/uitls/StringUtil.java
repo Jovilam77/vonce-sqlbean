@@ -129,6 +129,9 @@ public class StringUtil {
                 result.append(s);
                 continue;
             }
+            if (StringUtil.isEmpty(s)){
+                continue;
+            }
             if (result.length() == 0) {
                 result.append(s.toLowerCase());
             } else {
@@ -148,7 +151,7 @@ public class StringUtil {
 
     public static String humpToUnderline(String para) {
         StringBuilder sb = new StringBuilder(para);
-        int temp = 0;//定位
+        int temp = 0;
         if (!para.contains(UNDERLINE)) {
             for (int i = 0; i < para.length(); i++) {
                 if (Character.isUpperCase(para.charAt(i)) && (i - 1 > 0 ? Character.isLowerCase(para.charAt(i - 1)) : false)) {
