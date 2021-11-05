@@ -96,7 +96,7 @@ public class Wrapper implements Serializable {
     /**
      * 条件模型
      */
-    public static class Data {
+    public static class Data implements Serializable {
         private SqlLogic sqlLogic;
         private Object item;
 
