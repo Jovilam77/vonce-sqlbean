@@ -6,6 +6,7 @@ import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
@@ -127,8 +128,14 @@ public class SqlBeanMapper {
                     //其次通过驼峰转下划线方式匹配
                     newFieldName = StringUtil.humpToUnderline(fieldName);
                     if (!columnNameList.contains(newFieldName)) {
-                        //再其次通过字段名匹配
-                        newFieldName = fieldName;
+                        newFieldName = newFieldName.toUpperCase();
+                        if (!columnNameList.contains(newFieldName)) {
+                            //再其次通过字段名匹配
+                            newFieldName = fieldName;
+                            if (!columnNameList.contains(newFieldName)) {
+                                newFieldName = fieldName.toUpperCase();
+                            }
+                        }
                     }
                 }
                 if (columnNameList.contains(newFieldName)) {

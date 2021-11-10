@@ -520,7 +520,7 @@ public class SqlBeanProvider {
             case SQLServer:
                 return "SELECT o.name, p.value AS comm FROM sysobjects o LEFT JOIN sys.extended_properties p ON p.major_id = o.id AND p.minor_id = 0 WHERE o.xtype='U'" + (StringUtil.isNotEmpty(name) ? " AND o.name = '" + name + "'" : "");
             case Oracle:
-                return "SELECT t.table_name AS \"name\", c.comments AS comm  FROM user_tables t LEFT JOIN user_tab_comments c ON c.table_name = t.table_name" + (StringUtil.isNotEmpty(name) ? " WHERE t.table_name = '" + name + "'" : "");
+                return "SELECT t.table_name AS \"name\", c.comments AS \"comm\"  FROM user_tables t LEFT JOIN user_tab_comments c ON c.table_name = t.table_name" + (StringUtil.isNotEmpty(name) ? " WHERE t.table_name = '" + name + "'" : "");
             case PostgreSQL:
                 return "SELECT tablename AS \"name\" FROM pg_tables WHERE schemaname = 'public'" + (StringUtil.isNotEmpty(name) ? " AND tablename = '" + name + "'" : "");
             case DB2:
@@ -546,9 +546,9 @@ public class SqlBeanProvider {
      * @return
      */
     public static String selectColumnListSql(SqlBeanDB sqlBeanDB, String name) {
-        if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase() && StringUtil.isNotEmpty(name)) {
-            name = name.toUpperCase();
-        }
+//        if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase() && StringUtil.isNotEmpty(name)) {
+//            name = name.toUpperCase();
+//        }
         switch (sqlBeanDB.getDbType()) {
             case MySQL:
             case MariaDB:
@@ -609,7 +609,7 @@ public class SqlBeanProvider {
 
     private static String oracleColumnInfoSql(String tableName){
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT col.column_id AS cid, col.column_name, col.data_type type, ");
+        sql.append("SELECT col.column_id AS cid, col.column_name AS name, col.data_type AS type, ");
         sql.append("(CASE col.nullable WHEN 'N' THEN '1' ELSE '0' END) AS notnull, col.data_default AS dflt_value, ");
         sql.append("(CASE uc1.constraint_type WHEN 'P' THEN '1' ELSE '0' END) AS pk, ");
         sql.append("(CASE uc2.constraint_type WHEN 'R' THEN '1' ELSE '0' END) AS fk, ");
