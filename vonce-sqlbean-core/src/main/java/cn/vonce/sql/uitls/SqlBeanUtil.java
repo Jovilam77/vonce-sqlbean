@@ -28,14 +28,7 @@ public class SqlBeanUtil {
         if (clazz == null) {
             return null;
         }
-        SqlUnion sqlUnion = clazz.getAnnotation(SqlUnion.class);
-        SqlTable sqlTable;
-        if (sqlUnion != null) {
-            sqlTable = clazz.getSuperclass().getAnnotation(SqlTable.class);
-        } else {
-            sqlTable = clazz.getAnnotation(SqlTable.class);
-        }
-        return sqlTable;
+        return clazz.getAnnotation(SqlTable.class);
     }
 
     /**

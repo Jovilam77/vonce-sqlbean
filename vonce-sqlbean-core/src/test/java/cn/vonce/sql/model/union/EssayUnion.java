@@ -1,7 +1,6 @@
 package cn.vonce.sql.model.union;
 
 import cn.vonce.sql.annotation.SqlJoin;
-import cn.vonce.sql.annotation.SqlUnion;
 import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.model.Essay;
 import cn.vonce.sql.model.User;
@@ -9,7 +8,6 @@ import cn.vonce.sql.model.User;
 /**
  * 文章表 联表查询
  */
-@SqlUnion
 public class EssayUnion extends Essay {
 
     /**

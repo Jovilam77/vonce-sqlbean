@@ -1,6 +1,9 @@
 package cn.vonce.sql.spring.mapper;
 
 import cn.vonce.common.utils.ReflectUtil;
+import cn.vonce.sql.annotation.SqlTable;
+import cn.vonce.sql.bean.ColumnInfo;
+import cn.vonce.sql.bean.TableInfo;
 import cn.vonce.sql.mapper.SqlBeanMapper;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
@@ -11,6 +14,7 @@ import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.plugin.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -41,21 +45,20 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             Object parameterObj = parameterHandler.getParameterObject();
             // 获取节点属性的集合
             List<ResultMap> resultMaps = mappedStatement.getResultMaps();
-            if (parameterObj instanceof HashMap) {
+            if (mappedStatement.getId().startsWith("cn.vonce.sql.spring.dao.MybatisSqlBeanDao")) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> mapParam = (HashMap<String, Object>) parameterObj;
-                if (mapParam.containsKey("clazz") && (resultMaps.get(0).getResultMappings() == null || resultMaps.get(0).getResultMappings().isEmpty())) {
-                    // 获取当前resultType的类型
-                    Class<?> resultType = resultMaps.get(0).getType();
-                    // 获取当前statement
-                    Statement stmt = (Statement) invocation.getArgs()[0];
-                    if (Object.class.getName().equals(resultType.getName())) {
-                        return handleResultSet(stmt.getResultSet(), mapParam, resultType);
-                    } else if (SqlBeanUtil.isMap(resultType.getName())) {
-                        return mapHandleResultSet(stmt.getResultSet());
-                    }
-                    return baseHandleResultSet(stmt.getResultSet(), resultType);
+//                if (mapParam.containsKey("clazz") && (resultMaps.get(0).getResultMappings() == null || resultMaps.get(0).getResultMappings().isEmpty())) {
+                // 获取当前resultType的类型
+                Class<?> resultType = resultMaps.get(0).getType();
+                // 获取当前stateMybatisSqlBeanDaoment
+                Statement stmt = (Statement) invocation.getArgs()[0];
+                if (SqlBeanUtil.isMap(resultType.getName())) {
+                    return mapHandleResultSet(stmt.getResultSet());
+                } else {
+                    return handleResultSet(stmt.getResultSet(), mapParam, resultType);
                 }
+//                }
             }
         }
         return invocation.proceed();
@@ -81,6 +84,10 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
      */
     private Object handleResultSet(ResultSet resultSet, Map<String, Object> mapParam, Class<?> resultType) {
         if (null != resultSet) {
+            if (resultType.getName().equals(ColumnInfo.class.getName()) || resultType.getName().equals(TableInfo.class.getName())) {
+                return beanHandleResultSet(resultType, resultSet, super.getColumnNameList(resultSet));
+            }
+            List<Object> list;
             // 获取实际需要返回的类型
             Class<?> clazz = (Class<?>) mapParam.get("clazz");
             Class<?> returnType;
@@ -89,7 +96,6 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             } else {
                 returnType = clazz;
             }
-            List<Object> list;
             if (!SqlBeanUtil.isBaseType(returnType.getName())) {
                 list = beanHandleResultSet(returnType, resultSet, super.getColumnNameList(resultSet));
             } else {
