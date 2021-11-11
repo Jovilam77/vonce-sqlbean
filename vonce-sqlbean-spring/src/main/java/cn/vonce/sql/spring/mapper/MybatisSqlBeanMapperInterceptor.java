@@ -1,7 +1,6 @@
 package cn.vonce.sql.spring.mapper;
 
 import cn.vonce.common.utils.ReflectUtil;
-import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.bean.TableInfo;
 import cn.vonce.sql.mapper.SqlBeanMapper;
