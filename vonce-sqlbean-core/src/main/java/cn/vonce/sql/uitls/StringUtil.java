@@ -126,7 +126,7 @@ public class StringUtil {
         String a[] = para.split(UNDERLINE);
         for (String s : a) {
             if (!para.contains(UNDERLINE)) {
-                result.append(s);
+                result.append(s.toLowerCase());
                 continue;
             }
             if (StringUtil.isEmpty(s)){
