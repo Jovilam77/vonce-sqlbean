@@ -668,13 +668,21 @@ public class SqlBeanUtil {
         boolean isTrue;
         switch (typeName) {
             case "java.lang.String":
+            case "char":
             case "java.lang.Character":
+            case "boolean":
             case "java.lang.Boolean":
+            case "byte":
             case "java.lang.Byte":
+            case "short":
             case "java.lang.Short":
+            case "int":
             case "java.lang.Integer":
+            case "long":
             case "java.lang.Long":
+            case "float":
             case "java.lang.Float":
+            case "double":
             case "java.lang.Double":
             case "java.util.Date":
             case "java.math.BigDecimal":

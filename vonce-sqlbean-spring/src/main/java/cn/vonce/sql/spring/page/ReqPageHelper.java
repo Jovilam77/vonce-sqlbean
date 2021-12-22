@@ -1,6 +1,7 @@
 package cn.vonce.sql.spring.page;
 
 import cn.vonce.common.bean.PagingRS;
+import cn.vonce.common.bean.RS;
 import cn.vonce.common.enumerate.ResultCode;
 import cn.vonce.sql.bean.Order;
 import cn.vonce.sql.bean.Select;
@@ -9,7 +10,9 @@ import cn.vonce.sql.page.PagingService;
 import cn.vonce.sql.page.ResultData;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * ReqPageHelper
@@ -44,7 +47,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
         try {
             pagenum = request.getParameter("pagenum") == null ? 0 : Integer.parseInt(request.getParameter("pagenum"));
             pagesize = request.getParameter("pagesize") == null ? 10 : Integer.parseInt(request.getParameter("pagesize"));
-            orders = super.getOrder(request.getParameterValues("sortdatafield"), request.getParameterValues("sortdatafield"));
+            orders = super.getOrder(request.getParameterValues("sortdatafield"), request.getParameterValues("sortorder"));
             timestamp = request.getParameter("timestamp");
         } catch (NumberFormatException nfe) {
             try {
@@ -86,13 +89,13 @@ public class ReqPageHelper<T> extends PageHelper<T> {
     /**
      * 返回结果集
      *
-     * @param message
+     * @param msg
      * @return
      */
-    public PagingRS toResult(String message) {
+    public PagingRS toResult(String msg) {
         PagingRS result = new PagingRS();
         result.setCode(ResultCode.SUCCESS.getCode());
-        result.setMsg(message == null || message.equals("") ? "获取列表成功" : message);
+        result.setMsg(msg == null || msg.equals("") ? "获取列表成功" : msg);
         ResultData<List<T>> resultData = super.getResultData();
         result.setData(resultData.getData());
         result.setPagenum(resultData.getPagenum());
@@ -101,6 +104,44 @@ public class ReqPageHelper<T> extends PageHelper<T> {
         result.setTotalPage(resultData.getTotalPage());
         result.setTimestamp(resultData.getTimestamp());
         return result;
+    }
+
+    /**
+     * 返回结果集
+     *
+     * @return
+     */
+    public PagingRS toResult() {
+        return toResult(null);
+    }
+
+    /**
+     * 返回结果集
+     *
+     * @param msg
+     * @return
+     */
+    public RS result(String msg) {
+        RS result = new RS();
+        result.setCode(ResultCode.SUCCESS.getCode());
+        result.setMsg(msg == null || msg.equals("") ? "获取列表成功" : msg);
+        ResultData<List<T>> resultData = super.getResultData();
+        Map<String, Object> data = new HashMap<>();
+        data.put("page", resultData.getPagenum());
+        data.put("pageSize", resultData.getPagesize());
+        data.put("total", resultData.getTotalRecords());
+        data.put("rows", resultData.getData());
+        result.setData(data);
+        return result;
+    }
+
+    /**
+     * 返回结果集
+     *
+     * @return
+     */
+    public RS result() {
+        return result(null);
     }
 
 
