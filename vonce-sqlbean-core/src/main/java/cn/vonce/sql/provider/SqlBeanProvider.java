@@ -587,7 +587,7 @@ public class SqlBeanProvider {
         return sql.toString();
     }
 
-    private static String sqlServerColumnInfoSql(String tableName){
+    private static String sqlServerColumnInfoSql(String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT a.cid, a.name, a.type, (CASE a.notnull WHEN 0 THEN 1 ELSE 0 END) AS notnull, ");
         sql.append("(CASE LEFT(constraint_name, 2) WHEN 'PK' THEN 1 ELSE 0 END) AS pk, ");
@@ -607,7 +607,7 @@ public class SqlBeanProvider {
         return sql.toString();
     }
 
-    private static String oracleColumnInfoSql(String tableName){
+    private static String oracleColumnInfoSql(String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT col.column_id AS cid, col.column_name AS name, col.data_type AS type, ");
         sql.append("(CASE col.nullable WHEN 'N' THEN '1' ELSE '0' END) AS notnull, col.data_default AS dflt_value, ");
@@ -627,7 +627,7 @@ public class SqlBeanProvider {
         return sql.toString();
     }
 
-    private static String sqliteColumnInfoSql(String tableName){
+    private static String sqliteColumnInfoSql(String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("pragma table_info('");
         sql.append(tableName);
@@ -791,12 +791,12 @@ public class SqlBeanProvider {
         if (paging != null) {
             if (select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
                 try {
-                    select.setPage(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)), paging.getPagenum(), paging.getPagesize());
+                    select.setPage(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)), paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
                 } catch (SqlBeanException e) {
                     e.printStackTrace();
                 }
             } else {
-                select.setPage(null, paging.getPagenum(), paging.getPagesize());
+                select.setPage(null, paging.getPagenum(), paging.getPagesize(),paging.getStartByZero());
             }
             select.orderBy(paging.getOrders());
         }

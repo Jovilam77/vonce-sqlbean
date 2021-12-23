@@ -3,6 +3,7 @@ package cn.vonce.sql.bean;
 import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.enumerate.SqlSort;
 import cn.vonce.sql.helper.SqlHelper;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -284,7 +285,6 @@ public class Select extends SelectCondition implements Serializable {
     }
 
 
-
     /**
      * 获取orderBy排序列字段
      *
@@ -352,6 +352,17 @@ public class Select extends SelectCondition implements Serializable {
     }
 
     /**
+     * 设置分页参数
+     *
+     * @param pagenum     当前页(默认第一页从0开始)
+     * @param pagesize    每页显示数量
+     * @param startByZero 第一页是否从0开始
+     */
+    public void setPage(Integer pagenum, Integer pagesize, boolean startByZero) {
+        this.page = new Page(pagenum, pagesize, startByZero);
+    }
+
+    /**
      * 设置分页参数(SqlServer专用)
      *
      * @param idName   主键的名称
@@ -360,6 +371,18 @@ public class Select extends SelectCondition implements Serializable {
      */
     public void setPage(String idName, Integer pagenum, Integer pagesize) {
         this.page = new Page(idName, pagenum, pagesize);
+    }
+
+    /**
+     * 设置分页参数(SqlServer专用)
+     *
+     * @param idName      主键的名称
+     * @param pagenum     当前页(第一页从0开始)
+     * @param pagesize    每页显示数量
+     * @param startByZero startByZero 第一页是否从0开始
+     */
+    public void setPage(String idName, Integer pagenum, Integer pagesize, boolean startByZero) {
+        this.page = new Page(idName, pagenum, pagesize, startByZero);
     }
 
     /**
@@ -401,7 +424,7 @@ public class Select extends SelectCondition implements Serializable {
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(this);
         ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bos.toByteArray()));
-        return (Select)ois.readObject();
+        return (Select) ois.readObject();
     }
 
 }

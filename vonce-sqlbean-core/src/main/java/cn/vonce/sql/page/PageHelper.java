@@ -8,6 +8,7 @@ import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.SqlSort;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.StringUtil;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -47,18 +48,46 @@ public class PageHelper<T> {
      *
      * @param pagenum   当前页
      * @param pagesize  每页数量
+     * @param timestamp 时间戳
+     */
+    public PageHelper(Integer pagenum, Integer pagesize, boolean startByZero, String timestamp) {
+        this(pagenum, pagesize, startByZero, null, timestamp);
+    }
+
+    /**
+     * 实例化分页助手 - 手动设置参数
+     *
+     * @param pagenum   当前页
+     * @param pagesize  每页数量
      * @param orders    排序
      * @param timestamp 时间戳
      */
     public PageHelper(Integer pagenum, Integer pagesize, Order[] orders, String timestamp) {
-        init(pagenum, pagesize, orders, timestamp);
+        init(pagenum, pagesize, true, orders, timestamp);
     }
 
-    public void init(Integer pagenum, Integer pagesize, String timestamp) {
-        init(pagenum, pagesize, null, timestamp);
+    /**
+     * 实例化分页助手 - 手动设置参数
+     *
+     * @param pagenum   当前页
+     * @param pagesize  每页数量
+     * @param orders    排序
+     * @param timestamp 时间戳
+     */
+    public PageHelper(Integer pagenum, Integer pagesize, boolean startByZero, Order[] orders, String timestamp) {
+        init(pagenum, pagesize, startByZero, orders, timestamp);
     }
 
-    public void init(Integer pagenum, Integer pagesize, Order[] orders, String timestamp) {
+    /**
+     * 初始化
+     *
+     * @param pagenum
+     * @param pagesize
+     * @param startByZero
+     * @param orders
+     * @param timestamp
+     */
+    public void init(Integer pagenum, Integer pagesize, boolean startByZero, Order[] orders, String timestamp) {
         if (this.pagenum == null) {
             this.pagenum = pagenum == null ? 0 : pagenum;
         }
@@ -71,10 +100,12 @@ public class PageHelper<T> {
         if (this.timestamp == null) {
             this.setTimestamp(timestamp);
         }
+        this.startByZero = startByZero;
     }
 
     private Integer pagenum;
     private Integer pagesize;
+    private boolean startByZero = true;
     private Integer totalRecords;
     private Integer totalPage;
     private Order[] orders;
@@ -98,6 +129,15 @@ public class PageHelper<T> {
      */
     public Integer getPagesize() {
         return pagesize;
+    }
+
+    /**
+     * 获取当前页是否从0开始
+     *
+     * @return
+     */
+    public boolean getStartByZero() {
+        return startByZero;
     }
 
     /**
@@ -245,7 +285,7 @@ public class PageHelper<T> {
             select.getColumnList().clear();
             select.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
             //设置分页
-            sqlBeanSelect.setPage(pagenum, pagesize);
+            sqlBeanSelect.setPage(pagenum, pagesize, startByZero);
             sqlBeanSelect.orderBy(orders);
             // 先统计数量
             int count;
@@ -319,7 +359,7 @@ public class PageHelper<T> {
      * @return
      */
     public Paging getPaging() {
-        return new Paging(this.pagenum, this.pagesize, this.orders);
+        return new Paging(this.pagenum, this.pagesize, getStartByZero(), this.orders);
     }
 
     /**
