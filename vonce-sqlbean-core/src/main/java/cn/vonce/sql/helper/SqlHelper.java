@@ -1033,7 +1033,7 @@ public class SqlHelper {
             if (in_notInValues != null && in_notInValues.length > 0) {
                 for (int k = 0; k < in_notInValues.length; k++) {
                     if (in_notInValues[k] instanceof Original) {
-                        in_notIn.append(SqlBeanUtil.getOriginal(common,((Original) in_notInValues[k]).getValue()));
+                        in_notIn.append(SqlBeanUtil.getOriginal(common, ((Original) in_notInValues[k]).getValue()));
                     } else {
                         in_notIn.append(SqlBeanUtil.getSqlValue(common, in_notInValues[k]));
                     }
@@ -1192,7 +1192,8 @@ public class SqlHelper {
         Integer[] param;
         //SQLServer2008
         if (DbType.SQLServer == select.getSqlBeanDB().getDbType()) {
-            int top = (select.getPage().getPagenum() + 1) * select.getPage().getPagesize();
+            int pagenum = select.getPage().getStartByZero() ? select.getPage().getPagenum() + 1 : select.getPage().getPagenum();
+            int top = pagenum * select.getPage().getPagesize();
             int begin = top - select.getPage().getPagesize();
             param = new Integer[]{top, begin};
         }
@@ -1201,13 +1202,15 @@ public class SqlHelper {
             //startIndex = (当前页 * 每页显示的数量)，例如：(0 * 10)
             //endIndex = (当前页 * 每页显示的数量) + 每页显示的数量，例如：10 = (0 * 10) + 10
             //那么如果startIndex=0，endIndex=10，就是查询第0到10条数据
-            int startIndex = select.getPage().getPagenum() * select.getPage().getPagesize();
-            int endIndex = (select.getPage().getPagenum() * select.getPage().getPagesize()) + select.getPage().getPagesize();
+            int pagenum = select.getPage().getStartByZero() ? select.getPage().getPagenum() : select.getPage().getPagenum() - 1;
+            int startIndex = pagenum * select.getPage().getPagesize();
+            int endIndex = (pagenum * select.getPage().getPagesize()) + select.getPage().getPagesize();
             param = new Integer[]{startIndex, endIndex};
         }
         //Mysql,MariaDB,PostgreSQL,Sqlite,Hsql
         else {
-            int limitOffset = select.getPage().getPagenum() * select.getPage().getPagesize();
+            int pagenum = select.getPage().getStartByZero() ? select.getPage().getPagenum() : select.getPage().getPagenum() - 1;
+            int limitOffset = pagenum * select.getPage().getPagesize();
             int limitAmount = select.getPage().getPagesize();
             param = new Integer[]{limitOffset, limitAmount};
         }

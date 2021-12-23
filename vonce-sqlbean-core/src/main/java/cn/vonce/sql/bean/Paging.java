@@ -24,29 +24,47 @@ public class Paging implements Serializable {
         this.pagesize = pagesize;
     }
 
+    public Paging(Integer pagenum, Integer pagesize, boolean startByZero) {
+        this.pagenum = pagenum;
+        this.pagesize = pagesize;
+        this.startByZero = startByZero;
+    }
+
     public Paging(Integer pagenum, Integer pagesize, Order order) {
-        this(pagenum, pagesize, new Order[]{order});
+        this(pagenum, pagesize, true, new Order[]{order});
+    }
+
+    public Paging(Integer pagenum, Integer pagesize, boolean startByZero, Order order) {
+        this(pagenum, pagesize, startByZero, new Order[]{order});
     }
 
     public Paging(Integer pagenum, Integer pagesize, String field, SqlSort sqlSort) {
-        this(pagenum, pagesize, new Order[]{new Order(field, sqlSort)});
+        this(pagenum, pagesize, true, new Order[]{new Order(field, sqlSort)});
+    }
+
+    public Paging(Integer pagenum, Integer pagesize, boolean startByZero, String field, SqlSort sqlSort) {
+        this(pagenum, pagesize, startByZero, new Order[]{new Order(field, sqlSort)});
     }
 
     public Paging(Integer pagenum, Integer pagesize, Column column, SqlSort sqlSort) {
-        this(pagenum, pagesize, new Order[]{new Order(column, sqlSort)});
+        this(pagenum, pagesize, true, new Order[]{new Order(column, sqlSort)});
     }
 
-    public Paging(Integer pagenum, Integer pagesize, Order[] orders) {
+    public Paging(Integer pagenum, Integer pagesize, boolean startByZero, Column column, SqlSort sqlSort) {
+        this(pagenum, pagesize, startByZero, new Order[]{new Order(column, sqlSort)});
+    }
+
+    public Paging(Integer pagenum, Integer pagesize, boolean startByZero, Order[] orders) {
         this.pagenum = pagenum;
         this.pagesize = pagesize;
+        this.startByZero = startByZero;
         this.orders = orders;
     }
 
-
     private Integer pagenum;
     private Integer pagesize;
+    private boolean startByZero = true;
     private Order[] orders;
-
 
     public Integer getPagenum() {
         return pagenum;
@@ -62,6 +80,14 @@ public class Paging implements Serializable {
 
     public void setPagesize(Integer pagesize) {
         this.pagesize = pagesize;
+    }
+
+    public boolean getStartByZero() {
+        return startByZero;
+    }
+
+    public void setStartByZero(boolean startByZero) {
+        this.startByZero = startByZero;
     }
 
     public Order[] getOrders() {

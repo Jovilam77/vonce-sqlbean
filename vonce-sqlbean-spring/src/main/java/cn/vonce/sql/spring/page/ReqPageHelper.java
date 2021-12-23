@@ -1,6 +1,5 @@
 package cn.vonce.sql.spring.page;
 
-import cn.vonce.common.bean.PagingRS;
 import cn.vonce.common.bean.RS;
 import cn.vonce.common.enumerate.ResultCode;
 import cn.vonce.sql.bean.Order;
@@ -42,21 +41,47 @@ public class ReqPageHelper<T> extends PageHelper<T> {
         super();
         Integer pagenum = null;
         Integer pagesize = null;
+        String[] sortdatafield = null;
+        String[] sortorder = null;
         Order[] orders = null;
         String timestamp = null;
+        boolean startByZero = true;
         try {
-            pagenum = request.getParameter("pagenum") == null ? 0 : Integer.parseInt(request.getParameter("pagenum"));
-            pagesize = request.getParameter("pagesize") == null ? 10 : Integer.parseInt(request.getParameter("pagesize"));
-            orders = super.getOrder(request.getParameterValues("sortdatafield"), request.getParameterValues("sortorder"));
+            //当前页数
+            if (request.getParameter("page") != null) {
+                pagenum = Integer.parseInt(request.getParameter("page"));
+                startByZero = false;
+            } else if (request.getParameter("pagenum") != null) {
+                pagenum = Integer.parseInt(request.getParameter("pagenum"));
+            }
+            //每页数量
+            if (request.getParameter("pageSize") != null) {
+                pagesize = Integer.parseInt(request.getParameter("pageSize"));
+            } else if (request.getParameter("pagesize") != null) {
+                pagesize = Integer.parseInt(request.getParameter("pagesize"));
+            }
+            //排序字段
+            if (request.getParameterValues("prop") != null) {
+                sortdatafield = request.getParameterValues("prop");
+            } else if (request.getParameter("sortdatafield") != null) {
+                sortdatafield = request.getParameterValues("sortdatafield");
+            }
+            //排序类型
+            if (request.getParameterValues("order") != null) {
+                sortorder = request.getParameterValues("order");
+            } else if (request.getParameter("sortorder") != null) {
+                sortorder = request.getParameterValues("sortorder");
+            }
             timestamp = request.getParameter("timestamp");
+            orders = super.getOrder(sortdatafield, sortorder);
         } catch (NumberFormatException nfe) {
             try {
-                throw new Exception("初始化 PagingHelper 对象失败 , 请检查 pagenum 或 pagesize 参数是否为正确数字 : " + nfe.getMessage());
+                throw new Exception("初始化 PagingHelper 对象失败 , 请检查 pagenum(page) 和 pagesize(pageSize) 参数是否为正确数字 : " + nfe.getMessage());
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        super.init(pagenum, pagesize, orders, timestamp);
+        super.init(pagenum, pagesize, startByZero, orders, timestamp);
     }
 
     /**
@@ -92,17 +117,18 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      * @param msg
      * @return
      */
-    public PagingRS toResult(String msg) {
-        PagingRS result = new PagingRS();
+    public RS toResult(String msg) {
+        ResultData<List<T>> resultData = super.getResultData();
+        RS result = new RS();
         result.setCode(ResultCode.SUCCESS.getCode());
         result.setMsg(msg == null || msg.equals("") ? "获取列表成功" : msg);
-        ResultData<List<T>> resultData = super.getResultData();
         result.setData(resultData.getData());
-        result.setPagenum(resultData.getPagenum());
-        result.setPagesize(resultData.getPagesize());
-        result.setTotalRecords(resultData.getTotalRecords());
-        result.setTotalPage(resultData.getTotalPage());
-        result.setTimestamp(resultData.getTimestamp());
+        result.put("pagenum", resultData.getPagenum());
+        result.put("pagesize", resultData.getPagesize());
+        result.put("totalRecords", resultData.getTotalRecords());
+        result.put("totalPage", resultData.getTotalPage());
+        result.put("timestamp", resultData.getTimestamp());
+        result.put("startByZero", super.getStartByZero());
         return result;
     }
 
@@ -111,7 +137,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      *
      * @return
      */
-    public PagingRS toResult() {
+    public RS toResult() {
         return toResult(null);
     }
 
@@ -122,15 +148,17 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      * @return
      */
     public RS result(String msg) {
+        ResultData<List<T>> resultData = super.getResultData();
         RS result = new RS();
         result.setCode(ResultCode.SUCCESS.getCode());
         result.setMsg(msg == null || msg.equals("") ? "获取列表成功" : msg);
-        ResultData<List<T>> resultData = super.getResultData();
         Map<String, Object> data = new HashMap<>();
         data.put("page", resultData.getPagenum());
         data.put("pageSize", resultData.getPagesize());
         data.put("total", resultData.getTotalRecords());
         data.put("rows", resultData.getData());
+        data.put("timestamp", resultData.getTimestamp());
+        data.put("startByZero", super.getStartByZero());
         result.setData(data);
         return result;
     }

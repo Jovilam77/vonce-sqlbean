@@ -241,7 +241,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public <O> List<O> selectByCondition(Class<O> returnType, Paging paging, Wrapper where) {
         Select select = new Select();
         select.setWhere(where);
-        select.setPage(paging.getPagenum(), paging.getPagesize());
+        select.setPage(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
         if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
             clazz = returnType;
@@ -278,7 +278,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public List<T> selectByCondition(Paging paging, Wrapper where) {
         Select select = new Select();
         select.setWhere(where);
-        select.setPage(paging.getPagenum(), paging.getPagesize());
+        select.setPage(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
         return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select),
                 new SpringJbdcSqlBeanMapper<T>(clazz, clazz));

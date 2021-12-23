@@ -17,14 +17,22 @@ public class Page implements Serializable {
     }
 
     public Page(Integer pagenum, Integer pagesize) {
-        this.pagenum = pagenum;
-        this.pagesize = pagesize;
+        this(null, pagenum, pagesize, false);
+    }
+
+    public Page(Integer pagenum, Integer pagesize, boolean startByZero) {
+        this(null, pagenum, pagesize, startByZero);
     }
 
     public Page(String idName, Integer pagenum, Integer pagesize) {
+        this(idName, pagenum, pagesize, false);
+    }
+
+    public Page(String idName, Integer pagenum, Integer pagesize, boolean startByZero) {
         this.idName = idName;
         this.pagenum = pagenum;
         this.pagesize = pagesize;
+        this.startByZero = startByZero;
     }
 
     /**
@@ -39,6 +47,10 @@ public class Page implements Serializable {
      * 每页显示数
      */
     private Integer pagesize;
+    /**
+     * 页数从0开始
+     */
+    private boolean startByZero = true;
 
     public String getIdName() {
         return idName;
@@ -62,6 +74,14 @@ public class Page implements Serializable {
 
     public void setPagesize(Integer pagesize) {
         this.pagesize = pagesize;
+    }
+
+    public boolean getStartByZero() {
+        return startByZero;
+    }
+
+    public void setStartByZero(boolean startByZero) {
+        this.startByZero = startByZero;
     }
 
     @Override

@@ -224,7 +224,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     public <R> List<R> selectByCondition(Class<R> returnType, Paging paging, Wrapper where) {
         Select select = new Select();
         select.setWhere(where);
-        select.setPage(paging.getPagenum(), paging.getPagesize());
+        select.setPage(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
             return mybatisSqlBeanDao.selectO(getSqlBeanDB(), clazz, returnType, select);
@@ -257,7 +257,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     public List<T> selectByCondition(Paging paging, Wrapper where) {
         Select select = new Select();
         select.setWhere(where);
-        select.setPage(paging.getPagenum(), paging.getPagesize());
+        select.setPage(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
         return mybatisSqlBeanDao.select(getSqlBeanDB(), clazz, select);
     }

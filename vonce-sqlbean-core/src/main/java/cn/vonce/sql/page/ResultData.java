@@ -67,8 +67,8 @@ public class ResultData<T> {
 
     @Override
     public String toString() {
-        return "PagingRS{" +
-                "RS=" + super.toString() +
+        return "ResultData{" +
+                "data=" + data +
                 ", pagenum=" + pagenum +
                 ", pagesize=" + pagesize +
                 ", totalRecords=" + totalRecords +
