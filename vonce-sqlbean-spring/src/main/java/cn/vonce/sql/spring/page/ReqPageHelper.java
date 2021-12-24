@@ -117,7 +117,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      * @param msg
      * @return
      */
-    public RS toResult(String msg) {
+    public RS<T> toResult(String msg) {
         ResultData<List<T>> resultData = super.getResultData();
         RS result = new RS();
         result.setCode(ResultCode.SUCCESS.getCode());
@@ -137,7 +137,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      *
      * @return
      */
-    public RS toResult() {
+    public RS<T> toResult() {
         return toResult(null);
     }
 
@@ -147,7 +147,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      * @param msg
      * @return
      */
-    public RS result(String msg) {
+    public RS<T> result(String msg) {
         ResultData<List<T>> resultData = super.getResultData();
         RS result = new RS();
         result.setCode(ResultCode.SUCCESS.getCode());
@@ -168,7 +168,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      *
      * @return
      */
-    public RS result() {
+    public RS<T> result() {
         return result(null);
     }
 
