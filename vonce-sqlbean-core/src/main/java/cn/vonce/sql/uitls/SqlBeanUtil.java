@@ -28,7 +28,23 @@ public class SqlBeanUtil {
         if (clazz == null) {
             return null;
         }
-        return clazz.getAnnotation(SqlTable.class);
+        SqlTable sqlTable = clazz.getAnnotation(SqlTable.class);
+        if (sqlTable == null) {
+            Class<?> superClass = clazz.getSuperclass();
+            do {
+                if (!superClass.getName().equals("java.lang.Object")) {
+                    sqlTable = superClass.getAnnotation(SqlTable.class);
+                    if (sqlTable != null) {
+                        break;
+                    }
+                    superClass = superClass.getSuperclass();
+                }
+                if (superClass.getName().equals("java.lang.Object")) {
+                    break;
+                }
+            } while (!superClass.getName().equals("java.lang.Object"));
+        }
+        return sqlTable;
     }
 
     /**
@@ -308,7 +324,8 @@ public class SqlBeanUtil {
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
-            if (isIgnore(field)) {
+            SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
+            if (sqlColumn != null && sqlColumn.ignore()) {
                 continue;
             }
             if (isFilter(filterTableFields, getTableFieldName(field))) {
@@ -339,7 +356,8 @@ public class SqlBeanUtil {
                         if (Modifier.isStatic(subBeanField.getModifiers())) {
                             continue;
                         }
-                        if (isIgnore(field)) {
+                        SqlColumn subSqlColumn = field.getAnnotation(SqlColumn.class);
+                        if (subSqlColumn != null && subSqlColumn.ignore()) {
                             continue;
                         }
                         columnSet.add(new Column(subTable.getAlias(), getTableFieldName(subBeanField), getColumnAlias(subTable.getAlias(), subBeanField.getName())));
