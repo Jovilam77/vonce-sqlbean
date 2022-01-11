@@ -123,7 +123,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @Override
     public List<T> selectByIds(ID... ids) {
         if (ids == null || ids.length == 0) {
-            return null;
+            throw new SqlBeanException("selectByIds方法ids参数必须拥有一个值");
         }
         return jdbcTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, ids),
                 new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
@@ -133,7 +133,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @Override
     public <O> List<O> selectByIds(Class<O> returnType, ID... ids) {
         if (ids == null || ids.length == 0) {
-            return null;
+            throw new SqlBeanException("selectByIds方法ids参数必须拥有一个值");
         }
         if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
             clazz = returnType;
@@ -377,6 +377,9 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int deleteById(ID... id) {
+        if (id == null || id.length == 0) {
+            throw new SqlBeanException("deleteById方法id参数必须拥有一个值");
+        }
         return jdbcTemplate.update(SqlBeanProvider.deleteByIdSql(getSqlBeanDB(), clazz, id));
     }
 
@@ -409,6 +412,9 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int logicallyDeleteById(ID... id) {
+        if (id == null || id.length == 0) {
+            throw new SqlBeanException("logicallyDeleteById方法id参数必须拥有一个值");
+        }
         return jdbcTemplate.update(SqlBeanProvider.logicallyDeleteByIdSql(getSqlBeanDB(), clazz, id));
     }
 
@@ -509,6 +515,9 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int insert(T... bean) {
+        if (bean == null || bean.length == 0) {
+            throw new SqlBeanException("insert方法bean参数必须拥有一个值");
+        }
         return jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), clazz, bean));
     }
 

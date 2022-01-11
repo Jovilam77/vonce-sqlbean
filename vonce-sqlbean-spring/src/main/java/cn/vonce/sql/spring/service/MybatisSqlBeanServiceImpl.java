@@ -4,6 +4,7 @@ import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.enumerate.DbType;
+import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.service.TableService;
 import cn.vonce.sql.spring.annotation.DbSwitch;
@@ -118,7 +119,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Override
     public List<T> selectByIds(ID... ids) {
         if (ids == null || ids.length == 0) {
-            return null;
+            throw new SqlBeanException("selectByIds方法ids参数必须拥有一个值");
         }
         return mybatisSqlBeanDao.selectByIds(getSqlBeanDB(), clazz, ids);
     }
@@ -127,7 +128,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Override
     public <R> List<R> selectByIds(Class<R> returnType, ID... ids) {
         if (ids == null || ids.length == 0) {
-            return null;
+            throw new SqlBeanException("selectByIds方法ids参数必须拥有一个值");
         }
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
             return mybatisSqlBeanDao.selectByIdsO(getSqlBeanDB(), clazz, returnType, ids);
@@ -348,6 +349,9 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.MASTER)
     @Override
     public int deleteById(ID... id) {
+        if (id == null || id.length == 0) {
+            throw new SqlBeanException("deleteById方法id参数必须拥有一个值");
+        }
         return mybatisSqlBeanDao.deleteById(getSqlBeanDB(), clazz, id);
     }
 
@@ -380,6 +384,9 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.MASTER)
     @Override
     public int logicallyDeleteById(ID... id) {
+        if (id == null || id.length == 0) {
+            throw new SqlBeanException("logicallyDeleteById方法id参数必须拥有一个值");
+        }
         return mybatisSqlBeanDao.logicallyDeleteById(getSqlBeanDB(), clazz, id);
     }
 
@@ -482,6 +489,9 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.MASTER)
     @Override
     public int insert(T... bean) {
+        if (bean == null || bean.length == 0) {
+            throw new SqlBeanException("insert方法bean参数必须拥有一个值");
+        }
         return mybatisSqlBeanDao.insertBean(getSqlBeanDB(), clazz, Arrays.asList(bean));
     }
 

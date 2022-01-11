@@ -455,6 +455,17 @@ public class SqlBeanMapper {
             case "java.lang.Double":
                 newValue = new Double(value.toString());
                 break;
+            case "boolean":
+            case "java.lang.Boolean":
+                newValue = new Boolean(value.toString());
+                break;
+            case "char":
+            case "java.lang.Character":
+                newValue = value.toString().charAt(0);
+                break;
+            case "java.lang.String":
+                newValue = value.toString();
+                break;
         }
         return newValue;
     }

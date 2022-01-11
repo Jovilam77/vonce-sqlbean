@@ -41,10 +41,10 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             // 利用反射获取参数对象
             ParameterHandler parameterHandler = ReflectUtil.getFieldValue(resultSetHandler, "parameterHandler");
             MappedStatement mappedStatement = ReflectUtil.getFieldValue(resultSetHandler, "mappedStatement");
-            Object parameterObj = parameterHandler.getParameterObject();
-            // 获取节点属性的集合
-            List<ResultMap> resultMaps = mappedStatement.getResultMaps();
             if (mappedStatement.getId().startsWith("cn.vonce.sql.spring.dao.MybatisSqlBeanDao")) {
+                Object parameterObj = parameterHandler.getParameterObject();
+                // 获取节点属性的集合
+                List<ResultMap> resultMaps = mappedStatement.getResultMaps();
                 return handleResultSet(((Statement) invocation.getArgs()[0]).getResultSet(), ((HashMap<String, Object>) parameterObj), resultMaps.get(0).getType());
             }
         }
@@ -75,20 +75,26 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             if (resultType.getName().equals(ColumnInfo.class.getName()) || resultType.getName().equals(TableInfo.class.getName())) {
                 return beanHandleResultSet(resultType, resultSet, super.getColumnNameList(resultSet));
             }
+            if (SqlBeanUtil.isBaseType(resultType.getName())) {
+                return baseHandleResultSet(resultSet, resultType);
+            }
             if (SqlBeanUtil.isMap(resultType.getName())) {
                 return mapHandleResultSet(resultSet);
-            } else if (SqlBeanUtil.isBaseType(resultType.getName())) {
-                return baseHandleResultSet(resultSet, resultType);
-            } else {
-                // 获取实际需要返回的类型
-                Class<?> returnType;
-                if (mapParam.containsKey("returnType")) {
-                    returnType = (Class<?>) mapParam.get("returnType");
-                } else {
-                    returnType = (Class<?>) mapParam.get("clazz");
-                }
-                return beanHandleResultSet(returnType, resultSet, super.getColumnNameList(resultSet));
             }
+            // 获取实际需要返回的类型
+            Class<?> returnType;
+            if (mapParam.containsKey("returnType")) {
+                returnType = (Class<?>) mapParam.get("returnType");
+            } else {
+                returnType = (Class<?>) mapParam.get("clazz");
+            }
+            if (SqlBeanUtil.isBaseType(returnType.getName())) {
+                return baseHandleResultSet(resultSet, returnType);
+            }
+            if (SqlBeanUtil.isMap(returnType.getName())) {
+                return mapHandleResultSet(resultSet);
+            }
+            return beanHandleResultSet(returnType, resultSet, super.getColumnNameList(resultSet));
         }
         return null;
     }
