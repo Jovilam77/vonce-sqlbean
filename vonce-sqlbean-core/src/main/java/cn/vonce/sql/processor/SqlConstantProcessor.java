@@ -29,7 +29,7 @@ import java.util.Set;
 public class SqlConstantProcessor extends AbstractProcessor {
     private Messager messager; //有点像Logger,用于输出信息
     private Filer filer; //可以获得Build Path，用于生成文件
-    public static final String PREFIX = "Sql";
+    public static final String PREFIX = "$";
 
     // init做一些初始化操作
     @Override
