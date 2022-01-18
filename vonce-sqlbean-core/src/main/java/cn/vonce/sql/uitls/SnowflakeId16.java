@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  */
 public final class SnowflakeId16 implements Serializable {
 
-//    private static final Logger logger = LoggerFactory.getLogger(cn.vonce.common.utils.SnowflakeId16.class);
+//    private static final Logger logger = LoggerFactory.getLogger(SnowflakeId16.class);
 
     private static final Pattern PATTERN_LONG_ID = Pattern.compile("^([0-9]{15})([0-9a-f]{32})([0-9a-f]{3})$");
 

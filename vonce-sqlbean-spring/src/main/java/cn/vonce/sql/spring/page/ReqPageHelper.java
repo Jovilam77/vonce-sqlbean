@@ -1,7 +1,5 @@
 package cn.vonce.sql.spring.page;
 
-import cn.vonce.common.bean.RS;
-import cn.vonce.common.enumerate.ResultCode;
 import cn.vonce.sql.bean.Order;
 import cn.vonce.sql.bean.Select;
 import cn.vonce.sql.page.PageHelper;
@@ -117,12 +115,12 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      * @param msg
      * @return
      */
-    public RS<T> toResult(String msg) {
+    public HashMap toResult(String msg) {
         ResultData<List<T>> resultData = super.getResultData();
-        RS result = new RS();
-        result.setCode(ResultCode.SUCCESS.getCode());
-        result.setMsg(msg == null || msg.equals("") ? "获取列表成功" : msg);
-        result.setData(resultData.getData());
+        HashMap<String, Object> result = new HashMap();
+        result.put("code", 200);
+        result.put("msg", msg == null || msg.equals("") ? "获取列表成功" : msg);
+        result.put("data", resultData.getData());
         result.put("pagenum", resultData.getPagenum());
         result.put("pagesize", resultData.getPagesize());
         result.put("totalRecords", resultData.getTotalRecords());
@@ -137,7 +135,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      *
      * @return
      */
-    public RS<T> toResult() {
+    public HashMap toResult() {
         return toResult(null);
     }
 
@@ -147,11 +145,11 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      * @param msg
      * @return
      */
-    public RS<T> result(String msg) {
+    public HashMap result(String msg) {
         ResultData<List<T>> resultData = super.getResultData();
-        RS result = new RS();
-        result.setCode(ResultCode.SUCCESS.getCode());
-        result.setMsg(msg == null || msg.equals("") ? "获取列表成功" : msg);
+        HashMap<String, Object> result = new HashMap();
+        result.put("code", 200);
+        result.put("msg", msg == null || msg.equals("") ? "获取列表成功" : msg);
         Map<String, Object> data = new HashMap<>();
         data.put("page", resultData.getPagenum());
         data.put("pageSize", resultData.getPagesize());
@@ -159,7 +157,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
         data.put("rows", resultData.getData());
         data.put("timestamp", resultData.getTimestamp());
         data.put("startByZero", super.getStartByZero());
-        result.setData(data);
+        result.put("data", resultData.getData());
         return result;
     }
 
@@ -168,7 +166,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      *
      * @return
      */
-    public RS<T> result() {
+    public HashMap result() {
         return result(null);
     }
 
