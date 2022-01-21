@@ -115,7 +115,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      * @param msg
      * @return
      */
-    public HashMap toResult(String msg) {
+    public HashMap<String, Object> toResult(String msg) {
         ResultData<List<T>> resultData = super.getResultData();
         HashMap<String, Object> result = new HashMap();
         result.put("code", 200);
@@ -135,7 +135,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      *
      * @return
      */
-    public HashMap toResult() {
+    public HashMap<String, Object> toResult() {
         return toResult(null);
     }
 
@@ -145,7 +145,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      * @param msg
      * @return
      */
-    public HashMap result(String msg) {
+    public HashMap<String, Object> result(String msg) {
         ResultData<List<T>> resultData = super.getResultData();
         HashMap<String, Object> result = new HashMap();
         result.put("code", 200);
@@ -157,7 +157,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
         data.put("rows", resultData.getData());
         data.put("timestamp", resultData.getTimestamp());
         data.put("startByZero", super.getStartByZero());
-        result.put("data", resultData.getData());
+        result.put("data", data);
         return result;
     }
 
@@ -166,7 +166,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      *
      * @return
      */
-    public HashMap result() {
+    public HashMap<String, Object> result() {
         return result(null);
     }
 
