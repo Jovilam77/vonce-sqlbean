@@ -3,7 +3,7 @@ package cn.vonce.sql.spring.mapper;
 import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.bean.TableInfo;
 import cn.vonce.sql.mapper.SqlBeanMapper;
-import cn.vonce.sql.uitls.ReflectAsmUtil;
+import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.resultset.DefaultResultSetHandler;
@@ -39,10 +39,8 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
         if (target instanceof DefaultResultSetHandler) {
             DefaultResultSetHandler resultSetHandler = (DefaultResultSetHandler) target;
             // 利用反射获取参数对象
-            ParameterHandler parameterHandler = (ParameterHandler) ReflectAsmUtil.instance().get(DefaultResultSetHandler.class, resultSetHandler, "parameterHandler");
-            MappedStatement mappedStatement = (MappedStatement) ReflectAsmUtil.instance().get(DefaultResultSetHandler.class, resultSetHandler, "mappedStatement");
-//            ParameterHandler parameterHandler = ReflectUtil.getFieldValue(resultSetHandler, "parameterHandler");
-//            MappedStatement mappedStatement = ReflectUtil.getFieldValue(resultSetHandler, "mappedStatement");
+            ParameterHandler parameterHandler = ReflectUtil.getFieldValue(resultSetHandler, "parameterHandler");
+            MappedStatement mappedStatement = ReflectUtil.getFieldValue(resultSetHandler, "mappedStatement");
             if (mappedStatement.getId().startsWith("cn.vonce.sql.spring.dao.MybatisSqlBeanDao")) {
                 Object parameterObj = parameterHandler.getParameterObject();
                 // 获取节点属性的集合
