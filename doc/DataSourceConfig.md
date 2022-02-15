@@ -120,7 +120,7 @@ public class DataSourceConfiguration {
 /**
  * 1. 写(主)库只能有一个，读(从)库可以有多个，master和slave都配置则用于读写分离。
  * 2. master和slave同时配置之后，Service内置方法将自动启用读写分离，
- *    如Service中自定义SQL查询方法需自行在方法中指定读或写，使用@DbSwitch主键，如不指定默认读写都走主库。
+ *    如Service中自定义SQL查询方法需自行在方法中指定读或写，使用@DbSwitch注解，如不指定默认读写都走主库。
  * 3. 如果不需要读写分离，Service仅需指定某个数据源，那么只要配置master即可。
  * 4. 如果不使用@DbSource注解，那么该Service将使用默认数据源
  * 
