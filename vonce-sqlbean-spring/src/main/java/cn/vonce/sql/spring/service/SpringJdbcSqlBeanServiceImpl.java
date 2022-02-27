@@ -19,7 +19,6 @@ import cn.vonce.sql.uitls.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -443,14 +442,32 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public int updateById(T bean, ID id) {
+        return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanDB(), clazz, bean, id, true, false, null));
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock) {
         return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public int updateByBeanId(T bean) {
+        return jdbcTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanDB(), clazz, bean, true, false, null));
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, String[] filterFields) {
         return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, filterFields));
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int updateByCondition(T bean, String where, Object... args) {
+        return jdbcTemplate.update(SqlBeanProvider.updateByConditionSql(getSqlBeanDB(), clazz, bean, true, false, null, where, args));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -469,6 +486,17 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @Override
     public int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, String where, Object... args) {
         return jdbcTemplate.update(SqlBeanProvider.updateByConditionSql(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, null, where, args));
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int updateByCondition(T bean, Wrapper where) {
+        Update update = new Update();
+        update.setUpdateBean(bean);
+        update.setUpdateNotNull(true);
+        update.setOptimisticLock(false);
+        update.setWhere(where);
+        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), clazz, update, false));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -498,6 +526,12 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         update.setFilterFields(filterFields);
         update.setWhere(where);
         return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), clazz, update, false));
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int updateByBeanCondition(T bean, String where) {
+        return 0;
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -618,7 +652,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<TableInfo> getTableList(String tableName) {
-        return jdbcTemplate.query(SqlBeanProvider.selectTableListSql(getSqlBeanDB(), tableName) , new SpringJbdcSqlBeanMapper<TableInfo>(TableInfo.class, TableInfo.class));
+        return jdbcTemplate.query(SqlBeanProvider.selectTableListSql(getSqlBeanDB(), tableName), new SpringJbdcSqlBeanMapper<TableInfo>(TableInfo.class, TableInfo.class));
     }
 
     @DbSwitch(DbRole.SLAVE)

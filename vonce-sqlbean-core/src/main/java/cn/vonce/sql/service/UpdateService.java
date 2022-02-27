@@ -17,6 +17,15 @@ public interface UpdateService<T, ID> {
     /**
      * 根据id条件更新
      *
+     * @param bean 更新的bean实体
+     * @param id   id条件
+     * @return
+     */
+    int updateById(T bean, ID id);
+
+    /**
+     * 根据id条件更新
+     *
      * @param bean           更新的bean实体
      * @param id             id条件
      * @param updateNotNull  是否仅更新不为null的字段
@@ -24,6 +33,14 @@ public interface UpdateService<T, ID> {
      * @return
      */
     int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock);
+
+    /**
+     * 根据实体类id条件更新
+     *
+     * @param bean 更新的bean实体
+     * @return
+     */
+    int updateByBeanId(T bean);
 
     /**
      * 根据实体类id条件更新
@@ -61,6 +78,16 @@ public interface UpdateService<T, ID> {
     /**
      * 根据条件更新
      *
+     * @param bean  更新的bean实体
+     * @param where 条件字符串表达式
+     * @param args  条件参数
+     * @return
+     */
+    int updateByCondition(T bean, String where, Object... args);
+
+    /**
+     * 根据条件更新
+     *
      * @param bean           更新的bean实体
      * @param updateNotNull  是否仅更新不为null的字段
      * @param optimisticLock 是否使用乐观锁
@@ -69,6 +96,15 @@ public interface UpdateService<T, ID> {
      * @return
      */
     int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, String where, Object... args);
+
+    /**
+     * 根据条件更新
+     *
+     * @param bean  更新的bean实体
+     * @param where 条件包装器
+     * @return
+     */
+    int updateByCondition(T bean, Wrapper where);
 
     /**
      * 根据条件更新
@@ -105,6 +141,15 @@ public interface UpdateService<T, ID> {
      * @return
      */
     int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, Wrapper where);
+
+    /**
+     * 根据实体类字段条件更新
+     *
+     * @param bean  更新的bean实体
+     * @param where 条件字符串表达式
+     * @return
+     */
+    int updateByBeanCondition(T bean, String where);
 
     /**
      * 根据实体类字段条件更新
