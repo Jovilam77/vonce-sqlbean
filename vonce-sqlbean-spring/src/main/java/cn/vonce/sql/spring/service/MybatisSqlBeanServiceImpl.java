@@ -416,14 +416,32 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public int updateById(T bean, ID id) {
+        return mybatisSqlBeanDao.updateById(getSqlBeanDB(), clazz, bean, id, true, false, null);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock) {
         return mybatisSqlBeanDao.updateById(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, null);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public int updateByBeanId(T bean) {
+        return mybatisSqlBeanDao.updateByBeanId(getSqlBeanDB(), clazz, bean, true, false , null);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, String[] filterFields) {
         return mybatisSqlBeanDao.updateById(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, filterFields);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int updateByCondition(T bean, String where, Object... args) {
+        return mybatisSqlBeanDao.updateByBeanId(getSqlBeanDB(), clazz, bean, true, false, null);
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -442,6 +460,17 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Override
     public int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, String where, Object... args) {
         return mybatisSqlBeanDao.updateByCondition(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, null, where, args);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int updateByCondition(T bean, Wrapper where) {
+        Update update = new Update();
+        update.setUpdateBean(bean);
+        update.setUpdateNotNull(true);
+        update.setOptimisticLock(false);
+        update.setWhere(where);
+        return mybatisSqlBeanDao.update(getSqlBeanDB(), clazz, update, false);
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -471,6 +500,13 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         update.setFilterFields(filterFields);
         update.setWhere(where);
         return mybatisSqlBeanDao.update(getSqlBeanDB(), clazz, update, false);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int updateByBeanCondition(T bean, String where) {
+        return mybatisSqlBeanDao.updateByBeanCondition(getSqlBeanDB(), clazz, bean, true,
+                false, null, where);
     }
 
     @DbSwitch(DbRole.MASTER)
