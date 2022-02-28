@@ -21,7 +21,7 @@ select.where(SqlLogic.ORBracket, "type", 1);            //不写操作符参数,
 //select.wORBracket("type", 1);                        //不写操作符参数, 则默认为SqlOperator.EQUAL_TO
 ```
 
-#### 二. 条件表达式
+#### 二. Where条件表达式
 ```java
 //该方式设置where条件以手写sql表达式进行, 不支持where以外的语法, 如group、order、limit等, 占位符“&”代表字段名称, 占位符“?”代表字段值。
 
@@ -35,7 +35,7 @@ setWhere("& > ? AND & = ?", $User.status, 10, $User.type, 1);//建议采用此�
 
 ```
 
-#### 三. 条件包装器（推荐使用）
+#### 三. Where条件包装器（推荐使用）
 ```java
 //SQL: where id = 1 and content = '222'
 setWhere(
@@ -54,7 +54,7 @@ setWhere(
 
 ```
 
-#### 四. 条件操作符 枚举解释
+#### 四. Where条件操作符 枚举解释
 ```java
 SqlOperator.IN = "IN"                       //包含
 SqlOperator.NOT_IN = "NOT IN"               //不包含
@@ -69,7 +69,7 @@ SqlOperator.EQUAL_TO = "="                  //等于
 SqlOperator.NOT_EQUAL_TO = "!="             //不等于
 ```
 
-#### 五. 条件逻辑 枚举解释
+#### 五. Where条件逻辑 枚举解释
 ```java
 SqlLogic.OR = select.wOR("字段","值");                  //或者
 SqlLogic.AND = select.wAND("字段","值");                //并且
