@@ -117,6 +117,7 @@ import cn.vonce.sql.bean.Column;
 import java.lang.String;
 
 public class $Essay {
+
   public static final String _schema = "";
 
   public static final String _tableName = "d_essay";
@@ -158,6 +159,7 @@ public class $Essay {
   public static final String updateTime = "update_time";
   
   public static final Column $updateTime = new Column(_schema,_tableAlias,"update_time","");
+
 }
 ```
 #### 四. 示例.主外键联表查询的用法
