@@ -18,24 +18,27 @@
 	</dependency>
 ###### 2.标注实体类
 ```java
-@SqlTable("d_essay") //标识表名
+//标识表名
+@SqlTable("d_essay")
 public class Essay {
 
-	@SqlId(type = IdType.SNOWFLAKE_ID_16) //标识id字段
-	//@SqlColumn("id") 常规情况下可不写
+        //标识id字段
+	@SqlId(type = IdType.SNOWFLAKE_ID_16)
+	//@SqlColumn("id")
 	private Long id;
 
-	//@SqlColumn("user_id" ) 常规情况下可不写
+	//@SqlColumn("user_id")
 	private String userId;
 
-	//@SqlColumn("content" ) 常规情况下可不写
+	//@SqlColumn("content")
 	private String content;
 
-	//@SqlColumn("creation_time" ) 常规情况下可不写
+	//@SqlColumn("creation_time")
 	private Date creationTime;
 
-        @SqlVersion //标识乐观锁字段
-        //@SqlColumn("update_time" ) 常规情况下可不写
+        //标识乐观锁字段
+        @SqlVersion
+        //@SqlColumn("update_time")
 	private Date updateTime;
 	
 	/**省略get set方法*/
@@ -46,7 +49,6 @@ public class Essay {
 
 ```java
 public interface EssayService extends SqlBeanService<Essay, Long> {
-
 	//已内置大量常用查询、更新、删除、插入方法，这里可以写自己封装的方法
 
 }
@@ -73,42 +75,56 @@ public class EssayController {
 	//查询
 	@GetMapping("select")
 	public RS select() {
+
 	//查询列表  全部
         List<Essay> list = essayService.selectAll();
+
         //查询列表  根据条件查询 方式一
-        list = essayService.selectByCondition("& > ?", SqlEssay.id, 20);
+        list = essayService.selectByCondition("& > ?", $Essay.id, 20);
+
         //查询列表  根据条件查询 方式二 推荐
-        list = essayService.selectByCondition(Wrapper.where(Cond.gt(SqlEssay.id, 10)).and(Cond.lt(SqlEssay.id, 20)));
+        list = essayService.selectByCondition(Wrapper.where(Cond.gt($Essay.id, 10)).and(Cond.lt($Essay.id, 20)));
 
 
         //查询单条  根据id
         Essay essay = essayService.selectById(1L);
+
         //查询单条  根据条件查询 方式一
-        essay = essayService.selectOneByCondition("& = ?", SqlEssay.id, 1);
+        essay = essayService.selectOneByCondition("& = ?", $Essay.id, 1);
+
         //查询单条  根据条件查询 方式二 推荐
-        essay = essayService.selectOneByCondition(Wrapper.where(Cond.eq(SqlEssay.id, 333)));
+        essay = essayService.selectOneByCondition(Wrapper.where(Cond.eq($Essay.id, 333)));
 
         //复杂查询
         Select select = new Select();
+
         //指定查询的字段
-        select.column(SqlEssay.id).column(SqlEssay.content);
+        select.column(SqlEssay.id).column($Essay.content);
+
         //指定查询的表 可不写
         //select.setTable(Essay.class);
+
         //看需求指定连表 这里不演示
         //select.join("","");
-        //id 大于 1  这里的id建议用SqlEssay.id 常量替代 这里演示多种写法特意不写
+
+        //id 大于 1  这里的id建议用$Essay.id常量替代
         select.where("id", 1, SqlOperator.GREATER_THAN);
-        //并且 内容等于222 这里的content建议用SqlEssay.content 常量替代 这里演示多种写法特意不写
+
+        //并且 内容等于222 这里的content建议用$Essay.content常量替代
         select.wAND("content", "222");
+
         //条件也可用包装器 复杂条件推荐使用
-        //select.setWhere(Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
+        //select.setWhere(Wrapper.where(Cond.gt($Essay.id, 1)).and(Cond.eq($Essay.content, "222")));
+
         //也可使用表达式 如果这三种条件同时出现 那么此方式优先级最高 上面包装器次之
-        //select.setWhere("& = ? AND & = ?", SqlEssay.id, 1, SqlEssay.content, "222");
+        //select.setWhere("& = ? AND & = ?", $Essay.id, 1, $Essay.content, "222");
+
         //根据id倒序
         select.orderBy("id", SqlSort.DESC);
 
         //用于查询Map 多条结果时会报错
         Map<String, Object> map = essayService.selectMap(select);
+
 	//用于查询Map列表
         List<Map<String, Object>> mapList = essayService.selectMapList(select);
 
@@ -116,61 +132,72 @@ public class EssayController {
         list = essayService.select(select);
 		
         return super.successHint("获取成功", list);
-	//更多用法请查看下方详细文档...
+
 	}
 
 	//分页
 	@GetMapping("getList")
-	public RS getList(HttpServletRequest request) {
+	public Map getList(HttpServletRequest request) {
+
 	// 查询对象
         Select select = new Select();
+
         // 分页助手ReqPageHelper
         ReqPageHelper<Essay> pageHelper = new ReqPageHelper<>(request);
+
         //分页查询
         pageHelper.paging(select, essayService);
+
         //返回结果
-        return super.customHint(pageHelper.toResult("获取列表成功"));
+        return pageHelper.toResult("获取列表成功");
+
         // 或者这样
-        // return super.customHint(new PageHelper<Essay>(request).paging(new Select(),essayService).toResult("获取文章列表成功"));
+        // return new PageHelper<Essay>(request).paging(new Select(),essayService).toResult("获取文章列表成功");
         
         //又或者 更简便的用法（不带统计和页数信息）
-        //List<Essay> list = essayService.selectByCondition(new Paging(0,10), Wrapper.where(Cond.gt(SqlEssay.id, 10)).and(Cond.lt(SqlEssay.id, 20)));
+        //List<Essay> list = essayService.selectByCondition(new Paging(0,10), Wrapper.where(Cond.gt($Essay.id, 10)).and(Cond.lt($Essay.id, 20)));
         //return super.successHint("获取成功", list);
+        
 	}
 
 	//更新
 	@PostMapping("update")
 	public RS update(Essay essay) {
+
 	    //根据bean内部id更新
 	    long i = essayService.updateByBeanId(essay);
 	    //根据外部id更新 参数3的true代表仅更新不为null字段 参数4的true代表使用乐观锁
             //i = essayService.updateById(essay,20,true,true);
 	    //根据条件更新 参数2的true代表仅更新不为null字段 参数3的true代表使用乐观锁
-            //i = essayService.updateByCondition(essay,true,true,Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
-	    //更多用法请查看下方详细文档...
+            //i = essayService.updateByCondition(essay,true,true,Wrapper.where(Cond.gt($Essay.id, 1)).and(Cond.eq($Essay.content, "222")));
+
             if (i > 0) {
 		return super.successHint("更新成功");
 	    }
 	    return super.othersHint("更新失败");
+    
 	}
 
 	//删除
 	@PostMapping("deleteById")
 	public RS deleteById(Integer[] id) {
+
 	    //根据id删除
 	    long i = essayService.deleteById(id);
 	    //根据条件删除
-	    //i = essayService.deleteByCondition(Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
-	    //更多用法请查看下方详细文档...
+	    //i = essayService.deleteByCondition(Wrapper.where(Cond.gt($Essay.id, 1)).and(Cond.eq($Essay.content, "222")));
+	    
 	    if (i > 0) {
 	        return super.successHint("删除成功");
 	    }
 	    return super.othersHint("删除失败");
+    
 	}
 
 	//插入
 	@PostMapping("add")
 	public RS add() {
+
 	     List<Essay> essayList = new ArrayList<>();
 	     for (int i = 0; i < 100; i++) {
 		  Essay essay = new Essay(i, "name" + i);
@@ -178,10 +205,11 @@ public class EssayController {
 	     }
 	     essayService.insert(essayList);
 	     return successHint("成功");
+    
 	}
 
 }
-// 更多用法请查看下方详细文档...
+
 ```
 
 
