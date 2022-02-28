@@ -1,4 +1,4 @@
-#### 一. Where条件
+#### 一. Where条件（不推荐）
 ```java
 //SQL: where id = 1 or id = 2
 Select select = new Select();
@@ -28,27 +28,27 @@ select.where(SqlLogic.ORBracket, "type", 1);            //不写操作符参数,
 //SQL: where status = 7 and type = 1
 //那么使用占位符的方式即为
 setWhere("status = ? AND type = ?", 7, 1); //这种方式sql的列字段仍自己手写
-setWhere("& > ? AND & = ?", SqlUser.status, 10, SqlUser.type, 1);//建议采用此方式
+setWhere("& > ? AND & = ?", $User.status, 10, $User.type, 1);//建议采用此方式
 	 
 //此例子同样适用SqlBeanService接口中内置的xxxByCondition()方法
 //SqlUser类 maven编译后自动生成, 如不理解请查看注解文档
 
 ```
 
-#### 三. 条件包装器（复杂条件推荐）
+#### 三. 条件包装器（推荐使用）
 ```java
 //SQL: where id = 1 and content = '222'
 setWhere(
-       Wrapper.where(Cond.gt(SqlEssay.id, 1)).
-	           and(Cond.eq(SqlEssay.content, "222"))
+       Wrapper.where(Cond.gt($Essay.id, 1)).
+	           and(Cond.eq($Essay.content, "222"))
    );
 
 //SQL（优先运算）: where content = '222' and (type = 1 or type = 2)
 setWhere(
-       Wrapper.where(Cond.gt(SqlEssay.content, "222")).
+       Wrapper.where(Cond.gt($Essay.content, "222")).
 	           and(
-			       Wrapper.where(Cond.gt(SqlEssay.type, 1)).
-	                       or(Cond.eq(SqlEssay.type, 2))
+			       Wrapper.where(Cond.gt($Essay.type, 1)).
+	                       or(Cond.eq($Essay.type, 2))
 				)
    );
 
