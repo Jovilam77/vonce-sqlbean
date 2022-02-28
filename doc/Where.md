@@ -1,4 +1,4 @@
-#### 一. Where条件（不推荐）
+#### 一. Where条件
 ```java
 //SQL: where id = 1 or id = 2
 Select select = new Select();
