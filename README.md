@@ -3,7 +3,7 @@
 ###### Sqlbean是一款使用Java面向对象思想来编写并生成Sql语句的工具，在此基础上对Mybatis和Spring Jdbc实现了类似于JPA的轻量级插件支持。其中内置大量常用SQL执行的方法，可以非常方便的达到你想要的目的，相对复杂的SQL语句也得以支持，在常规的项目开发几乎做到不写DAO层，可以有效的提高项目开发的效率，让开发者更专注于业务代码的编写。
  
 ###### 🚀特点: 零入侵, 多数据源, 动态Schema, 读写分离, 自动建表, 连表查询, 乐观锁, 分页, 支持Mybatis和Spring Jdbc
-###### 💻环境: JDK7+, Mybatis3.2.4+, (Spring MVC 4.1.2+, Spring Boot 1.x, Spring Boot 2.x)
+###### 💻环境: JDK8+, Mybatis3.2.4+, (Spring MVC 4.1.2+, Spring Boot 1.x, Spring Boot 2.x)
 ###### 💿数据库: Mysql, MariaDB, Oracle, Sqlserver2008+, PostgreSQL, DB2, Derby, Sqlite, HSQL, H2
 
 ###### Sqlbean For Android请移步这里👉 [gitee](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android"), [github](https://github.com/Jovilam77/vonce-sqlbean-android "vonce-sqlbean-android")
@@ -14,7 +14,7 @@
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
-		<version>1.5.1-RELEASE</version>
+		<version>1.5.2</version>
 	</dependency>
 ###### 2.标注实体类
 ```java
@@ -22,7 +22,7 @@
 @SqlTable("d_essay")
 public class Essay {
 
-        //标识id字段
+	//标识id字段
 	@SqlId(type = IdType.SNOWFLAKE_ID_16)
 	//@SqlColumn("id")
 	private Long id;
@@ -36,9 +36,9 @@ public class Essay {
 	//@SqlColumn("creation_time")
 	private Date creationTime;
 
-        //标识乐观锁字段
-        @SqlVersion
-        //@SqlColumn("update_time")
+	//标识乐观锁字段
+	@SqlVersion
+	//@SqlColumn("update_time")
 	private Date updateTime;
 	
 	/**省略get set方法*/
@@ -65,6 +65,10 @@ public class EssayServiceImpl extends MybatisSqlBeanServiceImpl<Essay, Long> imp
 ```
 ###### 5.Controller层
 ```java
+//导入其他需要的包
+import cn.vonce.xxx.xxx.XXX;
+//导入包装器的条件静态方法，否则需通过Cond.eq("","")获取
+import static cn.vonce.sql.helper.Cond.*;
 @RequestMapping("essay")
 @RestController
 public class EssayController {
@@ -76,14 +80,14 @@ public class EssayController {
 	@GetMapping("select")
 	public RS select() {
 
-	//查询列表  全部
+        //查询列表  全部
         List<Essay> list = essayService.selectAll();
 
         //查询列表  根据条件查询 方式一
         list = essayService.selectByCondition("& > ?", $Essay.id, 20);
 
         //查询列表  根据条件查询 方式二 推荐
-        list = essayService.selectByCondition(Wrapper.where(Cond.gt($Essay.id, 10)).and(Cond.lt($Essay.id, 20)));
+        list = essayService.selectByCondition(Wrapper.where(gt($Essay.id, 10)).and(lt($Essay.id, 20)));
 
 
         //查询单条  根据id
@@ -93,7 +97,7 @@ public class EssayController {
         essay = essayService.selectOneByCondition("& = ?", $Essay.id, 1);
 
         //查询单条  根据条件查询 方式二 推荐
-        essay = essayService.selectOneByCondition(Wrapper.where(Cond.eq($Essay.id, 333)));
+        essay = essayService.selectOneByCondition(Wrapper.where(eq($Essay.id, 333)));
 
         //复杂查询
         Select select = new Select();
@@ -114,7 +118,7 @@ public class EssayController {
         select.wAND("content", "222");
 
         //条件也可用包装器 复杂条件推荐使用
-        //select.setWhere(Wrapper.where(Cond.gt($Essay.id, 1)).and(Cond.eq($Essay.content, "222")));
+        //select.setWhere(Wrapper.where(gt($Essay.id, 1)).and(eq($Essay.content, "222")));
 
         //也可使用表达式 如果这三种条件同时出现 那么此方式优先级最高 上面包装器次之
         //select.setWhere("& = ? AND & = ?", $Essay.id, 1, $Essay.content, "222");
@@ -125,7 +129,7 @@ public class EssayController {
         //用于查询Map 多条结果时会报错
         Map<String, Object> map = essayService.selectMap(select);
 
-	//用于查询Map列表
+        //用于查询Map列表
         List<Map<String, Object>> mapList = essayService.selectMapList(select);
 
         //用于查询对象列表
@@ -139,7 +143,7 @@ public class EssayController {
 	@GetMapping("getList")
 	public Map getList(HttpServletRequest request) {
 
-	// 查询对象
+        // 查询对象
         Select select = new Select();
 
         // 分页助手ReqPageHelper
@@ -155,7 +159,7 @@ public class EssayController {
         // return new PageHelper<Essay>(request).paging(new Select(),essayService).toResult("获取文章列表成功");
         
         //又或者 更简便的用法（不带统计和页数信息）
-        //List<Essay> list = essayService.selectByCondition(new Paging(0,10), Wrapper.where(Cond.gt($Essay.id, 10)).and(Cond.lt($Essay.id, 20)));
+        //List<Essay> list = essayService.selectByCondition(new Paging(0,10), Wrapper.where(gt($Essay.id, 10)).and(lt($Essay.id, 20)));
         //return super.successHint("获取成功", list);
         
 	}
@@ -166,13 +170,15 @@ public class EssayController {
 
 	    //根据bean内部id更新
 	    long i = essayService.updateByBeanId(essay);
+        
 	    //根据外部id更新 参数3的true代表仅更新不为null字段 参数4的true代表使用乐观锁
-            //i = essayService.updateById(essay,20,true,true);
+        //i = essayService.updateById(essay,20,true,true);
+        
 	    //根据条件更新 参数2的true代表仅更新不为null字段 参数3的true代表使用乐观锁
-            //i = essayService.updateByCondition(essay,true,true,Wrapper.where(Cond.gt($Essay.id, 1)).and(Cond.eq($Essay.content, "222")));
+        //i = essayService.updateByCondition(essay,true,true,Wrapper.where(gt($Essay.id, 1)).and(eq($Essay.content, "222")));
 
-            if (i > 0) {
-		return super.successHint("更新成功");
+        if (i > 0) {
+		    return super.successHint("更新成功");
 	    }
 	    return super.othersHint("更新失败");
     
@@ -184,8 +190,9 @@ public class EssayController {
 
 	    //根据id删除
 	    long i = essayService.deleteById(id);
+        
 	    //根据条件删除
-	    //i = essayService.deleteByCondition(Wrapper.where(Cond.gt($Essay.id, 1)).and(Cond.eq($Essay.content, "222")));
+	    //i = essayService.deleteByCondition(Wrapper.where(gt($Essay.id, 1)).and(eq($Essay.content, "222")));
 	    
 	    if (i > 0) {
 	        return super.successHint("删除成功");

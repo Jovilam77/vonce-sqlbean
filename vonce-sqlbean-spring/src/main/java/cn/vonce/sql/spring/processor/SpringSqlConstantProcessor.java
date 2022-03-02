@@ -16,7 +16,7 @@ import java.util.Set;
  * @date 2020/2/26 14:21
  */
 @SupportedAnnotationTypes({"cn.vonce.sql.annotation.SqlTable"})
-@SupportedSourceVersion(SourceVersion.RELEASE_7)
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class SpringSqlConstantProcessor extends SqlConstantProcessor {
 
     @Override
