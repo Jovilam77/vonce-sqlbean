@@ -69,6 +69,7 @@ public class EssayServiceImpl extends MybatisSqlBeanServiceImpl<Essay, Long> imp
 import cn.vonce.xxx.xxx.XXX;
 //导入包装器的条件静态方法，否则需通过Cond.eq("","")获取
 import static cn.vonce.sql.helper.Cond.*;
+
 @RequestMapping("essay")
 @RestController
 public class EssayController {
