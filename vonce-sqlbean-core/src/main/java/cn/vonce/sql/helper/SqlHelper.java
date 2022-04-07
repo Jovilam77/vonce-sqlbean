@@ -3,7 +3,6 @@ package cn.vonce.sql.helper;
 import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.StringUtil;
-import com.google.common.collect.ListMultimap;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.*;
@@ -79,7 +78,7 @@ public class SqlHelper {
         sqlSb.append(SqlConstant.FROM);
         sqlSb.append(fromFullName(select));
         sqlSb.append(joinSql(select));
-        sqlSb.append(whereSql(select, null));
+        sqlSb.append(whereSql(select, select.where(), null));
         String groupBySql = groupBySql(select);
         sqlSb.append(groupBySql);
         sqlSb.append(havingSql(select));
@@ -144,7 +143,7 @@ public class SqlHelper {
         }
         sqlSb.append(SqlConstant.SET);
         sqlSb.append(setSql(update));
-        sqlSb.append(whereSql(update, update.getUpdateBean()));
+        sqlSb.append(whereSql(update, update.where(), update.getUpdateBean()));
         return sqlSb.toString();
     }
 
@@ -181,7 +180,7 @@ public class SqlHelper {
         } else {
             sqlSb.append(getTableName(delete.getTable(), delete));
         }
-        sqlSb.append(whereSql(delete, null));
+        sqlSb.append(whereSql(delete, delete.where(), null));
         return sqlSb.toString();
     }
 
@@ -304,7 +303,7 @@ public class SqlHelper {
         if (DbType.Derby == backup.getSqlBeanDB().getDbType()) {
             backupSql.append(" WITH NO DATA");
         } else {
-            backupSql.append(whereSql(backup, null));
+            backupSql.append(whereSql(backup, backup.where(), null));
         }
         return backupSql.toString();
     }
@@ -345,7 +344,7 @@ public class SqlHelper {
         }
         copySql.append(SqlConstant.FROM);
         copySql.append(getTableName(copy.getTable(), copy));
-        copySql.append(whereSql(copy, null));
+        copySql.append(whereSql(copy, copy.where(), null));
         return copySql.toString();
     }
 
@@ -569,11 +568,11 @@ public class SqlHelper {
      * 返回field及values语句
      *
      * @param common
-     * @param objects
+     * @param objectList
      * @return
      * @throws IllegalArgumentException
      */
-    private static String fieldAndValuesSql(Common common, Object[] objects) throws IllegalArgumentException {
+    private static String fieldAndValuesSql(Common common, List objectList) throws IllegalArgumentException {
         String tableName = getTableName(common.getTable(), common);
         StringBuffer fieldSql = new StringBuffer();
         StringBuffer valueSql = new StringBuffer();
@@ -581,9 +580,9 @@ public class SqlHelper {
         List<String> valueSqlList = new ArrayList<>();
         String transferred = SqlBeanUtil.getTransferred(common);
         //获取sqlbean的全部字段
-        List<Field> fieldList = SqlBeanUtil.getBeanAllField(objects[0].getClass());
+        List<Field> fieldList = SqlBeanUtil.getBeanAllField(objectList.get(0).getClass());
         if (common.getSqlBeanDB().getDbType() == DbType.Oracle) {
-            if (objects != null && objects.length > 1) {
+            if (objectList != null && objectList.size() > 1) {
                 fieldAndValuesSql.append(SqlConstant.INSERT_ALL_INTO);
             } else {
                 fieldAndValuesSql.append(SqlConstant.INSERT_INTO);
@@ -592,7 +591,7 @@ public class SqlHelper {
             fieldAndValuesSql.append(SqlConstant.INSERT_INTO);
         }
         Date date = new Date();
-        for (int i = 0; i < objects.length; i++) {
+        for (int i = 0; i < objectList.size(); i++) {
             //每次必须清空
             valueSql.delete(0, valueSql.length());
             //只有在循环第一遍的时候才会处理
@@ -624,7 +623,7 @@ public class SqlHelper {
                 if (sqlId != null && sqlId.type() == IdType.AUTO) {
                     continue;
                 }
-                Object value = ReflectUtil.instance().get(objects[i].getClass(), objects[i], field.getName());
+                Object value = ReflectUtil.instance().get(objectList.get(i).getClass(), objectList.get(i), field.getName());
                 //如果此字段为id且需要生成唯一id
                 if (sqlId != null && sqlId.type() != IdType.AUTO && sqlId.type() != IdType.NORMAL) {
                     if (StringUtil.isEmpty(value)) {
@@ -634,7 +633,7 @@ public class SqlHelper {
                 } else if (field.isAnnotationPresent(SqlInsertTime.class) && SqlBeanUtil.whatType(field.getType().getName()) == WhatType.DATE_TYPE && value == null) {
                     valueSql.append(SqlBeanUtil.getSqlValue(common, date));
                 } else {
-                    valueSql.append(SqlBeanUtil.getSqlValue(common, ReflectUtil.instance().get(objects[i].getClass(), objects[i], field.getName())));
+                    valueSql.append(SqlBeanUtil.getSqlValue(common, ReflectUtil.instance().get(objectList.get(i).getClass(), objectList.get(i), field.getName())));
                 }
                 valueSql.append(SqlConstant.COMMA);
             }
@@ -657,7 +656,7 @@ public class SqlHelper {
                 fieldAndValuesSql.append(SqlConstant.VALUES);
                 fieldAndValuesSql.append(valueSqlList.get(k));
             }
-            if (objects != null && objects.length > 1) {
+            if (objectList != null && objectList.size() > 1) {
                 fieldAndValuesSql.append(SqlConstant.SELECT_DUAL);
             }
         } else {
@@ -725,12 +724,13 @@ public class SqlHelper {
      * 返回where语句
      *
      * @param condition
+     * @param simpleCondition
      * @param bean
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static String whereSql(Condition condition, Object bean) {
-        return conditionHandle(ConditionType.WHERE, condition, condition.getWhere(), condition.getAgrs(), bean, condition.getWhereMap(), condition.getWhereWrapper());
+    public static String whereSql(Condition condition, SimpleCondition simpleCondition, Object bean) {
+        return conditionHandle(ConditionType.WHERE, condition, condition.getWhere(), condition.getAgrs(), bean, simpleCondition, condition.getWhereWrapper());
     }
 
     /**
@@ -748,7 +748,7 @@ public class SqlHelper {
      * @return
      */
     private static String havingSql(Select select) {
-        return conditionHandle(ConditionType.HAVING, select, select.getHaving(), select.getHavingArgs(), null, select.getHavingMap(), select.getHavingWrapper());
+        return conditionHandle(ConditionType.HAVING, select, select.getHaving(), select.getHavingArgs(), null, select.having(), select.getHavingWrapper());
     }
 
     /**
@@ -803,19 +803,80 @@ public class SqlHelper {
         return groupByAndOrderBySql.toString();
     }
 
+//    /**
+//     * 条件处理
+//     *
+//     * @param conditionType 条件类型（where还是 having）
+//     * @param common        公共类
+//     * @param condition     条件字符串（优先级1）
+//     * @param args          条件字符串参数
+//     * @param conditionMap  条件Map（优先级3）
+//     * @param wrapper       条件包装器（优先级2）
+//     * @return
+//     */
+//    private static String conditionHandle(ConditionType conditionType, Common common, String condition, Object[]
+//            args, Object bean, ListMultimap<String, ConditionInfo> conditionMap, Wrapper wrapper) {
+//        StringBuffer conditionSql = new StringBuffer();
+//        // 优先级1 使用条件字符串拼接
+//        if (condition != null && !"".equals(condition)) {
+//            conditionSql.append(ConditionType.WHERE == conditionType ? SqlConstant.WHERE : SqlConstant.HAVING);
+//            conditionSql.append(versionCondition(common, bean));
+//            conditionSql.append(SqlConstant.BEGIN_BRACKET);
+//            if (args != null && args.length > 0) {
+//                conditionSql.append(SqlBeanUtil.getCondition(common, condition, args));
+//            } else if (condition.indexOf("${") > -1 && bean != null) {
+//                conditionSql.append(SqlBeanUtil.getCondition(common, condition, bean));
+//            } else {
+//                conditionSql.append(condition);
+//            }
+//            conditionSql.append(SqlConstant.END_BRACKET);
+//        }
+//        // 优先级2 使用条件包装器
+//        else if (wrapper != null && !wrapper.getDataList().isEmpty()) {
+//            conditionSql.append(ConditionType.WHERE == conditionType ? SqlConstant.WHERE : SqlConstant.HAVING);
+//            conditionSql.append(versionCondition(common, bean));
+//            conditionSql.append(conditionWrapperHandle(common, wrapper));
+//        } else {
+//            conditionSql.append(versionCondition(common, bean));
+//            if (conditionMap.size() > 0) {
+//                conditionSql.append(SqlConstant.BEGIN_BRACKET);
+//                int i = 0;
+//                // 遍历所有条件
+//                Collection<Map.Entry<String, ConditionInfo>> sqlConditionEntryCollection = conditionMap.entries();
+//                for (Map.Entry<String, ConditionInfo> sqlConditionEntry : sqlConditionEntryCollection) {
+//                    ConditionInfo conditionInfo = sqlConditionEntry.getValue();
+//                    // 遍历sql逻辑处理
+//                    if (i != 0 && i < sqlConditionEntryCollection.size()) {
+//                        conditionSql.append(getLogic(conditionInfo.getSqlLogic()));
+//                    }
+//                    if (SqlBeanUtil.isToUpperCase(common)) {
+//                        conditionInfo.setName(conditionInfo.getName().toUpperCase());
+//                    }
+//                    conditionSql.append(valueOperator(common, conditionInfo));
+//                    i++;
+//                }
+//                conditionSql.append(SqlConstant.END_BRACKET);
+//            }
+//            if (conditionSql.length() != 0) {
+//                conditionSql.insert(0, ConditionType.WHERE == conditionType ? SqlConstant.WHERE : SqlConstant.HAVING);
+//            }
+//        }
+//        return conditionSql.toString();
+//    }
+
     /**
      * 条件处理
      *
-     * @param conditionType 条件类型（where还是 having）
-     * @param common        公共类
-     * @param condition     条件字符串（优先级1）
-     * @param args          条件字符串参数
-     * @param conditionMap  条件Map（优先级3）
-     * @param wrapper       条件包装器（优先级2）
+     * @param conditionType   条件类型（where还是 having）
+     * @param common          公共类
+     * @param condition       条件字符串（优先级1）
+     * @param args            条件字符串参数
+     * @param simpleCondition 简单条件（优先级3）
+     * @param wrapper         条件包装器（优先级2）
      * @return
      */
     private static String conditionHandle(ConditionType conditionType, Common common, String condition, Object[]
-            args, Object bean, ListMultimap<String, ConditionInfo> conditionMap, Wrapper wrapper) {
+            args, Object bean, SimpleCondition simpleCondition, Wrapper wrapper) {
         StringBuffer conditionSql = new StringBuffer();
         // 优先级1 使用条件字符串拼接
         if (condition != null && !"".equals(condition)) {
@@ -838,23 +899,34 @@ public class SqlHelper {
             conditionSql.append(conditionWrapperHandle(common, wrapper));
         } else {
             conditionSql.append(versionCondition(common, bean));
-            if (conditionMap.size() > 0) {
+            if (simpleCondition.getDataList().size() > 0) {
                 conditionSql.append(SqlConstant.BEGIN_BRACKET);
-                int i = 0;
+//                int i = 0;
                 // 遍历所有条件
-                Collection<Map.Entry<String, ConditionInfo>> sqlConditionEntryCollection = conditionMap.entries();
-                for (Map.Entry<String, ConditionInfo> sqlConditionEntry : sqlConditionEntryCollection) {
-                    ConditionInfo conditionInfo = sqlConditionEntry.getValue();
+                List<ConditionData> conditionDataList = simpleCondition.getDataList();
+                for (int i = 0; i < conditionDataList.size(); i++) {
+                    ConditionInfo conditionInfo = (ConditionInfo) conditionDataList.get(i).getItem();
                     // 遍历sql逻辑处理
-                    if (i != 0 && i < sqlConditionEntryCollection.size()) {
-                        conditionSql.append(getLogic(conditionInfo.getSqlLogic()));
+                    if (i != 0 && i < simpleCondition.getDataList().size()) {
+                        conditionSql.append(getLogic(conditionDataList.get(i).getSqlLogic()));
                     }
                     if (SqlBeanUtil.isToUpperCase(common)) {
                         conditionInfo.setName(conditionInfo.getName().toUpperCase());
                     }
                     conditionSql.append(valueOperator(common, conditionInfo));
-                    i++;
                 }
+//                for (ConditionData conditionData : conditionDataList) {
+//                    ConditionInfo conditionInfo = (ConditionInfo) conditionData.getItem();
+//                    // 遍历sql逻辑处理
+//                    if (i != 0 && i < simpleCondition.getDataList().size()) {
+//                        conditionSql.append(getLogic(conditionInfo.getSqlLogic()));
+//                    }
+//                    if (SqlBeanUtil.isToUpperCase(common)) {
+//                        conditionInfo.setName(conditionInfo.getName().toUpperCase());
+//                    }
+//                    conditionSql.append(valueOperator(common, conditionInfo));
+//                    i++;
+//                }
                 conditionSql.append(SqlConstant.END_BRACKET);
             }
             if (conditionSql.length() != 0) {

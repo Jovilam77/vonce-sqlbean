@@ -74,9 +74,11 @@ public class SqlHelperTest {
         select.column(SqlUser.nickname, "昵称");
         select.setTable(SqlEssay._tableName);
         select.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id.getName(), SqlEssay.userId.getName());
-        select.where(SqlEssay.userId, "1111");
+//        select.where(SqlEssay.userId, "1111");
+        select.where().eq(SqlEssay.userId, "1111");
         //value 直接输入字符串 会当作字符串处理，sql中会带''，如果希望不被做处理则使用Original
-        select.where("DATE_FORMAT( " + SqlEssay.creationTime + ", '%Y-%m-%d' )", new Original("DATE_FORMAT( '2018-01-19 20:24:19', '%Y-%m-%d' ) "), SqlOperator.EQUAL_TO);
+//        select.where("DATE_FORMAT( " + SqlEssay.creationTime + ", '%Y-%m-%d' )", new Original("DATE_FORMAT( '2018-01-19 20:24:19', '%Y-%m-%d' ) "), SqlOperator.EQUAL_TO);
+        select.where().eq("DATE_FORMAT( " + SqlEssay.creationTime + ", '%Y-%m-%d' )", new Original("DATE_FORMAT( '2018-01-19 20:24:19', '%Y-%m-%d' ) "));
         select.orderBy(SqlEssay.id, SqlSort.DESC);
         System.out.println("---select1---");
         System.out.println(SqlHelper.buildSelectSql(select));
@@ -96,8 +98,9 @@ public class SqlHelperTest {
                 .column(SqlUser.nickname, "用户昵称");
         select2.setTable(SqlEssay._tableName);
         select2.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id.getName(), SqlEssay.userId.getName());
-        select2.where("date_format(" + SqlEssay.creationTime + ",'%y%m%m ')", "2020-01-01 00:00:00", SqlOperator.GREATER_THAN);
-        select2.wAND(SqlUser.nickname, "vicky", SqlOperator.EQUAL_TO);
+//        select2.where("date_format(" + SqlEssay.creationTime + ",'%y%m%m ')", "2020-01-01 00:00:00", SqlOperator.GREATER_THAN);
+        select2.where().gt("DATE_FORMAT( " + SqlEssay.creationTime + ", '%Y-%m-%d' )", "2020-01-01 00:00:00");
+        select2.where().eq(SqlUser.nickname, "vicky");
         System.out.println("---select2---");
         System.out.println(SqlHelper.buildSelectSql(select2));
     }
@@ -114,7 +117,8 @@ public class SqlHelperTest {
                 .column(SqlEssay.categoryId);
         select3.setTable(SqlEssay._tableName);
         select3.groupBy(SqlEssay.categoryId);
-        select3.having("count", 5, SqlOperator.GREATER_THAN);
+//        select3.having("count", 5, SqlOperator.GREATER_THAN);
+        select3.having().eq("count", 5);
         System.out.println("---select3---");
         System.out.println(SqlHelper.buildSelectSql(select3));
     }
@@ -129,14 +133,18 @@ public class SqlHelperTest {
         select4.setSqlBeanDB(sqlBeanDB);
         select4.setColumn(SqlUser._all);
         select4.setTable(SqlUser._tableName);
-        Integer[] between = {2, 6};
+        Integer[] value = {2, 6};
 //        List<Integer> between = new ArrayList<>();
 //        between.add(2);
 //        between.add(6);
         Integer[] gender = {0, 1};
-        select4.where(SqlUser.id, between, SqlOperator.BETWEEN)
-                .wANDBracket(SqlUser.nickname, "vicky", SqlOperator.EQUAL_TO)
-                .wOR(SqlUser.gender, gender, SqlOperator.IN);
+//        select4.where(SqlUser.id, value, SqlOperator.BETWEEN)
+//                .wANDBracket(SqlUser.nickname, "vicky", SqlOperator.EQUAL_TO)
+//                .wOR(SqlUser.gender, gender, SqlOperator.IN);
+
+        select4.setWhere(
+                Wrapper.where(Cond.between(SqlUser.id, 2, 6)).
+                        and(Wrapper.where(Cond.eq(SqlUser.nickname, "vicky")).or(Cond.in(SqlUser.gender, gender))));
         System.out.println("---select4---");
         System.out.println(SqlHelper.buildSelectSql(select4));
     }
@@ -213,8 +221,10 @@ public class SqlHelperTest {
         update.setFilterFields("username");//java字段名
         update.setUpdateBean(user);
         update.setUpdateNotNull(true);
-        update.where(SqlUser.id, 0, SqlOperator.GREATER_THAN);
-        update.wAND(SqlUser.id, 10, SqlOperator.LESS_THAN);
+//        update.where(SqlUser.id, 0, SqlOperator.GREATER_THAN);
+        update.where().gt(SqlUser.id, 0);
+//        update.wAND(SqlUser.id, 10, SqlOperator.LESS_THAN);
+        update.where().lt(SqlUser.id, 10);
         System.out.println("---update---");
         System.out.println(SqlHelper.buildUpdateSql(update));
     }
@@ -227,8 +237,10 @@ public class SqlHelperTest {
     private static void delete(SqlBeanDB sqlBeanDB) {
         Delete delete = new Delete();
         delete.setSqlBeanDB(sqlBeanDB);
-        delete.where(SqlUser.id, 1, SqlOperator.GREATER_THAN);
-        delete.wOR(SqlUser.nickname, "jovi");
+//        delete.where(SqlUser.id, 1, SqlOperator.GREATER_THAN);
+        delete.where().gt(SqlUser.id, 1);
+//        delete.wOR(SqlUser.nickname, "jovi");
+        delete.where().eq(SqlUser.nickname, "jovi");
         delete.setTable(User.class);
         System.out.println("---delete---");
         System.out.println(SqlHelper.buildDeleteSql(delete));

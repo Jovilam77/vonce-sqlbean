@@ -3,6 +3,7 @@ package cn.vonce.sql.bean;
 import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.enumerate.SqlSort;
 import cn.vonce.sql.helper.SqlHelper;
+import cn.vonce.sql.helper.Wrapper;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -27,7 +28,10 @@ public class Select extends SelectCondition implements Serializable {
     private List<Group> groupByList = new ArrayList<>();//分组
     private List<Order> orderByList = new ArrayList<>();//排序
     private Page page = null;
-    private String[] filterFields = null;//需要过滤的列字段
+    private String[] filterFields = null;
+    private SimpleCondition<Select> whereSimpleCondition = new SimpleCondition<>(this);
+    private SimpleCondition<Select> havingSimpleCondition = new SimpleCondition<>(this);
+
 
     /**
      * 获取useDistinct是否过滤重复
@@ -410,6 +414,14 @@ public class Select extends SelectCondition implements Serializable {
      */
     public void setFilterFields(String... filterField) {
         this.filterFields = filterField;
+    }
+
+    public SimpleCondition<Select> where() {
+        return whereSimpleCondition;
+    }
+
+    public SimpleCondition<Select> having() {
+        return havingSimpleCondition;
     }
 
     /**

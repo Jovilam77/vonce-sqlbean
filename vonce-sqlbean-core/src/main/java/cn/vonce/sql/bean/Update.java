@@ -22,6 +22,7 @@ public class Update<T> extends Condition implements Serializable {
     private boolean optimisticLock = false;
     //是否为逻辑删除
     private boolean logicallyDelete = false;
+    private SimpleCondition<Update<T>> whereSimpleCondition = new SimpleCondition<>(this);
 
     /**
      * 是否只更新不为null的字段
@@ -102,4 +103,9 @@ public class Update<T> extends Condition implements Serializable {
     public void setLogicallyDelete(boolean logicallyDelete) {
         this.logicallyDelete = logicallyDelete;
     }
+
+    public SimpleCondition<Update<T>> where() {
+        return whereSimpleCondition;
+    }
+
 }

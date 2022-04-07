@@ -54,9 +54,11 @@ public class SqlBeanProvider {
             return null;
         }
         if (ids.length > 1) {
-            select.where(SqlBeanUtil.getTable(clazz).getAlias(), SqlBeanUtil.getTableFieldName(idField), ids, SqlOperator.IN);
+//            select.where(SqlBeanUtil.getTable(clazz).getAlias(), SqlBeanUtil.getTableFieldName(idField), ids, SqlOperator.IN);
+            select.where().in(SqlBeanUtil.getTableFieldName(idField), ids);
         } else {
-            select.where(SqlBeanUtil.getTable(clazz).getAlias(), SqlBeanUtil.getTableFieldName(idField), ids[0], SqlOperator.EQUAL_TO);
+//            select.where(SqlBeanUtil.getTable(clazz).getAlias(), SqlBeanUtil.getTableFieldName(idField), ids[0], SqlOperator.EQUAL_TO);
+            select.where().eq(SqlBeanUtil.getTableFieldName(idField), ids[0]);
         }
         return SqlHelper.buildSelectSql(select);
     }
@@ -184,7 +186,8 @@ public class SqlBeanProvider {
             e.printStackTrace();
             return null;
         }
-        delete.where("", SqlBeanUtil.getTableFieldName(idField), id, SqlOperator.IN);
+//        delete.where("", SqlBeanUtil.getTableFieldName(idField), id, SqlOperator.IN);
+        delete.where().in(SqlBeanUtil.getTableFieldName(idField), id);
         return SqlHelper.buildDeleteSql(delete);
     }
 
@@ -221,7 +224,8 @@ public class SqlBeanProvider {
             delete.setTable(clazz);
         }
         setSchema(delete, clazz);
-        if (ignore || (!delete.getWhereMap().isEmpty() || StringUtil.isNotEmpty(delete.getWhere()) || !delete.getWhereWrapper().getDataList().isEmpty())) {
+        //delete.getWhereMap().isEmpty()
+        if (ignore || (!delete.where().getDataList().isEmpty() || StringUtil.isNotEmpty(delete.getWhere()) || !delete.getWhereWrapper().getDataList().isEmpty())) {
             return SqlHelper.buildDeleteSql(delete);
         } else {
             try {
@@ -249,7 +253,8 @@ public class SqlBeanProvider {
             update.setTable(clazz);
             update.setUpdateBean(bean);
             Field idField = SqlBeanUtil.getIdField(bean.getClass());
-            update.where(SqlBeanUtil.getTableFieldName(idField), id, SqlOperator.IN);
+//            update.where(SqlBeanUtil.getTableFieldName(idField), id, SqlOperator.IN);
+            update.where().in(SqlBeanUtil.getTableFieldName(idField), id);
             setSchema(update, clazz);
         } catch (SqlBeanException e) {
             e.printStackTrace();
@@ -320,7 +325,8 @@ public class SqlBeanProvider {
             update.setTable(clazz);
         }
         setSchema(update, clazz);
-        if (ignore || (!update.getWhereMap().isEmpty() || StringUtil.isNotEmpty(update.getWhere()) || !update.getWhereWrapper().getDataList().isEmpty())) {
+        //update.getWhereMap().isEmpty()
+        if (ignore || (!update.where().getDataList().isEmpty() || StringUtil.isNotEmpty(update.getWhere()) || !update.getWhereWrapper().getDataList().isEmpty())) {
             return SqlHelper.buildUpdateSql(update);
         } else {
             try {
@@ -361,7 +367,8 @@ public class SqlBeanProvider {
             e.printStackTrace();
             return null;
         }
-        update.where(SqlBeanUtil.getTableFieldName(idField), id);
+//        update.where(SqlBeanUtil.getTableFieldName(idField), id);
+        update.where().eq(SqlBeanUtil.getTableFieldName(idField), id);
         return SqlHelper.buildUpdateSql(update);
     }
 
@@ -391,7 +398,8 @@ public class SqlBeanProvider {
                     return null;
                 }
             }
-            update.where(SqlBeanUtil.getTableFieldName(idField), id);
+//            update.where(SqlBeanUtil.getTableFieldName(idField), id);
+            update.where().eq(SqlBeanUtil.getTableFieldName(idField), id);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -796,7 +804,7 @@ public class SqlBeanProvider {
                     e.printStackTrace();
                 }
             } else {
-                select.setPage(null, paging.getPagenum(), paging.getPagesize(),paging.getStartByZero());
+                select.setPage(null, paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
             }
             select.orderBy(paging.getOrders());
         }

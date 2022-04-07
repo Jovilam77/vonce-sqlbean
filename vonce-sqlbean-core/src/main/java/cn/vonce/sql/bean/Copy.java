@@ -1,7 +1,7 @@
 package cn.vonce.sql.bean;
 
 /**
- * 复制表数据
+ * 复制表数据（根据条件将数据复制插入到同样结构的表中）
  *
  * @author Jovi
  * @version 1.0
@@ -13,6 +13,7 @@ public class Copy extends Condition {
     private String targetSchema;
     private String targetTableName;
     private Column[] columns;
+    private SimpleCondition<Copy> whereSimpleCondition = new SimpleCondition<>(this);
 
     public String getTargetSchema() {
         return targetSchema;
@@ -36,6 +37,10 @@ public class Copy extends Condition {
 
     public void setColumns(Column[] columns) {
         this.columns = columns;
+    }
+
+    public SimpleCondition<Copy> where() {
+        return whereSimpleCondition;
     }
 
 }
