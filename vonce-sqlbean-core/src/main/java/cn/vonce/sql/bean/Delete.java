@@ -12,10 +12,10 @@ import java.io.Serializable;
  */
 public class Delete extends Condition implements Serializable {
 
-    private SimpleCondition<Delete> whereSimpleCondition = new SimpleCondition<>(this);
+    private SimpleCondition<Delete> whereCondition = new SimpleCondition<>(this);
 
     public SimpleCondition<Delete> where() {
-        return whereSimpleCondition;
+        return whereCondition;
     }
 
 }

@@ -79,6 +79,7 @@ public class SqlHelperTest {
         //value 直接输入字符串 会当作字符串处理，sql中会带''，如果希望不被做处理则使用Original
 //        select.where("DATE_FORMAT( " + SqlEssay.creationTime + ", '%Y-%m-%d' )", new Original("DATE_FORMAT( '2018-01-19 20:24:19', '%Y-%m-%d' ) "), SqlOperator.EQUAL_TO);
         select.where().eq("DATE_FORMAT( " + SqlEssay.creationTime + ", '%Y-%m-%d' )", new Original("DATE_FORMAT( '2018-01-19 20:24:19', '%Y-%m-%d' ) "));
+//        select.setWhere(Wrapper.where(Cond.eq("bbbbbbbbb",2)));
         select.orderBy(SqlEssay.id, SqlSort.DESC);
         System.out.println("---select1---");
         System.out.println(SqlHelper.buildSelectSql(select));

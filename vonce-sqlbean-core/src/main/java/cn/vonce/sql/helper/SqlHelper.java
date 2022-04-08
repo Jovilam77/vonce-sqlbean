@@ -8,6 +8,7 @@ import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.uitls.SqlBeanUtil;
+import com.google.common.collect.ListMultimap;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -730,7 +731,7 @@ public class SqlHelper {
      */
     @SuppressWarnings("unchecked")
     public static String whereSql(Condition condition, SimpleCondition simpleCondition, Object bean) {
-        return conditionHandle(ConditionType.WHERE, condition, condition.getWhere(), condition.getAgrs(), bean, simpleCondition, condition.getWhereWrapper());
+        return conditionHandle(ConditionType.WHERE, condition, condition.getWhere(), condition.getAgrs(), bean, simpleCondition, condition.getWhereMap(), condition.getWhereWrapper());
     }
 
     /**
@@ -748,7 +749,7 @@ public class SqlHelper {
      * @return
      */
     private static String havingSql(Select select) {
-        return conditionHandle(ConditionType.HAVING, select, select.getHaving(), select.getHavingArgs(), null, select.having(), select.getHavingWrapper());
+        return conditionHandle(ConditionType.HAVING, select, select.getHaving(), select.getHavingArgs(), null, select.having(), select.getHavingMap(), select.getHavingWrapper());
     }
 
     /**
@@ -876,7 +877,7 @@ public class SqlHelper {
      * @return
      */
     private static String conditionHandle(ConditionType conditionType, Common common, String condition, Object[]
-            args, Object bean, SimpleCondition simpleCondition, Wrapper wrapper) {
+            args, Object bean, SimpleCondition simpleCondition, ListMultimap<String, ConditionInfo> conditionMap, Wrapper wrapper) {
         StringBuffer conditionSql = new StringBuffer();
         // 优先级1 使用条件字符串拼接
         if (condition != null && !"".equals(condition)) {
@@ -897,36 +898,49 @@ public class SqlHelper {
             conditionSql.append(ConditionType.WHERE == conditionType ? SqlConstant.WHERE : SqlConstant.HAVING);
             conditionSql.append(versionCondition(common, bean));
             conditionSql.append(conditionWrapperHandle(common, wrapper));
-        } else {
+        }
+        // 优先级3 使用简单的条件
+        else if (simpleCondition != null && simpleCondition.getDataList().size() > 0) {
             conditionSql.append(versionCondition(common, bean));
-            if (simpleCondition.getDataList().size() > 0) {
+            conditionSql.append(SqlConstant.BEGIN_BRACKET);
+            // 遍历所有条件
+            List<ConditionData> conditionDataList = simpleCondition.getDataList();
+            for (int i = 0; i < conditionDataList.size(); i++) {
+                ConditionInfo conditionInfo = (ConditionInfo) conditionDataList.get(i).getItem();
+                // 遍历sql逻辑处理
+                if (i != 0 && i < simpleCondition.getDataList().size()) {
+                    conditionSql.append(getLogic(conditionDataList.get(i).getSqlLogic()));
+                }
+                if (SqlBeanUtil.isToUpperCase(common)) {
+                    conditionInfo.setName(conditionInfo.getName().toUpperCase());
+                }
+                conditionSql.append(valueOperator(common, conditionInfo));
+            }
+            conditionSql.append(SqlConstant.END_BRACKET);
+            if (conditionSql.length() != 0) {
+                conditionSql.insert(0, ConditionType.WHERE == conditionType ? SqlConstant.WHERE : SqlConstant.HAVING);
+            }
+        }
+        //优先级4 过时，未来版本将会移除
+        else {
+            conditionSql.append(versionCondition(common, bean));
+            if (conditionMap.size() > 0) {
                 conditionSql.append(SqlConstant.BEGIN_BRACKET);
-//                int i = 0;
+                int i = 0;
                 // 遍历所有条件
-                List<ConditionData> conditionDataList = simpleCondition.getDataList();
-                for (int i = 0; i < conditionDataList.size(); i++) {
-                    ConditionInfo conditionInfo = (ConditionInfo) conditionDataList.get(i).getItem();
+                Collection<Map.Entry<String, ConditionInfo>> sqlConditionEntryCollection = conditionMap.entries();
+                for (Map.Entry<String, ConditionInfo> sqlConditionEntry : sqlConditionEntryCollection) {
+                    ConditionInfo conditionInfo = sqlConditionEntry.getValue();
                     // 遍历sql逻辑处理
-                    if (i != 0 && i < simpleCondition.getDataList().size()) {
-                        conditionSql.append(getLogic(conditionDataList.get(i).getSqlLogic()));
+                    if (i != 0 && i < sqlConditionEntryCollection.size()) {
+                        conditionSql.append(getLogic(conditionInfo.getSqlLogic()));
                     }
                     if (SqlBeanUtil.isToUpperCase(common)) {
                         conditionInfo.setName(conditionInfo.getName().toUpperCase());
                     }
                     conditionSql.append(valueOperator(common, conditionInfo));
+                    i++;
                 }
-//                for (ConditionData conditionData : conditionDataList) {
-//                    ConditionInfo conditionInfo = (ConditionInfo) conditionData.getItem();
-//                    // 遍历sql逻辑处理
-//                    if (i != 0 && i < simpleCondition.getDataList().size()) {
-//                        conditionSql.append(getLogic(conditionInfo.getSqlLogic()));
-//                    }
-//                    if (SqlBeanUtil.isToUpperCase(common)) {
-//                        conditionInfo.setName(conditionInfo.getName().toUpperCase());
-//                    }
-//                    conditionSql.append(valueOperator(common, conditionInfo));
-//                    i++;
-//                }
                 conditionSql.append(SqlConstant.END_BRACKET);
             }
             if (conditionSql.length() != 0) {
@@ -980,7 +994,7 @@ public class SqlHelper {
         if (!wrapper.getDataList().isEmpty()) {
             conditionSql.append(SqlConstant.BEGIN_BRACKET);
             for (int i = 0; i < wrapper.getDataList().size(); i++) {
-                Wrapper.Data data = wrapper.getDataList().get(i);
+                ConditionData data = wrapper.getDataList().get(i);
                 // 遍历sql逻辑处理
                 if (i != 0 && i < wrapper.getDataList().size()) {
                     conditionSql.append(getLogic(data.getSqlLogic()));

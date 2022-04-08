@@ -6,6 +6,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 简单的条件
+ *
+ * @author Jovi
+ * @version 1.0
+ * @email 766255988@qq.com
+ * @date 2022年3月15日上午10:00:10
+ */
 public class SimpleCondition<Action> implements Serializable {
 
     private Action action;
@@ -37,8 +45,6 @@ public class SimpleCondition<Action> implements Serializable {
     public List<ConditionData> getDataList() {
         return this.dataList;
     }
-
-    private Condition2 condition2;
 
     /**
      * 等于

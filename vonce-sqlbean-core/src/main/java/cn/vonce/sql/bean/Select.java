@@ -29,8 +29,8 @@ public class Select extends SelectCondition implements Serializable {
     private List<Order> orderByList = new ArrayList<>();//排序
     private Page page = null;
     private String[] filterFields = null;
-    private SimpleCondition<Select> whereSimpleCondition = new SimpleCondition<>(this);
-    private SimpleCondition<Select> havingSimpleCondition = new SimpleCondition<>(this);
+    private SimpleCondition<Select> whereCondition = new SimpleCondition<>(this);
+    private SimpleCondition<Select> havingCondition = new SimpleCondition<>(this);
 
 
     /**
@@ -417,11 +417,11 @@ public class Select extends SelectCondition implements Serializable {
     }
 
     public SimpleCondition<Select> where() {
-        return whereSimpleCondition;
+        return whereCondition;
     }
 
     public SimpleCondition<Select> having() {
-        return havingSimpleCondition;
+        return havingCondition;
     }
 
     /**
