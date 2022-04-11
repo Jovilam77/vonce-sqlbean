@@ -16,13 +16,20 @@ import com.google.common.collect.ListMultimap;
  * @email 766255988@qq.com
  * @date 2020年3月1日上午10:00:10
  */
-public class Condition extends Common {
+public class Condition<T> extends Common {
 
+    private T returnObj;
     private String where = "";//条件
     private Object[] agrs = null;
     //过时，未来版本将移除
     private ListMultimap<String, ConditionInfo> whereMap = LinkedListMultimap.create();//where条件包含的逻辑
-    private Wrapper whereWrapper = new Wrapper();
+    private SimpleCondition<T> whereCondition;
+    private Wrapper whereWrapper;
+
+    protected void setReturnObj(T returnObj){
+        this.returnObj = returnObj;
+        whereCondition = new SimpleCondition<>(returnObj);
+    }
 
     /**
      * 获取where sql 内容
@@ -457,6 +464,10 @@ public class Condition extends Common {
         return where(SqlLogic.ORBracket, tableAlias, field, value, sqlOperator);
     }
 
+    public SimpleCondition<T> where() {
+        return whereCondition;
+    }
+
     /**
      * 获得where包装器
      *
@@ -471,8 +482,9 @@ public class Condition extends Common {
      *
      * @param wrapper
      */
-    public void setWhere(Wrapper wrapper) {
+    public T setWhere(Wrapper wrapper) {
         this.whereWrapper = wrapper;
+        return returnObj;
     }
 
 }

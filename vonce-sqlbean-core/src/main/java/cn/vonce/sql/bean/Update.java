@@ -10,7 +10,12 @@ import java.io.Serializable;
  * @email 766255988@qq.com
  * @date 2017年8月18日上午9:00:19
  */
-public class Update<T> extends Condition implements Serializable {
+public class Update<T> extends Condition<Update<T>> implements Serializable {
+
+    public Update() {
+        super();
+        super.setReturnObj(this);
+    }
 
     //更新的实体对象
     private T updateBean = null;
@@ -22,7 +27,6 @@ public class Update<T> extends Condition implements Serializable {
     private boolean optimisticLock = false;
     //是否为逻辑删除
     private boolean logicallyDelete = false;
-    private SimpleCondition<Update<T>> whereCondition = new SimpleCondition<>(this);
 
     /**
      * 是否只更新不为null的字段
@@ -102,10 +106,6 @@ public class Update<T> extends Condition implements Serializable {
 
     public void setLogicallyDelete(boolean logicallyDelete) {
         this.logicallyDelete = logicallyDelete;
-    }
-
-    public SimpleCondition<Update<T>> where() {
-        return whereCondition;
     }
 
 }

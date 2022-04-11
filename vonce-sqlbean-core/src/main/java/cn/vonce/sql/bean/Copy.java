@@ -8,12 +8,16 @@ package cn.vonce.sql.bean;
  * @email 766255988@qq.com
  * @date 2021年6月21日下午21:53:00
  */
-public class Copy extends Condition {
+public class Copy extends Condition<Copy> {
+
+    public Copy() {
+        super();
+        super.setReturnObj(this);
+    }
 
     private String targetSchema;
     private String targetTableName;
     private Column[] columns;
-    private SimpleCondition<Copy> whereSimpleCondition = new SimpleCondition<>(this);
 
     public String getTargetSchema() {
         return targetSchema;
@@ -37,10 +41,6 @@ public class Copy extends Condition {
 
     public void setColumns(Column[] columns) {
         this.columns = columns;
-    }
-
-    public SimpleCondition<Copy> where() {
-        return whereSimpleCondition;
     }
 
 }

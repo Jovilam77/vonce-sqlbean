@@ -94,36 +94,4 @@ public class Wrapper implements Serializable {
         return this.dataList;
     }
 
-//    /**
-//     * 条件模型
-//     */
-//    public static class Data implements Serializable {
-//        private SqlLogic sqlLogic;
-//        private Object item;
-//
-//        public Data() {
-//        }
-//
-//        public Data(SqlLogic sqlLogic, Object item) {
-//            this.sqlLogic = sqlLogic;
-//            this.item = item;
-//        }
-//
-//        public SqlLogic getSqlLogic() {
-//            return sqlLogic;
-//        }
-//
-//        public void setSqlLogic(SqlLogic sqlLogic) {
-//            this.sqlLogic = sqlLogic;
-//        }
-//
-//        public Object getItem() {
-//            return item;
-//        }
-//
-//        public void setItem(Object item) {
-//            this.item = item;
-//        }
-//    }
-
 }

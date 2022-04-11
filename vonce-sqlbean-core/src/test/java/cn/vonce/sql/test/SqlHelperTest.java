@@ -237,6 +237,7 @@ public class SqlHelperTest {
      */
     private static void delete(SqlBeanDB sqlBeanDB) {
         Delete delete = new Delete();
+        delete.where().eq("",null).back();
         delete.setSqlBeanDB(sqlBeanDB);
 //        delete.where(SqlUser.id, 1, SqlOperator.GREATER_THAN);
         delete.where().gt(SqlUser.id, 1);

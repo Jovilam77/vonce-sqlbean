@@ -79,7 +79,7 @@ public class SqlHelper {
         sqlSb.append(SqlConstant.FROM);
         sqlSb.append(fromFullName(select));
         sqlSb.append(joinSql(select));
-        sqlSb.append(whereSql(select, select.where(), null));
+        sqlSb.append(whereSql(select, null));
         String groupBySql = groupBySql(select);
         sqlSb.append(groupBySql);
         sqlSb.append(havingSql(select));
@@ -144,7 +144,7 @@ public class SqlHelper {
         }
         sqlSb.append(SqlConstant.SET);
         sqlSb.append(setSql(update));
-        sqlSb.append(whereSql(update, update.where(), update.getUpdateBean()));
+        sqlSb.append(whereSql(update, update.getUpdateBean()));
         return sqlSb.toString();
     }
 
@@ -181,7 +181,7 @@ public class SqlHelper {
         } else {
             sqlSb.append(getTableName(delete.getTable(), delete));
         }
-        sqlSb.append(whereSql(delete, delete.where(), null));
+        sqlSb.append(whereSql(delete, null));
         return sqlSb.toString();
     }
 
@@ -304,7 +304,7 @@ public class SqlHelper {
         if (DbType.Derby == backup.getSqlBeanDB().getDbType()) {
             backupSql.append(" WITH NO DATA");
         } else {
-            backupSql.append(whereSql(backup, backup.where(), null));
+            backupSql.append(whereSql(backup, null));
         }
         return backupSql.toString();
     }
@@ -345,7 +345,7 @@ public class SqlHelper {
         }
         copySql.append(SqlConstant.FROM);
         copySql.append(getTableName(copy.getTable(), copy));
-        copySql.append(whereSql(copy, copy.where(), null));
+        copySql.append(whereSql(copy, null));
         return copySql.toString();
     }
 
@@ -725,13 +725,12 @@ public class SqlHelper {
      * 返回where语句
      *
      * @param condition
-     * @param simpleCondition
      * @param bean
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static String whereSql(Condition condition, SimpleCondition simpleCondition, Object bean) {
-        return conditionHandle(ConditionType.WHERE, condition, condition.getWhere(), condition.getAgrs(), bean, simpleCondition, condition.getWhereMap(), condition.getWhereWrapper());
+    public static String whereSql(Condition condition, Object bean) {
+        return conditionHandle(ConditionType.WHERE, condition, condition.getWhere(), condition.getAgrs(), bean, condition.where(), condition.getWhereMap(), condition.getWhereWrapper());
     }
 
     /**
