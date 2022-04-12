@@ -5,14 +5,19 @@ import cn.vonce.sql.enumerate.SqlLogic;
 
 import java.io.Serializable;
 
+/**
+ * 条件逻辑
+ *
+ * @param <Action>
+ */
 public class Logic<Action> implements Serializable {
 
-    private SimpleCondition condition;
+    private Condition condition;
 
     private Logic() {
     }
 
-    protected Logic(SimpleCondition condition) {
+    protected Logic(Condition condition) {
         this.condition = condition;
     }
 
@@ -22,7 +27,7 @@ public class Logic<Action> implements Serializable {
      * @param
      * @return
      */
-    public SimpleCondition and() {
+    public Condition and() {
         condition.setSqlLogic(SqlLogic.AND);
         return condition;
     }
@@ -33,11 +38,16 @@ public class Logic<Action> implements Serializable {
      * @param
      * @return
      */
-    public SimpleCondition or() {
+    public Condition or() {
         condition.setSqlLogic(SqlLogic.OR);
         return condition;
     }
 
+    /**
+     * 返回Bean对象
+     *
+     * @return
+     */
     public Action back() {
         return (Action) condition.getAction();
     }

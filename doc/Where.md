@@ -2,23 +2,7 @@
 ```java
 //SQL: where id = 1 or id = 2
 Select select = new Select();
-select.where("id", 1);              //不写操作符参数, 则默认为SqlOperator.EQUAL_TO
-select.where(SqlLogic.OR, "id", 2); //不写操作符参数, 则默认为SqlOperator.EQUAL_TO
-//等同于
-//Select select = new Select();
-//select.where("id", 1);            //不写操作符参数, 则默认为SqlOperator.EQUAL_TO
-//select.wOR("id", 2);              //不写操作符参数, 则默认为SqlOperator.EQUAL_TO
-
-//SQL（优先运算）: where (id > 1 and id < 10) or type = 1
-Select select = new Select();
-select.where("id", 1, SqlOperator.GREATER_THAN);
-select.where(SqlLogic.AND, "id", 10, SqlOperator.LESS_THAN);
-select.where(SqlLogic.ORBracket, "type", 1);            //不写操作符参数, 则默认为SqlOperator.EQUAL_TO
-//等同于
-//Select select = new Select();
-//select.where("id", 1, SqlOperator.GREATER_THAN);
-//select.wAND("id", 10, SqlOperator.LESS_THAN);
-//select.wORBracket("type", 1);                        //不写操作符参数, 则默认为SqlOperator.EQUAL_TO
+select.where().eq("id", 1).or().eq("id", 2);
 ```
 
 #### 二. Where条件表达式
@@ -54,30 +38,7 @@ setWhere(
 
 ```
 
-#### 四. Where条件操作符 枚举解释
-```java
-SqlOperator.IN = "IN"                       //包含
-SqlOperator.NOT_IN = "NOT IN"               //不包含
-SqlOperator.LIKE = "LIKE"                   //相似
-SqlOperator.NOT_LIKE = "NOT LIKE"           //不相似
-SqlOperator.SqlOperator.BETWEEN = "BETWEEN" //介于
-SqlOperator.GREATER_THAN = ">"              //大于
-SqlOperator.GREAT_THAN_OR_EQUAL_TO = ">="   //大于等于
-SqlOperator.LESS_THAN = "<"                 //小于
-SqlOperator.LESS_THAN_OR_EQUAL_TO = "<="    //小于等于
-SqlOperator.EQUAL_TO = "="                  //等于
-SqlOperator.NOT_EQUAL_TO = "!="             //不等于
-```
-
-#### 五. Where条件逻辑 枚举解释
-```java
-SqlLogic.OR = select.wOR("字段","值");                  //或者
-SqlLogic.AND = select.wAND("字段","值");                //并且
-SqlLogic.ORBracket = select.wORBracket("字段","值");    //或者的前面加个括号（如果需要优先运算）
-SqlLogic.ANDBracket = select.wANDBracket("字段","值");  //并且的前面加个括号（如果需要优先运算）
-```
-
-#### 六. 原始值Original
+#### 四. 原始值Original
 ```
 在where条件中, 有些条件的值可能等于某个字段或者等于某个函数, 这个时候传入的值就不能对它进行处理。
 比如说Java中: select.where("time", "DATE_FORMAT(NOW(),'%Y-%m-%d')");

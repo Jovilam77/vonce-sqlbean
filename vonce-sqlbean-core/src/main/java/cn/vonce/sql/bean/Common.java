@@ -6,7 +6,7 @@ import cn.vonce.sql.uitls.SqlBeanUtil;
 import java.io.Serializable;
 
 /**
- * Common
+ * 公共信息
  *
  * @author Jovi
  * @version 1.0
@@ -17,7 +17,13 @@ public class Common implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 数据库相关配置
+     */
     private SqlBeanDB sqlBeanDB = null;
+    /**
+     * 表信息
+     */
     private Table table = new Table();
 
     public SqlBeanDB getSqlBeanDB() {

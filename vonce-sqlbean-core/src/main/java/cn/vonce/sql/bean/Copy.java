@@ -8,7 +8,7 @@ package cn.vonce.sql.bean;
  * @email 766255988@qq.com
  * @date 2021年6月21日下午21:53:00
  */
-public class Copy extends Condition<Copy> {
+public class Copy extends CommonCondition<Copy> {
 
     public Copy() {
         super();

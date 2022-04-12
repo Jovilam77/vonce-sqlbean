@@ -54,10 +54,8 @@ public class SqlBeanProvider {
             return null;
         }
         if (ids.length > 1) {
-//            select.where(SqlBeanUtil.getTable(clazz).getAlias(), SqlBeanUtil.getTableFieldName(idField), ids, SqlOperator.IN);
             select.where().in(SqlBeanUtil.getTableFieldName(idField), ids);
         } else {
-//            select.where(SqlBeanUtil.getTable(clazz).getAlias(), SqlBeanUtil.getTableFieldName(idField), ids[0], SqlOperator.EQUAL_TO);
             select.where().eq(SqlBeanUtil.getTableFieldName(idField), ids[0]);
         }
         return SqlHelper.buildSelectSql(select);

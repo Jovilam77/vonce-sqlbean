@@ -22,29 +22,64 @@ import java.util.List;
  * @email 766255988@qq.com
  * @date 2017年8月18日上午9:00:19
  */
-public class Select extends Condition<Select> implements Serializable {
+public class Select extends CommonCondition<Select> implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public Select() {
         super();
         super.setReturnObj(this);
     }
 
-    private static final long serialVersionUID = 1L;
-
-    private boolean useDistinct = false;//默认不去重复
-    private List<Column> columnList = new ArrayList<>();//查询的列字段数组
-    private List<Join> joinList = new ArrayList<>();//表连接的表数组
-    private List<Group> groupByList = new ArrayList<>();//分组
-    private List<Order> orderByList = new ArrayList<>();//排序
+    /**
+     * 默认不去重复
+     */
+    private boolean useDistinct = false;
+    /**
+     * 查询的列字段列表
+     */
+    private List<Column> columnList = new ArrayList<>();
+    /**
+     * 表连接列表
+     */
+    private List<Join> joinList = new ArrayList<>();
+    /**
+     * 分组列表
+     */
+    private List<Group> groupByList = new ArrayList<>();
+    /**
+     * 排序列表
+     */
+    private List<Order> orderByList = new ArrayList<>();
+    /**
+     * 分页对象
+     */
     private Page page = null;
+    /**
+     * 过滤的字段数组
+     */
     private String[] filterFields = null;
-    private SimpleCondition<Select> havingCondition = new SimpleCondition<>(this);
-    private Wrapper havingWrapper = new Wrapper();
+    /**
+     * having 条件表达式 优先级一
+     */
     private String having = null;
+    /**
+     * having 条件表达式 参数
+     */
     private Object[] havingArgs = null;
-    //过时，未来版本将移除
-    private ListMultimap<String, ConditionInfo> havingMap = LinkedListMultimap.create();//having条件包含的逻辑
-
+    /**
+     * having 条件包装器 优先级二
+     */
+    private Wrapper havingWrapper = new Wrapper();
+    /**
+     * having 条件 优先级三
+     */
+    private Condition<Select> havingCondition = new Condition<>(this);
+    /**
+     * having 条件，过时，未来版本将移除
+     */
+    @Deprecated
+    private ListMultimap<String, ConditionInfo> havingMap = LinkedListMultimap.create();
 
     /**
      * 获取useDistinct是否过滤重复
@@ -433,7 +468,7 @@ public class Select extends Condition<Select> implements Serializable {
      * 简单的having
      * @return
      */
-    public SimpleCondition<Select> having() {
+    public Condition<Select> having() {
         return havingCondition;
     }
 

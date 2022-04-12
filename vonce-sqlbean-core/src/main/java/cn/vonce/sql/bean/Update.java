@@ -10,22 +10,32 @@ import java.io.Serializable;
  * @email 766255988@qq.com
  * @date 2017年8月18日上午9:00:19
  */
-public class Update<T> extends Condition<Update<T>> implements Serializable {
+public class Update<T> extends CommonCondition<Update<T>> implements Serializable {
 
     public Update() {
         super();
         super.setReturnObj(this);
     }
 
-    //更新的实体对象
+    /**
+     * 更新的实体对象
+     */
     private T updateBean = null;
-    //需要过滤的字段
+    /**
+     * 需要过滤的字段
+     */
     private String[] filterFields = null;
-    //默认只更新不为空的字段
+    /**
+     * 默认只更新不为空的字段
+     */
     private boolean updateNotNull = true;
-    //是否使用乐观锁
+    /**
+     * 是否使用乐观锁
+     */
     private boolean optimisticLock = false;
-    //是否为逻辑删除
+    /**
+     * 是否为逻辑删除
+     */
     private boolean logicallyDelete = false;
 
     /**
