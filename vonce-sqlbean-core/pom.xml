@@ -123,10 +123,8 @@
 
     <!-- 版本信息 -->
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <com.google.guava.version>20.0</com.google.guava.version>
-        <com.squareup.javapoet.version>1.12.1</com.squareup.javapoet.version>
-        <com.esotericsoftware.version>1.11.0</com.esotericsoftware.version>
+        <com.google.guava.version>23.0</com.google.guava.version>
+        <com.esotericsoftware.version>1.11.8</com.esotericsoftware.version>
     </properties>
 
     <dependencies>
