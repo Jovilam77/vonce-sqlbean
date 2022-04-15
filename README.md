@@ -159,7 +159,6 @@ public class EssayController {
 
 	    //根据id删除
 	    long i = essayService.deleteById(id);
-        
 	    //根据条件删除
 	    //i = essayService.deleteByCondition(Wrapper.where(gt($Essay.id, 1)).and(eq($Essay.content, "222")));
 	    
