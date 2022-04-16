@@ -6,6 +6,10 @@ package cn.vonce.sql.uitls;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RunnableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -82,7 +86,15 @@ public final class SnowflakeId16 implements Serializable {
 
     private static long getServerIdAsLong() {
         try {
-            String hostname = InetAddress.getLocalHost().getHostName();
+            //为照顾安卓版需异步调用
+            RunnableFuture<String> runnableFuture = new FutureTask<>(new Callable<String>() {
+                @Override
+                public String call() throws UnknownHostException {
+                    return InetAddress.getLocalHost().getHostName();
+                }
+            });
+            new Thread(runnableFuture).start();
+            String hostname = runnableFuture.get();
             Matcher matcher = PATTERN_HOSTNAME.matcher(hostname);
             if (matcher.matches()) {
                 long n = Long.parseLong(matcher.group(1));
@@ -91,8 +103,10 @@ public final class SnowflakeId16 implements Serializable {
                     return n;
                 }
             }
-        } catch (UnknownHostException e) {
-//            logger.warn("unable to get host name. set server id = 0.");
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         return 0;
     }

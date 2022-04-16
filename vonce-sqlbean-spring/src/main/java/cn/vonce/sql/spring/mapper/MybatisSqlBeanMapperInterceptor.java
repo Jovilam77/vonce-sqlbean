@@ -149,14 +149,14 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
      * @param resultSet
      * @return
      */
-    public List<Object> baseHandleResultSet(ResultSet resultSet, Class<?> resultType) {
+    public List<Object> baseHandleResultSet(ResultSet resultSet, Class<?> returnType) {
         List<Object> resultList = new ArrayList<>();
         if (null != resultSet) {
             try {
                 while (resultSet.next()) {
                     Object value = super.baseHandleResultSet(resultSet);
-                    if (value != null && !value.getClass().getName().equals(resultType.getName())) {
-                        value = getValueConvert(resultType.getName(), value);
+                    if (value != null && !value.getClass().getName().equals(returnType.getName())) {
+                        value = getValueConvert(returnType.getName(), value);
                     }
                     resultList.add(value);
                 }
@@ -168,7 +168,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             }
         }
         if (resultList.isEmpty()) {
-            resultList.add(getDefaultValue(resultType.getName()));
+            resultList.add(getDefaultValue(returnType.getName()));
         }
         return resultList;
     }

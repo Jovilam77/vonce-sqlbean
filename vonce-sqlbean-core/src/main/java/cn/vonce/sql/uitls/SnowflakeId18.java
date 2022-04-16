@@ -2,6 +2,9 @@ package cn.vonce.sql.uitls;
 
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -220,7 +223,10 @@ public final class SnowflakeId18 implements Serializable {
         }
 
         try {
-            InetAddress inetAddress = InetAddress.getLocalHost();
+            //为照顾安卓版需异步调用
+            RunnableFuture<InetAddress> runnableFuture = new FutureTask<>(() -> InetAddress.getLocalHost());
+            new Thread(runnableFuture).start();
+            InetAddress inetAddress = runnableFuture.get();
             byte[] addressByte = inetAddress.getAddress();
             LAST_IP = addressByte[addressByte.length - 1];
         } catch (Exception e) {
