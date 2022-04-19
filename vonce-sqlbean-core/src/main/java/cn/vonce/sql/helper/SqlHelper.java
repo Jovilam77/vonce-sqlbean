@@ -629,10 +629,12 @@ public class SqlHelper {
                 if (sqlId != null && sqlId.type() != IdType.AUTO && sqlId.type() != IdType.NORMAL) {
                     if (StringUtil.isEmpty(value)) {
                         value = common.getSqlBeanDB().getSqlBeanConfig().getUniqueIdProcessor().uniqueId(sqlId.type());
+                        ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), value);
                     }
                     valueSql.append(SqlBeanUtil.getSqlValue(common, value));
                 } else if (field.isAnnotationPresent(SqlInsertTime.class) && SqlBeanUtil.whatType(field.getType().getName()) == WhatType.DATE_TYPE && value == null) {
                     valueSql.append(SqlBeanUtil.getSqlValue(common, date));
+                    ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), date);
                 } else {
                     valueSql.append(SqlBeanUtil.getSqlValue(common, ReflectUtil.instance().get(objectList.get(i).getClass(), objectList.get(i), field.getName())));
                 }
@@ -712,6 +714,7 @@ public class SqlHelper {
                 setSql.append(SqlBeanUtil.getSqlValue(update, o));
             } else if (field.isAnnotationPresent(SqlUpdateTime.class) && SqlBeanUtil.whatType(field.getType().getName()) == WhatType.DATE_TYPE) {
                 setSql.append(SqlBeanUtil.getSqlValue(update, date));
+                ReflectUtil.instance().set(bean.getClass(), bean, field.getName(), date);
             } else {
                 setSql.append(SqlBeanUtil.getSqlValue(update, objectValue));
             }
