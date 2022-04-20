@@ -806,67 +806,6 @@ public class SqlHelper {
         return groupByAndOrderBySql.toString();
     }
 
-//    /**
-//     * 条件处理
-//     *
-//     * @param conditionType 条件类型（where还是 having）
-//     * @param common        公共类
-//     * @param condition     条件字符串（优先级1）
-//     * @param args          条件字符串参数
-//     * @param conditionMap  条件Map（优先级3）
-//     * @param wrapper       条件包装器（优先级2）
-//     * @return
-//     */
-//    private static String conditionHandle(ConditionType conditionType, Common common, String condition, Object[]
-//            args, Object bean, ListMultimap<String, ConditionInfo> conditionMap, Wrapper wrapper) {
-//        StringBuffer conditionSql = new StringBuffer();
-//        // 优先级1 使用条件字符串拼接
-//        if (condition != null && !"".equals(condition)) {
-//            conditionSql.append(ConditionType.WHERE == conditionType ? SqlConstant.WHERE : SqlConstant.HAVING);
-//            conditionSql.append(versionCondition(common, bean));
-//            conditionSql.append(SqlConstant.BEGIN_BRACKET);
-//            if (args != null && args.length > 0) {
-//                conditionSql.append(SqlBeanUtil.getCondition(common, condition, args));
-//            } else if (condition.indexOf("${") > -1 && bean != null) {
-//                conditionSql.append(SqlBeanUtil.getCondition(common, condition, bean));
-//            } else {
-//                conditionSql.append(condition);
-//            }
-//            conditionSql.append(SqlConstant.END_BRACKET);
-//        }
-//        // 优先级2 使用条件包装器
-//        else if (wrapper != null && !wrapper.getDataList().isEmpty()) {
-//            conditionSql.append(ConditionType.WHERE == conditionType ? SqlConstant.WHERE : SqlConstant.HAVING);
-//            conditionSql.append(versionCondition(common, bean));
-//            conditionSql.append(conditionWrapperHandle(common, wrapper));
-//        } else {
-//            conditionSql.append(versionCondition(common, bean));
-//            if (conditionMap.size() > 0) {
-//                conditionSql.append(SqlConstant.BEGIN_BRACKET);
-//                int i = 0;
-//                // 遍历所有条件
-//                Collection<Map.Entry<String, ConditionInfo>> sqlConditionEntryCollection = conditionMap.entries();
-//                for (Map.Entry<String, ConditionInfo> sqlConditionEntry : sqlConditionEntryCollection) {
-//                    ConditionInfo conditionInfo = sqlConditionEntry.getValue();
-//                    // 遍历sql逻辑处理
-//                    if (i != 0 && i < sqlConditionEntryCollection.size()) {
-//                        conditionSql.append(getLogic(conditionInfo.getSqlLogic()));
-//                    }
-//                    if (SqlBeanUtil.isToUpperCase(common)) {
-//                        conditionInfo.setName(conditionInfo.getName().toUpperCase());
-//                    }
-//                    conditionSql.append(valueOperator(common, conditionInfo));
-//                    i++;
-//                }
-//                conditionSql.append(SqlConstant.END_BRACKET);
-//            }
-//            if (conditionSql.length() != 0) {
-//                conditionSql.insert(0, ConditionType.WHERE == conditionType ? SqlConstant.WHERE : SqlConstant.HAVING);
-//            }
-//        }
-//        return conditionSql.toString();
-//    }
-
     /**
      * 条件处理
      *
