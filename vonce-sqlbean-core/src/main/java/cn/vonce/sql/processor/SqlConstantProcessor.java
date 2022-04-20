@@ -74,7 +74,7 @@ public class SqlConstantProcessor extends AbstractProcessor {
                     String schema = "";
                     String tableName = element.getSimpleName().toString();
                     String tableAlias = "";
-                    String className = PREFIX + tableName;
+                    String className =  tableName + PREFIX;
                     if (sqlTable != null) {
                         schema = sqlTable.schema();
                         tableName = sqlTable.value();
@@ -106,7 +106,7 @@ public class SqlConstantProcessor extends AbstractProcessor {
                                 }
                             }
                             code.append(String.format("\tpublic static final String %s = \"%s\";\n", sqlFieldName, sqlFieldName));
-                            code.append(String.format("\tpublic static final Column $%s = new Column(_tableAlias,%s,\"\");\n", sqlFieldName, sqlFieldName));
+                            code.append(String.format("\tpublic static final Column %s$ = new Column(_tableAlias,%s,\"\");\n", sqlFieldName, sqlFieldName));
                         }
 
                         code.append("\n}");
