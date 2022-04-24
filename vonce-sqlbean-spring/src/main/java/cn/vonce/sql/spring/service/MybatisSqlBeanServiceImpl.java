@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -81,7 +82,9 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     public String getProductName() {
         if (StringUtil.isEmpty(productName)) {
             try {
-                productName = sqlSession.getConfiguration().getEnvironment().getDataSource().getConnection().getMetaData().getDatabaseProductName();
+                Connection connection = sqlSession.getConfiguration().getEnvironment().getDataSource().getConnection();
+                productName = connection.getMetaData().getDatabaseProductName();
+                connection.close();
             } catch (SQLException e) {
                 logger.error(e.getMessage(), e);
             }
@@ -429,7 +432,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBeanId(T bean) {
-        return mybatisSqlBeanDao.updateByBeanId(getSqlBeanDB(), clazz, bean, true, false , null);
+        return mybatisSqlBeanDao.updateByBeanId(getSqlBeanDB(), clazz, bean, true, false, null);
     }
 
     @DbSwitch(DbRole.MASTER)
