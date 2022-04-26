@@ -48,7 +48,7 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                     if (clazz == null) {
                         continue;
                     }
-                    SqlTable sqlTable = clazz.getAnnotation(SqlTable.class);
+                    SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
                     if (sqlTable != null && !sqlTable.isView() && sqlTable.autoCreate()) {
                         Table table = SqlBeanUtil.getTable(clazz);
                         if (tableList != null && !tableList.isEmpty()) {

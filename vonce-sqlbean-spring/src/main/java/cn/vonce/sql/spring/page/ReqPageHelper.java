@@ -43,14 +43,14 @@ public class ReqPageHelper<T> extends PageHelper<T> {
         String[] sortorder = null;
         Order[] orders = null;
         String timestamp = null;
-        boolean startByZero = true;
+        boolean startByZero = false;
         try {
             //当前页数
             if (request.getParameter("page") != null) {
                 pagenum = Integer.parseInt(request.getParameter("page"));
-                startByZero = false;
             } else if (request.getParameter("pagenum") != null) {
                 pagenum = Integer.parseInt(request.getParameter("pagenum"));
+                startByZero = true;
             }
             //每页数量
             if (request.getParameter("pageSize") != null) {

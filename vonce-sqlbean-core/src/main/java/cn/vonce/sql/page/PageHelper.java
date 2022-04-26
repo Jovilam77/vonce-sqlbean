@@ -35,6 +35,16 @@ public class PageHelper<T> {
     /**
      * 实例化分页助手 - 手动设置参数
      *
+     * @param pagenum  当前页
+     * @param pagesize 每页数量
+     */
+    public PageHelper(Integer pagenum, Integer pagesize) {
+        this(pagenum, pagesize, null, null);
+    }
+
+    /**
+     * 实例化分页助手 - 手动设置参数
+     *
      * @param pagenum   当前页
      * @param pagesize  每页数量
      * @param timestamp 时间戳
@@ -63,7 +73,7 @@ public class PageHelper<T> {
      * @param timestamp 时间戳
      */
     public PageHelper(Integer pagenum, Integer pagesize, Order[] orders, String timestamp) {
-        init(pagenum, pagesize, true, orders, timestamp);
+        init(pagenum, pagesize, false, orders, timestamp);
     }
 
     /**
@@ -105,7 +115,7 @@ public class PageHelper<T> {
 
     private Integer pagenum;
     private Integer pagesize;
-    private boolean startByZero = true;
+    private boolean startByZero;
     private Integer totalRecords;
     private Integer totalPage;
     private Order[] orders;

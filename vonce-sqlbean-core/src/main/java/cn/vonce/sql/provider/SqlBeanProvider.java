@@ -1,5 +1,6 @@
 package cn.vonce.sql.provider;
 
+import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
@@ -53,10 +54,11 @@ public class SqlBeanProvider {
             e.printStackTrace();
             return null;
         }
+        SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
         if (ids.length > 1) {
-            select.where().in(SqlBeanUtil.getTableFieldName(idField), ids);
+            select.where().in(SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc()), ids);
         } else {
-            select.where().eq(SqlBeanUtil.getTableFieldName(idField), ids[0]);
+            select.where().eq(SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc()), ids[0]);
         }
         return SqlHelper.buildSelectSql(select);
     }
@@ -117,9 +119,10 @@ public class SqlBeanProvider {
         }
         if (select.getColumnList().isEmpty()) {
             try {
+                SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
                 select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
                 if (select.getPage() != null && select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
-                    select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)));
+                    select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz), sqlTable.mapUsToCc()));
                 }
             } catch (SqlBeanException e) {
                 e.printStackTrace();
@@ -184,8 +187,8 @@ public class SqlBeanProvider {
             e.printStackTrace();
             return null;
         }
-//        delete.where("", SqlBeanUtil.getTableFieldName(idField), id, SqlOperator.IN);
-        delete.where().in(SqlBeanUtil.getTableFieldName(idField), id);
+        SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
+        delete.where().in(SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc()), id);
         return SqlHelper.buildDeleteSql(delete);
     }
 
@@ -251,8 +254,8 @@ public class SqlBeanProvider {
             update.setTable(clazz);
             update.setUpdateBean(bean);
             Field idField = SqlBeanUtil.getIdField(bean.getClass());
-//            update.where(SqlBeanUtil.getTableFieldName(idField), id, SqlOperator.IN);
-            update.where().in(SqlBeanUtil.getTableFieldName(idField), id);
+            SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
+            update.where().in(SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc()), id);
             setSchema(update, clazz);
         } catch (SqlBeanException e) {
             e.printStackTrace();
@@ -365,8 +368,8 @@ public class SqlBeanProvider {
             e.printStackTrace();
             return null;
         }
-//        update.where(SqlBeanUtil.getTableFieldName(idField), id);
-        update.where().eq(SqlBeanUtil.getTableFieldName(idField), id);
+        SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
+        update.where().eq(SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc()), id);
         return SqlHelper.buildUpdateSql(update);
     }
 
@@ -396,8 +399,8 @@ public class SqlBeanProvider {
                     return null;
                 }
             }
-//            update.where(SqlBeanUtil.getTableFieldName(idField), id);
-            update.where().eq(SqlBeanUtil.getTableFieldName(idField), id);
+            SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
+            update.where().eq(SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc()), id);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -797,7 +800,8 @@ public class SqlBeanProvider {
         if (paging != null) {
             if (select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
                 try {
-                    select.setPage(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz)), paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
+                    SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
+                    select.setPage(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz), sqlTable.mapUsToCc()), paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
                 } catch (SqlBeanException e) {
                     e.printStackTrace();
                 }

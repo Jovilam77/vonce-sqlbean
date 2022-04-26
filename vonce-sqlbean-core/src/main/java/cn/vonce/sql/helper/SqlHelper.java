@@ -199,7 +199,7 @@ public class SqlHelper {
         sqlSb.append(SqlConstant.BEGIN_BRACKET);
         Field idField = null;
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(create.getBeanClass());
-        SqlTable sqlTable = create.getBeanClass().getAnnotation(SqlTable.class);
+        SqlTable sqlTable = SqlBeanUtil.getSqlTable(create.getBeanClass());
         String transferred = SqlBeanUtil.getTransferred(create);
         for (Field field : fieldList) {
             if (SqlBeanUtil.isIgnore(field)) {
@@ -213,14 +213,7 @@ public class SqlHelper {
             SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
             ColumnInfo columnInfo = getColumnInfo(create.getSqlBeanDB().getDbType(), field.getType(), sqlColumn);
             JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
-            String columnName = field.getName();
-            if (sqlColumn != null) {
-                columnName = sqlColumn.value();
-            } else {
-                if (sqlTable != null && sqlTable.mapUsToCc()) {
-                    columnName = StringUtil.humpToUnderline(columnName);
-                }
-            }
+            String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable.mapUsToCc());
             sqlSb.append(transferred);
             sqlSb.append(SqlBeanUtil.isToUpperCase(create) ? columnName.toUpperCase() : columnName);
             sqlSb.append(transferred);
@@ -249,7 +242,7 @@ public class SqlHelper {
         }
         //主键
         if (idField != null) {
-            String id = SqlBeanUtil.getTableFieldName(idField);
+            String id = SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc());
             sqlSb.append(SqlConstant.PRIMARY_KEY);
             sqlSb.append(SqlConstant.BEGIN_BRACKET);
             sqlSb.append(transferred);
@@ -580,6 +573,7 @@ public class SqlHelper {
         StringBuffer fieldAndValuesSql = new StringBuffer();
         List<String> valueSqlList = new ArrayList<>();
         String transferred = SqlBeanUtil.getTransferred(common);
+        SqlTable sqlTable = SqlBeanUtil.getSqlTable(objectList.get(0).getClass());
         //获取sqlbean的全部字段
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(objectList.get(0).getClass());
         if (common.getSqlBeanDB().getDbType() == DbType.Oracle) {
@@ -614,7 +608,7 @@ public class SqlHelper {
                 }
                 //只有在循环第一遍的时候才会处理
                 if (i == 0) {
-                    String tableFieldName = SqlBeanUtil.getTableFieldName(field);
+                    String tableFieldName = SqlBeanUtil.getTableFieldName(field, sqlTable.mapUsToCc());
                     //如果此字段非id字段 或者 此字段为id字段但是不是自增的id则生成该字段的insert语句
                     if (sqlId == null || (sqlId != null && sqlId.type() != IdType.AUTO)) {
                         fieldSql.append(transferred + (SqlBeanUtil.isToUpperCase(common) ? tableFieldName.toUpperCase() : tableFieldName) + transferred);
@@ -688,13 +682,14 @@ public class SqlHelper {
         String transferred = SqlBeanUtil.getTransferred(update);
         String[] filterFields = update.getFilterFields();
         Object bean = update.getUpdateBean();
+        SqlTable sqlTable = SqlBeanUtil.getSqlTable(bean.getClass());
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(bean.getClass());
         Date date = new Date();
         for (Field field : fieldList) {
             if (SqlBeanUtil.isIgnore(field)) {
                 continue;
             }
-            String name = SqlBeanUtil.getTableFieldName(field);
+            String name = SqlBeanUtil.getTableFieldName(field, sqlTable.mapUsToCc());
             if (SqlBeanUtil.isFilter(filterFields, name)) {
                 continue;
             }
@@ -903,6 +898,7 @@ public class SqlHelper {
             return "";
         }
         StringBuffer versionConditionSql = new StringBuffer();
+        SqlTable sqlTable = SqlBeanUtil.getSqlTable(bean.getClass());
         Field versionField = null;
         //更新时乐观锁处理
         if (bean != null) {
@@ -912,7 +908,7 @@ public class SqlHelper {
             boolean versionEffectiveness = SqlBeanUtil.versionEffectiveness(versionField.getType().getName());
             if (versionEffectiveness) {
                 versionConditionSql.append(SqlConstant.BEGIN_BRACKET);
-                versionConditionSql.append(SqlBeanUtil.getTableFieldName(versionField));
+                versionConditionSql.append(SqlBeanUtil.getTableFieldName(versionField, sqlTable.mapUsToCc()));
                 Object versionValue = ReflectUtil.instance().get(bean.getClass(), bean, versionField.getName());
                 versionConditionSql.append(versionValue == null ? SqlConstant.IS : SqlConstant.EQUAL_TO);
                 versionConditionSql.append(SqlBeanUtil.getSqlValue(common, versionValue));
