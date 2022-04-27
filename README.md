@@ -83,26 +83,26 @@ public class EssayController {
 
 	    //查询列表
 	    List<Essay> list = essayService.selectAll();
-	    //list = essayService.selectByCondition("& > ?", $Essay.id, 20);
-	    list = essayService.selectByCondition(Wrapper.where(gt($Essay.id, 10)).and(lt($Essay.id, 20)));
+	    //list = essayService.selectByCondition("& > ?", Essay$.id, 20);
+	    list = essayService.selectByCondition(Wrapper.where(gt(Essay$.id, 10)).and(lt(Essay$.id, 20)));
 
  	    //查询一条
 	    Essay essay = essayService.selectById(1L);
-	    //essay = essayService.selectOneByCondition("& = ?", $Essay.id, 1);
-	    essay = essayService.selectOneByCondition(Wrapper.where(eq($Essay.id, 333)));
+	    //essay = essayService.selectOneByCondition("& = ?", Essay$.id, 1);
+	    essay = essayService.selectOneByCondition(Wrapper.where(eq(Essay$.id, 333)));
 
 	    //复杂查询
 	    Select select = new Select();
-	    select.column(SqlEssay.id).column($Essay.content);
+	    select.column(SqlEssay.id).column(Essay$.content);
 	    //指定查询的表 可不写
 	    //select.setTable(Essay.class);
 	    //看需求指定连表 这里不演示
 	    //select.join("","");
 	    select.where().gt("id", 1).and().eq("content", "222");
 	    //复杂条件推荐使用
-	    //select.setWhere(Wrapper.where(gt($Essay.id, 1)).and(eq($Essay.content, "222")));
+	    //select.setWhere(Wrapper.where(gt(Essay$.id, 1)).and(eq(Essay$.content, "222")));
 	    //也可使用表达式 如果这三种条件同时出现 那么此方式优先级最高 上面包装器次之
-	    //select.setWhere("& = ? AND & = ?", $Essay.id, 1, $Essay.content, "222");
+	    //select.setWhere("& = ? AND & = ?", Essay$.id, 1, Essay$.content, "222");
 	    select.orderBy("id", SqlSort.DESC);
 	    list = essayService.select(select);
         
@@ -130,7 +130,7 @@ public class EssayController {
 	    // return new PageHelper<Essay>(request).paging(new Select(),essayService).toResult("获取文章列表成功");
         
 	    //又或者 更简便的用法（不带统计和页数信息）
-	    //List<Essay> list = essayService.selectByCondition(new Paging(0,10), Wrapper.where(gt($Essay.id, 10)).and(lt($Essay.id, 20)));
+	    //List<Essay> list = essayService.selectByCondition(new Paging(0,10), Wrapper.where(gt(Essay$.id, 10)).and(lt(Essay$.id, 20)));
 	    //return super.successHint("获取成功", list);
         
 	}
@@ -144,7 +144,7 @@ public class EssayController {
 	    //根据外部id更新
 	    //i = essayService.updateById(essay, 20);
 	    //根据条件更新
-	    //i = essayService.updateByCondition(essay, Wrapper.where(gt($Essay.id, 1)).and(eq($Essay.content, "222")));
+	    //i = essayService.updateByCondition(essay, Wrapper.where(gt(Essay$.id, 1)).and(eq(Essay$.content, "222")));
 
 	    if (i > 0) {
                return super.successHint("更新成功");
@@ -160,7 +160,7 @@ public class EssayController {
 	    //根据id删除
 	    long i = essayService.deleteById(id);
 	    //根据条件删除
-	    //i = essayService.deleteByCondition(Wrapper.where(gt($Essay.id, 1)).and(eq($Essay.content, "222")));
+	    //i = essayService.deleteByCondition(Wrapper.where(gt(Essay$.id, 1)).and(eq(Essay$.content, "222")));
 	    
 	    if (i > 0) {
 	        return super.successHint("删除成功");

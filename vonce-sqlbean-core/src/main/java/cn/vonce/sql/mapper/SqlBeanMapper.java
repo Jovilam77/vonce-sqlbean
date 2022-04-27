@@ -98,7 +98,7 @@ public class SqlBeanMapper {
                     if (StringUtil.isNotEmpty(sqlJoin.tableAlias())) {
                         subTableAlias = sqlJoin.tableAlias();
                     }
-                    Field[] subFields = subClazz.getDeclaredFields();
+                    List<Field> subFields = SqlBeanUtil.getBeanAllField(subClazz);
                     for (Field subField : subFields) {
                         if (Modifier.isStatic(subField.getModifiers())) {
                             continue;

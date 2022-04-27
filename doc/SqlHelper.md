@@ -25,28 +25,28 @@
     private static void select1(SqlBeanDB sqlBeanDB) {
         Select select = new Select();
         select.setSqlBeanDB(sqlBeanDB);
-        select.setColumn($Essay._all);
+        select.setColumn(Essay$._all);
         select.column($User.headPortrait);
         select.column($User.nickname);
-        select.setTable($Essay._tableName);
-        select.join(JoinType.INNER_JOIN, $User._tableAlias, $User.id, $Essay.userId);
-        select.where($Essay.userId, "1111");
+        select.setTable(Essay$._tableName);
+        select.join(JoinType.INNER_JOIN, $User._tableAlias, $User.id, Essay$.userId);
+        select.where(Essay$.userId, "1111");
         //value 直接输入字符串 会当作字符串处理，sql中会带''，如果希望不被做处理则使用Original
-        select.where("DATE_FORMAT( " + $Essay.creationTime + ", '%Y-%m-%d' )", new Original("DATE_FORMAT( '2018-01-19 20:24:19', '%Y-%m-%d' ) "), SqlOperator.EQUAL_TO);
-        select.orderBy($Essay.id, SqlSort.DESC);
+        select.where("DATE_FORMAT( " + Essay$.creationTime + ", '%Y-%m-%d' )", new Original("DATE_FORMAT( '2018-01-19 20:24:19', '%Y-%m-%d' ) "), SqlOperator.EQUAL_TO);
+        select.orderBy(Essay$.id, SqlSort.DESC);
         System.out.println(SqlHelper.buildSelectSql(select));
     }
 
     private static void select2(SqlBeanDB sqlBeanDB) {
         Select select2 = new Select();
         select2.setSqlBeanDB(sqlBeanDB);
-        select2.column($Essay.id)
-                .column($Essay.content)
-                .column($Essay.creationTime)
+        select2.column(Essay$.id)
+                .column(Essay$.content)
+                .column(Essay$.creationTime)
                 .column($User.nickname);
-        select2.setTable($Essay._tableName);
-        select2.join(JoinType.INNER_JOIN, $User._tableAlias, $User.id, $Essay.userId);
-        select2.where("date_format(" + $Essay.creationTime + ",'%y%m%m ')", "2020-01-01 00:00:00", SqlOperator.GREATER_THAN);
+        select2.setTable(Essay$._tableName);
+        select2.join(JoinType.INNER_JOIN, $User._tableAlias, $User.id, Essay$.userId);
+        select2.where("date_format(" + Essay$.creationTime + ",'%y%m%m ')", "2020-01-01 00:00:00", SqlOperator.GREATER_THAN);
         select2.wAND($User.nickname, "vicky", SqlOperator.EQUAL_TO);
         System.out.println(SqlHelper.buildSelectSql(select2));
     }
@@ -54,10 +54,10 @@
     private static void select3(SqlBeanDB sqlBeanDB) {
         Select select3 = new Select();
         select3.setSqlBeanDB(sqlBeanDB);
-        select3.column($Essay._all, "count")
-                .column($Essay.categoryId);
-        select3.setTable($Essay._tableName);
-        select3.groupBy($Essay.categoryId);
+        select3.column(Essay$._all, "count")
+                .column(Essay$.categoryId);
+        select3.setTable(Essay$._tableName);
+        select3.groupBy(Essay$.categoryId);
         select3.having("count", 5, SqlOperator.GREATER_THAN);
         System.out.println(SqlHelper.buildSelectSql(select3));
     }

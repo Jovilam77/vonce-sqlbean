@@ -360,7 +360,7 @@ public class SqlBeanUtil {
                         if (Modifier.isStatic(subBeanField.getModifiers())) {
                             continue;
                         }
-                        SqlColumn subSqlColumn = field.getAnnotation(SqlColumn.class);
+                        SqlColumn subSqlColumn = subBeanField.getAnnotation(SqlColumn.class);
                         if (subSqlColumn != null && subSqlColumn.ignore()) {
                             continue;
                         }
