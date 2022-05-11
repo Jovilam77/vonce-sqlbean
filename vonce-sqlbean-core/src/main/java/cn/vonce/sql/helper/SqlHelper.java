@@ -812,8 +812,7 @@ public class SqlHelper {
      * @param wrapper         条件包装器（优先级2）
      * @return
      */
-    private static String conditionHandle(ConditionType conditionType, Common common, String conditionString, Object[]
-            args, Object bean, Condition condition, ListMultimap<String, ConditionInfo> conditionMap, Wrapper wrapper) {
+    private static String conditionHandle(ConditionType conditionType, Common common, String conditionString, Object[] args, Object bean, Condition condition, ListMultimap<String, ConditionInfo> conditionMap, Wrapper wrapper) {
         StringBuffer conditionSql = new StringBuffer();
         // 优先级1 使用条件字符串拼接
         if (conditionString != null && !"".equals(conditionString)) {
@@ -959,9 +958,9 @@ public class SqlHelper {
         // 优先使用枚举类型的操作符
         if (conditionInfo.getSqlOperator() != null) {
             SqlOperator sqlOperator = conditionInfo.getSqlOperator();
-            if (sqlOperator == SqlOperator.IS) {
+            if (sqlOperator == SqlOperator.IS || sqlOperator == SqlOperator.IS_NULL) {
                 operator = SqlConstant.IS;
-            } else if (sqlOperator == SqlOperator.IS_NOT) {
+            } else if (sqlOperator == SqlOperator.IS_NOT || sqlOperator == SqlOperator.IS_NOT_NULL) {
                 operator = SqlConstant.IS_NOT;
             } else if (sqlOperator == SqlOperator.IN) {
                 operator = SqlConstant.IN;
@@ -1099,6 +1098,8 @@ public class SqlHelper {
             sql.append(SqlBeanUtil.getSqlValue(common, betweenValues[0]));
             sql.append(SqlConstant.AND);
             sql.append(SqlBeanUtil.getSqlValue(common, betweenValues[1]));
+        } else if (conditionInfo.getSqlOperator() == SqlOperator.IS_NULL || conditionInfo.getSqlOperator() == SqlOperator.IS_NOT_NULL) {
+            sql.append("NULL ");
         } else {
             sql.append(value);
         }

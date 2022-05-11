@@ -12,6 +12,8 @@ public enum SqlOperator {
 
     IS,
     IS_NOT,
+    IS_NULL,
+    IS_NOT_NULL,
     IN,
     NOT_IN,
     LIKE,

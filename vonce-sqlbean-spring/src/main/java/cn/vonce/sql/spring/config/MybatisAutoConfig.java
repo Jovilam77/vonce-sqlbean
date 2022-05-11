@@ -45,7 +45,7 @@ public class MybatisAutoConfig {
             try {
                 sqlSessionFactory = beanFactory.getBean(SqlSessionFactory.class);
             } catch (Exception e) {
-                logger.error("MybatisAutoConfig：{}", e.getMessage());
+                logger.info("MybatisAutoConfig：{}", e.getMessage());
             }
         }
         if (sqlSessionFactory != null) {

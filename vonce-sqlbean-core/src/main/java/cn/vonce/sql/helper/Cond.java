@@ -323,6 +323,46 @@ public class Cond extends ConditionInfo {
     }
 
     /**
+     * 是null
+     *
+     * @param field
+     * @return
+     */
+    public static Cond isNull(String field) {
+        return new Cond(field, SqlOperator.IS_NULL, null);
+    }
+
+    /**
+     * 是null
+     *
+     * @param column
+     * @return
+     */
+    public static Cond isNull(Column column) {
+        return new Cond(column, SqlOperator.IS_NULL, null);
+    }
+
+    /**
+     * 不是null
+     *
+     * @param field
+     * @return
+     */
+    public static Cond isNotNull(String field) {
+        return new Cond(field, SqlOperator.IS_NULL, null);
+    }
+
+    /**
+     * 不是null
+     *
+     * @param column
+     * @return
+     */
+    public static Cond isNotNull(Column column) {
+        return new Cond(column, SqlOperator.IS_NULL, null);
+    }
+
+    /**
      * 包含
      *
      * @param field

@@ -371,6 +371,50 @@ public class Condition<Action> implements Serializable {
     }
 
     /**
+     * 是null
+     *
+     * @param column
+     * @return
+     */
+    public Logic<Action> isNull(Column column) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(column, SqlOperator.IS_NULL, null)));
+        return logic;
+    }
+
+    /**
+     * 是null
+     *
+     * @param field
+     * @return
+     */
+    public Logic<Action> isNull(String field) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.IS_NULL, null)));
+        return logic;
+    }
+
+    /**
+     * 不是null
+     *
+     * @param column
+     * @return
+     */
+    public Logic<Action> isNotNull(Column column) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(column, SqlOperator.IS_NULL, null)));
+        return logic;
+    }
+
+    /**
+     * 不是null
+     *
+     * @param field
+     * @return
+     */
+    public Logic<Action> isNotNull(String field) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.IS_NULL, null)));
+        return logic;
+    }
+
+    /**
      * 不是
      *
      * @param column
