@@ -764,7 +764,7 @@ public class SqlBeanProvider {
             e.printStackTrace();
         }
         Field field = SqlBeanUtil.getLogicallyField(clazz);
-        ReflectUtil.instance().set(bean.getClass(), bean, field.getName(), field.getType() == Boolean.class && field.getType() == boolean.class ? true : 1);
+        ReflectUtil.instance().set(bean.getClass(), bean, field.getName(), field.getType() == Boolean.class || field.getType() == boolean.class ? true : 1);
         return bean;
     }
 
