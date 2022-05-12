@@ -3,7 +3,9 @@ package cn.vonce.sql.service;
 import cn.vonce.sql.bean.Paging;
 import cn.vonce.sql.bean.Select;
 import cn.vonce.sql.helper.Wrapper;
+import cn.vonce.sql.page.PageHelper;
 import cn.vonce.sql.page.PagingService;
+import cn.vonce.sql.page.ResultData;
 
 import java.util.List;
 import java.util.Map;
@@ -290,5 +292,13 @@ public interface SelectService<T, ID> extends PagingService {
      * @return
      */
     int count(Class<?> clazz, Select select);
+
+    ResultData<T> paging(Select select, PageHelper<T> pageHelper);
+
+    ResultData<T> paging(Select select, int pagenum, int pagesize);
+
+    <R> ResultData<R> paging(Class<R> tClazz, Select select, PageHelper<R> pageHelper);
+
+    <R> ResultData<R> paging(Class<R> tClazz, Select select, int pagenum, int pagesize);
 
 }

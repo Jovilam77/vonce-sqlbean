@@ -1,5 +1,7 @@
 package cn.vonce.sql.page;
 
+import java.util.List;
+
 /**
  * 用于返回分页数据结果集(Result Set)
  *
@@ -10,18 +12,18 @@ package cn.vonce.sql.page;
  */
 public class ResultData<T> {
 
-    private T data;
+    private List<T> data;
     private Integer pagenum;
     private Integer pagesize;
     private Integer totalRecords;
     private Integer totalPage;
     private String timestamp;
 
-    public T getData() {
+    public List<T> getData() {
         return data;
     }
 
-    public void setData(T data) {
+    public void setData(List<T> data) {
         this.data = data;
     }
 

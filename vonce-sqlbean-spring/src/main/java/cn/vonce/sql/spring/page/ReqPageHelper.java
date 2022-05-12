@@ -116,7 +116,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      * @return
      */
     public HashMap<String, Object> toResult(String msg) {
-        ResultData<List<T>> resultData = super.getResultData();
+        ResultData<T> resultData = super.getResultData();
         HashMap<String, Object> result = new HashMap();
         result.put("code", 200);
         result.put("msg", msg == null || msg.equals("") ? "获取列表成功" : msg);
@@ -146,7 +146,7 @@ public class ReqPageHelper<T> extends PageHelper<T> {
      * @return
      */
     public HashMap<String, Object> result(String msg) {
-        ResultData<List<T>> resultData = super.getResultData();
+        ResultData<T> resultData = super.getResultData();
         HashMap<String, Object> result = new HashMap();
         result.put("code", 200);
         result.put("msg", msg == null || msg.equals("") ? "获取列表成功" : msg);

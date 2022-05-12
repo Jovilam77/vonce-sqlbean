@@ -822,7 +822,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean isUsePage(Select select) {
-        if (select.getPage() != null) {
+        if (select.getPage() != null && select.getPage().getPagenum() != null && select.getPage().getPagesize() != null) {
             return true;
         }
         return false;

@@ -6,6 +6,8 @@ import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.Wrapper;
+import cn.vonce.sql.page.PageHelper;
+import cn.vonce.sql.page.ResultData;
 import cn.vonce.sql.service.TableService;
 import cn.vonce.sql.spring.annotation.DbSwitch;
 import cn.vonce.sql.spring.config.UseMybatis;
@@ -347,6 +349,36 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Override
     public int count(Class<?> clazz, Select select) {
         return mybatisSqlBeanDao.count(getSqlBeanDB(), clazz, select);
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public ResultData<T> paging(Select select, PageHelper<T> pageHelper) {
+        pageHelper.paging(select, this);
+        return pageHelper.getResultData();
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public ResultData<T> paging(Select select, int pagenum, int pagesize) {
+        PageHelper<T> pageHelper = new PageHelper<>(pagenum, pagesize);
+        pageHelper.paging(select, this);
+        return pageHelper.getResultData();
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public <R> ResultData<R> paging(Class<R> tClazz, Select select, PageHelper<R> pageHelper) {
+        pageHelper.paging(tClazz, select, this);
+        return pageHelper.getResultData();
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public <R> ResultData<R> paging(Class<R> tClazz, Select select, int pagenum, int pagesize) {
+        PageHelper<R> pageHelper = new PageHelper<>(pagenum, pagesize);
+        pageHelper.paging(tClazz, select, this);
+        return pageHelper.getResultData();
     }
 
     @DbSwitch(DbRole.MASTER)

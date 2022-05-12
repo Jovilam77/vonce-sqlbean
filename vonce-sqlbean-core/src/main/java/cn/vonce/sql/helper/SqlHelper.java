@@ -1213,6 +1213,14 @@ public class SqlHelper {
      * @return
      */
     public static Integer[] pageParam(Select select) {
+        //当前页不能小于0
+        if (select.getPage().getPagenum() < 0) {
+            throw new SqlBeanException("当前页不能小于0");
+        }
+        //每页数量不能小于0
+        if (select.getPage().getPagesize() < 0) {
+            throw new SqlBeanException("每页数量不能小于0");
+        }
         Integer[] param;
         //SQLServer2008
         if (DbType.SQLServer == select.getSqlBeanDB().getDbType()) {
@@ -1226,14 +1234,14 @@ public class SqlHelper {
             //startIndex = (当前页 * 每页显示的数量)，例如：(0 * 10)
             //endIndex = (当前页 * 每页显示的数量) + 每页显示的数量，例如：10 = (0 * 10) + 10
             //那么如果startIndex=0，endIndex=10，就是查询第0到10条数据
-            int pagenum = select.getPage().getStartByZero() ? select.getPage().getPagenum() : select.getPage().getPagenum() - 1;
+            int pagenum = select.getPage().getStartByZero() ? select.getPage().getPagenum() : select.getPage().getPagenum() > 0 ? select.getPage().getPagenum() - 1 : select.getPage().getPagenum();
             int startIndex = pagenum * select.getPage().getPagesize();
             int endIndex = (pagenum * select.getPage().getPagesize()) + select.getPage().getPagesize();
             param = new Integer[]{startIndex, endIndex};
         }
         //Mysql,MariaDB,PostgreSQL,Sqlite,Hsql
         else {
-            int pagenum = select.getPage().getStartByZero() ? select.getPage().getPagenum() : select.getPage().getPagenum() - 1;
+            int pagenum = select.getPage().getStartByZero() ? select.getPage().getPagenum() : select.getPage().getPagenum() > 0 ? select.getPage().getPagenum() - 1 : select.getPage().getPagenum();
             int limitOffset = pagenum * select.getPage().getPagesize();
             int limitAmount = select.getPage().getPagesize();
             param = new Integer[]{limitOffset, limitAmount};

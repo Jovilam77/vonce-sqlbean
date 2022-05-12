@@ -29,7 +29,7 @@ public class PageHelper<T> {
     public static final String COUNT = "count";
 
     public PageHelper() {
-
+        this(1, 10);
     }
 
     /**
@@ -99,7 +99,7 @@ public class PageHelper<T> {
      */
     public void init(Integer pagenum, Integer pagesize, boolean startByZero, Order[] orders, String timestamp) {
         if (this.pagenum == null) {
-            this.pagenum = pagenum == null ? 0 : pagenum;
+            this.pagenum = pagenum == null ? (startByZero ? 1 : 0) : pagenum;
         }
         if (this.pagesize == null) {
             this.pagesize = pagesize == null ? 10 : pagesize;
@@ -352,8 +352,8 @@ public class PageHelper<T> {
      *
      * @return
      */
-    public ResultData<List<T>> getResultData() {
-        ResultData<List<T>> resultData = new ResultData();
+    public ResultData<T> getResultData() {
+        ResultData<T> resultData = new ResultData();
         resultData.setData(this.getDataList());
         resultData.setPagenum(this.getPagenum());
         resultData.setPagesize(this.getPagesize());
