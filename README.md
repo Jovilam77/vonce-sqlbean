@@ -14,7 +14,7 @@
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
-		<version>1.5.4</version>
+		<version>1.5.5</version>
 	</dependency>
 ###### 2.标注实体类
 ```java
@@ -71,8 +71,8 @@ public class EssayController {
         //复杂查询
         Select select = new Select();
         select.column(Essay$.id).column(Essay$.content);
-        select.where().gt("id", 1).and().eq("content", "222");
-        select.orderBy("id", SqlSort.DESC);
+        select.where().gt(Essay$.id, 1).and().eq(Essay$.content, "222");
+        select.orderBy(Essay$.id, SqlSort.DESC);
         list = essayService.select(select);
 
         //用于查询Map
@@ -112,7 +112,6 @@ public class EssayController {
         long i = essayService.deleteById(id);
         //根据条件删除
         //i = essayService.deleteByCondition(Wrapper.where(gt(Essay$.id, 1)).and(eq(Essay$.content, "222")));
-
         if (i > 0) {
             return super.successHint("删除成功");
         }
