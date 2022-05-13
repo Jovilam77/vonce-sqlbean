@@ -18,6 +18,10 @@ public class Common implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * 实体类class
+     */
+    private Class<?> beanClass;
+    /**
      * 数据库相关配置
      */
     private SqlBeanDB sqlBeanDB = null;
@@ -25,6 +29,14 @@ public class Common implements Serializable {
      * 表信息
      */
     private Table table = new Table();
+
+    public Class<?> getBeanClass() {
+        return beanClass;
+    }
+
+    public void setBeanClass(Class<?> beanClass) {
+        this.beanClass = beanClass;
+    }
 
     public SqlBeanDB getSqlBeanDB() {
         return sqlBeanDB;

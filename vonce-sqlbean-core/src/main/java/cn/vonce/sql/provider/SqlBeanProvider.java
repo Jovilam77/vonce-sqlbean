@@ -179,6 +179,7 @@ public class SqlBeanProvider {
         Delete delete = new Delete();
         delete.setSqlBeanDB(sqlBeanDB);
         delete.setTable(clazz);
+        delete.setBeanClass(clazz);
         setSchema(delete, clazz);
         Field idField;
         try {
@@ -224,8 +225,10 @@ public class SqlBeanProvider {
         if (delete.getTable().isNotSet()) {
             delete.setTable(clazz);
         }
+        if (delete.getBeanClass() == null) {
+            delete.setBeanClass(clazz);
+        }
         setSchema(delete, clazz);
-        //delete.getWhereMap().isEmpty()
         if (ignore || (!delete.where().getDataList().isEmpty() || StringUtil.isNotEmpty(delete.getWhere()) || !delete.getWhereWrapper().getDataList().isEmpty())) {
             return SqlHelper.buildDeleteSql(delete);
         } else {
@@ -325,8 +328,10 @@ public class SqlBeanProvider {
         if (update.getTable().isNotSet()) {
             update.setTable(clazz);
         }
+        if (update.getBeanClass() == null) {
+            update.setBeanClass(clazz);
+        }
         setSchema(update, clazz);
-        //update.getWhereMap().isEmpty()
         if (ignore || (!update.where().getDataList().isEmpty() || StringUtil.isNotEmpty(update.getWhere()) || !update.getWhereWrapper().getDataList().isEmpty())) {
             return SqlHelper.buildUpdateSql(update);
         } else {
@@ -457,6 +462,7 @@ public class SqlBeanProvider {
         Insert insert = new Insert();
         insert.setSqlBeanDB(sqlBeanDB);
         insert.setTable(clazz);
+        insert.setBeanClass(clazz);
         insert.setInsertBean(SqlBeanUtil.getObjectArray(bean));
         setSchema(insert, clazz);
         return SqlHelper.buildInsertSql(insert);
@@ -476,6 +482,9 @@ public class SqlBeanProvider {
         }
         if (insert.getTable().isNotSet()) {
             insert.setTable(clazz);
+        }
+        if (insert.getBeanClass() == null) {
+            insert.setBeanClass(clazz);
         }
         setSchema(insert, clazz);
         return SqlHelper.buildInsertSql(insert);
@@ -699,6 +708,7 @@ public class SqlBeanProvider {
         Select select = new Select();
         select.setSqlBeanDB(sqlBeanDB);
         select.setTable(clazz);
+        select.setBeanClass(clazz);
         try {
             if (isCount) {
                 select.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
@@ -729,6 +739,9 @@ public class SqlBeanProvider {
             if (StringUtil.isEmpty(select.getTable().getAlias())) {
                 select.getTable().setAlias(table.getAlias());
             }
+        }
+        if (select.getBeanClass() == null) {
+            select.setBeanClass(clazz);
         }
         setSchema(select, clazz);
         try {
@@ -782,6 +795,7 @@ public class SqlBeanProvider {
         Update update = new Update();
         update.setSqlBeanDB(sqlBeanDB);
         update.setTable(clazz);
+        update.setBeanClass(clazz);
         update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
         update.setOptimisticLock(optimisticLock);

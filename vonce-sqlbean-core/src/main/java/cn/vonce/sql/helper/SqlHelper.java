@@ -816,8 +816,13 @@ public class SqlHelper {
         StringBuffer conditionSql = new StringBuffer();
         // 优先级1 使用条件字符串拼接
         if (conditionString != null && !"".equals(conditionString)) {
-            conditionSql.append(ConditionType.WHERE == conditionType ? SqlConstant.WHERE : SqlConstant.HAVING);
-            conditionSql.append(versionCondition(common, bean));
+            if (ConditionType.WHERE == conditionType) {
+                conditionSql.append(SqlConstant.WHERE);
+                conditionSql.append(versionCondition(common, bean));
+                conditionSql.append(logicallyDeleteCondition(common));
+            } else {
+                conditionSql.append(SqlConstant.HAVING);
+            }
             conditionSql.append(SqlConstant.BEGIN_BRACKET);
             if (args != null && args.length > 0) {
                 conditionSql.append(SqlBeanUtil.getCondition(common, conditionString, args));
@@ -830,13 +835,21 @@ public class SqlHelper {
         }
         // 优先级2 使用条件包装器
         else if (wrapper != null && !wrapper.getDataList().isEmpty()) {
-            conditionSql.append(ConditionType.WHERE == conditionType ? SqlConstant.WHERE : SqlConstant.HAVING);
-            conditionSql.append(versionCondition(common, bean));
+            if (ConditionType.WHERE == conditionType) {
+                conditionSql.append(SqlConstant.WHERE);
+                conditionSql.append(versionCondition(common, bean));
+                conditionSql.append(logicallyDeleteCondition(common));
+            } else {
+                conditionSql.append(SqlConstant.HAVING);
+            }
             conditionSql.append(conditionWrapperHandle(common, wrapper));
         }
         // 优先级3 使用简单的条件
         else if (condition != null && condition.getDataList().size() > 0) {
-            conditionSql.append(versionCondition(common, bean));
+            if (ConditionType.WHERE == conditionType) {
+                conditionSql.append(versionCondition(common, bean));
+                conditionSql.append(logicallyDeleteCondition(common));
+            }
             conditionSql.append(SqlConstant.BEGIN_BRACKET);
             // 遍历所有条件
             List<ConditionData> conditionDataList = condition.getDataList();
@@ -858,7 +871,10 @@ public class SqlHelper {
         }
         //优先级4 过时，未来版本将会移除
         else {
-            conditionSql.append(versionCondition(common, bean));
+            if (ConditionType.WHERE == conditionType) {
+                conditionSql.append(versionCondition(common, bean));
+                conditionSql.append(logicallyDeleteCondition(common));
+            }
             if (conditionMap.size() > 0) {
                 conditionSql.append(SqlConstant.BEGIN_BRACKET);
                 int i = 0;
@@ -916,6 +932,30 @@ public class SqlHelper {
             }
         }
         return versionConditionSql.toString();
+    }
+
+    /**
+     * 逻辑删除处理（Select）
+     *
+     * @param common
+     * @return
+     */
+    private static String logicallyDeleteCondition(Common common) {
+        if (common instanceof Select) {
+            StringBuffer logicallyDeleteSql = new StringBuffer();
+            SqlTable sqlTable = SqlBeanUtil.getSqlTable(common.getBeanClass());
+            Field logicallyDeleteField = SqlBeanUtil.getLogicallyField(common.getBeanClass());
+            if (logicallyDeleteField != null) {
+                logicallyDeleteSql.append(SqlConstant.BEGIN_BRACKET);
+                logicallyDeleteSql.append(SqlBeanUtil.getTableFieldFullName(common, common.getTable().getAlias(), SqlBeanUtil.getTableFieldName(logicallyDeleteField, sqlTable.mapUsToCc())));
+                logicallyDeleteSql.append(SqlConstant.EQUAL_TO);
+                logicallyDeleteSql.append(0);
+                logicallyDeleteSql.append(SqlConstant.END_BRACKET);
+                logicallyDeleteSql.append(SqlConstant.AND);
+            }
+            return logicallyDeleteSql.toString();
+        }
+        return "";
     }
 
     /**
