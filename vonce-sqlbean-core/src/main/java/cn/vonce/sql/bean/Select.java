@@ -350,33 +350,48 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * 添加列字段排序
      *
      * @param columNname 列字段名
-     * @param sqlSort    排序方式
      */
-    public Select orderBy(String columNname, SqlSort sqlSort) {
-        return orderBy("", columNname, sqlSort);
+    public Select orderByAsc(String columNname) {
+        return orderBy("", columNname, SqlSort.ASC);
     }
 
     /**
      * 添加列字段排序
      *
-     * @param column  列字段信息
-     * @param sqlSort 排序方式
-     * @return
+     * @param columNname 列字段名
      */
-    public Select orderBy(Column column, SqlSort sqlSort) {
-        return orderBy(column.getTableAlias(), column.getName(), sqlSort);
+    public Select orderByDesc(String columNname) {
+        return orderBy("", columNname, SqlSort.DESC);
+    }
+
+    /**
+     * 添加列字段排序
+     *
+     * @param column 列字段名
+     */
+    public Select orderByAsc(Column column) {
+        return orderBy(column.getTableAlias(), column.getName(), SqlSort.ASC);
+    }
+
+    /**
+     * 添加列字段排序
+     *
+     * @param column 列字段名
+     */
+    public Select orderByDesc(Column column) {
+        return orderBy(column.getTableAlias(), column.getName(), SqlSort.DESC);
     }
 
     /**
      * 添加列字段排序
      *
      * @param tableAlias 表别名
-     * @param columNname 列字段名
+     * @param columName 列字段名
      * @param sqlSort    排序方式
      * @return
      */
-    public Select orderBy(String tableAlias, String columNname, SqlSort sqlSort) {
-        orderByList.add(new Order(tableAlias, columNname, sqlSort));
+    public Select orderBy(String tableAlias, String columName, SqlSort sqlSort) {
+        orderByList.add(new Order(tableAlias, columName, sqlSort));
         return this;
     }
 
@@ -466,6 +481,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
 
     /**
      * 简单的having
+     *
      * @return
      */
     public Condition<Select> having() {

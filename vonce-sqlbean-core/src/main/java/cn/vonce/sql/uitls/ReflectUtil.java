@@ -20,7 +20,7 @@ public abstract class ReflectUtil {
 
     public abstract Object invoke(Class<?> clazz, Object instance, String name);
 
-    public abstract void invoke(Class<?> clazz, Object instance, String name, Object value);
+    public abstract Object invoke(Class<?> clazz, Object instance, String name, Object value);
 
     public abstract Object invoke(Class<?> clazz, Object instance, String name, Class<?>[] parameterTypes, Object[] values);
 

@@ -627,8 +627,13 @@ public class SqlHelper {
                     }
                     valueSql.append(SqlBeanUtil.getSqlValue(common, value));
                 } else if (field.isAnnotationPresent(SqlInsertTime.class) && SqlBeanUtil.whatType(field.getType().getName()) == WhatType.DATE_TYPE && value == null) {
+                    //如果标识插入时间的字段为空则自动填充
                     valueSql.append(SqlBeanUtil.getSqlValue(common, date));
                     ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), date);
+                } else if (field.isAnnotationPresent(SqlLogically.class) && value == null) {
+                    //如果标识逻辑删除的字段为空则自动填充
+                    valueSql.append(0);
+                    ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), field.getType() == Boolean.class || field.getType() == boolean.class ? false : 0);
                 } else {
                     valueSql.append(SqlBeanUtil.getSqlValue(common, ReflectUtil.instance().get(objectList.get(i).getClass(), objectList.get(i), field.getName())));
                 }
@@ -909,7 +914,7 @@ public class SqlHelper {
      * @return
      */
     private static String versionCondition(Common common, Object bean) {
-        if (!(common instanceof Update) || (common instanceof Update && ((Update) common).isLogicallyDelete()) || common instanceof Update && !((Update) common).isOptimisticLock()) {
+        if (!(common instanceof Update) || !((Update) common).isOptimisticLock()) {
             return "";
         }
         StringBuffer versionConditionSql = new StringBuffer();

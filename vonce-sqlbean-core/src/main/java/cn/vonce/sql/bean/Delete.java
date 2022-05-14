@@ -12,9 +12,32 @@ import java.io.Serializable;
  */
 public class Delete extends CommonCondition<Delete> implements Serializable {
 
+    /**
+     * 是否为逻辑删除
+     */
+    private boolean logicallyDelete = false;
+
     public Delete() {
         super();
         super.setReturnObj(this);
+    }
+
+    /**
+     * 获取是否为逻辑删除
+     *
+     * @return
+     */
+    public boolean isLogicallyDelete() {
+        return logicallyDelete;
+    }
+
+    /**
+     * 设置是否为逻辑删除
+     *
+     * @param logicallyDelete
+     */
+    public void setLogicallyDelete(boolean logicallyDelete) {
+        this.logicallyDelete = logicallyDelete;
     }
 
 }

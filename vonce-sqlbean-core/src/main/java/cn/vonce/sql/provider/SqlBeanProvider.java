@@ -168,6 +168,10 @@ public class SqlBeanProvider {
      * @return
      */
     public static String deleteByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object id) {
+        //如果是逻辑删除那么将Delete对象转为Update对象
+        if (SqlBeanUtil.checkLogically(clazz)) {
+            return logicallyDeleteByIdSql(sqlBeanDB, clazz, id);
+        }
         if (StringUtil.isEmpty(id)) {
             try {
                 throw new SqlBeanException("deleteByIdSql id不能为空");
@@ -202,6 +206,10 @@ public class SqlBeanProvider {
      * @return
      */
     public static String deleteByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
+        //如果是逻辑删除那么将Delete对象转为Update对象
+        if (SqlBeanUtil.checkLogically(clazz)) {
+            return logicallyDeleteByConditionSql(sqlBeanDB, clazz, where, args);
+        }
         Delete delete = new Delete();
         delete.setSqlBeanDB(sqlBeanDB);
         delete.setTable(clazz);
@@ -219,6 +227,17 @@ public class SqlBeanProvider {
      * @return
      */
     public static String deleteSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Delete delete, boolean ignore) {
+        //如果是逻辑删除那么将Delete对象转为Update对象
+        if (delete.isLogicallyDelete()) {
+            Update update = new Update();
+            update.setSqlBeanDB(sqlBeanDB);
+            update.setTable(clazz);
+            update.setUpdateBean(newLogicallyDeleteBean(clazz));
+            update.setWhere(delete.getWhereWrapper());
+            update.setWhere(delete.getWhere(), delete.getAgrs());
+            update.where().setDataList(delete.where().getDataList());
+            return updateSql(sqlBeanDB, clazz, update, ignore);
+        }
         if (delete.getSqlBeanDB() == null) {
             delete.setSqlBeanDB(sqlBeanDB);
         }
@@ -250,13 +269,11 @@ public class SqlBeanProvider {
      */
     public static String logicallyDeleteByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object id) {
         Update update = new Update();
-        Object bean;
         try {
-            bean = newLogicallyDeleteBean(clazz);
             update.setSqlBeanDB(sqlBeanDB);
             update.setTable(clazz);
-            update.setUpdateBean(bean);
-            Field idField = SqlBeanUtil.getIdField(bean.getClass());
+            update.setUpdateBean(newLogicallyDeleteBean(clazz));
+            Field idField = SqlBeanUtil.getIdField(clazz);
             SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
             update.where().in(SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc()), id);
             setSchema(update, clazz);

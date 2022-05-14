@@ -95,8 +95,7 @@ public class ReflectJdkUtil extends ReflectUtil {
         return null;
     }
 
-    @Override
-    public void invoke(Class<?> clazz, Object instance, String name, Object value) {
+    public Object invoke(Class<?> clazz, Object instance, String name, Object value) {
         try {
             String methodFullName = clazz.getName() + "." + name;
             Method method = methodMap.get(methodFullName);
@@ -104,12 +103,13 @@ public class ReflectJdkUtil extends ReflectUtil {
                 method = getMethod(clazz.getMethods(), name, 1);
                 methodMap.put(methodFullName, method);
             }
-            method.invoke(instance, value);
+            return method.invoke(instance, value);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     @Override

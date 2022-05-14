@@ -33,10 +33,6 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      * 是否使用乐观锁
      */
     private boolean optimisticLock = false;
-    /**
-     * 是否为逻辑删除
-     */
-    private boolean logicallyDelete = false;
 
     /**
      * 是否只更新不为null的字段
@@ -108,14 +104,6 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      */
     public void setFilterFields(String... filterField) {
         this.filterFields = filterField;
-    }
-
-    public boolean isLogicallyDelete() {
-        return logicallyDelete;
-    }
-
-    public void setLogicallyDelete(boolean logicallyDelete) {
-        this.logicallyDelete = logicallyDelete;
     }
 
 }

@@ -194,6 +194,23 @@ public class SqlBeanUtil {
     }
 
     /**
+     * 是否使用逻辑删除
+     *
+     * @param clazz
+     * @return
+     */
+    public static boolean checkLogically(Class<?> clazz) {
+        List<Field> fieldList = getBeanAllField(clazz);
+        for (Field field : fieldList) {
+            SqlLogically sqlLogically = field.getAnnotation(SqlLogically.class);
+            if (sqlLogically != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * 获取乐观锁标识字段
      *
      * @param clazz

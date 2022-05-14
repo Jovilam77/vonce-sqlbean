@@ -2,6 +2,7 @@ package cn.vonce.sql.bean;
 
 import cn.vonce.sql.enumerate.SqlLogic;
 import cn.vonce.sql.enumerate.SqlOperator;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ public class Condition<Action> implements Serializable {
     private Logic<Action> logic = new Logic(this);
     private List<ConditionData> dataList = new ArrayList<>();
 
-    protected Condition(Action action){
+    protected Condition(Action action) {
         this.action = action;
     }
 
@@ -44,6 +45,15 @@ public class Condition<Action> implements Serializable {
      */
     public List<ConditionData> getDataList() {
         return this.dataList;
+    }
+
+    /**
+     * 设置条件模型列表
+     *
+     * @param dataList
+     */
+    public void setDataList(List<ConditionData> dataList) {
+        this.dataList = dataList;
     }
 
     /**

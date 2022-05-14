@@ -66,13 +66,13 @@ public class ReflectAsmUtil extends ReflectUtil {
     }
 
     @Override
-    public void invoke(Class<?> clazz, Object instance, String name, Object value) {
+    public Object invoke(Class<?> clazz, Object instance, String name, Object value) {
         MethodAccess methodAccess = methodAccessMap.get(clazz);
         if (methodAccess == null) {
             methodAccess = MethodAccess.get(clazz);
             methodAccessMap.put(clazz, methodAccess);
         }
-        methodAccess.invoke(instance, name, value);
+        return methodAccess.invoke(instance, name, value);
     }
 
     @Override
