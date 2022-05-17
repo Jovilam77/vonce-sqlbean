@@ -825,7 +825,9 @@ public class SqlHelper {
         }
         // 优先级1 使用条件字符串拼接
         if (conditionString != null && !"".equals(conditionString)) {
-            conditionSql.append(SqlConstant.AND);
+            if (conditionSql.length() > 0) {
+                conditionSql.append(SqlConstant.AND);
+            }
             conditionSql.append(SqlConstant.BEGIN_BRACKET);
             if (args != null && args.length > 0) {
                 conditionSql.append(SqlBeanUtil.getCondition(common, conditionString, args));
@@ -838,12 +840,16 @@ public class SqlHelper {
         }
         // 优先级2 使用条件包装器
         else if (wrapper != null && !wrapper.getDataList().isEmpty()) {
-            conditionSql.append(SqlConstant.AND);
+            if (conditionSql.length() > 0) {
+                conditionSql.append(SqlConstant.AND);
+            }
             conditionSql.append(conditionWrapperHandle(common, wrapper));
         }
         // 优先级3 使用简单的条件
         else if (condition != null && condition.getDataList().size() > 0) {
-            conditionSql.append(SqlConstant.AND);
+            if (conditionSql.length() > 0) {
+                conditionSql.append(SqlConstant.AND);
+            }
             conditionSql.append(SqlConstant.BEGIN_BRACKET);
             // 遍历所有条件
             List<ConditionData> conditionDataList = condition.getDataList();
@@ -862,7 +868,9 @@ public class SqlHelper {
         }
         //优先级4 过时，未来版本将会移除
         else if (conditionMap.size() > 0) {
-            conditionSql.append(SqlConstant.AND);
+            if (conditionSql.length() > 0) {
+                conditionSql.append(SqlConstant.AND);
+            }
             conditionSql.append(SqlConstant.BEGIN_BRACKET);
             int i = 0;
             // 遍历所有条件
