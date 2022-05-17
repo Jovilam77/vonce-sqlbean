@@ -74,7 +74,7 @@ public class SqlConstantProcessor extends AbstractProcessor {
                     String schema = "";
                     String tableName = element.getSimpleName().toString();
                     String tableAlias = "";
-                    String className =  tableName + PREFIX;
+                    String className = tableName + PREFIX;
                     if (sqlTable != null) {
                         schema = sqlTable.schema();
                         tableName = sqlTable.value();
@@ -98,6 +98,10 @@ public class SqlConstantProcessor extends AbstractProcessor {
                         for (Element subElement : subElementList) {
                             String sqlFieldName = subElement.getSimpleName().toString();
                             SqlColumn sqlColumn = subElement.getAnnotation(SqlColumn.class);
+                            //不存在数据库的字段跳过
+                            if (sqlColumn != null && sqlColumn.ignore()) {
+                                continue;
+                            }
                             if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.value())) {
                                 sqlFieldName = sqlColumn.value();
                             } else {
