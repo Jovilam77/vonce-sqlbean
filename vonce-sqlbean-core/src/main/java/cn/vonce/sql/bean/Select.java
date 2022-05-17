@@ -385,8 +385,20 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加列字段排序
      *
-     * @param tableAlias 表别名
      * @param columName 列字段名
+     * @param sqlSort   排序方式
+     * @return
+     */
+    public Select orderBy(String columName, SqlSort sqlSort) {
+        orderByList.add(new Order("", columName, sqlSort));
+        return this;
+    }
+
+    /**
+     * 添加列字段排序
+     *
+     * @param tableAlias 表别名
+     * @param columName  列字段名
      * @param sqlSort    排序方式
      * @return
      */
