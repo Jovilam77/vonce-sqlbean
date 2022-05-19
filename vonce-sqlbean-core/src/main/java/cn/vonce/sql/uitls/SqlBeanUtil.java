@@ -290,7 +290,6 @@ public class SqlBeanUtil {
      */
     public static List<Field> getBeanAllField(Class<?> clazz) {
         List<Field> fieldList = new ArrayList<>();
-        fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
         Class<?> superClass = clazz.getSuperclass();
         do {
             if (!superClass.getName().equals("java.lang.Object")) {
@@ -301,6 +300,7 @@ public class SqlBeanUtil {
                 break;
             }
         } while (!superClass.getName().equals("java.lang.Object"));
+        fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
         return fieldList;
     }
 
