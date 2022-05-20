@@ -142,6 +142,38 @@ public class SqlBeanUtil {
     }
 
     /**
+     * 获得新的表字段名
+     *
+     * @param common
+     * @param tableAlias
+     * @param tableFieldName
+     * @return
+     */
+    public static String getTableFieldFullName(Common common, String tableAlias, String tableFieldName) {
+        String transferred = getTransferred(common);
+        StringBuffer fullName = new StringBuffer();
+        fullName.append(transferred);
+        fullName.append(tableAlias);
+        fullName.append(transferred);
+        fullName.append(SqlConstant.POINT);
+        fullName.append(tableFieldName);
+        return fullName.toString();
+    }
+
+    /**
+     * 获得新的表字段名
+     *
+     * @param common
+     * @param tableAlias
+     * @param field
+     * @param mapUsToCc
+     * @return
+     */
+    public static String getTableFieldFullName(Common common, String tableAlias, Field field, boolean mapUsToCc) {
+        return getTableFieldFullName(common, tableAlias, getTableFieldName(field, mapUsToCc));
+    }
+
+    /**
      * 获取id标识字段
      *
      * @param clazz
@@ -474,25 +506,6 @@ public class SqlBeanUtil {
      */
     public static String getColumnAlias(String tableAlias, String fieldName) {
         return tableAlias + SqlConstant.UNDERLINE + fieldName;
-    }
-
-    /**
-     * 获得新的表字段名
-     *
-     * @param common
-     * @param tableAlias
-     * @param tableFieldName
-     * @return
-     */
-    public static String getTableFieldFullName(Common common, String tableAlias, String tableFieldName) {
-        String transferred = getTransferred(common);
-        StringBuffer fullName = new StringBuffer();
-        fullName.append(transferred);
-        fullName.append(tableAlias);
-        fullName.append(transferred);
-        fullName.append(SqlConstant.POINT);
-        fullName.append(tableFieldName);
-        return fullName.toString();
     }
 
     /**

@@ -104,6 +104,7 @@ public class Common implements Serializable {
      */
     public void setTable(Class<?> clazz) {
         this.table = SqlBeanUtil.getTable(clazz);
+        this.beanClass = clazz;
     }
 
 }

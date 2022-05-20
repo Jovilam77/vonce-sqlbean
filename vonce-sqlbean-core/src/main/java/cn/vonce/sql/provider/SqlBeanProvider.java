@@ -56,9 +56,9 @@ public class SqlBeanProvider {
         }
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
         if (ids.length > 1) {
-            select.where().in(SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc()), ids);
+            select.where().in(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), idField, sqlTable.mapUsToCc()), ids);
         } else {
-            select.where().eq(SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc()), ids[0]);
+            select.where().eq(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), idField, sqlTable.mapUsToCc()), ids[0]);
         }
         return SqlHelper.buildSelectSql(select);
     }
@@ -122,7 +122,7 @@ public class SqlBeanProvider {
                 SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
                 select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
                 if (select.getPage() != null && select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
-                    select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz), sqlTable.mapUsToCc()));
+                    select.getPage().setIdName(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), SqlBeanUtil.getIdField(clazz), sqlTable.mapUsToCc()));
                 }
             } catch (SqlBeanException e) {
                 e.printStackTrace();
@@ -832,7 +832,7 @@ public class SqlBeanProvider {
             if (select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
                 try {
                     SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-                    select.setPage(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz), sqlTable.mapUsToCc()), paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
+                    select.setPage(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), SqlBeanUtil.getIdField(clazz), sqlTable.mapUsToCc()), paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
                 } catch (SqlBeanException e) {
                     e.printStackTrace();
                 }
