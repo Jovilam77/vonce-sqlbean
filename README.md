@@ -18,8 +18,6 @@
 	</dependency>
 ###### 2.标注实体类
 ```java
-//标识表名
-//标识表名
 @SqlTable("d_essay")
 public class Essay {
     @SqlId(type = IdType.SNOWFLAKE_ID_16)
@@ -27,12 +25,11 @@ public class Essay {
     private String userId;
     private String content;
     private Date creationTime;
-    @SqlVersion
     private Date updateTime;
     /**省略get set方法*/
 }
 ```
-###### 3.无需Dao层，Service层接口只需继承SqlBeanService<实体类, ID>
+###### 3.无需Dao层，Service层接口只需继承SqlBeanService<实体类, id类型>
 
 ```java
 public interface EssayService extends SqlBeanService<Essay, Long> {
@@ -40,7 +37,7 @@ public interface EssayService extends SqlBeanService<Essay, Long> {
 
 }
 ```
-###### 4.Service实现类只需继承MybatisSqlBeanServiceImpl<实体类, ID>和实现你的Service接口
+###### 4.Service实现类只需继承MybatisSqlBeanServiceImpl<实体类, id类型>和实现你的Service接口
 ```java
 //使用Spring Jdbc的话将继承的父类改成SpringJdbcSqlBeanServiceImpl即可
 @Service
@@ -72,7 +69,7 @@ public class EssayController {
         Select select = new Select();
         select.column(Essay$.id).column(Essay$.content);
         select.where().gt(Essay$.id, 1).and().eq(Essay$.content, "222");
-        select.orderBy(Essay$.id, SqlSort.DESC);
+        select.orderByDesc(Essay$.creation_time);
         list = essayService.select(select);
 
         //用于查询Map
