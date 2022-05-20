@@ -154,7 +154,7 @@ public class StringUtil {
         int temp = 0;
         if (!para.contains(UNDERLINE)) {
             for (int i = 0; i < para.length(); i++) {
-                if (Character.isUpperCase(para.charAt(i)) && (i - 1 > 0 ? Character.isLowerCase(para.charAt(i - 1)) : false)) {
+                if (Character.isUpperCase(para.charAt(i)) && (i - 1 >= 0 ? Character.isLowerCase(para.charAt(i - 1)) : false)) {
                     sb.insert(i + temp, UNDERLINE);
                     temp += 1;
                 }
