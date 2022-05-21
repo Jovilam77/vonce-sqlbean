@@ -375,8 +375,8 @@ public class SqlBeanUtil {
                 Class<?> subBeanClazz = field.getType();
                 SqlTable subSqlTable = getSqlTable(subBeanClazz);
                 //如果有指定查询的字段
-                if (sqlJoinIsNotEmpty(sqlJoin) && sqlJoin.value().length > 0 && !sqlJoin.value()[0].equals("")) {
-                    List<Field> subBeanFieldList = getBeanAllField(subBeanClazz);
+                List<Field> subBeanFieldList = getBeanAllField(subBeanClazz);
+                if (sqlJoin.value().length > 0 && !sqlJoin.value()[0].equals("")) {
                     for (String fieldName : sqlJoin.value()) {
                         Field javaField = getFieldByTableFieldName(subBeanFieldList, fieldName);
                         if (javaField == null) {
@@ -384,12 +384,11 @@ public class SqlBeanUtil {
                         }
                         //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
                         Table subTable = getTable(subBeanClazz, sqlJoin);
-                        columnSet.add(new Column(sqlJoin.table(), fieldName, getColumnAlias(subTable.getAlias(), javaField.getName())));
+                        columnSet.add(new Column(subTable.getAlias(), fieldName, getColumnAlias(subTable.getAlias(), javaField.getName())));
                     }
                 }
                 //没有指定查询的字段则查询所有字段
                 else {
-                    List<Field> subBeanFieldList = getBeanAllField(subBeanClazz);
                     //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
                     Table subTable = getTable(subBeanClazz, sqlJoin);
                     for (Field subBeanField : subBeanFieldList) {
