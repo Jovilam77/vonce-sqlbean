@@ -25,9 +25,6 @@ public class SqlBeanUtil {
      * @return
      */
     public static SqlTable getSqlTable(Class<?> clazz) {
-        if (clazz == null) {
-            return null;
-        }
         SqlTable sqlTable = clazz.getAnnotation(SqlTable.class);
         if (sqlTable == null) {
             Class<?> superClass = clazz.getSuperclass();
@@ -44,9 +41,6 @@ public class SqlBeanUtil {
                 }
             } while (!superClass.getName().equals("java.lang.Object"));
         }
-        if (sqlTable == null) {
-            new SqlBeanException("请在实体类中标注@SqlTable指定表名");
-        }
         return sqlTable;
     }
 
@@ -58,22 +52,15 @@ public class SqlBeanUtil {
      */
     public static Table getTable(Class<?> clazz) {
         SqlTable sqlTable = getSqlTable(clazz);
-        String className = "";
-        String schema = "";
-        String tableName = "";
-        String tableAlias = "";
         if (sqlTable != null) {
-            schema = sqlTable.schema();
-            tableName = sqlTable.value();
-            tableAlias = sqlTable.alias();
-        } else {
-            tableName = className;
-            tableAlias = tableName;
+            return new Table(sqlTable.schema(), sqlTable.value(), sqlTable.alias());
         }
+        String tableName = clazz.getSimpleName();
+        String tableAlias = tableName;
         if (StringUtil.isEmpty(tableAlias)) {
             tableAlias = tableName;
         }
-        return new Table(schema, tableName, tableAlias);
+        return new Table("", tableName, tableAlias);
     }
 
     /**
@@ -443,6 +430,9 @@ public class SqlBeanUtil {
      */
     public static Map<String, Join> getJoin(Class<?> clazz) throws SqlBeanException {
         SqlTable sqlTable = getSqlTable(clazz);
+        if (sqlTable == null) {
+            throw new SqlBeanException("请在实体类中标识@SqlTable注解或继承标识过的实体类'" + clazz.getName() + "'");
+        }
         List<Field> fieldList = getBeanAllField(clazz);
         Map<String, Join> joinFieldMap = new HashMap<>();
         for (Field field : fieldList) {
@@ -537,7 +527,7 @@ public class SqlBeanUtil {
                 }
                 if (objects != null) {
                     for (int i = 0; i < objects.length; i++) {
-                        value.append(getSqlValue(common, objects[i]));
+                        value.append(getOriginal(common, objects[i]));
                         value.append(SqlConstant.COMMA);
                     }
                     value.delete(value.length() - SqlConstant.COMMA.length(), value.length());
@@ -545,7 +535,7 @@ public class SqlBeanUtil {
                 conditionSql.append(value);
                 index++;
             } else if ('&' == c) {
-                conditionSql.append(getOriginal(common, args[index]));
+                conditionSql.append(getColumn(common, args[index]));
                 index++;
             } else {
                 conditionSql.append(c);
@@ -555,17 +545,17 @@ public class SqlBeanUtil {
     }
 
     /**
-     * 获取实际类型值
+     * 获取列
      *
      * @param common
-     * @param object
+     * @param columnObject
      * @return
      */
-    public static String getOriginal(Common common, Object object) {
+    public static String getColumn(Common common, Object columnObject) {
         StringBuffer value = new StringBuffer();
         Column column = null;
-        if (object instanceof Column) {
-            column = (Column) object;
+        if (columnObject instanceof Column) {
+            column = (Column) columnObject;
         }
         if (column != null) {
             String transferred = getTransferred(common);
@@ -577,9 +567,24 @@ public class SqlBeanUtil {
             }
             value.append(column.getName());
         } else {
-            value.append(object);
+            value.append(columnObject);
         }
         return value.toString();
+    }
+
+    /**
+     * 获取实际类型值
+     *
+     * @param common
+     * @param object
+     * @return
+     */
+    public static Object getOriginal(Common common, Object object) {
+        if (object instanceof Original) {
+            Original original = (Original) object;
+            return original.getValue();
+        }
+        return getSqlValue(common, object);
     }
 
     /**

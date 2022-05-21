@@ -934,7 +934,7 @@ public class SqlHelper {
      * @return
      */
     private static String logicallyDeleteCondition(Common common) {
-        if (common instanceof Select) {
+        if (common instanceof Select && SqlBeanUtil.checkLogically(common.getBeanClass())) {
             StringBuffer logicallyDeleteSql = new StringBuffer();
             SqlTable sqlTable = SqlBeanUtil.getSqlTable(common.getBeanClass());
             Field logicallyDeleteField = SqlBeanUtil.getLogicallyField(common.getBeanClass());
@@ -1087,7 +1087,7 @@ public class SqlHelper {
             if (in_notInValues != null && in_notInValues.length > 0) {
                 for (int k = 0; k < in_notInValues.length; k++) {
                     if (in_notInValues[k] instanceof Original) {
-                        in_notIn.append(SqlBeanUtil.getOriginal(common, ((Original) in_notInValues[k]).getValue()));
+                        in_notIn.append(((Original) in_notInValues[k]).getValue());
                     } else {
                         in_notIn.append(SqlBeanUtil.getSqlValue(common, in_notInValues[k]));
                     }
