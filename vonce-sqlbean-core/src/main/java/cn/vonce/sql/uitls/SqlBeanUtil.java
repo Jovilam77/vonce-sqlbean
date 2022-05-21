@@ -53,7 +53,7 @@ public class SqlBeanUtil {
     public static Table getTable(Class<?> clazz) {
         SqlTable sqlTable = getSqlTable(clazz);
         if (sqlTable != null) {
-            return new Table(sqlTable.schema(), sqlTable.value(), sqlTable.alias());
+            return new Table(sqlTable.schema(), sqlTable.value(), StringUtil.isEmpty(sqlTable.alias()) ? sqlTable.value() : sqlTable.alias());
         }
         String tableName = clazz.getSimpleName();
         String tableAlias = tableName;
