@@ -334,9 +334,7 @@ public class SqlBeanUtil {
         Field thisField = null;
         for (Field field : fieldList) {
             SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
-            if (sqlColumn != null && sqlColumn.value().equals(tableFieldName)) {
-                thisField = field;
-            } else if (field.getName().equals(tableFieldName)) {
+            if (sqlColumn != null && sqlColumn.value().equals(tableFieldName) || StringUtil.humpToUnderline(field.getName()).equals(tableFieldName) || field.getName().equals(tableFieldName)) {
                 thisField = field;
             }
         }
