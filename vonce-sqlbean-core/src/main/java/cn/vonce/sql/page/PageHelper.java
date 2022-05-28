@@ -295,7 +295,7 @@ public class PageHelper<T> {
             select.getColumnList().clear();
             select.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
             //设置分页
-            sqlBeanSelect.setPage(pagenum, pagesize, startByZero);
+            sqlBeanSelect.page(pagenum, pagesize, startByZero);
             sqlBeanSelect.orderBy(orders);
             // 先统计数量
             int count;

@@ -197,26 +197,26 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Deprecated
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public T selectOneByCondition(Wrapper where) {
+    public T selectOneByCondition(Wrapper wrapper) {
         Select select = new Select();
-        select.setWhere(where);
+        select.where(wrapper);
         return mybatisSqlBeanDao.selectOne(getSqlBeanDB(), clazz, select);
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public T selectOneBy(Wrapper where) {
+    public T selectOneBy(Wrapper wrapper) {
         Select select = new Select();
-        select.setWhere(where);
+        select.where(wrapper);
         return mybatisSqlBeanDao.selectOne(getSqlBeanDB(), clazz, select);
     }
 
     @Deprecated
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public <R> R selectOneByCondition(Class<R> returnType, Wrapper where) {
+    public <R> R selectOneByCondition(Class<R> returnType, Wrapper wrapper) {
         Select select = new Select();
-        select.setWhere(where);
+        select.where(wrapper);
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
             return mybatisSqlBeanDao.selectOneO(getSqlBeanDB(), clazz, returnType, select);
         }
@@ -225,9 +225,9 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public <R> R selectOneBy(Class<R> returnType, Wrapper where) {
+    public <R> R selectOneBy(Class<R> returnType, Wrapper wrapper) {
         Select select = new Select();
-        select.setWhere(where);
+        select.where(wrapper);
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
             return mybatisSqlBeanDao.selectOneO(getSqlBeanDB(), clazz, returnType, select);
         }
@@ -256,9 +256,9 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Deprecated
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public <R> List<R> selectByCondition(Class<R> returnType, Wrapper where) {
+    public <R> List<R> selectByCondition(Class<R> returnType, Wrapper wrapper) {
         Select select = new Select();
-        select.setWhere(where);
+        select.where(wrapper);
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
             return mybatisSqlBeanDao.selectO(getSqlBeanDB(), clazz, returnType, select);
         }
@@ -267,9 +267,9 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public <R> List<R> selectBy(Class<R> returnType, Wrapper where) {
+    public <R> List<R> selectBy(Class<R> returnType, Wrapper wrapper) {
         Select select = new Select();
-        select.setWhere(where);
+        select.where(wrapper);
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
             return mybatisSqlBeanDao.selectO(getSqlBeanDB(), clazz, returnType, select);
         }
@@ -298,9 +298,9 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Deprecated
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public <R> List<R> selectByCondition(Class<R> returnType, Paging paging, Wrapper where) {
+    public <R> List<R> selectByCondition(Class<R> returnType, Paging paging, Wrapper wrapper) {
         Select select = new Select();
-        select.setWhere(where);
+        select.where(wrapper);
         select.setPage(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
@@ -311,9 +311,9 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public <R> List<R> selectBy(Class<R> returnType, Paging paging, Wrapper where) {
+    public <R> List<R> selectBy(Class<R> returnType, Paging paging, Wrapper wrapper) {
         Select select = new Select();
-        select.setWhere(where);
+        select.where(wrapper);
         select.setPage(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
@@ -338,17 +338,17 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Deprecated
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public List<T> selectByCondition(Wrapper where) {
+    public List<T> selectByCondition(Wrapper wrapper) {
         Select select = new Select();
-        select.setWhere(where);
+        select.where(wrapper);
         return mybatisSqlBeanDao.select(getSqlBeanDB(), clazz, select);
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public List<T> selectBy(Wrapper where) {
+    public List<T> selectBy(Wrapper wrapper) {
         Select select = new Select();
-        select.setWhere(where);
+        select.where(wrapper);
         return mybatisSqlBeanDao.select(getSqlBeanDB(), clazz, select);
     }
 
@@ -368,9 +368,9 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Deprecated
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public List<T> selectByCondition(Paging paging, Wrapper where) {
+    public List<T> selectByCondition(Paging paging, Wrapper wrapper) {
         Select select = new Select();
-        select.setWhere(where);
+        select.where(wrapper);
         select.setPage(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
         return mybatisSqlBeanDao.select(getSqlBeanDB(), clazz, select);
@@ -378,9 +378,9 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public List<T> selectBy(Paging paging, Wrapper where) {
+    public List<T> selectBy(Paging paging, Wrapper wrapper) {
         Select select = new Select();
-        select.setWhere(where);
+        select.where(wrapper);
         select.setPage(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
         return mybatisSqlBeanDao.select(getSqlBeanDB(), clazz, select);
@@ -402,17 +402,17 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Deprecated
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public int selectCountByCondition(Wrapper where) {
+    public int selectCountByCondition(Wrapper wrapper) {
         Select select = new Select();
-        select.setWhere(where);
+        select.where(wrapper);
         return mybatisSqlBeanDao.count(getSqlBeanDB(), clazz, select);
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public int countBy(Wrapper where) {
+    public int countBy(Wrapper wrapper) {
         Select select = new Select();
-        select.setWhere(where);
+        select.where(wrapper);
         return mybatisSqlBeanDao.count(getSqlBeanDB(), clazz, select);
     }
 
@@ -581,17 +581,17 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Deprecated
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int deleteByCondition(Wrapper where) {
+    public int deleteByCondition(Wrapper wrapper) {
         Delete delete = new Delete();
-        delete.setWhere(where);
+        delete.where(wrapper);
         return mybatisSqlBeanDao.delete(getSqlBeanDB(), clazz, delete, false);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int deleteBy(Wrapper where) {
+    public int deleteBy(Wrapper wrapper) {
         Delete delete = new Delete();
-        delete.setWhere(where);
+        delete.where(wrapper);
         return mybatisSqlBeanDao.delete(getSqlBeanDB(), clazz, delete, false);
     }
 
@@ -632,14 +632,14 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Deprecated
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int logicallyDeleteByCondition(Wrapper where) {
-        return mybatisSqlBeanDao.logicallyDeleteByWrapper(getSqlBeanDB(), clazz, where);
+    public int logicallyDeleteByCondition(Wrapper wrapper) {
+        return mybatisSqlBeanDao.logicallyDeleteByWrapper(getSqlBeanDB(), clazz, wrapper);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int logicallyDeleteBy(Wrapper where) {
-        return mybatisSqlBeanDao.logicallyDeleteByWrapper(getSqlBeanDB(), clazz, where);
+    public int logicallyDeleteBy(Wrapper wrapper) {
+        return mybatisSqlBeanDao.logicallyDeleteByWrapper(getSqlBeanDB(), clazz, wrapper);
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -719,46 +719,46 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Deprecated
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int updateByCondition(T bean, Wrapper where) {
+    public int updateByCondition(T bean, Wrapper wrapper) {
         Update update = new Update();
         update.setUpdateBean(bean);
         update.setUpdateNotNull(true);
         update.setOptimisticLock(false);
-        update.setWhere(where);
+        update.where(wrapper);
         return mybatisSqlBeanDao.update(getSqlBeanDB(), clazz, update, false);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int updateBy(T bean, Wrapper where) {
+    public int updateBy(T bean, Wrapper wrapper) {
         Update update = new Update();
         update.setUpdateBean(bean);
         update.setUpdateNotNull(true);
         update.setOptimisticLock(false);
-        update.setWhere(where);
+        update.where(wrapper);
         return mybatisSqlBeanDao.update(getSqlBeanDB(), clazz, update, false);
     }
 
     @Deprecated
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper where) {
+    public int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper) {
         Update update = new Update();
         update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
         update.setOptimisticLock(optimisticLock);
-        update.setWhere(where);
+        update.where(wrapper);
         return mybatisSqlBeanDao.update(getSqlBeanDB(), clazz, update, false);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper where) {
+    public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper) {
         Update update = new Update();
         update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
         update.setOptimisticLock(optimisticLock);
-        update.setWhere(where);
+        update.where(wrapper);
         return mybatisSqlBeanDao.update(getSqlBeanDB(), clazz, update, false);
     }
 
@@ -778,25 +778,25 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Deprecated
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, Wrapper where) {
+    public int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, Wrapper wrapper) {
         Update update = new Update();
         update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
         update.setOptimisticLock(optimisticLock);
         update.setFilterFields(filterFields);
-        update.setWhere(where);
+        update.where(wrapper);
         return mybatisSqlBeanDao.update(getSqlBeanDB(), clazz, update, false);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, Wrapper where) {
+    public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, Wrapper wrapper) {
         Update update = new Update();
         update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
         update.setOptimisticLock(optimisticLock);
         update.setFilterFields(filterFields);
-        update.setWhere(where);
+        update.where(wrapper);
         return mybatisSqlBeanDao.update(getSqlBeanDB(), clazz, update, false);
     }
 

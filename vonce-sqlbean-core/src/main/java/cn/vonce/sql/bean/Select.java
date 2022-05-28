@@ -118,10 +118,11 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
-     * 设置column
+     * 设置column 过时，未来将删除
      *
      * @param columnNames
      */
+    @Deprecated
     public void setColumn(String... columnNames) {
         for (String columnName : columnNames) {
             this.columnList.add(new Column(columnName));
@@ -131,13 +132,40 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 设置column
      *
+     * @param columnNames
+     */
+    public Select column(String... columnNames) {
+        if (columnNames != null && columnNames.length > 0) {
+            for (String columnName : columnNames) {
+                this.columnList.add(new Column(columnName));
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 设置column 过时，未来将删除
+     *
      * @param columns
      */
+    @Deprecated
     public void setColumn(Column... columns) {
         if (columns == null || columns.length == 0) {
             return;
         }
         this.columnList.addAll(Arrays.asList(columns));
+    }
+
+    /**
+     * 设置column
+     *
+     * @param columns
+     */
+    public Select column(Column... columns) {
+        if (columns != null && columns.length > 0) {
+            this.columnList.addAll(Arrays.asList(columns));
+        }
+        return this;
     }
 
     /**
@@ -421,13 +449,37 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
+     * 设置分页参数 过时，未来将删除
+     *
+     * @param pagenum  当前页(第一页从0开始)
+     * @param pagesize 每页显示数量
+     */
+    @Deprecated
+    public void setPage(Integer pagenum, Integer pagesize) {
+        this.page = new Page(pagenum, pagesize);
+    }
+
+    /**
      * 设置分页参数
      *
      * @param pagenum  当前页(第一页从0开始)
      * @param pagesize 每页显示数量
      */
-    public void setPage(Integer pagenum, Integer pagesize) {
+    public Select page(Integer pagenum, Integer pagesize) {
         this.page = new Page(pagenum, pagesize);
+        return this;
+    }
+
+    /**
+     * 设置分页参数 过时，未来将删除
+     *
+     * @param pagenum     当前页(默认第一页从0开始)
+     * @param pagesize    每页显示数量
+     * @param startByZero 第一页是否从0开始
+     */
+    @Deprecated
+    public void setPage(Integer pagenum, Integer pagesize, boolean startByZero) {
+        this.page = new Page(pagenum, pagesize, startByZero);
     }
 
     /**
@@ -437,8 +489,21 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param pagesize    每页显示数量
      * @param startByZero 第一页是否从0开始
      */
-    public void setPage(Integer pagenum, Integer pagesize, boolean startByZero) {
+    public Select page(Integer pagenum, Integer pagesize, boolean startByZero) {
         this.page = new Page(pagenum, pagesize, startByZero);
+        return this;
+    }
+
+    /**
+     * 设置分页参数(SqlServer专用) 过时，未来将删除
+     *
+     * @param idName   主键的名称
+     * @param pagenum  当前页(第一页从0开始)
+     * @param pagesize 每页显示数量
+     */
+    @Deprecated
+    public void setPage(String idName, Integer pagenum, Integer pagesize) {
+        this.page = new Page(idName, pagenum, pagesize);
     }
 
     /**
@@ -448,8 +513,22 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param pagenum  当前页(第一页从0开始)
      * @param pagesize 每页显示数量
      */
-    public void setPage(String idName, Integer pagenum, Integer pagesize) {
+    public Select page(String idName, Integer pagenum, Integer pagesize) {
         this.page = new Page(idName, pagenum, pagesize);
+        return this;
+    }
+
+    /**
+     * 设置分页参数(SqlServer专用) 过时，未来将删除
+     *
+     * @param idName      主键的名称
+     * @param pagenum     当前页(第一页从0开始)
+     * @param pagesize    每页显示数量
+     * @param startByZero startByZero 第一页是否从0开始
+     */
+    @Deprecated
+    public void setPage(String idName, Integer pagenum, Integer pagesize, boolean startByZero) {
+        this.page = new Page(idName, pagenum, pagesize, startByZero);
     }
 
     /**
@@ -460,8 +539,9 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param pagesize    每页显示数量
      * @param startByZero startByZero 第一页是否从0开始
      */
-    public void setPage(String idName, Integer pagenum, Integer pagesize, boolean startByZero) {
+    public Select page(String idName, Integer pagenum, Integer pagesize, boolean startByZero) {
         this.page = new Page(idName, pagenum, pagesize, startByZero);
+        return this;
     }
 
     /**
@@ -483,12 +563,23 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
+     * 设置过滤的列字段 过时，未来将删除
+     *
+     * @param filterField
+     */
+    @Deprecated
+    public void setFilterFields(String... filterField) {
+        this.filterFields = filterField;
+    }
+
+    /**
      * 设置过滤的列字段
      *
      * @param filterField
      */
-    public void setFilterFields(String... filterField) {
+    public Select filterFields(String... filterField) {
         this.filterFields = filterField;
+        return this;
     }
 
     /**
@@ -510,15 +601,25 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
-     * 设置Having条件包装器
+     * 设置Having条件包装器 过时，未来将删除
      *
      * @param wrapper
      */
+    @Deprecated
     public Select setHaving(Wrapper wrapper) {
         this.havingWrapper = wrapper;
         return this;
     }
 
+    /**
+     * 设置Having条件包装器
+     *
+     * @param wrapper
+     */
+    public Select having(Wrapper wrapper) {
+        this.havingWrapper = wrapper;
+        return this;
+    }
 
     /**
      * 获取where sql 内容
@@ -530,12 +631,25 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
-     * 设置having sql 内容
+     * 设置having sql 内容 过时，未来将删除
      *
      * @param having
      */
+    @Deprecated
     public void setHaving(String having) {
         this.having = having;
+    }
+
+    /**
+     * 设置having sql 内容 过时，未来将删除
+     *
+     * @param having
+     * @param args
+     */
+    @Deprecated
+    public void setHaving(String having, Object... args) {
+        this.having = having;
+        this.havingArgs = args;
     }
 
     /**
@@ -544,9 +658,10 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param having
      * @param args
      */
-    public void setHaving(String having, Object... args) {
+    public Select having(String having, Object... args) {
         this.having = having;
         this.havingArgs = args;
+        return this;
     }
 
     /**
@@ -559,16 +674,17 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
-     * 设置Having
+     * 设置Having 过时，未来将删除
      *
      * @param havingArgs
      */
+    @Deprecated
     public void setHavingArgs(Object[] havingArgs) {
         this.havingArgs = havingArgs;
     }
 
     /**
-     * 获取having条件值映射
+     * 获取having条件值映射 过时，未来将删除
      *
      * @return
      */
@@ -578,7 +694,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
-     * 添加having条件
+     * 添加having条件 过时，未来将删除
      *
      * @param field 列字段
      * @param value 列字段值
@@ -590,7 +706,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
-     * 添加having条件
+     * 添加having条件 过时，未来将删除
      *
      * @param column 列字段信息
      * @param value  列字段值
@@ -603,7 +719,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
 
 
     /**
-     * 添加having条件
+     * 添加having条件 过时，未来将删除
      *
      * @param field       列字段
      * @param value       列字段值
@@ -616,6 +732,8 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
+     * 过时，未来将删除
+     *
      * @param sqlLogic   该条件与下一条件之间的逻辑关系
      * @param tableAlias 表别名
      * @param field      列字段
@@ -628,7 +746,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
-     * 添加having条件
+     * 添加having条件 过时，未来将删除
      *
      * @param tableAlias  表别名
      * @param field       列字段
@@ -642,7 +760,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
-     * 添加having条件
+     * 添加having条件 过时，未来将删除
      *
      * @param column      列字段信息
      * @param value       列字段值
@@ -655,7 +773,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
-     * 添加having条件
+     * 添加having条件 过时，未来将删除
      *
      * @param sqlLogic    该条件与下一条件之间的逻辑关系
      * @param column      列字段信息
@@ -669,7 +787,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
-     * 添加having条件
+     * 添加having条件 过时，未来将删除
      *
      * @param sqlLogic    该条件与下一条件之间的逻辑关系
      * @param tableAlias  表别名
@@ -685,7 +803,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
-     * 复制对象
+     * 复制对象 过时，未来将删除
      *
      * @return
      * @throws IOException

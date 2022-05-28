@@ -500,7 +500,18 @@ public class CommonCondition<T> extends Common {
      *
      * @param wrapper
      */
+    @Deprecated
     public T setWhere(Wrapper wrapper) {
+        this.whereWrapper = wrapper;
+        return returnObj;
+    }
+
+    /**
+     * 设置Where条件包装器
+     *
+     * @param wrapper
+     */
+    public T where(Wrapper wrapper) {
         this.whereWrapper = wrapper;
         return returnObj;
     }

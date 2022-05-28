@@ -832,12 +832,12 @@ public class SqlBeanProvider {
             if (select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
                 try {
                     SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-                    select.setPage(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), SqlBeanUtil.getIdField(clazz), sqlTable.mapUsToCc()), paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
+                    select.page(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), SqlBeanUtil.getIdField(clazz), sqlTable.mapUsToCc()), paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
                 } catch (SqlBeanException e) {
                     e.printStackTrace();
                 }
             } else {
-                select.setPage(null, paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
+                select.page(null, paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
             }
             select.orderBy(paging.getOrders());
         }
