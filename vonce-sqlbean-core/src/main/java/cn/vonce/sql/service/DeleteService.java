@@ -23,13 +23,31 @@ public interface DeleteService<ID> {
     int deleteById(ID... id);
 
     /**
+     * 根据条件删除 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param where 条件表达式
+     * @param args  条件参数
+     * @return
+     */
+    @Deprecated
+    int deleteByCondition(String where, Object... args);
+
+    /**
      * 根据条件删除
      *
      * @param where 条件表达式
      * @param args  条件参数
      * @return
      */
-    int deleteByCondition(String where, Object... args);
+    int deleteBy(String where, Object... args);
+
+    /**
+     * 根据条件删除 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param where 条件包装器
+     * @return
+     */
+    int deleteByCondition(Wrapper where);
 
     /**
      * 根据条件删除
@@ -37,7 +55,7 @@ public interface DeleteService<ID> {
      * @param where 条件包装器
      * @return
      */
-    int deleteByCondition(Wrapper where);
+    int deleteBy(Wrapper where);
 
     /**
      * 删除(where条件为空会抛异常，因为删除全部非常危险)
@@ -74,11 +92,28 @@ public interface DeleteService<ID> {
     int logicallyDeleteByCondition(String where, Object... args);
 
     /**
+     * 根据条件逻辑删除 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param where 条件表达式
+     * @param args  条件参数
+     * @return
+     */
+    int logicallyDeleteBy(String where, Object... args);
+
+    /**
      * 根据条件逻辑删除
      *
      * @param where 条件包装器
      * @return
      */
     int logicallyDeleteByCondition(Wrapper where);
+
+    /**
+     * 根据条件逻辑删除 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param where 条件包装器
+     * @return
+     */
+    int logicallyDeleteBy(Wrapper where);
 
 }

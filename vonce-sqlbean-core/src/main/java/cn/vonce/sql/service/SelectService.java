@@ -36,7 +36,7 @@ public interface SelectService<T, ID> extends PagingService {
      * @param id
      * @return
      */
-    <O> O selectById(Class<O> returnType, ID id);
+    <R> R selectById(Class<R> returnType, ID id);
 
     /**
      * 根据ids条件查询
@@ -53,7 +53,7 @@ public interface SelectService<T, ID> extends PagingService {
      * @param ids
      * @return
      */
-    <O> List<O> selectByIds(Class<O> returnType, ID... ids);
+    <R> List<R> selectByIds(Class<R> returnType, ID... ids);
 
     /**
      * 根据自定义条件查询 只返回一条记录
@@ -70,7 +70,7 @@ public interface SelectService<T, ID> extends PagingService {
      * @param select
      * @return
      */
-    <O> O selectOne(Class<O> returnType, Select select);
+    <R> R selectOne(Class<R> returnType, Select select);
 
     /**
      * 根据自定义条件查询返回Map
@@ -81,13 +81,34 @@ public interface SelectService<T, ID> extends PagingService {
     Map<String, Object> selectMap(Select select);
 
     /**
+     * 根据条件查询 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param where
+     * @param args
+     * @return
+     */
+    @Deprecated
+    T selectOneByCondition(String where, Object... args);
+
+    /**
      * 根据条件查询
      *
      * @param where
      * @param args
      * @return
      */
-    T selectOneByCondition(String where, Object... args);
+    T selectOneBy(String where, Object... args);
+
+    /**
+     * 根据条件查询(可指定返回类型、查询的表) 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param returnType
+     * @param where
+     * @param args
+     * @return
+     */
+    @Deprecated
+    <R> R selectOneByCondition(Class<R> returnType, String where, Object... args);
 
     /**
      * 根据条件查询(可指定返回类型、查询的表)
@@ -97,7 +118,16 @@ public interface SelectService<T, ID> extends PagingService {
      * @param args
      * @return
      */
-    <O> O selectOneByCondition(Class<O> returnType, String where, Object... args);
+    <R> R selectOneBy(Class<R> returnType, String where, Object... args);
+
+    /**
+     * 根据条件查询 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param where
+     * @return
+     */
+    @Deprecated
+    T selectOneByCondition(Wrapper where);
 
     /**
      * 根据条件查询
@@ -105,43 +135,74 @@ public interface SelectService<T, ID> extends PagingService {
      * @param where
      * @return
      */
-    T selectOneByCondition(Wrapper where);
+    T selectOneBy(Wrapper where);
+
+    /**
+     * 根据条件查询 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param returnType
+     * @param where
+     * @param <R>
+     * @return
+     */
+    @Deprecated
+    <R> R selectOneByCondition(Class<R> returnType, Wrapper where);
 
     /**
      * 根据条件查询
      *
      * @param returnType
      * @param where
-     * @param <O>
+     * @param <R>
      * @return
      */
-    <O> O selectOneByCondition(Class<O> returnType, Wrapper where);
+    <R> R selectOneBy(Class<R> returnType, Wrapper where);
 
     /**
-     * 根据条件查询
+     * 根据条件查询 过时，将在1.6.0版本中移除，请尽快使用新方法替代
      *
      * @param where
      * @param args
      * @return
      */
+    @Deprecated
     List<T> selectByCondition(String where, Object... args);
 
     /**
      * 根据条件查询
      *
      * @param where
+     * @param args
      * @return
      */
+    List<T> selectBy(String where, Object... args);
+
+    /**
+     * 根据条件查询 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param where
+     * @return
+     */
+    @Deprecated
     List<T> selectByCondition(Wrapper where);
 
     /**
      * 根据条件查询
+     *
+     * @param where
+     * @return
+     */
+    List<T> selectBy(Wrapper where);
+
+    /**
+     * 根据条件查询 过时，将在1.6.0版本中移除，请尽快使用新方法替代
      *
      * @param paging
      * @param where
      * @param args
      * @return
      */
+    @Deprecated
     List<T> selectByCondition(Paging paging, String where, Object... args);
 
     /**
@@ -149,11 +210,31 @@ public interface SelectService<T, ID> extends PagingService {
      *
      * @param paging
      * @param where
+     * @param args
      * @return
      */
+    List<T> selectBy(Paging paging, String where, Object... args);
+
+    /**
+     * 根据条件查询 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param paging
+     * @param where
+     * @return
+     */
+    @Deprecated
     List<T> selectByCondition(Paging paging, Wrapper where);
 
     /**
+     * 根据条件查询
+     *
+     * @param paging
+     * @param where
+     * @return
+     */
+    List<T> selectBy(Paging paging, Wrapper where);
+
+    /**
      * 根据条件查询(可指定返回类型、查询的表)
      *
      * @param returnType
@@ -161,17 +242,51 @@ public interface SelectService<T, ID> extends PagingService {
      * @param args
      * @return
      */
-    <O> List<O> selectByCondition(Class<O> returnType, String where, Object... args);
+    @Deprecated
+    <R> List<R> selectByCondition(Class<R> returnType, String where, Object... args);
+
+    /**
+     * 根据条件查询(可指定返回类型、查询的表) 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param returnType
+     * @param where
+     * @param args
+     * @return
+     */
+    <R> List<R> selectBy(Class<R> returnType, String where, Object... args);
+
+    /**
+     * 根据条件查询(可指定返回类型、查询的表) 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param returnType
+     * @param where
+     * @param <R>
+     * @return
+     */
+    @Deprecated
+    <R> List<R> selectByCondition(Class<R> returnType, Wrapper where);
 
     /**
      * 根据条件查询(可指定返回类型、查询的表)
      *
      * @param returnType
      * @param where
-     * @param <O>
+     * @param <R>
      * @return
      */
-    <O> List<O> selectByCondition(Class<O> returnType, Wrapper where);
+    <R> List<R> selectBy(Class<R> returnType, Wrapper where);
+
+    /**
+     * 根据条件查询(可指定返回类型、查询的表) 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param returnType
+     * @param paging
+     * @param where
+     * @param args
+     * @return
+     */
+    @Deprecated
+    <R> List<R> selectByCondition(Class<R> returnType, Paging paging, String where, Object... args);
 
     /**
      * 根据条件查询(可指定返回类型、查询的表)
@@ -182,7 +297,19 @@ public interface SelectService<T, ID> extends PagingService {
      * @param args
      * @return
      */
-    <O> List<O> selectByCondition(Class<O> returnType, Paging paging, String where, Object... args);
+    <R> List<R> selectBy(Class<R> returnType, Paging paging, String where, Object... args);
+
+    /**
+     * 根据条件查询(可指定返回类型、查询的表) 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param returnType
+     * @param paging
+     * @param where
+     * @param <R>
+     * @return
+     */
+    @Deprecated
+    <R> List<R> selectByCondition(Class<R> returnType, Paging paging, Wrapper where);
 
     /**
      * 根据条件查询(可指定返回类型、查询的表)
@@ -190,49 +317,102 @@ public interface SelectService<T, ID> extends PagingService {
      * @param returnType
      * @param paging
      * @param where
-     * @param <O>
+     * @param <R>
      * @return
      */
-    <O> List<O> selectByCondition(Class<O> returnType, Paging paging, Wrapper where);
+    <R> List<R> selectBy(Class<R> returnType, Paging paging, Wrapper where);
 
     /**
-     * 根据条件查询统计
+     * 根据条件查询统计 过时，将在1.6.0版本中移除，请尽快使用新方法替代
      *
      * @param where
      * @param args
      * @return
      */
+    @Deprecated
     int selectCountByCondition(String where, Object... args);
 
     /**
      * 根据条件查询统计
      *
      * @param where
+     * @param args
      * @return
      */
+    int countBy(String where, Object... args);
+
+    /**
+     * 根据条件查询统计 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param where
+     * @return
+     */
+    @Deprecated
     int selectCountByCondition(Wrapper where);
+
+    /**
+     * 根据条件查询统计
+     *
+     * @param where
+     * @return
+     */
+    int countBy(Wrapper where);
+
+    /**
+     * 统计全部 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @return
+     */
+    @Deprecated
+    int countAll();
 
     /**
      * 统计全部
      *
      * @return
      */
-    int countAll();
+    int count();
 
     /**
-     * 查询全部
+     * 查询全部 过时，将在1.6.0版本中移除，请尽快使用新方法替代
      *
      * @return
      */
+    @Deprecated
     List<T> selectAll();
 
     /**
+     * 查询全部
+     *
+     * @return
+     */
+    List<T> select();
+
+    /**
+     * 查询全部(可指定返回类型、查询的表) 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param returnType
+     * @return
+     */
+    @Deprecated
+    <R> List<R> selectAll(Class<R> returnType);
+
+    /**
      * 查询全部(可指定返回类型、查询的表)
      *
      * @param returnType
      * @return
      */
-    <O> List<O> selectAll(Class<O> returnType);
+    <R> List<R> select(Class<R> returnType);
+
+    /**
+     * 查询全部 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param paging
+     * @return
+     */
+    @Deprecated
+    List<T> selectAll(Paging paging);
 
     /**
      * 查询全部
@@ -240,7 +420,16 @@ public interface SelectService<T, ID> extends PagingService {
      * @param paging
      * @return
      */
-    List<T> selectAll(Paging paging);
+    List<T> select(Paging paging);
+
+    /**
+     * 查询全部(可指定返回类型、查询的表) 过时，将在1.6.0版本中移除，请尽快使用新方法替代
+     *
+     * @param returnType
+     * @param paging
+     * @return
+     */
+    <R> List<R> selectAll(Class<R> returnType, Paging paging);
 
     /**
      * 查询全部(可指定返回类型、查询的表)
@@ -249,7 +438,7 @@ public interface SelectService<T, ID> extends PagingService {
      * @param paging
      * @return
      */
-    <O> List<O> selectAll(Class<O> returnType, Paging paging);
+    <R> List<R> select(Class<R> returnType, Paging paging);
 
     /**
      * 根据自定义条件查询（可自动分页）返回List<Map>结果集
@@ -268,13 +457,13 @@ public interface SelectService<T, ID> extends PagingService {
     List<T> select(Select select);
 
     /**
-     * 根据自定义条件查询（可自动分页）返回List<O> (可指定返回类型、查询的表)
+     * 根据自定义条件查询（可自动分页）返回List<R> (可指定返回类型、查询的表)
      *
      * @param returnType
      * @param select
      * @return
      */
-    <O> List<O> select(Class<O> returnType, Select select);
+    <R> List<R> select(Class<R> returnType, Select select);
 
     /**
      * 根据自定义条件统计

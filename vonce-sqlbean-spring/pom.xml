@@ -122,12 +122,12 @@
 
     <artifactId>vonce-sqlbean-spring</artifactId>
     <groupId>cn.vonce</groupId>
-    <version>1.5.8</version>
+    <version>1.5.9</version>
     <packaging>jar</packaging>
 
     <!-- 版本信息 -->
     <properties>
-        <vonce.sqlbean.core.version>1.1.0</vonce.sqlbean.core.version>
+        <vonce.sqlbean.core.version>1.1.1</vonce.sqlbean.core.version>
         <com.esotericsoftware.version>1.11.8</com.esotericsoftware.version>
         <log4j.version>1.2.17</log4j.version>
         <slf4j.version>1.7.8</slf4j.version>
