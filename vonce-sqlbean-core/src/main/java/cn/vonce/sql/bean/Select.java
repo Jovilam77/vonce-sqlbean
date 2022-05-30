@@ -8,7 +8,6 @@ import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.helper.Wrapper;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -799,6 +798,48 @@ public class Select extends CommonCondition<Select> implements Serializable {
     @Deprecated
     public Select having(SqlLogic sqlLogic, String tableAlias, String field, Object value, SqlOperator sqlOperator) {
         havingMap.put(tableAlias + field, new ConditionInfo(sqlLogic, tableAlias, field, value, sqlOperator));
+        return this;
+    }
+
+    /**
+     * 设置table
+     *
+     * @param name
+     */
+    public Select table(String name) {
+        super.setTable(name, name);
+        return this;
+    }
+
+    /**
+     * 设置table
+     *
+     * @param name
+     * @param aliasName
+     */
+    public Select table(String name, String aliasName) {
+        super.setTable(name, aliasName);
+        return this;
+    }
+
+    /**
+     * 设置table
+     *
+     * @param name
+     * @param aliasName
+     */
+    public Select table(String schema, String name, String aliasName) {
+        super.setTable(schema, name, aliasName);
+        return this;
+    }
+
+    /**
+     * 设置table sql 内容
+     *
+     * @param clazz 表对应的实体类
+     */
+    public Select table(Class<?> clazz) {
+        super.setTable(clazz);
         return this;
     }
 

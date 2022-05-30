@@ -15,6 +15,7 @@ import cn.vonce.sql.uitls.StringUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * 通用的数据库操作sql语句生成
@@ -770,7 +771,11 @@ public class SqlBeanProvider {
         if (!select.getOrderBy().isEmpty()) {
             for (Order order : select.getOrderBy()) {
                 if (StringUtil.isEmpty(order.getTableAlias())) {
-                    order.setTableAlias(select.getTable().getAlias());
+                    List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
+                    Field field = SqlBeanUtil.getFieldByTableFieldName(fieldList, order.getName());
+                    if (field != null) {
+                        order.setTableAlias(select.getTable().getAlias());
+                    }
                 }
             }
         }
