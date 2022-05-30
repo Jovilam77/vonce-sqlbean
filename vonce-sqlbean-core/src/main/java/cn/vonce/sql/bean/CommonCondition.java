@@ -63,6 +63,7 @@ public class CommonCondition<T> extends Common {
      *
      * @param where
      */
+    @Deprecated
     public void setWhere(String where) {
         this.where = where;
     }
@@ -73,9 +74,22 @@ public class CommonCondition<T> extends Common {
      * @param where
      * @param args
      */
+    @Deprecated
     public void setWhere(String where, Object... args) {
         this.where = where;
         this.agrs = args;
+    }
+
+    /**
+     * 设置where sql 内容
+     *
+     * @param where
+     * @param args
+     */
+    public T where(String where, Object... args) {
+        this.where = where;
+        this.agrs = args;
+        return returnObj;
     }
 
     /**
@@ -92,6 +106,7 @@ public class CommonCondition<T> extends Common {
      *
      * @param agrs
      */
+    @Deprecated
     public void setAgrs(Object[] agrs) {
         this.agrs = agrs;
     }

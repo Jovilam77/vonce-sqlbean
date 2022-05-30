@@ -5,7 +5,6 @@ import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.DbType;
-import cn.vonce.sql.enumerate.SqlOperator;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.helper.Wrapper;
@@ -75,7 +74,7 @@ public class SqlBeanProvider {
      */
     public static String selectByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Paging paging, String where, Object... args) {
         Select select = newSelect(sqlBeanDB, clazz, false);
-        select.setWhere(where, args);
+        select.where(where, args);
         setPaging(select, paging, clazz);
         return SqlHelper.buildSelectSql(select);
     }
@@ -88,9 +87,9 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public static String selectCountByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
+    public static String countByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
         Select select = newSelect(sqlBeanDB, clazz, true);
-        select.setWhere(where, args);
+        select.where(where, args);
         return SqlHelper.buildSelectSql(select);
     }
 
@@ -214,7 +213,7 @@ public class SqlBeanProvider {
         Delete delete = new Delete();
         delete.setSqlBeanDB(sqlBeanDB);
         delete.setTable(clazz);
-        delete.setWhere(where, args);
+        delete.where(where, args);
         setSchema(delete, clazz);
         return SqlHelper.buildDeleteSql(delete);
     }
@@ -230,12 +229,12 @@ public class SqlBeanProvider {
     public static String deleteSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Delete delete, boolean ignore) {
         //如果是逻辑删除那么将Delete对象转为Update对象
         if (delete.isLogicallyDelete()) {
-            Update update = new Update();
+            Update<Object> update = new Update();
             update.setSqlBeanDB(sqlBeanDB);
             update.setTable(clazz);
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
-            update.setWhere(delete.getWhereWrapper());
-            update.setWhere(delete.getWhere(), delete.getAgrs());
+            update.where(delete.getWhereWrapper());
+            update.where(delete.getWhere(), delete.getAgrs());
             update.where().setDataList(delete.where().getDataList());
             return updateSql(sqlBeanDB, clazz, update, ignore);
         }
@@ -299,7 +298,7 @@ public class SqlBeanProvider {
             update.setSqlBeanDB(sqlBeanDB);
             update.setTable(clazz);
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
-            update.setWhere(where, args);
+            update.where(where, args);
             setSchema(update, clazz);
         } catch (SqlBeanException e) {
             e.printStackTrace();
@@ -321,7 +320,7 @@ public class SqlBeanProvider {
             update.setSqlBeanDB(sqlBeanDB);
             update.setTable(clazz);
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
-            update.setWhere(wrapper);
+            update.where(wrapper);
             setSchema(update, clazz);
         } catch (SqlBeanException e) {
             e.printStackTrace();
@@ -447,7 +446,7 @@ public class SqlBeanProvider {
     public static String updateByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where, Object[] args) {
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
         update.setFilterFields(filterFields);
-        update.setWhere(where, args);
+        update.where(where, args);
         return SqlHelper.buildUpdateSql(update);
     }
 
@@ -466,7 +465,7 @@ public class SqlBeanProvider {
     public static String updateByBeanConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where) {
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
         update.setFilterFields(filterFields);
-        update.setWhere(where, null);
+        update.where(where, null);
         return SqlHelper.buildUpdateSql(update);
     }
 
@@ -688,7 +687,7 @@ public class SqlBeanProvider {
         backup.setColumns(columns);
         backup.setTargetSchema(targetSchema);
         backup.setTargetTableName(targetTableName);
-        backup.setWhere(wrapper);
+        backup.where(wrapper);
         setSchema(backup, clazz);
         return SqlHelper.buildBackup(backup);
     }

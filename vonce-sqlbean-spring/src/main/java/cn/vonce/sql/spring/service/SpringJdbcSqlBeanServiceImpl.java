@@ -391,13 +391,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public int selectCountByCondition(String where, Object... args) {
-        return jdbcTemplate.queryForObject(SqlBeanProvider.selectCountByConditionSql(getSqlBeanDB(), clazz, where, args), new SpringJbdcSqlBeanMapper<Integer>(clazz, Integer.class));
+        return jdbcTemplate.queryForObject(SqlBeanProvider.countByConditionSql(getSqlBeanDB(), clazz, where, args), new SpringJbdcSqlBeanMapper<Integer>(clazz, Integer.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public int countBy(String where, Object... args) {
-        return jdbcTemplate.queryForObject(SqlBeanProvider.selectCountByConditionSql(getSqlBeanDB(), clazz, where, args), new SpringJbdcSqlBeanMapper<>(clazz, Integer.class));
+        return jdbcTemplate.queryForObject(SqlBeanProvider.countByConditionSql(getSqlBeanDB(), clazz, where, args), new SpringJbdcSqlBeanMapper<>(clazz, Integer.class));
     }
 
     @Deprecated
@@ -421,13 +421,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public int countAll() {
-        return jdbcTemplate.queryForObject(SqlBeanProvider.selectCountByConditionSql(getSqlBeanDB(), clazz, null, null), new SpringJbdcSqlBeanMapper<Integer>(clazz, Integer.class));
+        return jdbcTemplate.queryForObject(SqlBeanProvider.countByConditionSql(getSqlBeanDB(), clazz, null, null), new SpringJbdcSqlBeanMapper<Integer>(clazz, Integer.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public int count() {
-        return jdbcTemplate.queryForObject(SqlBeanProvider.selectCountByConditionSql(getSqlBeanDB(), clazz, null, null), new SpringJbdcSqlBeanMapper<>(clazz, Integer.class));
+        return jdbcTemplate.queryForObject(SqlBeanProvider.countByConditionSql(getSqlBeanDB(), clazz, null, null), new SpringJbdcSqlBeanMapper<>(clazz, Integer.class));
     }
 
     @Deprecated

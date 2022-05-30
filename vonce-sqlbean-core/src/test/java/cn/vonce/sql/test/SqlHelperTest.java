@@ -69,7 +69,7 @@ public class SqlHelperTest {
     private static void select1(SqlBeanDB sqlBeanDB) {
         Select select = new Select();
         select.setSqlBeanDB(sqlBeanDB);
-        select.setColumn(SqlEssay._all);
+        select.column(SqlEssay._all);
         select.column(SqlUser.headPortrait, "头像");
         select.column(SqlUser.nickname, "昵称");
         select.setTable(SqlEssay._tableName);
@@ -126,10 +126,10 @@ public class SqlHelperTest {
     private static void select4(SqlBeanDB sqlBeanDB) {
         Select select4 = new Select();
         select4.setSqlBeanDB(sqlBeanDB);
-        select4.setColumn(SqlUser._all);
+        select4.column(SqlUser._all);
         select4.setTable(SqlUser._tableName);
         Integer[] gender = {0, 1};
-        select4.setWhere(
+        select4.where(
                 Wrapper.where(Cond.between(SqlUser.id, 2, 6)).
                         and(Wrapper.where(Cond.eq(SqlUser.nickname, "vicky")).or(Cond.in(SqlUser.gender, gender))));
         System.out.println("---select4---");
@@ -144,9 +144,9 @@ public class SqlHelperTest {
     private static void select5(SqlBeanDB sqlBeanDB) {
         Select select5 = new Select();
         select5.setSqlBeanDB(sqlBeanDB);
-        select5.setColumn(SqlUser._all);
+        select5.column(SqlUser._all);
         select5.setTable(SqlUser._tableName);
-        select5.setWhere(Wrapper.where(Cond.eq(SqlUser.id, 1)).and(Wrapper.where(Cond.eq(SqlUser.gender, "1")).or(Cond.eq(SqlUser.nickname, 1))));
+        select5.where(Wrapper.where(Cond.eq(SqlUser.id, 1)).and(Wrapper.where(Cond.eq(SqlUser.gender, "1")).or(Cond.eq(SqlUser.nickname, 1))));
         System.out.println("---select5---");
         System.out.println(SqlHelper.buildSelectSql(select5));
     }

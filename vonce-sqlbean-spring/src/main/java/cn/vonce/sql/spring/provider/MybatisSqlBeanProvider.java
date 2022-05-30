@@ -66,7 +66,7 @@ public class MybatisSqlBeanProvider {
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return SqlBeanProvider.selectCountByConditionSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
+        return SqlBeanProvider.countByConditionSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
     }
 
     /**
