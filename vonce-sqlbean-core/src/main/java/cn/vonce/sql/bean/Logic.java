@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 public class Logic<Action> implements Serializable {
 
-    private Condition condition;
+    private Condition<Action> condition;
 
     private Logic() {
     }
@@ -27,7 +27,7 @@ public class Logic<Action> implements Serializable {
      * @param
      * @return
      */
-    public Condition and() {
+    public Condition<Action> and() {
         condition.setSqlLogic(SqlLogic.AND);
         return condition;
     }
@@ -38,7 +38,7 @@ public class Logic<Action> implements Serializable {
      * @param
      * @return
      */
-    public Condition or() {
+    public Condition<Action> or() {
         condition.setSqlLogic(SqlLogic.OR);
         return condition;
     }
