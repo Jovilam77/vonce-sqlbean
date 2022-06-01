@@ -201,19 +201,19 @@ public class SqlHelper {
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(create.getBeanClass());
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(create.getBeanClass());
         String transferred = SqlBeanUtil.getTransferred(create);
-        for (Field field : fieldList) {
-            if (SqlBeanUtil.isIgnore(field)) {
+        for (int i = 0; i < fieldList.size(); i++) {
+            if (SqlBeanUtil.isIgnore(fieldList.get(i))) {
                 continue;
             }
             if (idField == null) {
-                if (field.getAnnotation(SqlId.class) != null) {
-                    idField = field;
+                if (fieldList.get(i).getAnnotation(SqlId.class) != null) {
+                    idField = fieldList.get(i);
                 }
             }
-            SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
-            ColumnInfo columnInfo = getColumnInfo(create.getSqlBeanDB().getDbType(), field.getType(), sqlColumn);
+            SqlColumn sqlColumn = fieldList.get(i).getAnnotation(SqlColumn.class);
+            ColumnInfo columnInfo = getColumnInfo(create.getSqlBeanDB().getDbType(), fieldList.get(i).getType(), sqlColumn);
             JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
-            String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable.mapUsToCc());
+            String columnName = SqlBeanUtil.getTableFieldName(fieldList.get(i), sqlTable.mapUsToCc());
             sqlSb.append(transferred);
             sqlSb.append(SqlBeanUtil.isToUpperCase(create) ? columnName.toUpperCase() : columnName);
             sqlSb.append(transferred);
@@ -240,6 +240,7 @@ public class SqlHelper {
             }
             sqlSb.append(SqlConstant.COMMA);
         }
+
         //主键
         if (idField != null) {
             String id = SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc());
@@ -250,7 +251,7 @@ public class SqlHelper {
             sqlSb.append(transferred);
             sqlSb.append(SqlConstant.END_BRACKET);
         } else {
-            sqlSb.deleteCharAt(sqlSb.length() - 1);
+            sqlSb.deleteCharAt(sqlSb.length() - SqlConstant.COMMA.length());
         }
         sqlSb.append(SqlConstant.END_BRACKET);
         return sqlSb.toString();

@@ -43,7 +43,7 @@ public class MybatisSqlBeanProvider {
      * @param map
      * @return
      */
-    public String selectBy(Map<String, Object> map) {
+    public String selectByCondition(Map<String, Object> map) {
         Paging paging = null;
         if (map.containsKey("paging")) {
             paging = (Paging) map.get("paging");
@@ -61,7 +61,7 @@ public class MybatisSqlBeanProvider {
      * @param map
      * @return
      */
-    public String selectCountBy(Map<String, Object> map) {
+    public String selectCountByCondition(Map<String, Object> map) {
         Object[] args = null;
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
