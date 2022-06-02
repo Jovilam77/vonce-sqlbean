@@ -58,12 +58,12 @@ public class EssayController {
     @GetMapping("select")
     public RS select() {
         //查询列表
-        List<Essay> list = essayService.selectAll();
-        list = essayService.selectByCondition(Wrapper.where(gt(Essay$.id, 10)).and(lt(Essay$.id, 20)));
+        List<Essay> list = essayService.select();
+        list = essayService.selectBy(Wrapper.where(gt(Essay$.id, 10)).and(lt(Essay$.id, 20)));
 
         //查询一条
         Essay essay = essayService.selectById(1L);
-        essay = essayService.selectOneByCondition(Wrapper.where(eq(Essay$.id, 333)));
+        essay = essayService.selectOneBy(Wrapper.where(eq(Essay$.id, 333)));
 
         //复杂查询
         Select select = new Select();
@@ -95,7 +95,7 @@ public class EssayController {
         //根据bean内部id更新
         long i = essayService.updateByBeanId(essay);
         //根据条件更新
-        //i = essayService.updateByCondition(Wrapper.where(gt(Essay$.id, 1)).and(eq(Essay$.content, "222")));
+        //i = essayService.updateBy(Wrapper.where(gt(Essay$.id, 1)).and(eq(Essay$.content, "222")));
         if (i > 0) {
             return super.successHint("更新成功");
         }
@@ -108,7 +108,7 @@ public class EssayController {
         //根据id删除
         long i = essayService.deleteById(id);
         //根据条件删除
-        //i = essayService.deleteByCondition(Wrapper.where(gt(Essay$.id, 1)).and(eq(Essay$.content, "222")));
+        //i = essayService.deleteBy(Wrapper.where(gt(Essay$.id, 1)).and(eq(Essay$.content, "222")));
         if (i > 0) {
             return super.successHint("删除成功");
         }
