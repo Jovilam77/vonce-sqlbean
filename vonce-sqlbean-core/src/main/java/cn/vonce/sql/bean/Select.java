@@ -133,7 +133,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      *
      * @param columnNames
      */
-    public Select column(String... columnNames) {
+    public Select column(String[] columnNames) {
         if (columnNames != null && columnNames.length > 0) {
             for (String columnName : columnNames) {
                 this.columnList.add(new Column(columnName));
