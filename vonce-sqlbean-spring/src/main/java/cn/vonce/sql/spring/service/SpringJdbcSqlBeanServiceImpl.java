@@ -855,6 +855,9 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int insert(List<T> beanList) {
+        if (beanList == null || beanList.size() == 0) {
+            throw new SqlBeanException("insert方法beanList参数至少拥有一个值");
+        }
         return jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), clazz, beanList));
     }
 
