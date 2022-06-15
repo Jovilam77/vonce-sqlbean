@@ -476,11 +476,11 @@ public interface SelectService<T, ID> extends PagingService {
     /**
      * 根据自定义条件统计
      *
-     * @param clazz
+     * @param returnType
      * @param select
      * @return
      */
-    int count(Class<?> clazz, Select select);
+    int count(Class<?> returnType, Select select);
 
     ResultData<T> paging(Select select, PageHelper<T> pageHelper);
 

@@ -301,7 +301,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     public <R> List<R> selectByCondition(Class<R> returnType, Paging paging, Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
-        select.setPage(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
+        select.page(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
             return mybatisSqlBeanDao.selectO(getSqlBeanDB(), clazz, returnType, select);
@@ -314,7 +314,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     public <R> List<R> selectBy(Class<R> returnType, Paging paging, Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
-        select.setPage(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
+        select.page(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
         if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
             return mybatisSqlBeanDao.selectO(getSqlBeanDB(), clazz, returnType, select);
@@ -371,7 +371,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     public List<T> selectByCondition(Paging paging, Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
-        select.setPage(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
+        select.page(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
         return mybatisSqlBeanDao.select(getSqlBeanDB(), clazz, select);
     }
@@ -522,8 +522,11 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public int count(Class<?> clazz, Select select) {
-        return mybatisSqlBeanDao.count(getSqlBeanDB(), clazz, select);
+    public int count(Class<?> returnType, Select select) {
+        if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
+            return mybatisSqlBeanDao.count(getSqlBeanDB(), clazz, select);
+        }
+        return mybatisSqlBeanDao.count(getSqlBeanDB(), returnType, select);
     }
 
     @DbSwitch(DbRole.SLAVE)
