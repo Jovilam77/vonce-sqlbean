@@ -575,6 +575,9 @@ public class SqlHelper {
         List<String> valueSqlList = new ArrayList<>();
         String transferred = SqlBeanUtil.getTransferred(common);
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(objectList.get(0).getClass());
+        if (sqlTable == null) {
+            throw new SqlBeanException("请在实体类中标识@SqlTable注解或继承标识过的实体类'" + objectList.get(0).getClass().getName() + "'");
+        }
         //获取sqlbean的全部字段
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(objectList.get(0).getClass());
         if (common.getSqlBeanDB().getDbType() == DbType.Oracle) {
