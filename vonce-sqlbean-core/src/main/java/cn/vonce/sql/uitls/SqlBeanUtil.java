@@ -112,16 +112,16 @@ public class SqlBeanUtil {
     /**
      * 获取Bean字段中实际对于的表字段
      *
-     * @param field
+     * @param sqlTable
      * @return
      */
-    public static String getTableFieldName(Field field, boolean mapUsToCc) {
+    public static String getTableFieldName(Field field, SqlTable sqlTable) {
         SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
         String name = field.getName();
         if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.value())) {
             name = sqlColumn.value();
         } else {
-            if (mapUsToCc) {
+            if (sqlTable == null || sqlTable.mapUsToCc()) {
                 name = StringUtil.humpToUnderline(name);
             }
         }
@@ -153,11 +153,11 @@ public class SqlBeanUtil {
      * @param common
      * @param tableAlias
      * @param field
-     * @param mapUsToCc
+     * @param sqlTable
      * @return
      */
-    public static String getTableFieldFullName(Common common, String tableAlias, Field field, boolean mapUsToCc) {
-        return getTableFieldFullName(common, tableAlias, getTableFieldName(field, mapUsToCc));
+    public static String getTableFieldFullName(Common common, String tableAlias, Field field, SqlTable sqlTable) {
+        return getTableFieldFullName(common, tableAlias, getTableFieldName(field, sqlTable));
     }
 
     /**
@@ -365,7 +365,7 @@ public class SqlBeanUtil {
             if (sqlColumn != null && sqlColumn.ignore()) {
                 continue;
             }
-            if (isFilter(filterTableFields, getTableFieldName(field, sqlTable.mapUsToCc()))) {
+            if (isFilter(filterTableFields, getTableFieldName(field, sqlTable))) {
                 continue;
             }
             SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
@@ -382,7 +382,7 @@ public class SqlBeanUtil {
                         }
                         //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
                         Table subTable = getTable(subBeanClazz, sqlJoin);
-                        columnSet.add(new Column(subTable.getAlias(), fieldName, getColumnAlias(subTable.getAlias(), javaField.getName())));
+                        columnSet.add(new Column(subSqlTable == null ? "" : subTable.getAlias(), fieldName, getColumnAlias(subSqlTable == null ? "" : subTable.getAlias(), javaField.getName())));
                     }
                 }
                 //没有指定查询的字段则查询所有字段
@@ -397,7 +397,7 @@ public class SqlBeanUtil {
                         if (subSqlColumn != null && subSqlColumn.ignore()) {
                             continue;
                         }
-                        columnSet.add(new Column(subTable.getAlias(), getTableFieldName(subBeanField, subSqlTable.mapUsToCc()), getColumnAlias(subTable.getAlias(), subBeanField.getName())));
+                        columnSet.add(new Column(subTable.getAlias(), getTableFieldName(subBeanField, subSqlTable), getColumnAlias(subTable.getAlias(), subBeanField.getName())));
                     }
                 }
             } else if (sqlJoin != null) {
@@ -412,7 +412,7 @@ public class SqlBeanUtil {
                     columnSet.add(new Column(subTableAlias, tableFieldName, getColumnAlias(subTableAlias, field.getName())));
                 }
             } else {
-                columnSet.add(new Column(tableAlias, getTableFieldName(field, sqlTable.mapUsToCc()), getColumnAlias(tableAlias, field.getName())));
+                columnSet.add(new Column(tableAlias, getTableFieldName(field, sqlTable), getColumnAlias(tableAlias, field.getName())));
             }
         }
         return new ArrayList<>(columnSet);
@@ -427,9 +427,6 @@ public class SqlBeanUtil {
      */
     public static Map<String, Join> getJoin(Class<?> clazz) throws SqlBeanException {
         SqlTable sqlTable = getSqlTable(clazz);
-        if (sqlTable == null) {
-            throw new SqlBeanException("请在实体类中标识@SqlTable注解或继承标识过的实体类'" + clazz.getName() + "'");
-        }
         List<Field> fieldList = getBeanAllField(clazz);
         Map<String, Join> joinFieldMap = new HashMap<>();
         for (Field field : fieldList) {
@@ -451,7 +448,7 @@ public class SqlBeanUtil {
                 Class<?> subClazz = field.getType();
                 //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
                 Table table = getTable(subClazz, sqlJoin);
-                String tableKeyword = getTableFieldName(getIdField(subClazz), sqlTable.mapUsToCc());
+                String tableKeyword = getTableFieldName(getIdField(subClazz), sqlTable);
                 join.setJoinType(sqlJoin.type());
                 join.setSchema(table.getSchema());
                 join.setTableName(table.getName());

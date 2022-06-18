@@ -213,7 +213,7 @@ public class SqlHelper {
             SqlColumn sqlColumn = fieldList.get(i).getAnnotation(SqlColumn.class);
             ColumnInfo columnInfo = getColumnInfo(create.getSqlBeanDB().getDbType(), fieldList.get(i).getType(), sqlColumn);
             JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
-            String columnName = SqlBeanUtil.getTableFieldName(fieldList.get(i), sqlTable.mapUsToCc());
+            String columnName = SqlBeanUtil.getTableFieldName(fieldList.get(i), sqlTable);
             sqlSb.append(transferred);
             sqlSb.append(SqlBeanUtil.isToUpperCase(create) ? columnName.toUpperCase() : columnName);
             sqlSb.append(transferred);
@@ -243,7 +243,7 @@ public class SqlHelper {
 
         //主键
         if (idField != null) {
-            String id = SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc());
+            String id = SqlBeanUtil.getTableFieldName(idField, sqlTable);
             sqlSb.append(SqlConstant.PRIMARY_KEY);
             sqlSb.append(SqlConstant.BEGIN_BRACKET);
             sqlSb.append(transferred);
@@ -575,9 +575,6 @@ public class SqlHelper {
         List<String> valueSqlList = new ArrayList<>();
         String transferred = SqlBeanUtil.getTransferred(common);
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(objectList.get(0).getClass());
-        if (sqlTable == null) {
-            throw new SqlBeanException("请在实体类中标识@SqlTable注解或继承标识过的实体类'" + objectList.get(0).getClass().getName() + "'");
-        }
         //获取sqlbean的全部字段
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(objectList.get(0).getClass());
         if (common.getSqlBeanDB().getDbType() == DbType.Oracle) {
@@ -612,7 +609,7 @@ public class SqlHelper {
                 }
                 //只有在循环第一遍的时候才会处理
                 if (i == 0) {
-                    String tableFieldName = SqlBeanUtil.getTableFieldName(field, sqlTable.mapUsToCc());
+                    String tableFieldName = SqlBeanUtil.getTableFieldName(field, sqlTable);
                     //如果此字段非id字段 或者 此字段为id字段但是不是自增的id则生成该字段的insert语句
                     if (sqlId == null || (sqlId != null && sqlId.type() != IdType.AUTO)) {
                         fieldSql.append(transferred + (SqlBeanUtil.isToUpperCase(common) ? tableFieldName.toUpperCase() : tableFieldName) + transferred);
@@ -698,7 +695,7 @@ public class SqlHelper {
             if (SqlBeanUtil.isIgnore(field)) {
                 continue;
             }
-            String name = SqlBeanUtil.getTableFieldName(field, sqlTable.mapUsToCc());
+            String name = SqlBeanUtil.getTableFieldName(field, sqlTable);
             if (SqlBeanUtil.isFilter(filterFields, name)) {
                 continue;
             }
@@ -921,7 +918,7 @@ public class SqlHelper {
             boolean versionEffectiveness = SqlBeanUtil.versionEffectiveness(versionField.getType().getName());
             if (versionEffectiveness) {
                 versionConditionSql.append(SqlConstant.BEGIN_BRACKET);
-                versionConditionSql.append(SqlBeanUtil.getTableFieldName(versionField, sqlTable.mapUsToCc()));
+                versionConditionSql.append(SqlBeanUtil.getTableFieldName(versionField, sqlTable));
                 Object versionValue = ReflectUtil.instance().get(bean.getClass(), bean, versionField.getName());
                 versionConditionSql.append(versionValue == null ? SqlConstant.IS : SqlConstant.EQUAL_TO);
                 versionConditionSql.append(SqlBeanUtil.getSqlValue(common, versionValue));
@@ -944,7 +941,7 @@ public class SqlHelper {
             Field logicallyDeleteField = SqlBeanUtil.getLogicallyField(common.getBeanClass());
             if (logicallyDeleteField != null) {
                 logicallyDeleteSql.append(SqlConstant.BEGIN_BRACKET);
-                logicallyDeleteSql.append(SqlBeanUtil.getTableFieldFullName(common, common.getTable().getAlias(), SqlBeanUtil.getTableFieldName(logicallyDeleteField, sqlTable.mapUsToCc())));
+                logicallyDeleteSql.append(SqlBeanUtil.getTableFieldFullName(common, common.getTable().getAlias(), SqlBeanUtil.getTableFieldName(logicallyDeleteField, sqlTable)));
                 logicallyDeleteSql.append(SqlConstant.EQUAL_TO);
                 logicallyDeleteSql.append(0);
                 logicallyDeleteSql.append(SqlConstant.END_BRACKET);

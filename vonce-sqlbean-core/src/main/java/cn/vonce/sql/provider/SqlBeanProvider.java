@@ -56,9 +56,9 @@ public class SqlBeanProvider {
         }
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
         if (ids.length > 1) {
-            select.where().in(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), idField, sqlTable.mapUsToCc()), ids);
+            select.where().in(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), idField, sqlTable), ids);
         } else {
-            select.where().eq(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), idField, sqlTable.mapUsToCc()), ids[0]);
+            select.where().eq(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), idField, sqlTable), ids[0]);
         }
         return SqlHelper.buildSelectSql(select);
     }
@@ -122,7 +122,7 @@ public class SqlBeanProvider {
                 SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
                 select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
                 if (select.getPage() != null && select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
-                    select.getPage().setIdName(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), SqlBeanUtil.getIdField(clazz), sqlTable.mapUsToCc()));
+                    select.getPage().setIdName(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), SqlBeanUtil.getIdField(clazz), sqlTable));
                 }
             } catch (SqlBeanException e) {
                 e.printStackTrace();
@@ -193,7 +193,7 @@ public class SqlBeanProvider {
             return null;
         }
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-        delete.where().in(SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc()), id);
+        delete.where().in(SqlBeanUtil.getTableFieldName(idField, sqlTable), id);
         return SqlHelper.buildDeleteSql(delete);
     }
 
@@ -275,7 +275,7 @@ public class SqlBeanProvider {
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
             Field idField = SqlBeanUtil.getIdField(clazz);
             SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-            update.where().in(SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc()), id);
+            update.where().in(SqlBeanUtil.getTableFieldName(idField, sqlTable), id);
             setSchema(update, clazz);
         } catch (SqlBeanException e) {
             e.printStackTrace();
@@ -391,7 +391,7 @@ public class SqlBeanProvider {
             return null;
         }
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-        update.where().eq(SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc()), id);
+        update.where().eq(SqlBeanUtil.getTableFieldName(idField, sqlTable), id);
         return SqlHelper.buildUpdateSql(update);
     }
 
@@ -422,7 +422,7 @@ public class SqlBeanProvider {
                 }
             }
             SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-            update.where().eq(SqlBeanUtil.getTableFieldName(idField, sqlTable.mapUsToCc()), id);
+            update.where().eq(SqlBeanUtil.getTableFieldName(idField, sqlTable), id);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -836,7 +836,7 @@ public class SqlBeanProvider {
             if (select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
                 try {
                     SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-                    select.page(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), SqlBeanUtil.getIdField(clazz), sqlTable.mapUsToCc()), paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
+                    select.page(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), SqlBeanUtil.getIdField(clazz), sqlTable), paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
                 } catch (SqlBeanException e) {
                     e.printStackTrace();
                 }
