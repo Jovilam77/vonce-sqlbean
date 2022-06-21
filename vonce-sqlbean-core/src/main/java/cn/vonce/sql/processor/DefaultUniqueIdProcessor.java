@@ -1,6 +1,7 @@
 package cn.vonce.sql.processor;
 
 import cn.vonce.sql.enumerate.IdType;
+import cn.vonce.sql.uitls.IdBuilder;
 import cn.vonce.sql.uitls.SnowflakeId16;
 import cn.vonce.sql.uitls.SnowflakeId18;
 
@@ -20,11 +21,11 @@ public class DefaultUniqueIdProcessor implements UniqueIdProcessor {
     public Object uniqueId(IdType idType) {
         switch (idType) {
             case UUID:
-                return UUID.randomUUID().toString().replace("-", "");
+                return IdBuilder.uuid();
             case SNOWFLAKE_ID_16:
-                return SnowflakeId16.nextId();
+                return IdBuilder.snowflake16();
             case SNOWFLAKE_ID_18:
-                return SnowflakeId18.instance().nextId();
+                return IdBuilder.snowflake18();
             default:
                 return null;
         }
