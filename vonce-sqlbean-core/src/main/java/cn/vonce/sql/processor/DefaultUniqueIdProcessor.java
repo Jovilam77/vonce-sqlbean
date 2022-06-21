@@ -16,8 +16,6 @@ import java.util.UUID;
  */
 public class DefaultUniqueIdProcessor implements UniqueIdProcessor {
 
-    private SnowflakeId18 snowflakeId18 = null;
-
     @Override
     public Object uniqueId(IdType idType) {
         switch (idType) {
@@ -26,12 +24,10 @@ public class DefaultUniqueIdProcessor implements UniqueIdProcessor {
             case SNOWFLAKE_ID_16:
                 return SnowflakeId16.nextId();
             case SNOWFLAKE_ID_18:
-                if (snowflakeId18 == null){
-                    snowflakeId18 = new SnowflakeId18(0);
-                }
-                return snowflakeId18.nextId();
+                return SnowflakeId18.instance().nextId();
             default:
                 return null;
         }
     }
+
 }

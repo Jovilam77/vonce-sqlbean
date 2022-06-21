@@ -3,7 +3,6 @@ package cn.vonce.sql.uitls;
 import java.sql.Timestamp;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -38,26 +37,14 @@ public enum SystemClock {
             return;
         }
 
-        this.executorService = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
-            @Override
-            public Thread newThread(Runnable r) {
-                Thread thread = new Thread(r, "system-clock");
-                thread.setDaemon(true);
-                return thread;
-            }
+        this.executorService = new ScheduledThreadPoolExecutor(1, r -> {
+            Thread thread = new Thread(r, "system-clock");
+            thread.setDaemon(true);
+            return thread;
         });
-        executorService.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                nowTime.set(System.currentTimeMillis());
-            }
-        }, this.period, this.period, TimeUnit.MILLISECONDS);
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                destroy();
-            }
-        }));
+        executorService.scheduleAtFixedRate(() -> nowTime.set(System.currentTimeMillis()),
+                this.period, this.period, TimeUnit.MILLISECONDS);
+        Runtime.getRuntime().addShutdownHook(new Thread(this::destroy));
         started = true;
     }
 
