@@ -65,7 +65,7 @@ public class SqlHelper {
             }
         }
         //标准Sql
-        sqlSb.append(select.isUseDistinct() ? SqlConstant.SELECT_DISTINCT : SqlConstant.SELECT);
+        sqlSb.append(select.isDistinct() ? SqlConstant.SELECT_DISTINCT : SqlConstant.SELECT);
         //SqlServer 分页处理
         if (select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
             if (SqlBeanUtil.isUsePage(select)) {

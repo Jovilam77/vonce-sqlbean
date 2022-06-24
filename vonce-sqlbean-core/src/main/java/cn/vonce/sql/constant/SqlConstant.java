@@ -5,7 +5,7 @@ public class SqlConstant {
     // sql
     public static final String SELECT = "SELECT ";
     public static final String COUNT = "COUNT";
-    public static final String SELECT_DISTINCT = "SELECT DISTINCT";
+    public static final String SELECT_DISTINCT = "SELECT DISTINCT ";
     public static final String FROM = " FROM ";
     public static final String WHERE = " WHERE ";
     public static final String GROUP_BY = " GROUP BY ";

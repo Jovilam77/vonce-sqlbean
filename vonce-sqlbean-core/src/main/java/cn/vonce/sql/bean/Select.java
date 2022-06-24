@@ -33,7 +33,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 默认不去重复
      */
-    private boolean useDistinct = false;
+    private boolean distinct = false;
     /**
      * 查询的列字段列表
      */
@@ -85,17 +85,28 @@ public class Select extends CommonCondition<Select> implements Serializable {
      *
      * @return
      */
-    public boolean isUseDistinct() {
-        return useDistinct;
+    public boolean isDistinct() {
+        return distinct;
     }
 
     /**
      * 设置useDistinct是否过滤重复
      *
-     * @param useDistinct 是否过滤
+     * @param distinct 是否过滤
      */
-    public void setUseDistinct(boolean useDistinct) {
-        this.useDistinct = useDistinct;
+    @Deprecated
+    public void setUseDistinct(boolean distinct) {
+        this.distinct = distinct;
+    }
+
+    /**
+     * 设置useDistinct是否过滤重复
+     *
+     * @param distinct 是否过滤
+     */
+    public Select distinct(boolean distinct) {
+        this.distinct = distinct;
+        return this;
     }
 
     /**
