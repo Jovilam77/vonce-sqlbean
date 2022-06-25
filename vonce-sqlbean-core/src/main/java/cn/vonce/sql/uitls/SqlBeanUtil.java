@@ -10,6 +10,7 @@ import cn.vonce.sql.exception.SqlBeanException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -958,6 +959,36 @@ public class SqlBeanUtil {
             objects = new Object[]{bean};
         }
         return objects;
+    }
+
+    /**
+     * 获取类型的默认值（仅支持基本类型、Date、BigDecimal）
+     *
+     * @param typeName
+     * @return
+     */
+    public static Object getDefaultValue(String typeName) {
+        switch (typeName) {
+            case "java.lang.Byte":
+            case "java.lang.Short":
+            case "java.lang.Integer":
+                return 0;
+            case "java.lang.Long":
+                return 0l;
+            case "java.lang.Float":
+                return 0f;
+            case "java.lang.Double":
+                return 0d;
+            case "java.lang.Character":
+                return '\u0000';
+            case "java.lang.Boolean":
+                return false;
+            case "java.util.Date":
+                return new Date();
+            case "java.math.BigDecimal":
+                return new BigDecimal(0);
+        }
+        return null;
     }
 
 }
