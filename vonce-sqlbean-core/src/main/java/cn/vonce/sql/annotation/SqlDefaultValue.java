@@ -5,7 +5,7 @@ import cn.vonce.sql.enumerate.FillWith;
 import java.lang.annotation.*;
 
 /**
- * 标识了该注解的字段如果为null自动注入默认值（仅支持基本类型、Date、BigDecimal）
+ * 标识该注解的字段如果为null自动注入默认值（仅支持基本类型、String、Date、Timestamp、BigDecimal）
  *
  * @author Jovi
  * @email imjovi@qq.com

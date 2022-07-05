@@ -63,11 +63,7 @@
 ```
 
 ```java
-8.@SqlInsertTime //标识插入时间，标识的字段在插入时为null将自动赋值
-```
-
-```java
-9.@SqlUpdateTime //标识更新时间，标识的字段在更新时为null将自动赋值
+8.@SqlDefaultValue //标识该注解的字段如果为null自动注入默认值（仅支持基本类型、String、Date、Timestamp、BigDecimal）
 ```
 
 #### 二. 示例.单表用法（该例子已包含表生成、常量生成、id生成、乐观锁、插入时间、更新时间）

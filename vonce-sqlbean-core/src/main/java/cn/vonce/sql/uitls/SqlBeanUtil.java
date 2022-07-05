@@ -11,6 +11,7 @@ import cn.vonce.sql.exception.SqlBeanException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -962,7 +963,7 @@ public class SqlBeanUtil {
     }
 
     /**
-     * 获取类型的默认值（仅支持基本类型、Date、BigDecimal）
+     * 获取类型的默认值（仅支持基本类型、String、Date、Timestamp、BigDecimal）
      *
      * @param typeName
      * @return
@@ -983,8 +984,12 @@ public class SqlBeanUtil {
                 return '\u0000';
             case "java.lang.Boolean":
                 return false;
+            case "java.lang.String":
+                return "";
             case "java.util.Date":
                 return new Date();
+            case "java.sql.Timestamp":
+                return new Timestamp(System.currentTimeMillis());
             case "java.math.BigDecimal":
                 return new BigDecimal(0);
         }

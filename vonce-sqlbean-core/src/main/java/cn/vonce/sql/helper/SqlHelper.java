@@ -628,18 +628,14 @@ public class SqlHelper {
                         ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), value);
                     }
                     valueSql.append(SqlBeanUtil.getSqlValue(common, value));
-                } else if (value == null && field.isAnnotationPresent(SqlInsertTime.class) && SqlBeanUtil.whatType(field.getType().getName()) == WhatType.DATE_TYPE) {
-                    //如果标识插入时间的字段为空则自动填充
-                    valueSql.append(SqlBeanUtil.getSqlValue(common, date));
-                    ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), date);
-                } else if (value == null && sqlDefaultValue != null && (sqlDefaultValue.with() == FillWith.INSERT || sqlDefaultValue.with() == FillWith.TOGETHER)) {
-                    Object defaultValue = SqlBeanUtil.getDefaultValue(field.getType().getName());
-                    valueSql.append(SqlBeanUtil.getSqlValue(common, defaultValue));
-                    ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), defaultValue);
                 } else if (field.isAnnotationPresent(SqlLogically.class) && value == null) {
                     //如果标识逻辑删除的字段为空则自动填充
                     valueSql.append(0);
                     ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), field.getType() == Boolean.class || field.getType() == boolean.class ? false : 0);
+                } else if (value == null && sqlDefaultValue != null && (sqlDefaultValue.with() == FillWith.INSERT || sqlDefaultValue.with() == FillWith.TOGETHER)) {
+                    Object defaultValue = SqlBeanUtil.getDefaultValue(field.getType().getName());
+                    valueSql.append(SqlBeanUtil.getSqlValue(common, defaultValue));
+                    ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), defaultValue);
                 } else {
                     valueSql.append(SqlBeanUtil.getSqlValue(common, ReflectUtil.instance().get(objectList.get(i).getClass(), objectList.get(i), field.getName())));
                 }
@@ -695,7 +691,6 @@ public class SqlHelper {
         Object bean = update.getUpdateBean();
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(bean.getClass());
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(bean.getClass());
-        Date date = new Date();
         for (Field field : fieldList) {
             if (SqlBeanUtil.isIgnore(field)) {
                 continue;
@@ -705,25 +700,24 @@ public class SqlHelper {
                 continue;
             }
             Object objectValue = ReflectUtil.instance().get(bean.getClass(), bean, field.getName());
-            if (update.isUpdateNotNull() && objectValue == null && !field.isAnnotationPresent(SqlUpdateTime.class) && !field.isAnnotationPresent(SqlVersion.class)) {
-                continue;
-            }
-            if (!update.isOptimisticLock() && objectValue == null && field.isAnnotationPresent(SqlVersion.class)) {
-                continue;
-            }
-            Object value = ReflectUtil.instance().get(bean.getClass(), bean, field.getName());
             SqlDefaultValue sqlDefaultValue = field.getAnnotation(SqlDefaultValue.class);
+            SqlVersion sqlVersion = field.getAnnotation(SqlVersion.class);
+            //如果是只更新不为null的字段，那么该字段如果是null并且也不是乐观锁字段，也不是更新时填充默认值的字段则跳过
+            if (update.isUpdateNotNull() && objectValue == null && sqlVersion == null && (sqlDefaultValue == null || sqlDefaultValue.with() == FillWith.INSERT)) {
+                continue;
+            }
+            //如果不是乐观锁字段，那么字段如果是null并且没有标识乐观锁注解则跳过
+            if (!update.isOptimisticLock() && objectValue == null && sqlVersion != null) {
+                continue;
+            }
             setSql.append(transferred);
             setSql.append(SqlBeanUtil.isToUpperCase(update) ? name.toUpperCase() : name);
             setSql.append(transferred);
             setSql.append(SqlConstant.EQUAL_TO);
-            if (update.isOptimisticLock() && field.isAnnotationPresent(SqlVersion.class)) {
+            if (update.isOptimisticLock() && sqlVersion != null) {
                 Object o = SqlBeanUtil.updateVersion(field.getType().getName(), objectValue);
                 setSql.append(SqlBeanUtil.getSqlValue(update, o));
-            } else if (value == null && field.isAnnotationPresent(SqlUpdateTime.class) && SqlBeanUtil.whatType(field.getType().getName()) == WhatType.DATE_TYPE) {
-                setSql.append(SqlBeanUtil.getSqlValue(update, date));
-                ReflectUtil.instance().set(bean.getClass(), bean, field.getName(), date);
-            } else if (value == null && sqlDefaultValue != null && (sqlDefaultValue.with() == FillWith.UPDATE || sqlDefaultValue.with() == FillWith.TOGETHER)) {
+            } else if (objectValue == null && sqlDefaultValue != null && (sqlDefaultValue.with() == FillWith.UPDATE || sqlDefaultValue.with() == FillWith.TOGETHER)) {
                 Object defaultValue = SqlBeanUtil.getDefaultValue(field.getType().getName());
                 setSql.append(SqlBeanUtil.getSqlValue(update, defaultValue));
                 ReflectUtil.instance().set(bean.getClass(), bean, field.getName(), defaultValue);
