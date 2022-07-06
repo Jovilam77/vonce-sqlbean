@@ -2,15 +2,15 @@
 
 #### 介绍
 
-###### Sqlbean是一款使用Java面向对象思想来编写并生成Sql语句的工具，在此基础上对Mybatis和Spring Jdbc实现了类似于JPA的轻量级插件支持。其中内置大量常用SQL执行的方法，可以非常方便的达到你想要的目的，相对复杂的SQL语句也得以支持，在常规的项目开发几乎做到不写DAO层，可以有效的提高项目开发的效率，让开发者更专注于业务代码的编写。
+###### Sqlbean是一款通过Java语法编写SQL语句并自动生成的ORM插件，除了支持Mybatis也同时支持Spring Jdbc，内置大量常用方法，无需编写DAO层，能减少90%的SQL语句，帮助你快速进行业务功能开发。
 
-###### 🚀特点: 零入侵, 多数据源, 动态Schema, 读写分离, 自动建表, 连表查询, 乐观锁, 分页, 支持Mybatis和Spring Jdbc
+###### 🚀特点: 无入侵, 多数据源, 动态Schema, 读写分离, 自动建表, 连表查询, 乐观锁, 分页, 支持Spring Jdbc
 
 ###### 💻环境: JDK8+, Mybatis3.2.4+, (Spring MVC 4.1.2+, Spring Boot 1.x, Spring Boot 2.x)
 
 ###### 💿数据库: Mysql, MariaDB, Oracle, Sqlserver2008+, PostgreSQL, DB2, Derby, Sqlite, HSQL, H2
 
-###### Sqlbean For Android请移步这里👉 [gitee](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android"), [github](https://github.com/Jovilam77/vonce-sqlbean-android "vonce-sqlbean-android")
+###### Sqlbean For Android请移步这里👉 [gitee(推荐)](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")、 [github(停止更新)](https://github.com/Jovilam77/vonce-sqlbean-android "vonce-sqlbean-android")
 
 #### 简单上手
 
