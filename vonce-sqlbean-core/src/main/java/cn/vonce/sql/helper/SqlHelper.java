@@ -8,8 +8,6 @@ import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.uitls.SqlBeanUtil;
-import com.google.common.collect.ListMultimap;
-
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -739,7 +737,7 @@ public class SqlHelper {
      */
     @SuppressWarnings("unchecked")
     public static String whereSql(CommonCondition commonCondition, Object bean) {
-        return conditionHandle(ConditionType.WHERE, commonCondition, commonCondition.getWhere(), commonCondition.getAgrs(), bean, commonCondition.where(), commonCondition.getWhereMap(), commonCondition.getWhereWrapper());
+        return conditionHandle(ConditionType.WHERE, commonCondition, commonCondition.getWhere(), commonCondition.getAgrs(), bean, commonCondition.where(), commonCondition.getWhereWrapper());
     }
 
     /**
@@ -757,7 +755,7 @@ public class SqlHelper {
      * @return
      */
     private static String havingSql(Select select) {
-        return conditionHandle(ConditionType.HAVING, select, select.getHaving(), select.getHavingArgs(), null, select.having(), select.getHavingMap(), select.getHavingWrapper());
+        return conditionHandle(ConditionType.HAVING, select, select.getHaving(), select.getHavingArgs(), null, select.having(), select.getHavingWrapper());
     }
 
     /**
@@ -819,11 +817,12 @@ public class SqlHelper {
      * @param common          公共类
      * @param conditionString 条件字符串（优先级1）
      * @param args            条件字符串参数
+     * @param bean            对应的bean
      * @param condition       简单条件（优先级3）
      * @param wrapper         条件包装器（优先级2）
      * @return
      */
-    private static String conditionHandle(ConditionType conditionType, Common common, String conditionString, Object[] args, Object bean, Condition condition, ListMultimap<String, ConditionInfo> conditionMap, Wrapper wrapper) {
+    private static String conditionHandle(ConditionType conditionType, Common common, String conditionString, Object[] args, Object bean, Condition condition, Wrapper wrapper) {
         StringBuffer conditionSql = new StringBuffer();
         if (ConditionType.WHERE == conditionType) {
             conditionSql.append(versionCondition(common, bean));
@@ -869,29 +868,6 @@ public class SqlHelper {
                     conditionInfo.setName(conditionInfo.getName().toUpperCase());
                 }
                 conditionSql.append(valueOperator(common, conditionInfo));
-            }
-            conditionSql.append(SqlConstant.END_BRACKET);
-        }
-        //优先级4 过时，未来版本将会移除
-        else if (conditionMap.size() > 0) {
-            if (conditionSql.length() > 0) {
-                conditionSql.append(SqlConstant.AND);
-            }
-            conditionSql.append(SqlConstant.BEGIN_BRACKET);
-            int i = 0;
-            // 遍历所有条件
-            Collection<Map.Entry<String, ConditionInfo>> sqlConditionEntryCollection = conditionMap.entries();
-            for (Map.Entry<String, ConditionInfo> sqlConditionEntry : sqlConditionEntryCollection) {
-                ConditionInfo conditionInfo = sqlConditionEntry.getValue();
-                // 遍历sql逻辑处理
-                if (i != 0 && i < sqlConditionEntryCollection.size()) {
-                    conditionSql.append(getLogic(conditionInfo.getSqlLogic()));
-                }
-                if (SqlBeanUtil.isToUpperCase(common)) {
-                    conditionInfo.setName(conditionInfo.getName().toUpperCase());
-                }
-                conditionSql.append(valueOperator(common, conditionInfo));
-                i++;
             }
             conditionSql.append(SqlConstant.END_BRACKET);
         }

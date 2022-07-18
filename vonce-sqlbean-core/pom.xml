@@ -119,22 +119,14 @@
 
     <groupId>cn.vonce</groupId>
     <artifactId>vonce-sqlbean-core</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.5</version>
 
     <!-- 版本信息 -->
     <properties>
-        <com.google.guava.version>23.0</com.google.guava.version>
-        <com.esotericsoftware.version>1.11.8</com.esotericsoftware.version>
+        <com.esotericsoftware.version>1.11.9</com.esotericsoftware.version>
     </properties>
 
     <dependencies>
-        <!-- 谷歌工具类 -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${com.google.guava.version}</version>
-            <scope>compile</scope>
-        </dependency>
         <dependency>
             <groupId>com.esotericsoftware</groupId>
             <artifactId>reflectasm</artifactId>

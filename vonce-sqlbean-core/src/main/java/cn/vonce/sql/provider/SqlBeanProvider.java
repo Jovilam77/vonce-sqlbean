@@ -709,7 +709,7 @@ public class SqlBeanProvider {
         copy.setColumns(columns);
         copy.setTargetSchema(targetSchema);
         copy.setTargetTableName(targetTableName);
-        copy.setWhere(wrapper);
+        copy.where(wrapper);
         return SqlHelper.buildCopy(copy);
     }
 

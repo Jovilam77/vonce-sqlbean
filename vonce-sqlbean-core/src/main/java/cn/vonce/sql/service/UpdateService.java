@@ -76,17 +76,6 @@ public interface UpdateService<T, ID> {
     int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, String[] filterFields);
 
     /**
-     * 根据条件更新 过时，将在1.6.0版本中移除，请尽快使用新方法替代
-     *
-     * @param bean  更新的bean实体
-     * @param where 条件字符串表达式
-     * @param args  条件参数
-     * @return
-     */
-    @Deprecated
-    int updateByCondition(T bean, String where, Object... args);
-
-    /**
      * 根据条件更新
      *
      * @param bean  更新的bean实体
@@ -106,18 +95,6 @@ public interface UpdateService<T, ID> {
      * @param args           条件参数
      * @return
      */
-    int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, String where, Object... args);
-
-    /**
-     * 根据条件更新 过时，将在1.6.0版本中移除，请尽快使用新方法替代
-     *
-     * @param bean           更新的bean实体
-     * @param updateNotNull  是否仅更新不为null的字段
-     * @param optimisticLock 是否使用乐观锁
-     * @param where          条件字符串表达式
-     * @param args           条件参数
-     * @return
-     */
     int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, String where, Object... args);
 
     /**
@@ -127,27 +104,7 @@ public interface UpdateService<T, ID> {
      * @param where 条件包装器
      * @return
      */
-    int updateByCondition(T bean, Wrapper where);
-
-    /**
-     * 根据条件更新 过时，将在1.6.0版本中移除，请尽快使用新方法替代
-     *
-     * @param bean  更新的bean实体
-     * @param where 条件包装器
-     * @return
-     */
     int updateBy(T bean, Wrapper where);
-
-    /**
-     * 根据条件更新 过时，将在1.6.0版本中移除，请尽快使用新方法替代
-     *
-     * @param bean           更新的bean实体
-     * @param updateNotNull  是否仅更新不为null的字段
-     * @param optimisticLock 是否使用乐观锁
-     * @param where          条件包装器
-     * @return
-     */
-    int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper where);
 
     /**
      * 根据条件更新
@@ -159,19 +116,6 @@ public interface UpdateService<T, ID> {
      * @return
      */
     int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper where);
-
-    /**
-     * 根据条件更新 过时，将在1.6.0版本中移除，请尽快使用新方法替代
-     *
-     * @param bean           更新的bean实体
-     * @param updateNotNull  是否仅更新不为null的字段
-     * @param optimisticLock 是否使用乐观锁
-     * @param filterFields   过滤不需更新的字段
-     * @param where          条件字符串表达式
-     * @param args           条件参数
-     * @return
-     */
-    int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where, Object... args);
 
     /**
      * 根据条件更新
@@ -187,18 +131,6 @@ public interface UpdateService<T, ID> {
     int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where, Object... args);
 
     /**
-     * 根据条件更新 过时，将在1.6.0版本中移除，请尽快使用新方法替代
-     *
-     * @param bean           更新的bean实体
-     * @param updateNotNull  是否仅更新不为null的字段
-     * @param optimisticLock 是否使用乐观锁
-     * @param filterFields   过滤不需更新的字段
-     * @param where          条件包装器
-     * @return
-     */
-    int updateByCondition(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, Wrapper where);
-
-    /**
      * 根据条件更新
      *
      * @param bean           更新的bean实体
@@ -211,15 +143,6 @@ public interface UpdateService<T, ID> {
     int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, Wrapper where);
 
     /**
-     * 根据实体类字段条件更新 过时，将在1.6.0版本中移除，请尽快使用新方法替代
-     *
-     * @param bean  更新的bean实体
-     * @param where 条件字符串表达式
-     * @return
-     */
-    int updateByBeanCondition(T bean, String where);
-
-    /**
      * 根据实体类字段条件更新
      *
      * @param bean  更新的bean实体
@@ -227,17 +150,6 @@ public interface UpdateService<T, ID> {
      * @return
      */
     int updateByBean(T bean, String where);
-
-    /**
-     * 根据实体类字段条件更新 过时，将在1.6.0版本中移除，请尽快使用新方法替代
-     *
-     * @param bean           更新的bean实体
-     * @param updateNotNull  是否仅更新不为null的字段
-     * @param optimisticLock 是否使用乐观锁
-     * @param where          条件字符串表达式
-     * @return
-     */
-    int updateByBeanCondition(T bean, boolean updateNotNull, boolean optimisticLock, String where);
 
     /**
      * 根据实体类字段条件更新
@@ -249,18 +161,6 @@ public interface UpdateService<T, ID> {
      * @return
      */
     int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String where);
-
-    /**
-     * 根据实体类字段条件更新 过时，将在1.6.0版本中移除，请尽快使用新方法替代
-     *
-     * @param bean           更新的bean实体
-     * @param updateNotNull  是否仅更新不为null的字段
-     * @param optimisticLock 是否使用乐观锁
-     * @param filterFields   过滤不需更新的字段
-     * @param where          条件字符串表达式
-     * @return
-     */
-    int updateByBeanCondition(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where);
 
     /**
      * 根据实体类字段条件更新
