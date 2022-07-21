@@ -1,8 +1,11 @@
 package cn.vonce.sql.model;
 
 import cn.vonce.sql.annotation.SqlColumn;
+import cn.vonce.sql.annotation.SqlDefaultValue;
 import cn.vonce.sql.annotation.SqlId;
 import cn.vonce.sql.annotation.SqlTable;
+import cn.vonce.sql.enumerate.FillWith;
+
 import java.util.Date;
 
 /**
@@ -15,6 +18,7 @@ public class Essay {
      * id
      */
     @SqlId
+    @SqlDefaultValue(with = FillWith.INSERT)
     @SqlColumn(value = "id")
     private String id;
     /**
