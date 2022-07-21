@@ -25,7 +25,6 @@
 ###### 2.标注实体类
 
 ```java
-
 @SqlTable("d_user")
 public class User {
     @SqlId(type = IdType.SNOWFLAKE_ID_16)
