@@ -64,7 +64,20 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> eq(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.EQUAL_TO, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.EQUAL_TO, value)));
+        return logic;
+    }
+
+    /**
+     * 等于
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> eq(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.EQUAL_TO, value)));
         return logic;
     }
 
@@ -88,7 +101,20 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> notEq(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.NOT_EQUAL_TO, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.NOT_EQUAL_TO, value)));
+        return logic;
+    }
+
+    /**
+     * 不等于
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> notEq(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.NOT_EQUAL_TO, value)));
         return logic;
     }
 
@@ -112,7 +138,20 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> lt(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.LESS_THAN, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.LESS_THAN, value)));
+        return logic;
+    }
+
+    /**
+     * 小于
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> lt(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.LESS_THAN, value)));
         return logic;
     }
 
@@ -136,7 +175,20 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> gt(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.GREATER_THAN, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.GREATER_THAN, value)));
+        return logic;
+    }
+
+    /**
+     * 大于
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> gt(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.GREATER_THAN, value)));
         return logic;
     }
 
@@ -160,9 +212,23 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> ltEq(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.LESS_THAN_OR_EQUAL_TO, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.LESS_THAN_OR_EQUAL_TO, value)));
         return logic;
     }
+
+    /**
+     * 小于等于
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> ltEq(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.LESS_THAN_OR_EQUAL_TO, value)));
+        return logic;
+    }
+
 
     /**
      * 小于等于
@@ -184,7 +250,20 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> gtEq(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.GREAT_THAN_OR_EQUAL_TO, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.GREAT_THAN_OR_EQUAL_TO, value)));
+        return logic;
+    }
+
+    /**
+     * 大于等于
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> gtEq(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.GREAT_THAN_OR_EQUAL_TO, value)));
         return logic;
     }
 
@@ -208,9 +287,23 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> like(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.LIKE, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.LIKE, value)));
         return logic;
     }
+
+    /**
+     * 全模糊 包含
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> like(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.LIKE, value)));
+        return logic;
+    }
+
 
     /**
      * 全模糊 包含
@@ -232,9 +325,23 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> likeL(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.LIKE_L, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.LIKE_L, value)));
         return logic;
     }
+
+    /**
+     * 左模糊 包含
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> likeL(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.LIKE_L, value)));
+        return logic;
+    }
+
 
     /**
      * 左模糊 包含
@@ -256,9 +363,23 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> likeR(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.LIKE_R, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.LIKE_R, value)));
         return logic;
     }
+
+    /**
+     * 右模糊 包含
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> likeR(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.LIKE_R, value)));
+        return logic;
+    }
+
 
     /**
      * 右模糊 包含
@@ -280,7 +401,20 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> notLike(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.NOT_LIKE, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.NOT_LIKE, value)));
+        return logic;
+    }
+
+    /**
+     * 全模糊 不包含
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> notLike(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.NOT_LIKE, value)));
         return logic;
     }
 
@@ -304,7 +438,20 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> notLikeL(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.NOT_LIKE_L, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.NOT_LIKE_L, value)));
+        return logic;
+    }
+
+    /**
+     * 左模糊 不包含
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> notLikeL(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.NOT_LIKE_L, value)));
         return logic;
     }
 
@@ -328,7 +475,20 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> notLikeR(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.NOT_LIKE_R, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.NOT_LIKE_R, value)));
+        return logic;
+    }
+
+    /**
+     * 右模糊 不包含
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> notLikeR(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.NOT_LIKE_R, value)));
         return logic;
     }
 
@@ -352,7 +512,20 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> is(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.IS, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.IS, value)));
+        return logic;
+    }
+
+    /**
+     * 是
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> is(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.IS, value)));
         return logic;
     }
 
@@ -376,7 +549,20 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> isNot(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.IS_NOT, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.IS_NOT, value)));
+        return logic;
+    }
+
+    /**
+     * 不是
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> isNot(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.IS_NOT, value)));
         return logic;
     }
 
@@ -398,9 +584,22 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> isNull(String field) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.IS_NULL, null)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.IS_NULL, null)));
         return logic;
     }
+
+    /**
+     * 是null
+     *
+     * @param tableAlias
+     * @param field
+     * @return
+     */
+    public Logic<Action> isNull(String tableAlias, String field) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.IS_NULL, null)));
+        return logic;
+    }
+
 
     /**
      * 不是null
@@ -420,9 +619,22 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> isNotNull(String field) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.IS_NULL, null)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.IS_NULL, null)));
         return logic;
     }
+
+    /**
+     * 不是null
+     *
+     * @param tableAlias
+     * @param field
+     * @return
+     */
+    public Logic<Action> isNotNull(String tableAlias, String field) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.IS_NULL, null)));
+        return logic;
+    }
+
 
     /**
      * 不是
@@ -444,7 +656,20 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> in(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.IN, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.IN, value)));
+        return logic;
+    }
+
+    /**
+     * 包含
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> in(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.IN, value)));
         return logic;
     }
 
@@ -468,7 +693,20 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> notIn(String field, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.NOT_IN, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.NOT_IN, value)));
+        return logic;
+    }
+
+    /**
+     * 不包含
+     *
+     * @param tableAlias
+     * @param field
+     * @param value
+     * @return
+     */
+    public Logic<Action> notIn(String tableAlias, String field, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.NOT_IN, value)));
         return logic;
     }
 
@@ -493,7 +731,21 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> between(String field, Object value1, Object value2) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(field, SqlOperator.BETWEEN, new Object[]{value1, value2})));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.BETWEEN, new Object[]{value1, value2})));
+        return logic;
+    }
+
+    /**
+     * 介于
+     *
+     * @param tableAlias
+     * @param field
+     * @param value1
+     * @param value2
+     * @return
+     */
+    public Logic<Action> between(String tableAlias, String field, Object value1, Object value2) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.BETWEEN, new Object[]{value1, value2})));
         return logic;
     }
 
@@ -510,8 +762,8 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    private ConditionInfo newConditionInfo(String name, SqlOperator sqlOperator, Object value) {
-        return new ConditionInfo(null, null, name, value, sqlOperator);
+    private ConditionInfo newConditionInfo(String tableAlias, String name, SqlOperator sqlOperator, Object value) {
+        return new ConditionInfo(null, tableAlias, name, value, sqlOperator);
     }
 
     private ConditionInfo newConditionInfo(Column column, SqlOperator sqlOperator, Object value) {

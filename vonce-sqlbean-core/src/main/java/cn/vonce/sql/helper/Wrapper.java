@@ -37,6 +37,18 @@ public class Wrapper implements Serializable {
      * @param cond
      * @return
      */
+    public static Wrapper where(Wrapper cond) {
+        Wrapper wrapper = new Wrapper();
+        wrapper.dataList.add(new ConditionData(SqlLogic.AND, cond));
+        return wrapper;
+    }
+
+    /**
+     * 条件
+     *
+     * @param cond
+     * @return
+     */
     public static Wrapper having(Cond cond) {
         return where(cond);
     }
