@@ -7,6 +7,7 @@ import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.helper.Cond;
 import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.helper.Wrapper;
+import cn.vonce.sql.model.Essay;
 import cn.vonce.sql.model.User;
 import cn.vonce.sql.model.sql.SqlEssay;
 import cn.vonce.sql.model.sql.SqlUser;
@@ -69,6 +70,7 @@ public class SqlHelperTest {
     private static void select1(SqlBeanDB sqlBeanDB) {
         Select select = new Select();
         select.setSqlBeanDB(sqlBeanDB);
+        select.setBeanClass(Essay.class);
         select.column(SqlEssay._all);
         select.column(SqlUser.headPortrait, "头像");
         select.column(SqlUser.nickname, "昵称");
@@ -90,6 +92,7 @@ public class SqlHelperTest {
     private static void select2(SqlBeanDB sqlBeanDB) {
         Select select2 = new Select();
         select2.setSqlBeanDB(sqlBeanDB);
+        select2.setBeanClass(Essay.class);
         select2.column(SqlEssay.id, "序号")
                 .column(SqlEssay.content, "文章内容")
                 .column(SqlEssay.creationTime, "创建时间")
@@ -109,6 +112,7 @@ public class SqlHelperTest {
     private static void select3(SqlBeanDB sqlBeanDB) {
         Select select3 = new Select();
         select3.setSqlBeanDB(sqlBeanDB);
+        select3.setBeanClass(Essay.class);
         select3.column(SqlEssay._all, "count")
                 .column(SqlEssay.categoryId);
         select3.setTable(SqlEssay._tableName);
@@ -126,6 +130,7 @@ public class SqlHelperTest {
     private static void select4(SqlBeanDB sqlBeanDB) {
         Select select4 = new Select();
         select4.setSqlBeanDB(sqlBeanDB);
+        select4.setBeanClass(Essay.class);
         select4.column(SqlUser._all);
         select4.setTable(SqlUser._tableName);
         Integer[] gender = {0, 1};
@@ -144,6 +149,7 @@ public class SqlHelperTest {
     private static void select5(SqlBeanDB sqlBeanDB) {
         Select select5 = new Select();
         select5.setSqlBeanDB(sqlBeanDB);
+        select5.setBeanClass(Essay.class);
         select5.column(SqlUser._all);
         select5.setTable(SqlUser._tableName);
         select5.where(Wrapper.where(Cond.eq(SqlUser.id, 1)).and(Wrapper.where(Cond.eq(SqlUser.gender, "1")).or(Cond.eq(SqlUser.nickname, 1))));

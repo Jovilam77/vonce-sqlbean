@@ -76,7 +76,7 @@ public class UserController {
         List<User> list = userService.select();
         list = userService.selectBy(Wrapper.where(gt(User$.id, 10)).and(lt(User$.id, 20)));
         //指定查询
-        list = userService.select(new Select().column(User$.id$, User$.name$, User$.phone).where().eq());
+        list = userService.select(new Select().column(User$.id$, User$.name$, User$.phone$).where().gt(User$.id$, 10));
 
         //查询一条
         User user = userService.selectById(1);

@@ -171,6 +171,19 @@ public class EssayUnion extends Essay {
 	/**省略get set方法*/
 
 }
+
+@RestController
+public class XxxController {
+
+    @Autowired
+    private EssayService essayService;
+
+    @GetMapper("getList")
+    public Object getList(){
+        return essayService.select(EssayUnion.class);//最后查询时需指定类型EssayUnion.class，所有selectXX方法都支持
+    }
+
+}
 ```
 #### 五. 示例.指定某字段关联查询的用法
 ```java
@@ -184,6 +197,19 @@ public class EssayUnion extends Essay {
 	private User user;
 
 	/**省略get set方法*/
+
+}
+
+@RestController
+public class XxxController {
+
+    @Autowired
+    private EssayService essayService;
+
+    @GetMapper("getList")
+    public Object getList(){
+        return essayService.select(EssayUnion.class);//最后查询时需指定类型EssayUnion.class，所有selectXX方法都支持
+    }
 
 }
 ```
@@ -208,5 +234,18 @@ public class EssayUnion extends Essay {
 
 	/**省略get set方法*/
 
+}
+
+@RestController
+public class XxxController {
+    
+    @Autowired
+    private EssayService essayService;
+    
+    @GetMapper("getList")
+    public Object getList(){
+        return essayService.select(EssayUnion.class);//最后查询时需指定类型EssayUnion.class，所有selectXX方法都支持
+    }
+    
 }
 ```
