@@ -115,9 +115,9 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (id == null) {
             return null;
         }
-        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-            clazz = returnType;
-        }
+//        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+//            clazz = returnType;
+//        }
         return singleResult(jdbcTemplate.query(SqlBeanProvider.selectByIdSql(getSqlBeanDB(), clazz, id), new SpringJbdcSqlBeanMapper<R>(clazz, returnType)));
     }
 
@@ -136,9 +136,9 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (ids == null || ids.length == 0) {
             throw new SqlBeanException("selectByIds方法ids参数必须拥有一个值");
         }
-        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-            clazz = returnType;
-        }
+//        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+//            clazz = returnType;
+//        }
         return jdbcTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, ids), new SpringJbdcSqlBeanMapper<R>(clazz, returnType));
     }
 
@@ -151,9 +151,9 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> R selectOne(Class<R> returnType, Select select) {
-        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-            clazz = returnType;
-        }
+//        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+//            clazz = returnType;
+//        }
         return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select), new SpringJbdcSqlBeanMapper<R>(clazz, returnType)));
     }
 
@@ -172,9 +172,9 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> R selectOneBy(Class<R> returnType, String where, Object... args) {
-        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-            clazz = returnType;
-        }
+//        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+//            clazz = returnType;
+//        }
         return singleResult(jdbcTemplate.query(SqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args), new SpringJbdcSqlBeanMapper<>(clazz, returnType)));
     }
 
@@ -191,18 +191,18 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public <R> R selectOneBy(Class<R> returnType, Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
-        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-            clazz = returnType;
-        }
+//        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+//            clazz = returnType;
+//        }
         return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select), new SpringJbdcSqlBeanMapper<>(clazz, returnType)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> selectBy(Class<R> returnType, String where, Object... args) {
-        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-            clazz = returnType;
-        }
+//        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+//            clazz = returnType;
+//        }
         return jdbcTemplate.query(SqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, null, where, args), new SpringJbdcSqlBeanMapper<>(clazz, returnType));
     }
 
@@ -211,18 +211,18 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public <R> List<R> selectBy(Class<R> returnType, Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
-        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-            clazz = returnType;
-        }
+//        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+//            clazz = returnType;
+//        }
         return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select), new SpringJbdcSqlBeanMapper<>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> selectBy(Class<R> returnType, Paging paging, String where, Object... args) {
-        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-            clazz = returnType;
-        }
+//        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+//            clazz = returnType;
+//        }
         return jdbcTemplate.query(SqlBeanProvider.selectByConditionSql(getSqlBeanDB(), clazz, paging, where, args), new SpringJbdcSqlBeanMapper<>(clazz, returnType));
     }
 
@@ -233,9 +233,9 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         select.where(wrapper);
         select.page(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
-        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-            clazz = returnType;
-        }
+//        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+//            clazz = returnType;
+//        }
         return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select), new SpringJbdcSqlBeanMapper<>(clazz, returnType));
     }
 
@@ -304,18 +304,18 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> select(Class<R> returnType) {
-        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-            clazz = returnType;
-        }
+//        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+//            clazz = returnType;
+//        }
         return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, null), new SpringJbdcSqlBeanMapper<R>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> select(Class<R> returnType, Paging paging) {
-        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-            clazz = returnType;
-        }
+//        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+//            clazz = returnType;
+//        }
         return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, paging), new SpringJbdcSqlBeanMapper<R>(clazz, returnType));
     }
 
@@ -328,9 +328,9 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> select(Class<R> returnType, Select select) {
-        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
-            clazz = returnType;
-        }
+//        if (!SqlBeanUtil.isBaseType(returnType.getName()) && !SqlBeanUtil.isMap(returnType.getName())) {
+//            clazz = returnType;
+//        }
         return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, select), new SpringJbdcSqlBeanMapper<R>(clazz, returnType));
     }
 
@@ -349,9 +349,9 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public int count(Class<?> returnType, Select select) {
-        if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
-            return jdbcTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanDB(), clazz, select), Integer.class);
-        }
+//        if (SqlBeanUtil.isBaseType(returnType.getName()) || SqlBeanUtil.isMap(returnType.getName())) {
+//            return jdbcTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanDB(), clazz, select), Integer.class);
+//        }
         return jdbcTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanDB(), clazz, select), Integer.class);
     }
 
