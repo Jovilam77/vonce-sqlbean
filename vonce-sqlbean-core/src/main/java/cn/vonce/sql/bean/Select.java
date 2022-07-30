@@ -4,6 +4,7 @@ import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.enumerate.SqlSort;
 import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.helper.Wrapper;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +27,10 @@ public class Select extends CommonCondition<Select> implements Serializable {
         super.setReturnObj(this);
     }
 
+    /**
+     * 是否为分页时克隆的副本
+     */
+    private boolean clone;
     /**
      * 默认不去重复
      */
@@ -88,6 +93,24 @@ public class Select extends CommonCondition<Select> implements Serializable {
     public Select distinct(boolean distinct) {
         this.distinct = distinct;
         return this;
+    }
+
+    /**
+     * 是否为克隆对象
+     *
+     * @return
+     */
+    public boolean isClone() {
+        return clone;
+    }
+
+    /**
+     * 标识为克隆对象
+     *
+     * @param clone 是否为克隆对象
+     */
+    protected void setClone(boolean clone) {
+        this.clone = clone;
     }
 
     /**

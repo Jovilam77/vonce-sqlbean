@@ -81,7 +81,7 @@ public class SqlHelper {
         String groupBySql = groupBySql(select);
         sqlSb.append(groupBySql);
         sqlSb.append(havingSql(select));
-        if (!SqlBeanUtil.isCount(select)) {
+        if (!select.isClone()) {
             sqlSb.append(orderSql);
         }
         //SQLServer2008 分页处理
@@ -96,8 +96,8 @@ public class SqlHelper {
                 sqlSb.append(pageParam[1]);
             }
         }
-        //标准Sql
-        if (SqlBeanUtil.isCount(select) && StringUtil.isNotEmpty(groupBySql)) {
+        //标准Sql 如果是克隆的select则为分页时的count
+        if (select.isClone() && StringUtil.isNotEmpty(groupBySql)) {
             sqlSb.insert(0, SqlConstant.SELECT + SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET + SqlConstant.FROM + SqlConstant.BEGIN_BRACKET);
             sqlSb.append(SqlConstant.END_BRACKET + SqlConstant.AS + SqlConstant.T);
         }
@@ -801,7 +801,7 @@ public class SqlHelper {
             }
             groupByAndOrderBySql.deleteCharAt(groupByAndOrderBySql.length() - SqlConstant.COMMA.length());
         } else {
-            if (SqlConstant.ORDER_BY.equals(type) && select.getSqlBeanDB().getDbType() == DbType.SQLServer && SqlBeanUtil.isUsePage(select) && !SqlBeanUtil.isCount(select)) {
+            if (SqlConstant.ORDER_BY.equals(type) && select.getSqlBeanDB().getDbType() == DbType.SQLServer && SqlBeanUtil.isUsePage(select) && !select.isClone()) {
                 groupByAndOrderBySql.append(type);
                 String tableFieldFullName = SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), select.getPage().getIdName());
                 groupByAndOrderBySql.append(SqlBeanUtil.isToUpperCase(select) ? tableFieldFullName.toUpperCase() : tableFieldFullName);
