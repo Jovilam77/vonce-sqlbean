@@ -29,22 +29,29 @@ public class SqlBeanProvider {
     /**
      * 根据id条件查询
      *
+     * @param sqlBeanDB
      * @param clazz
+     * @param returnType
      * @param id
      * @return
      */
-    public static String selectByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object id) {
-        return selectByIdsSql(sqlBeanDB, clazz, new Object[]{id});
+    public static String selectByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Class<?> returnType, Object id) {
+        return selectByIdsSql(sqlBeanDB, clazz, returnType, new Object[]{id});
     }
 
     /**
      * 根据ids条件查询
-     *
+     * @param sqlBeanDB
      * @param clazz
+     * @param returnType
      * @param ids
      * @return
      */
-    public static String selectByIdsSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object... ids) {
+    public static String selectByIdsSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Class<?> returnType, Object... ids) {
+        //如果returnType类与clazz的SqlTable一致，说明这两个对象指向的都是同一张表，那么returnType则继承于clazz并包装了额外的属性
+        if (returnType != null && SqlBeanUtil.sqlTableIsConsistent(clazz, returnType)) {
+            clazz = returnType;
+        }
         Select select;
         Field idField;
         try {
@@ -66,13 +73,19 @@ public class SqlBeanProvider {
     /**
      * 根据条件查询
      *
+     * @param sqlBeanDB
      * @param clazz
+     * @param returnType
      * @param paging
      * @param where
      * @param args
      * @return
      */
-    public static String selectByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Paging paging, String where, Object... args) {
+    public static String selectBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, Class<?> returnType, Paging paging, String where, Object... args) {
+        //如果returnType类与clazz的SqlTable一致，说明这两个对象指向的都是同一张表，那么returnType则继承于clazz并包装了额外的属性
+        if (returnType != null && SqlBeanUtil.sqlTableIsConsistent(clazz, returnType)) {
+            clazz = returnType;
+        }
         Select select = newSelect(sqlBeanDB, clazz, false);
         select.where(where, args);
         setPaging(select, paging, clazz);
@@ -82,12 +95,13 @@ public class SqlBeanProvider {
     /**
      * 根据条件查询统计
      *
+     * @param sqlBeanDB
      * @param clazz
      * @param where
      * @param args
      * @return
      */
-    public static String countByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
+    public static String countBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
         Select select = newSelect(sqlBeanDB, clazz, true);
         select.where(where, args);
         return SqlHelper.buildSelectSql(select);
@@ -96,10 +110,17 @@ public class SqlBeanProvider {
     /**
      * 查询全部
      *
+     * @param sqlBeanDB
      * @param clazz
+     * @param returnType
+     * @param paging
      * @return
      */
-    public static String selectAllSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Paging paging) {
+    public static String selectAllSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Class<?> returnType, Paging paging) {
+        //如果returnType类与clazz的SqlTable一致，说明这两个对象指向的都是同一张表，那么returnType则继承于clazz并包装了额外的属性
+        if (returnType != null && SqlBeanUtil.sqlTableIsConsistent(clazz, returnType)) {
+            clazz = returnType;
+        }
         Select select = newSelect(sqlBeanDB, clazz, false);
         setPaging(select, paging, clazz);
         return SqlHelper.buildSelectSql(select);
@@ -110,10 +131,15 @@ public class SqlBeanProvider {
      *
      * @param sqlBeanDB
      * @param clazz
+     * @param returnType
      * @param select
      * @return
      */
-    public static String selectSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Select select) {
+    public static String selectSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Class<?> returnType, Select select) {
+        //如果returnType类与clazz的SqlTable一致，说明这两个对象指向的都是同一张表，那么returnType则继承于clazz并包装了额外的属性
+        if (returnType != null && SqlBeanUtil.sqlTableIsConsistent(clazz, returnType)) {
+            clazz = returnType;
+        }
         if (select.getSqlBeanDB() == null) {
             select.setSqlBeanDB(sqlBeanDB);
         }
@@ -137,10 +163,15 @@ public class SqlBeanProvider {
      *
      * @param sqlBeanDB
      * @param clazz
+     * @param returnType
      * @param select
      * @return
      */
-    public static String countSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Select select) {
+    public static String countSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Class<?> returnType, Select select) {
+        //如果returnType类与clazz的SqlTable一致，说明这两个对象指向的都是同一张表，那么returnType则继承于clazz并包装了额外的属性
+        if (returnType != null && SqlBeanUtil.sqlTableIsConsistent(clazz, returnType)) {
+            clazz = returnType;
+        }
         if (select.getSqlBeanDB() == null) {
             select.setSqlBeanDB(sqlBeanDB);
         }
@@ -205,10 +236,10 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public static String deleteByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
+    public static String deleteBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
         //如果是逻辑删除那么将Delete对象转为Update对象
         if (SqlBeanUtil.checkLogically(clazz)) {
-            return logicallyDeleteByConditionSql(sqlBeanDB, clazz, where, args);
+            return logicallyDeleteBySql(sqlBeanDB, clazz, where, args);
         }
         Delete delete = new Delete();
         delete.setSqlBeanDB(sqlBeanDB);
@@ -292,7 +323,7 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public static String logicallyDeleteByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
+    public static String logicallyDeleteBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
         Update update = new Update();
         try {
             update.setSqlBeanDB(sqlBeanDB);
@@ -314,7 +345,7 @@ public class SqlBeanProvider {
      * @param wrapper
      * @return
      */
-    public static String logicallyDeleteByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Wrapper wrapper) {
+    public static String logicallyDeleteBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, Wrapper wrapper) {
         Update update = new Update();
         try {
             update.setSqlBeanDB(sqlBeanDB);
@@ -443,7 +474,7 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public static String updateByConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where, Object[] args) {
+    public static String updateBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where, Object[] args) {
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
         update.setFilterFields(filterFields);
         update.where(where, args);
@@ -462,7 +493,7 @@ public class SqlBeanProvider {
      * @param where
      * @return
      */
-    public static String updateByBeanConditionSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where) {
+    public static String updateByBeanSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where) {
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
         update.setFilterFields(filterFields);
         update.where(where, null);

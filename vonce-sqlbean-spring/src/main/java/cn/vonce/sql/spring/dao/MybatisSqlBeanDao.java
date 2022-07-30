@@ -115,8 +115,8 @@ public interface MybatisSqlBeanDao<T> {
      * @param args
      * @return
      */
-    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectByCondition")
-    T selectOneByCondition(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("where") String where, @Param("args") Object... args);
+    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectBy")
+    T selectOneBy(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("where") String where, @Param("args") Object... args);
 
     /**
      * 根据条件查询(可指定返回类型、查询的表)
@@ -128,8 +128,8 @@ public interface MybatisSqlBeanDao<T> {
      * @param args
      * @return
      */
-    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectByCondition")
-    <O> O selectOneByConditionO(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("returnType") Class<O> returnType, @Param("where") String where, @Param("args") Object... args);
+    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectBy")
+    <O> O selectOneByO(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("returnType") Class<O> returnType, @Param("where") String where, @Param("args") Object... args);
 
     /**
      * 根据条件查询(可指定返回类型、查询的表)
@@ -141,8 +141,8 @@ public interface MybatisSqlBeanDao<T> {
      * @param args
      * @return
      */
-    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectByCondition")
-    <O> List<O> selectByConditionO(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("returnType") Class<O> returnType, @Param("paging") Paging paging, @Param("where") String where, @Param("args") Object... args);
+    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectBy")
+    <O> List<O> selectByO(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("returnType") Class<O> returnType, @Param("paging") Paging paging, @Param("where") String where, @Param("args") Object... args);
 
     /**
      * 根据条件查询
@@ -154,8 +154,8 @@ public interface MybatisSqlBeanDao<T> {
      * @param args
      * @return
      */
-    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectByCondition")
-    List<T> selectByCondition(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("paging") Paging paging, @Param("where") String where, @Param("args") Object... args);
+    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectBy")
+    List<T> selectBy(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("paging") Paging paging, @Param("where") String where, @Param("args") Object... args);
 
     /**
      * 根据条件查询统计
@@ -166,8 +166,8 @@ public interface MybatisSqlBeanDao<T> {
      * @param args
      * @return
      */
-    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectCountByCondition")
-    int selectCountByCondition(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("where") String where, @Param("args") Object... args);
+    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "countBy")
+    int countBy(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("where") String where, @Param("args") Object... args);
 
     /**
      * 查询全部
@@ -225,7 +225,7 @@ public interface MybatisSqlBeanDao<T> {
      * @return
      */
     @SelectProvider(type = MybatisSqlBeanProvider.class, method = "select")
-    <O> List<O> selectO(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("returnType") Class<O> returnType, @Param("select") Select select);
+    <O> List<O> selectO(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("returnType") Class<?> returnType, @Param("select") Select select);
 
     /**
      * 根据自定义条件统计
@@ -236,7 +236,7 @@ public interface MybatisSqlBeanDao<T> {
      * @return
      */
     @SelectProvider(type = MybatisSqlBeanProvider.class, method = "count")
-    int count(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("select") Select select);
+    int count(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("returnType") Class<?> returnType, @Param("select") Select select);
 
     /**
      * 根据id条件删除
@@ -258,8 +258,8 @@ public interface MybatisSqlBeanDao<T> {
      * @param args
      * @return
      */
-    @DeleteProvider(type = MybatisSqlBeanProvider.class, method = "deleteByCondition")
-    int deleteByCondition(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("where") String where, @Param("args") Object... args);
+    @DeleteProvider(type = MybatisSqlBeanProvider.class, method = "deleteBy")
+    int deleteBy(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("where") String where, @Param("args") Object... args);
 
     /**
      * 删除
@@ -293,8 +293,8 @@ public interface MybatisSqlBeanDao<T> {
      * @param args
      * @return
      */
-    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "logicallyDeleteByCondition")
-    int logicallyDeleteByCondition(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("where") String where, @Param("args") Object... args);
+    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "logicallyDeleteBy")
+    int logicallyDeleteBy(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("where") String where, @Param("args") Object... args);
 
     /**
      * 根据条件逻辑删除
@@ -360,8 +360,8 @@ public interface MybatisSqlBeanDao<T> {
      * @param args
      * @return
      */
-    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateByCondition")
-    int updateByCondition(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("optimisticLock") boolean optimisticLock, @Param("filterFields") String[] filterFields, @Param("where") String where, @Param("args") Object... args);
+    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateBy")
+    int updateBy(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("optimisticLock") boolean optimisticLock, @Param("filterFields") String[] filterFields, @Param("where") String where, @Param("args") Object... args);
 
     /**
      * 根据实体类字段条件更新
@@ -375,8 +375,8 @@ public interface MybatisSqlBeanDao<T> {
      * @param where
      * @return
      */
-    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateByBeanCondition")
-    int updateByBeanCondition(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("optimisticLock") boolean optimisticLock, @Param("filterFields") String[] filterFields, @Param("where") String where);
+    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateByBean")
+    int updateByBean(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("optimisticLock") boolean optimisticLock, @Param("filterFields") String[] filterFields, @Param("where") String where);
 
     /**
      * 插入数据

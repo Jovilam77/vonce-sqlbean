@@ -21,12 +21,20 @@ import java.util.*;
 public class SqlBeanUtil {
 
     /**
+     * 保存SqlTable缓存
+     */
+    private static final WeakHashMap<Class<?>, SqlTable> sqlTableMap = new WeakHashMap<>();
+
+    /**
      * 获取SqlTable注解
      *
      * @param clazz
      * @return
      */
     public static SqlTable getSqlTable(Class<?> clazz) {
+        if (sqlTableMap.containsKey(clazz)) {
+            return sqlTableMap.get(clazz);
+        }
         SqlTable sqlTable = clazz.getAnnotation(SqlTable.class);
         if (sqlTable == null) {
             Class<?> superClass = clazz.getSuperclass();
@@ -43,7 +51,24 @@ public class SqlBeanUtil {
                 }
             } while (!superClass.getName().equals("java.lang.Object"));
         }
+        sqlTableMap.put(clazz, sqlTable);
         return sqlTable;
+    }
+
+    /**
+     * 校验两个SqlTable是否一致
+     *
+     * @param clazz1
+     * @param clazz2
+     * @return
+     */
+    public static boolean sqlTableIsConsistent(Class<?> clazz1, Class<?> clazz2) {
+        SqlTable sqlTable = getSqlTable(clazz1);
+        SqlTable sqlTable2 = getSqlTable(clazz2);
+        if (sqlTable != null && sqlTable2 != null && sqlTable.schema().equals(sqlTable2.schema()) && sqlTable.value().equals(sqlTable2.value())) {
+            return true;
+        }
+        return false;
     }
 
     /**

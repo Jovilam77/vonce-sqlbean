@@ -24,7 +24,11 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String selectById(Map<String, Object> map) {
-        return SqlBeanProvider.selectByIdSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("id"));
+        Class<?> returnType = null;
+        if (map.containsKey("returnType")) {
+            returnType = (Class<?>) map.get("returnType");
+        }
+        return SqlBeanProvider.selectByIdSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), returnType, map.get("id"));
     }
 
     /**
@@ -34,7 +38,11 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String selectByIds(Map<String, Object> map) {
-        return SqlBeanProvider.selectByIdsSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Object[]) map.get("ids"));
+        Class<?> returnType = null;
+        if (map.containsKey("returnType")) {
+            returnType = (Class<?>) map.get("returnType");
+        }
+        return SqlBeanProvider.selectByIdsSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), returnType, (Object[]) map.get("ids"));
     }
 
     /**
@@ -43,16 +51,20 @@ public class MybatisSqlBeanProvider {
      * @param map
      * @return
      */
-    public String selectByCondition(Map<String, Object> map) {
+    public String selectBy(Map<String, Object> map) {
         Paging paging = null;
+        Class<?> returnType = null;
         if (map.containsKey("paging")) {
             paging = (Paging) map.get("paging");
+        }
+        if (map.containsKey("returnType")) {
+            returnType = (Class<?>) map.get("returnType");
         }
         Object[] args = null;
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return SqlBeanProvider.selectByConditionSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), paging, (String) map.get("where"), args);
+        return SqlBeanProvider.selectBySql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), returnType, paging, (String) map.get("where"), args);
     }
 
     /**
@@ -61,12 +73,12 @@ public class MybatisSqlBeanProvider {
      * @param map
      * @return
      */
-    public String selectCountByCondition(Map<String, Object> map) {
+    public String countBy(Map<String, Object> map) {
         Object[] args = null;
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return SqlBeanProvider.countByConditionSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
+        return SqlBeanProvider.countBySql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
     }
 
     /**
@@ -77,10 +89,14 @@ public class MybatisSqlBeanProvider {
      */
     public String selectAll(Map<String, Object> map) {
         Paging paging = null;
+        Class<?> returnType = null;
         if (map.containsKey("paging")) {
             paging = (Paging) map.get("paging");
         }
-        return SqlBeanProvider.selectAllSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), paging);
+        if (map.containsKey("returnType")) {
+            returnType = (Class<?>) map.get("returnType");
+        }
+        return SqlBeanProvider.selectAllSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), returnType, paging);
     }
 
     /**
@@ -90,7 +106,11 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String select(Map<String, Object> map) {
-        return SqlBeanProvider.selectSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Select) map.get("select"));
+        Class<?> returnType = null;
+        if (map.containsKey("returnType")) {
+            returnType = (Class<?>) map.get("returnType");
+        }
+        return SqlBeanProvider.selectSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), returnType, (Select) map.get("select"));
     }
 
     /**
@@ -100,7 +120,11 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String count(Map<String, Object> map) {
-        return SqlBeanProvider.countSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Select) map.get("select"));
+        Class<?> returnType = null;
+        if (map.containsKey("returnType")) {
+            returnType = (Class<?>) map.get("returnType");
+        }
+        return SqlBeanProvider.countSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), returnType, (Select) map.get("select"));
     }
 
     /**
@@ -119,12 +143,12 @@ public class MybatisSqlBeanProvider {
      * @param map
      * @return
      */
-    public String deleteByCondition(Map<String, Object> map) {
+    public String deleteBy(Map<String, Object> map) {
         Object[] args = null;
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return SqlBeanProvider.deleteByConditionSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
+        return SqlBeanProvider.deleteBySql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
     }
 
     /**
@@ -153,12 +177,12 @@ public class MybatisSqlBeanProvider {
      * @param map
      * @return
      */
-    public String logicallyDeleteByCondition(Map<String, Object> map) {
+    public String logicallyDeleteBy(Map<String, Object> map) {
         Object[] args = null;
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return SqlBeanProvider.logicallyDeleteByConditionSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
+        return SqlBeanProvider.logicallyDeleteBySql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
     }
 
     /**
@@ -168,7 +192,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String logicallyDeleteByWrapper(Map<String, Object> map) {
-        return SqlBeanProvider.logicallyDeleteByConditionSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Wrapper) map.get("wrapper"));
+        return SqlBeanProvider.logicallyDeleteBySql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Wrapper) map.get("wrapper"));
     }
 
     /**
@@ -207,12 +231,12 @@ public class MybatisSqlBeanProvider {
      * @param map
      * @return
      */
-    public String updateByCondition(Map<String, Object> map) {
+    public String updateBy(Map<String, Object> map) {
         Object[] args = null;
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return SqlBeanProvider.updateByConditionSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (String[]) map.get("filterFields"), (String) map.get("where"), args);
+        return SqlBeanProvider.updateBySql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (String[]) map.get("filterFields"), (String) map.get("where"), args);
     }
 
     /**
@@ -221,8 +245,8 @@ public class MybatisSqlBeanProvider {
      * @param map
      * @return
      */
-    public String updateByBeanCondition(Map<String, Object> map) {
-        return SqlBeanProvider.updateByBeanConditionSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (String[]) map.get("filterFields"), (String) map.get("where"));
+    public String updateByBean(Map<String, Object> map) {
+        return SqlBeanProvider.updateByBeanSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (String[]) map.get("filterFields"), (String) map.get("where"));
     }
 
     /**
