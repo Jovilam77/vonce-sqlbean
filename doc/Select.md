@@ -100,7 +100,7 @@
     * @param args  条件参数
     * @return
     */
-    T selectOneByCondition(String where, Object...args);
+    T selectOneBy(String where, Object...args);
 ```
 ###### 9.根据条件查询
 ```java
@@ -112,7 +112,7 @@
     * @param args       条件参数
     * @return
     */
-    <O> O selectOneByCondition(Class<O> returnType, String where, Object...args);
+    <O> O selectOneBy(Class<O> returnType, String where, Object...args);
 ```
 ###### 10.根据条件查询
 ```java
@@ -122,7 +122,7 @@
     * @param where 条件包装器
     * @return
     */
-    T selectOneByCondition(Wrapper where);
+    T selectOneBy(Wrapper where);
 ```
 ###### 11.根据条件查询
 ```java
@@ -133,7 +133,7 @@
     * @param where      条件包装器
     * @return
     */
-    <O> O selectOneByCondition(Class<O> returnType, Wrapper where);
+    <O> O selectOneBy(Class<O> returnType, Wrapper where);
 ```
 ###### 12.根据条件查询
 ```java
@@ -144,7 +144,7 @@
     * @param args  条件参数
     * @return
     */
-    List<T> selectByCondition(String where, Object...args);
+    List<T> selectBy(String where, Object...args);
 ```
 ###### 13.根据条件查询
 ```java
@@ -154,7 +154,7 @@
     * @param where 条件包装器
     * @return
     */
-    List<T> selectByCondition(Wrapper where);
+    List<T> selectBy(Wrapper where);
 ```
 ###### 14.根据条件查询
 ```java
@@ -166,7 +166,7 @@
     * @param args   条件参数
     * @return
     */
-    List<T> selectByCondition(Paging paging, String where, Object...args);
+    List<T> selectBy(Paging paging, String where, Object...args);
 ```
 ###### 15.根据条件查询
 ```java
@@ -177,7 +177,7 @@
     * @param where  条件包装器
     * @return
     */
-    List<T> selectByCondition(Paging paging, Wrapper where);
+    List<T> selectBy(Paging paging, Wrapper where);
 ```
 ###### 16.根据条件查询
 ```java
@@ -189,7 +189,7 @@
     * @param args       条件参数
     * @return
     */
-    <O> List<O> selectByCondition(Class<O> returnType, String where, Object...args);
+    <O> List<O> selectBy(Class<O> returnType, String where, Object...args);
 ```
 ###### 17.根据条件查询
 ```java
@@ -200,7 +200,7 @@
     * @param where      条件包装器
     * @return
     */
-    <O> List<O> selectByCondition(Class<O> returnType, Wrapper where);
+    <O> List<O> selectBy(Class<O> returnType, Wrapper where);
 ```
 ###### 18.根据条件查询
 ```java
@@ -213,7 +213,7 @@
     * @param args       条件参数
     * @return
     */
-    <O> List<O> selectByCondition(Class<O> returnType, Paging paging, String where, Object...args);
+    <O> List<O> selectBy(Class<O> returnType, Paging paging, String where, Object...args);
 ```
 ###### 19.根据条件查询
 ```java
@@ -225,7 +225,7 @@
     * @param where      条件包装器
     * @return
     */
-    <O> List<O> selectByCondition(Class<O> returnType, Paging paging, Wrapper where);
+    <O> List<O> selectBy(Class<O> returnType, Paging paging, Wrapper where);
 ```
 ###### 20.根据条件查询统计
 ```java
@@ -236,7 +236,7 @@
     * @param args  条件参数
     * @return
     */
-    int selectCountByCondition(String where, Object...args);
+    int countBy(String where, Object...args);
 ```
 ###### 21.根据条件查询统计
 ```java
@@ -246,7 +246,7 @@
     * @param where 条件包装器
     * @return
     */
-    int selectCountByCondition(Wrapper where);
+    int countBy(Wrapper where);
 ```
 ###### 22.统计全部
 ```java

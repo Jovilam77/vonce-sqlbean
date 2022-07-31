@@ -59,7 +59,7 @@
 ```
 
 ```java
-7.@SqlLogically //标识逻辑删除，请配合logicallyDeleteById、logicallyDeleteByCondition这两个方法使用，请查看内置Delete文档
+7.@SqlLogically //标识逻辑删除，请配合logicallyDeleteById、logicallyDeleteBy这两个方法使用，请查看内置Delete文档
 ```
 
 ```java

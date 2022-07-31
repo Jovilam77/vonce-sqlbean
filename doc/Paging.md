@@ -39,8 +39,8 @@ public RS getList(HttpServletRequest request) {
 	//如果你有条件则用这个
 	//String sql = "(id > ? and id < ?) or type = ?";
 	//Object[] args = new Object[]{1, 10, "军事"};
-	//pageHelper.dispose(testDBService.selectCountByCondition(sql, args));
-	//pageHelper.setDataList(testDBService.selectByCondition(pageHelper.getPaging(), sql, args));
+	//pageHelper.dispose(testDBService.countBy(sql, args));
+	//pageHelper.setDataList(testDBService.selectBy(pageHelper.getPaging(), sql, args));
 	return super.customHint(pageHelper.toResult("获取文章列表成功"));
 }
 ```
@@ -54,6 +54,6 @@ public RS getList(HttpServletRequest request) {
 	//如果你有条件则用这个
 	//String sql = "(id > ? and id < ?) or type = ?";
 	//Object[] args = new Object[]{1, 10, "军事"};
-	//return testDBService.selectByCondition(pageHelper.getPaging(), sql, args);
+	//return testDBService.selectBy(pageHelper.getPaging(), sql, args);
 }
 ```

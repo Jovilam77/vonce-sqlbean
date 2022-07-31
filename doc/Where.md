@@ -14,7 +14,7 @@ select.where().eq("id", 1).or().eq("id", 2);
 setWhere("status = ? AND type = ?", 7, 1); //这种方式sql的列字段仍自己手写
 setWhere("& > ? AND & = ?", User$.status, 10, User$.type, 1);//建议采用此方式
 	 
-//此例子同样适用SqlBeanService接口中内置的xxxByCondition()方法
+//此例子同样适用SqlBeanService接口中内置的xxxBy()方法
 //SqlUser类 maven编译后自动生成, 如不理解请查看注解文档
 
 ```

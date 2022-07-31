@@ -38,7 +38,7 @@
    * @param args  条件参数
    * @return
    */
-   int deleteByCondition(String where, Object... args);
+   int deleteBy(String where, Object... args);
 ```
 ###### 3：根据条件删除
 ```java
@@ -48,7 +48,7 @@
    * @param where 条件包装器
    * @return
    */
-   int deleteByCondition(Wrapper where);
+   int deleteBy(Wrapper where);
 ```
 ###### 4：删除
 ```java
@@ -90,7 +90,7 @@
     * @param args  条件参数
     * @return
     */
-    int logicallyDeleteByCondition(String where, Object... args);
+    int logicallyDeleteBy(String where, Object... args);
 ```
 ###### 8：根据条件逻辑删除（需在实体类标记逻辑删除字段@SqlLogically）
 ```java
@@ -100,5 +100,5 @@
     * @param where 条件包装器
     * @return
     */
-    int logicallyDeleteByCondition(Wrapper where);
+    int logicallyDeleteBy(Wrapper where);
 ```

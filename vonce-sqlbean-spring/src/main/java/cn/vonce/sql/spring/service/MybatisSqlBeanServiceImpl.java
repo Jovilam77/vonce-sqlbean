@@ -364,6 +364,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Override
     public int deleteBy(Wrapper wrapper) {
         Delete delete = new Delete();
+        delete.setLogicallyDelete(SqlBeanUtil.checkLogically(clazz));
         delete.where(wrapper);
         return mybatisSqlBeanDao.delete(getSqlBeanDB(), clazz, delete, false);
     }
