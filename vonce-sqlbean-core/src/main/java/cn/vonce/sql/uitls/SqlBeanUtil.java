@@ -38,6 +38,9 @@ public class SqlBeanUtil {
         SqlTable sqlTable = clazz.getAnnotation(SqlTable.class);
         if (sqlTable == null) {
             Class<?> superClass = clazz.getSuperclass();
+            if (superClass == null) {
+                return null;
+            }
             do {
                 if (!superClass.getName().equals("java.lang.Object")) {
                     sqlTable = superClass.getAnnotation(SqlTable.class);
@@ -856,19 +859,6 @@ public class SqlBeanUtil {
         }
         return sqlValue;
     }
-
-//    /**
-//     * 该查询语句是否为count
-//     *
-//     * @param select
-//     * @return
-//     */
-//    public static boolean isCount(Select select) {
-//        if (select.getColumnList() != null && !select.getColumnList().contains(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET)) {
-//            return false;
-//        }
-//        return true;
-//    }
 
     /**
      * 是否使用分页
