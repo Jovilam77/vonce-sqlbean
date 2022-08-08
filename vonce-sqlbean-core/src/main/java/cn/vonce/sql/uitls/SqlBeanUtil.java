@@ -322,16 +322,6 @@ public class SqlBeanUtil {
     }
 
     /**
-     * 判断SqlJoin 是否为空
-     *
-     * @param sqlJoin
-     * @return
-     */
-    public static boolean sqlJoinIsNotEmpty(SqlJoin sqlJoin) {
-        return StringUtil.isNotEmpty(sqlJoin.table()) && StringUtil.isNotEmpty(sqlJoin.tableKeyword()) && StringUtil.isNotEmpty(sqlJoin.mainKeyword());
-    }
-
-    /**
      * 获取该bean所有字段（包括父类）
      *
      * @param clazz
@@ -431,16 +421,14 @@ public class SqlBeanUtil {
                     }
                 }
             } else if (sqlJoin != null) {
-                if (sqlJoinIsNotEmpty(sqlJoin)) {
-                    //获取SqlBeanJoin 注解中的查询字段
-                    String tableFieldName = sqlJoin.value()[0];
-                    if (StringUtil.isEmpty(tableFieldName)) {
-                        throw new SqlBeanException("需指定连接查询的字段：@SqlJoin > value = {“xxx”}");
-                    }
-                    //可能会连同一个表，但连接条件不一样（这时表需要区分别名），所以查询的字段可能是同一个，但属于不同表别名下，所以用java字段名当sql字段别名不会出错
-                    String subTableAlias = StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias();
-                    columnSet.add(new Column(subTableAlias, tableFieldName, getColumnAlias(subTableAlias, field.getName())));
+                //获取SqlBeanJoin 注解中的查询字段
+                String tableFieldName = sqlJoin.value()[0];
+                if (StringUtil.isEmpty(tableFieldName)) {
+                    throw new SqlBeanException("需指定连接查询的字段：@SqlJoin > value = {“xxx”}");
                 }
+                //可能会连同一个表，但连接条件不一样（这时表需要区分别名），所以查询的字段可能是同一个，但属于不同表别名下，所以用java字段名当sql字段别名不会出错
+                String subTableAlias = StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias();
+                columnSet.add(new Column(subTableAlias, tableFieldName, getColumnAlias(subTableAlias, field.getName())));
             } else {
                 columnSet.add(new Column(tableAlias, getTableFieldName(field, sqlTable), getColumnAlias(tableAlias, field.getName())));
             }
@@ -465,13 +453,14 @@ public class SqlBeanUtil {
             }
             SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
             Join join = new Join();
-            if (sqlJoin != null && sqlJoinIsNotEmpty(sqlJoin)) {
+            if (sqlJoin != null && !sqlJoin.isBean()) {
                 join.setJoinType(sqlJoin.type());
                 join.setSchema(sqlJoin.schema());
                 join.setTableName(sqlJoin.table());
                 join.setTableAlias(StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias());
                 join.setTableKeyword(sqlJoin.tableKeyword());
                 join.setMainKeyword(sqlJoin.mainKeyword());
+                join.setOn(sqlJoin.on());
                 //key是唯一的，作用是为了去重复，因为可能连接相同的表取不同的字段，但连接相同的表，连接条件不同是可以允许的
                 joinFieldMap.put(sqlJoin.table().toLowerCase() + sqlJoin.tableKeyword().toLowerCase() + sqlJoin.mainKeyword().toLowerCase(), join);
             } else if (sqlJoin != null && sqlJoin.isBean()) {
@@ -485,6 +474,7 @@ public class SqlBeanUtil {
                 join.setTableAlias(table.getAlias());
                 join.setTableKeyword(tableKeyword);
                 join.setMainKeyword(sqlJoin.mainKeyword());
+                join.setOn(sqlJoin.on());
                 //key是唯一的，作用是为了去重复，因为可能连接相同的表取不同的字段，但连接相同的表，连接条件不同是可以允许的
                 joinFieldMap.put(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlJoin.mainKeyword().toLowerCase(), join);
             }
@@ -507,7 +497,12 @@ public class SqlBeanUtil {
             String tableAlias = join.getTableAlias();
             String tableKeyword = join.getTableKeyword();
             String mainKeyword = join.getMainKeyword();
-            select.join(join.getJoinType(), schema, tableName, tableAlias, tableKeyword, mainKeyword);
+            String on = join.getOn();
+            if (StringUtil.isNotEmpty(on)) {
+                select.join(join.getJoinType(), schema, tableName, tableAlias, on);
+            } else {
+                select.join(join.getJoinType(), schema, tableName, tableAlias, tableKeyword, mainKeyword);
+            }
         }
     }
 

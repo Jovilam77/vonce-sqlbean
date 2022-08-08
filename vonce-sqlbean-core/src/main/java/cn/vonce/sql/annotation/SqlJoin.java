@@ -1,7 +1,6 @@
 package cn.vonce.sql.annotation;
 
 import cn.vonce.sql.enumerate.JoinType;
-
 import java.lang.annotation.*;
 
 /**
@@ -72,6 +71,13 @@ public @interface SqlJoin {
      *
      * @return
      */
-    String mainKeyword();
+    String mainKeyword() default "";
+
+    /**
+     * 连接条件（优先级高）
+     *
+     * @return
+     */
+    String on() default "";
 
 }
