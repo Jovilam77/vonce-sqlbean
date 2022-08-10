@@ -173,7 +173,7 @@ public class SqlBeanUtil {
         fullName.append(tableAlias);
         fullName.append(transferred);
         fullName.append(SqlConstant.POINT);
-        fullName.append(tableFieldName);
+        fullName.append(SqlBeanUtil.isToUpperCase(common) ? tableFieldName.toUpperCase() : tableFieldName);
         return fullName.toString();
     }
 

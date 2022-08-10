@@ -8,6 +8,7 @@ import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.uitls.SqlBeanUtil;
+
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -529,7 +530,6 @@ public class SqlHelper {
                 if (SqlBeanUtil.isToUpperCase(select)) {
                     schema = schema.toUpperCase();
                     tableName = tableName.toUpperCase();
-                    tableAlias = tableAlias.toUpperCase();
                 }
                 if (StringUtil.isNotEmpty(schema)) {
                     joinSql.append(schema);
@@ -783,15 +783,19 @@ public class SqlHelper {
         } else {
             columns = select.getGroupBy().toArray(new Column[]{});
         }
+        String transferred = SqlBeanUtil.getTransferred(select);
+        boolean isToUpperCase = SqlBeanUtil.isToUpperCase(select);
         if (columns != null && columns.length != 0) {
             groupByAndOrderBySql.append(type);
             for (int i = 0; i < columns.length; i++) {
                 Column column = columns[i];
                 if (StringUtil.isNotEmpty(column.getTableAlias())) {
+                    groupByAndOrderBySql.append(transferred);
                     groupByAndOrderBySql.append(column.getTableAlias());
+                    groupByAndOrderBySql.append(transferred);
                     groupByAndOrderBySql.append(SqlConstant.POINT);
                 }
-                groupByAndOrderBySql.append(column.getName());
+                groupByAndOrderBySql.append(isToUpperCase ? column.getName().toUpperCase() : column.getName());
                 if (SqlConstant.ORDER_BY.equals(type)) {
                     groupByAndOrderBySql.append(SqlConstant.SPACES);
                     groupByAndOrderBySql.append(select.getOrderBy().get(i).getSqlSort().name());
