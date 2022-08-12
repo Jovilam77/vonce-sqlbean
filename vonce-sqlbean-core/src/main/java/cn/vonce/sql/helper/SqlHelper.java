@@ -376,12 +376,14 @@ public class SqlHelper {
         ColumnInfo columnInfo = new ColumnInfo();
         JdbcType jdbcType;
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
-            jdbcType = JdbcType.getType(sqlColumn.type().name());
+            jdbcType = sqlColumn.type();
             columnInfo.setType(jdbcType.name());
             columnInfo.setNotnull(sqlColumn.notNull());
         } else {
             if (dbType == DbType.SQLite) {
                 jdbcType = JdbcType.getType(SQLiteJavaType.getType(clazz).name());
+            } else if (dbType == DbType.Derby) {
+                jdbcType = JdbcType.getType(DerbyJavaType.getType(clazz).name());
             } else {
                 jdbcType = JdbcType.getType(JavaType.getType(clazz).name());
             }
