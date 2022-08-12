@@ -212,10 +212,8 @@ public class SqlHelper {
             SqlColumn sqlColumn = fieldList.get(i).getAnnotation(SqlColumn.class);
             ColumnInfo columnInfo = getColumnInfo(create.getSqlBeanDB().getDbType(), fieldList.get(i).getType(), sqlColumn);
             JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
-            String columnName = SqlBeanUtil.getTableFieldName(fieldList.get(i), sqlTable);
-            sqlSb.append(transferred);
-            sqlSb.append(SqlBeanUtil.isToUpperCase(create) ? columnName.toUpperCase() : columnName);
-            sqlSb.append(transferred);
+            String columnName = SqlBeanUtil.getTableFieldName(create, fieldList.get(i), sqlTable);
+            sqlSb.append(columnName);
             sqlSb.append(SqlConstant.SPACES);
             sqlSb.append(jdbcType.name());
             if (columnInfo.getLength() > 0) {
@@ -242,12 +240,10 @@ public class SqlHelper {
 
         //主键
         if (idField != null) {
-            String id = SqlBeanUtil.getTableFieldName(idField, sqlTable);
+            String idFieldName = SqlBeanUtil.getTableFieldName(create, idField, sqlTable);
             sqlSb.append(SqlConstant.PRIMARY_KEY);
             sqlSb.append(SqlConstant.BEGIN_BRACKET);
-            sqlSb.append(transferred);
-            sqlSb.append(SqlBeanUtil.isToUpperCase(create) ? id.toUpperCase() : id);
-            sqlSb.append(transferred);
+            sqlSb.append(idFieldName);
             sqlSb.append(SqlConstant.END_BRACKET);
         } else {
             sqlSb.deleteCharAt(sqlSb.length() - SqlConstant.COMMA.length());
@@ -381,9 +377,13 @@ public class SqlHelper {
             columnInfo.setNotnull(sqlColumn.notNull());
         } else {
             if (dbType == DbType.SQLite) {
-                jdbcType = JdbcType.getType(SQLiteJavaType.getType(clazz).name());
+                jdbcType = JdbcType.getType(JavaMapSqliteType.getType(clazz).name());
+            } else if (dbType == DbType.H2) {
+                jdbcType = JdbcType.getType(JavaMapH2Type.getType(clazz).name());
+            } else if (dbType == DbType.Hsql) {
+                jdbcType = JdbcType.getType(JavaMapHsqlType.getType(clazz).name());
             } else if (dbType == DbType.Derby) {
-                jdbcType = JdbcType.getType(DerbyJavaType.getType(clazz).name());
+                jdbcType = JdbcType.getType(JavaMapDerbyType.getType(clazz).name());
             } else {
                 jdbcType = JdbcType.getType(JavaType.getType(clazz).name());
             }
@@ -586,7 +586,6 @@ public class SqlHelper {
         } else {
             fieldAndValuesSql.append(SqlConstant.INSERT_INTO);
         }
-        Date date = new Date();
         for (int i = 0; i < objectList.size(); i++) {
             //每次必须清空
             valueSql.delete(0, valueSql.length());
@@ -610,10 +609,10 @@ public class SqlHelper {
                 }
                 //只有在循环第一遍的时候才会处理
                 if (i == 0) {
-                    String tableFieldName = SqlBeanUtil.getTableFieldName(field, sqlTable);
+                    String tableFieldName = SqlBeanUtil.getTableFieldName(common, field, sqlTable);
                     //如果此字段非id字段 或者 此字段为id字段但是不是自增的id则生成该字段的insert语句
                     if (sqlId == null || (sqlId != null && sqlId.type() != IdType.AUTO)) {
-                        fieldSql.append(transferred + (SqlBeanUtil.isToUpperCase(common) ? tableFieldName.toUpperCase() : tableFieldName) + transferred);
+                        fieldSql.append(tableFieldName);
                         fieldSql.append(SqlConstant.COMMA);
                     }
                 }
@@ -797,7 +796,9 @@ public class SqlHelper {
                     groupByAndOrderBySql.append(transferred);
                     groupByAndOrderBySql.append(SqlConstant.POINT);
                 }
+                groupByAndOrderBySql.append(transferred);
                 groupByAndOrderBySql.append(isToUpperCase ? column.getName().toUpperCase() : column.getName());
+                groupByAndOrderBySql.append(transferred);
                 if (SqlConstant.ORDER_BY.equals(type)) {
                     groupByAndOrderBySql.append(SqlConstant.SPACES);
                     groupByAndOrderBySql.append(select.getOrderBy().get(i).getSqlSort().name());
@@ -869,9 +870,6 @@ public class SqlHelper {
                 // 遍历sql逻辑处理
                 if (i != 0 && i < condition.getDataList().size()) {
                     conditionSql.append(getLogic(conditionDataList.get(i).getSqlLogic()));
-                }
-                if (SqlBeanUtil.isToUpperCase(common)) {
-                    conditionInfo.setName(conditionInfo.getName().toUpperCase());
                 }
                 conditionSql.append(valueOperator(common, conditionInfo));
             }
@@ -1050,7 +1048,6 @@ public class SqlHelper {
     private static StringBuffer valueOperator(Common common, ConditionInfo conditionInfo) {
         StringBuffer sql = new StringBuffer();
         String operator = getOperator(conditionInfo);
-        String transferred = SqlBeanUtil.getTransferred(common);
         boolean needEndBracket = false;
         Object[] betweenValues = null;
         Object value = conditionInfo.getValue();
@@ -1102,15 +1099,12 @@ public class SqlHelper {
                 value = SqlBeanUtil.getSqlValue(common, value);
             }
         }
-        //表别名
+        //如果存在表别名
         if (StringUtil.isNotEmpty(conditionInfo.getTableAlias())) {
-            sql.append(transferred);
-            sql.append(conditionInfo.getTableAlias());
-            sql.append(transferred);
-            sql.append(SqlConstant.POINT);
+            sql.append(SqlBeanUtil.getTableFieldFullName(common, conditionInfo.getTableAlias(), conditionInfo.getName()));
+        } else {
+            sql.append(conditionInfo.getName());
         }
-        //字段名
-        sql.append(conditionInfo.getName());
         //操作符
         sql.append(operator);
         //值

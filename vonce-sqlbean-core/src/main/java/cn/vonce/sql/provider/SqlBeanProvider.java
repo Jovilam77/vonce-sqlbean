@@ -41,6 +41,7 @@ public class SqlBeanProvider {
 
     /**
      * 根据ids条件查询
+     *
      * @param sqlBeanDB
      * @param clazz
      * @param returnType
@@ -224,7 +225,7 @@ public class SqlBeanProvider {
             return null;
         }
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-        delete.where().in(SqlBeanUtil.getTableFieldName(idField, sqlTable), id);
+        delete.where().in(SqlBeanUtil.getTableFieldName(delete, idField, sqlTable), id);
         return SqlHelper.buildDeleteSql(delete);
     }
 
@@ -306,7 +307,7 @@ public class SqlBeanProvider {
             update.setUpdateBean(newLogicallyDeleteBean(clazz));
             Field idField = SqlBeanUtil.getIdField(clazz);
             SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-            update.where().in(SqlBeanUtil.getTableFieldName(idField, sqlTable), id);
+            update.where().in(SqlBeanUtil.getTableFieldName(update, idField, sqlTable), id);
             setSchema(update, clazz);
         } catch (SqlBeanException e) {
             e.printStackTrace();
@@ -422,7 +423,7 @@ public class SqlBeanProvider {
             return null;
         }
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-        update.where().eq(SqlBeanUtil.getTableFieldName(idField, sqlTable), id);
+        update.where().eq(SqlBeanUtil.getTableFieldName(update, idField, sqlTable), id);
         return SqlHelper.buildUpdateSql(update);
     }
 
@@ -453,7 +454,7 @@ public class SqlBeanProvider {
                 }
             }
             SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-            update.where().eq(SqlBeanUtil.getTableFieldName(idField, sqlTable), id);
+            update.where().eq(SqlBeanUtil.getTableFieldName(update, idField, sqlTable), id);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
@@ -612,9 +613,6 @@ public class SqlBeanProvider {
      * @return
      */
     public static String selectColumnListSql(SqlBeanDB sqlBeanDB, String name) {
-//        if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase() && StringUtil.isNotEmpty(name)) {
-//            name = name.toUpperCase();
-//        }
         switch (sqlBeanDB.getDbType()) {
             case MySQL:
             case MariaDB:

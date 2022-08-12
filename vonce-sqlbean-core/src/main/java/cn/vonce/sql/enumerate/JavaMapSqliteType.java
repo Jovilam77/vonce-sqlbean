@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  * @version 1.0
  * @email 766255988@qq.com
  */
-public enum SQLiteJavaType {
+public enum JavaMapSqliteType {
 
     NULL(new Class[]{}),
     INTEGER(new Class[]{boolean.class, Boolean.class, byte.class, Byte.class, short.class, Short.class, int.class, Integer.class, long.class, Long.class}),
@@ -17,14 +17,14 @@ public enum SQLiteJavaType {
     TEXT(new Class[]{java.sql.Clob.class, char.class, Character.class, String.class, java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class, java.util.Date.class}),
     BLOB(new Class[]{java.sql.Blob.class, Object.class});
 
-    SQLiteJavaType(Class<?>[] classes) {
+    JavaMapSqliteType(Class<?>[] classes) {
         this.classes = classes;
     }
 
     private Class<?>[] classes;
 
-    public static SQLiteJavaType getType(Class<?> clazz) {
-        for (SQLiteJavaType javaType : values()) {
+    public static JavaMapSqliteType getType(Class<?> clazz) {
+        for (JavaMapSqliteType javaType : values()) {
             for (Class<?> thisClazz : javaType.classes) {
                 if (thisClazz == clazz) {
                     return javaType;

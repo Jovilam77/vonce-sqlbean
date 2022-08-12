@@ -142,6 +142,24 @@ public class SqlBeanUtil {
     /**
      * 获取Bean字段中实际对于的表字段
      *
+     * @param common
+     * @param field
+     * @param sqlTable
+     * @return
+     */
+    public static String getTableFieldName(Common common, Field field, SqlTable sqlTable) {
+        String name = getTableFieldName(field, sqlTable);
+        if (SqlBeanUtil.isToUpperCase(common)){
+            name = name.toUpperCase();
+        }
+        String transferred = SqlBeanUtil.getTransferred(common);
+        return transferred + name + transferred;
+    }
+
+    /**
+     * 获取Bean字段中实际对于的表字段
+     *
+     * @param field
      * @param sqlTable
      * @return
      */
@@ -173,7 +191,9 @@ public class SqlBeanUtil {
         fullName.append(tableAlias);
         fullName.append(transferred);
         fullName.append(SqlConstant.POINT);
+        fullName.append(transferred);
         fullName.append(SqlBeanUtil.isToUpperCase(common) ? tableFieldName.toUpperCase() : tableFieldName);
+        fullName.append(transferred);
         return fullName.toString();
     }
 

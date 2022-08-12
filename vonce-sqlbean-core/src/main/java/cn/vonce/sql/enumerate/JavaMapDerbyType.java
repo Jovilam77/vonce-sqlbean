@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  * @email imjovi@qq.com
  * @date 2022/8/12 14:42
  */
-public enum DerbyJavaType {
+public enum JavaMapDerbyType {
 
     INTEGER(new Class[]{int.class, Integer.class}),
     BIGINT(new Class[]{long.class, Long.class}),
@@ -25,14 +25,14 @@ public enum DerbyJavaType {
     CLOB(new Class[]{java.sql.Clob.class}),
     BLOB(new Class[]{java.sql.Blob.class, Object.class});
 
-    DerbyJavaType(Class<?>[] classes) {
+    JavaMapDerbyType(Class<?>[] classes) {
         this.classes = classes;
     }
 
     private Class<?>[] classes;
 
-    public static DerbyJavaType getType(Class<?> clazz) {
-        for (DerbyJavaType javaType : values()) {
+    public static JavaMapDerbyType getType(Class<?> clazz) {
+        for (JavaMapDerbyType javaType : values()) {
             for (Class<?> thisClazz : javaType.classes) {
                 if (thisClazz == clazz) {
                     return javaType;
