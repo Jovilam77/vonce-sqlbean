@@ -636,7 +636,9 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<ColumnInfo> getColumnInfoList(String tableName) {
-        return jdbcTemplate.query(SqlBeanProvider.selectColumnListSql(getSqlBeanDB(), tableName), new SpringJbdcSqlBeanMapper<ColumnInfo>(ColumnInfo.class, ColumnInfo.class));
+        List<ColumnInfo> columnInfoList = jdbcTemplate.query(SqlBeanProvider.selectColumnListSql(getSqlBeanDB(), tableName), new SpringJbdcSqlBeanMapper<ColumnInfo>(ColumnInfo.class, ColumnInfo.class));
+        super.handleColumnInfo(columnInfoList);
+        return columnInfoList;
     }
 
     private static <T> T singleResult(Collection<T> results) {

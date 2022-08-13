@@ -1,9 +1,12 @@
 package cn.vonce.sql.spring.service;
 
+import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.enumerate.DbType;
+import cn.vonce.sql.uitls.StringUtil;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -48,6 +51,31 @@ public abstract class BaseSqlBeanServiceImpl {
             }
         }
         return sqlBeanDB;
+    }
+
+    /**
+     * 处理字段信息
+     *
+     * @param columnInfoList
+     */
+    public void handleColumnInfo(List<ColumnInfo> columnInfoList) {
+        if (getSqlBeanDB().getDbType() == DbType.Derby) {
+            for (ColumnInfo info : columnInfoList) {
+                String[] values = info.getName().split(" ");
+                //如果存在空格分割说明字段名后面存在NOT NULL，即不能为空
+                if (values.length > 1) {
+                    info.setNotnull(true);
+                } else {
+                    info.setNotnull(false);
+                }
+                //设置字段名
+                info.setName(StringUtil.getWord(values[0]));
+                //设置字段长度范围
+                String range[] = StringUtil.getBracketContent(values[0]).split(",");
+                info.setLength(Integer.parseInt(range[0]));
+                info.setScale(range.length == 1 ? 0 : Integer.parseInt(range[1]));
+            }
+        }
     }
 
 }

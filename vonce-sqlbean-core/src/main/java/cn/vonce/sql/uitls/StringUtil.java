@@ -1,8 +1,11 @@
 package cn.vonce.sql.uitls;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 字符串工具类
@@ -129,7 +132,7 @@ public class StringUtil {
                 result.append(s.toLowerCase());
                 continue;
             }
-            if (StringUtil.isEmpty(s)){
+            if (StringUtil.isEmpty(s)) {
                 continue;
             }
             if (result.length() == 0) {
@@ -162,5 +165,33 @@ public class StringUtil {
         }
         return sb.toString().toLowerCase();
     }
+
+    /**
+     * 获取指定字符串中括号内的内容，返回字符串数组
+     *
+     * @param content
+     * @return
+     */
+    public static String getBracketContent(String content) {
+        String[] arr = new String[0];
+        Pattern p = Pattern.compile("(?<=\\()[^\\)]+");
+        Matcher m = p.matcher(content);
+        while (m.find()) {
+            arr = Arrays.copyOf(arr, arr.length + 1);
+            arr[arr.length - 1] = m.group();
+        }
+        return arr[0];
+    }
+
+    /**
+     * 排除括号及括号内的数据
+     *
+     * @param content
+     * @return
+     */
+    public static String getWord(String content) {
+        return content.replaceAll("[\\[][^\\[\\]]+[\\]]|[\\(][^\\(\\)]+[\\)]", "");
+    }
+
 
 }
