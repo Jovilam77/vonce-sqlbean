@@ -715,8 +715,8 @@ public class SqlBeanProvider {
         sql.append("cl.COLUMN_DEFAULT AS dflt_value, ");
         sql.append("cl.CHARACTER_MAXIMUM_LENGTH AS length, ");
         sql.append("cl.NUMERIC_SCALE AS scale, ");
-        sql.append("CASE WHEN kcu.TABLE_NAME = cl.TABLE_NAME AND kcu.POSITION_IN_UNIQUE_CONSTRAINT is null THEN 1 ELSE 0 END AS pk ");
-        sql.append("CASE WHEN kcu.TABLE_NAME = cl.TABLE_NAME AND kcu.POSITION_IN_UNIQUE_CONSTRAINT = 1 THEN 1 ELSE 0 END AS fk ");
+        sql.append("CASE WHEN kcu.TABLE_NAME = cl.TABLE_NAME AND kcu.POSITION_IN_UNIQUE_CONSTRAINT is null THEN 1 ELSE 0 END AS pk, ");
+        sql.append("CASE WHEN kcu.TABLE_NAME = cl.TABLE_NAME AND kcu.POSITION_IN_UNIQUE_CONSTRAINT = 1 THEN 1 ELSE 0 END AS fk, ");
         sql.append("cl.REMARKS AS comm ");
         sql.append("FROM INFORMATION_SCHEMA.COLUMNS cl ");
         sql.append("LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ");
