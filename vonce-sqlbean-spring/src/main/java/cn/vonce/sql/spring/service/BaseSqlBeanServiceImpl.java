@@ -59,7 +59,8 @@ public abstract class BaseSqlBeanServiceImpl {
      * @param columnInfoList
      */
     public void handleColumnInfo(List<ColumnInfo> columnInfoList) {
-        if (getSqlBeanDB().getDbType() == DbType.Derby) {
+        DbType dbType = getSqlBeanDB().getDbType();
+        if (dbType == DbType.Derby) {
             for (ColumnInfo info : columnInfoList) {
                 String[] values = info.getName().split(" ");
                 //如果存在空格分割说明字段名后面存在NOT NULL，即不能为空
@@ -74,6 +75,18 @@ public abstract class BaseSqlBeanServiceImpl {
                 String range[] = StringUtil.getBracketContent(values[0]).split(",");
                 info.setLength(Integer.parseInt(range[0]));
                 info.setScale(range.length == 1 ? 0 : Integer.parseInt(range[1]));
+            }
+        } else if (dbType == DbType.H2) {
+            for (ColumnInfo info : columnInfoList) {
+                if ("CHARACTER VARYING".equalsIgnoreCase(info.getName())) {
+                    info.setType("varchar");
+                } else if ("CHARACTER LARGE OBJECT".equalsIgnoreCase(info.getName())) {
+                    info.setType("longtext");
+                } else if ("BINARY VARYING".equalsIgnoreCase(info.getName())) {
+                    info.setType("blob");
+                } else if ("BINARY LARGE OBJECT".equalsIgnoreCase(info.getName())) {
+                    info.setType("longblob");
+                }
             }
         }
     }

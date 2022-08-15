@@ -25,8 +25,7 @@ public enum JavaMapH2Type {
     TIME(new Class[]{java.sql.Time.class}),
     TIMESTAMP(new Class[]{java.sql.Timestamp.class, java.util.Date.class}),
     CLOB(new Class[]{java.sql.Clob.class}),
-    BLOB(new Class[]{java.sql.Blob.class, Object.class}),
-    ARRAY(new Class[]{Object[].class});
+    BLOB(new Class[]{java.sql.Blob.class, Object.class});
 
     JavaMapH2Type(Class<?>[] classes) {
         this.classes = classes;
