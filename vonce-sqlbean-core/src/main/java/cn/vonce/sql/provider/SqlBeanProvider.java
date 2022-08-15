@@ -697,12 +697,12 @@ public class SqlBeanProvider {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT cl.COLUMNNUMBER AS cid, cl.COLUMNNAME AS name, cl.COLUMNDATATYPE AS type, cl.COLUMNDEFAULT AS dflt_value, ");
         //由于Derby的缺陷无法查询是否为主键和外键，所以默认第一个字段为主键，其余字段都不是外键
-        sql.append("(CASE cl.COLUMNNUMBER WHEN 1 THEN '1' ELSE '0' END) AS pk, 0 AS pk ");
-        sql.append("FROM SYS.SYSTABLES tb, SYS.SYSCOLUMNS cl ");
+        sql.append("(CASE WHEN cl.COLUMNNUMBER = 1 THEN '1' ELSE '0' END) AS pk, 0 AS pk ");
+        sql.append("FROM SYS.SYSTABLES AS tb, SYS.SYSCOLUMNS AS cl ");
         sql.append("WHERE cl.REFERENCEID = tb.TABLEID ");
         sql.append("AND tb.TABLENAME = '");
         sql.append(tableName);
-        sql.append("') ORDER BY cl.COLUMNNUMBER");
+        sql.append("' ORDER BY cl.COLUMNNUMBER");
         return sql.toString();
     }
 

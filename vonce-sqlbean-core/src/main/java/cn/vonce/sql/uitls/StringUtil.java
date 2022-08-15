@@ -180,7 +180,7 @@ public class StringUtil {
             arr = Arrays.copyOf(arr, arr.length + 1);
             arr[arr.length - 1] = m.group();
         }
-        return arr[0];
+        return arr.length == 0 ? "" : arr[0];
     }
 
     /**
