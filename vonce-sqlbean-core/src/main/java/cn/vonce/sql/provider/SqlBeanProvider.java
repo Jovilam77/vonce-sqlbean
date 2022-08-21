@@ -709,18 +709,20 @@ public class SqlBeanProvider {
     private static String h2ColumnInfoSql(String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT cl.ORDINAL_POSITION AS cid, ");
-        sql.append("cl.COLUMN_NAME AS name,");
+        sql.append("cl.COLUMN_NAME AS name, ");
         sql.append("cl.DATA_TYPE AS type, ");
         sql.append("cl.IS_NULLABLE AS notnull, ");
         sql.append("cl.COLUMN_DEFAULT AS dflt_value, ");
         sql.append("cl.CHARACTER_MAXIMUM_LENGTH AS length, ");
         sql.append("cl.NUMERIC_SCALE AS scale, ");
-        sql.append("CASE WHEN kcu.TABLE_NAME = cl.TABLE_NAME AND kcu.POSITION_IN_UNIQUE_CONSTRAINT is null THEN 1 ELSE 0 END AS pk, ");
-        sql.append("CASE WHEN kcu.TABLE_NAME = cl.TABLE_NAME AND kcu.POSITION_IN_UNIQUE_CONSTRAINT = 1 THEN 1 ELSE 0 END AS fk, ");
+        sql.append("CASE WHEN tc.CONSTRAINT_TYPE = 'PRIMARY KEY' THEN 1 ELSE 0 END AS pk, ");
+        sql.append("CASE WHEN tc.CONSTRAINT_TYPE = 'FOREIGN KEY' THEN 1 ELSE 0 END AS fk, ");
         sql.append("cl.REMARKS AS comm ");
         sql.append("FROM INFORMATION_SCHEMA.COLUMNS cl ");
-        sql.append("LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ");
-        sql.append("ON kcu.TABLE_NAME = cl.TABLE_NAME AND kcu.COLUMN_NAME = cl.COLUMN_NAME ");
+        sql.append("LEFT JOIN INDEX_COLUMNS ic ");
+        sql.append("ON ic.TABLE_NAME = cl.TABLE_NAME AND ic.COLUMN_NAME = cl.COLUMN_NAME ");
+        sql.append("LEFT JOIN TABLE_CONSTRAINTS tc ");
+        sql.append("ON tc.INDEX_NAME = ic.INDEX_NAME ");
         sql.append("WHERE cl.TABLE_NAME = '");
         sql.append(tableName);
         sql.append("'");
