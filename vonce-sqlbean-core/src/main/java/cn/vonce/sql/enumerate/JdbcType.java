@@ -43,6 +43,7 @@ public enum JdbcType {
     CLOB(0, 0),
     NCLOB(0, 0),
     BLOB(0, 0),
+    LONGBLOB(0, 0),
     NBLOB(0, 0),
     ARRAY(0, 0),
     IMAGE(0, 0),

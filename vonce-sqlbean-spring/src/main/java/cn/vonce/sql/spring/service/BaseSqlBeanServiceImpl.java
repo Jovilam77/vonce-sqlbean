@@ -4,6 +4,7 @@ import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.enumerate.DbType;
+import cn.vonce.sql.enumerate.JdbcType;
 import cn.vonce.sql.uitls.StringUtil;
 
 import java.sql.DatabaseMetaData;
@@ -78,14 +79,14 @@ public abstract class BaseSqlBeanServiceImpl {
             }
         } else if (dbType == DbType.H2) {
             for (ColumnInfo info : columnInfoList) {
-                if ("CHARACTER VARYING".equalsIgnoreCase(info.getName())) {
-                    info.setType("varchar");
-                } else if ("CHARACTER LARGE OBJECT".equalsIgnoreCase(info.getName())) {
-                    info.setType("longtext");
-                } else if ("BINARY VARYING".equalsIgnoreCase(info.getName())) {
-                    info.setType("blob");
-                } else if ("BINARY LARGE OBJECT".equalsIgnoreCase(info.getName())) {
-                    info.setType("longblob");
+                if ("CHARACTER VARYING".equalsIgnoreCase(info.getType())) {
+                    info.setType(JdbcType.VARCHAR.name());
+                } else if ("CHARACTER LARGE OBJECT".equalsIgnoreCase(info.getType())) {
+                    info.setType(JdbcType.LONGTEXT.name());
+                } else if ("BINARY VARYING".equalsIgnoreCase(info.getType())) {
+                    info.setType(JdbcType.BLOB.name());
+                } else if ("BINARY LARGE OBJECT".equalsIgnoreCase(info.getType())) {
+                    info.setType(JdbcType.LONGBLOB.name());
                 }
             }
         }
