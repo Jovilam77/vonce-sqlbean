@@ -1,5 +1,8 @@
 package cn.vonce.sql.enumerate;
 
+import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.uitls.StringUtil;
+
 import java.math.BigDecimal;
 
 /**
@@ -38,5 +41,38 @@ public enum JavaMapSqliteType {
         return getType(clazz).name();
     }
 
+    /**
+     * 获取表数据列表的SQL
+     *
+     * @param sqlBeanDB
+     * @param schema
+     * @param tableName
+     * @return
+     */
+    public static String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT name ");
+        sql.append("FROM sqlite_master ");
+        sql.append("WHERE type='table'");
+        if (StringUtil.isNotEmpty(tableName)) {
+            sql.append(" AND name = '" + tableName + "'");
+        }
+        return sql.toString();
+    }
+
+    /**
+     * 获取列数据列表的SQL
+     *
+     * @param sqlBeanDB
+     * @param tableName
+     * @return
+     */
+    public static String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("pragma table_info('");
+        sql.append(tableName);
+        sql.append("')");
+        return sql.toString();
+    }
 
 }

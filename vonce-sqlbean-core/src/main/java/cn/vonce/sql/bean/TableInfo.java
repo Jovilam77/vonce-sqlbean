@@ -11,6 +11,10 @@ package cn.vonce.sql.bean;
 public class TableInfo {
 
     /**
+     * schema
+     */
+    private String schema;
+    /**
      * 名称
      */
     private String name;
@@ -18,6 +22,14 @@ public class TableInfo {
      * 注释
      */
     private String comm;
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
+    }
 
     public String getName() {
         return name;

@@ -4,7 +4,7 @@ import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
-import cn.vonce.sql.enumerate.DbType;
+import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.helper.Wrapper;
@@ -576,31 +576,30 @@ public class SqlBeanProvider {
      * @param sqlBeanDB
      * @return
      */
-    public static String selectTableListSql(SqlBeanDB sqlBeanDB, String name) {
+    public static String selectTableListSql(SqlBeanDB sqlBeanDB, String schema, String name) {
         if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase() && StringUtil.isNotEmpty(name)) {
             name = name.toUpperCase();
         }
         switch (sqlBeanDB.getDbType()) {
             case MySQL:
             case MariaDB:
-                return "SELECT table_name AS `name`, table_comment AS comm FROM information_schema.tables WHERE table_schema = database() AND table_type = 'BASE TABLE'" + (StringUtil.isNotEmpty(name) ? " AND table_name = '" + name + "'" : "");
+                return JavaMapMySqlType.getTableListSql(sqlBeanDB, schema, name);
             case SQLServer:
-                return "SELECT o.name, p.value AS comm FROM sysobjects o LEFT JOIN sys.extended_properties p ON p.major_id = o.id AND p.minor_id = 0 WHERE o.xtype='U'" + (StringUtil.isNotEmpty(name) ? " AND o.name = '" + name + "'" : "");
+                return JavaMapSqlServerType.getTableListSql(sqlBeanDB, schema, name);
             case Oracle:
-                return "SELECT t.table_name AS \"name\", c.comments AS \"comm\"  FROM user_tables t LEFT JOIN user_tab_comments c ON c.table_name = t.table_name" + (StringUtil.isNotEmpty(name) ? " WHERE t.table_name = '" + name + "'" : "");
+                return JavaMapOracleType.getTableListSql(sqlBeanDB, schema, name);
             case PostgreSQL:
-                return "SELECT tablename AS \"name\" FROM pg_tables WHERE schemaname = 'public'" + (StringUtil.isNotEmpty(name) ? " AND tablename = '" + name + "'" : "");
+                return JavaMapPostgreSqlType.getTableListSql(sqlBeanDB, schema, name);
             case DB2:
-//                return "select tabname AS \"name\" from syscat.tables where tabschema = current schema" + (StringUtil.isNotEmpty(name) ? " and tabname = '" + name + "'" : "");
-                return "SELECT name FROM sysibm.systables WHERE type = 'T' AND creator = current user" + (StringUtil.isNotEmpty(name) ? " AND name = '" + name + "'" : "") + (StringUtil.isNotEmpty(name) ? " AND table_name = '" + name + "'" : "");
+                return JavaMapDB2Type.getTableListSql(sqlBeanDB, schema, name);
             case H2:
-                return "SELECT table_name AS \"name\" FROM information_schema.tables WHERE table_type = 'TABLE'" + (StringUtil.isNotEmpty(name) ? " AND table_name = '" + name + "'" : "");
+                return JavaMapH2Type.getTableListSql(sqlBeanDB, schema, name);
             case Hsql:
-                return "SELECT table_name AS \"name\" FROM information_schema.tables WHERE table_type = 'BASE TABLE'" + (StringUtil.isNotEmpty(name) ? " AND table_name = '" + name + "'" : "");
+                return JavaMapHsqlType.getTableListSql(sqlBeanDB, schema, name);
             case Derby:
-                return "SELECT tablename AS \"name\" FROM SYS.systables WHERE tabletype = 'T'" + (StringUtil.isNotEmpty(name) ? " AND tablename = '" + name + "'" : "");
+                return JavaMapDerbyType.getTableListSql(sqlBeanDB, schema, name);
             case SQLite:
-                return "SELECT name FROM sqlite_master WHERE type='table'" + (StringUtil.isNotEmpty(name) ? " AND name = '" + name + "'" : "");
+                return JavaMapSqliteType.getTableListSql(sqlBeanDB, schema, name);
             default:
                 throw new SqlBeanException("请配置正确的数据库");
         }
@@ -616,148 +615,24 @@ public class SqlBeanProvider {
         switch (sqlBeanDB.getDbType()) {
             case MySQL:
             case MariaDB:
-                return mysqlColumnInfoSql(name);
+                return JavaMapMySqlType.getColumnListSql(sqlBeanDB, null, name);
             case SQLServer:
-                return sqlServerColumnInfoSql(name);
+                return JavaMapSqlServerType.getColumnListSql(sqlBeanDB, null, name);
             case Oracle:
-                return oracleColumnInfoSql(name);
+                return JavaMapOracleType.getColumnListSql(sqlBeanDB, null, name);
             case PostgreSQL:
             case DB2:
             case H2:
-                return h2ColumnInfoSql(name);
+                return JavaMapH2Type.getColumnListSql(sqlBeanDB, null, name);
             case Hsql:
-                return hqlColumnInfoSql(name);
+                return JavaMapHsqlType.getColumnListSql(sqlBeanDB, null, name);
             case Derby:
-                return derbyColumnInfoSql(name);
+                return JavaMapDerbyType.getColumnListSql(sqlBeanDB, null, name);
             case SQLite:
-                return sqliteColumnInfoSql(name);
+                return JavaMapSqliteType.getColumnListSql(sqlBeanDB, null, name);
             default:
                 throw new SqlBeanException("请配置正确的数据库");
         }
-    }
-
-    private static String mysqlColumnInfoSql(String tableName) {
-        StringBuffer sql = new StringBuffer();
-        sql.append("SELECT ordinal_position AS cid, column_name AS name, data_type AS type, ");
-        sql.append("(CASE is_nullable WHEN 'NO' THEN 1 ELSE 0 END) AS notnull, column_default AS dflt_value, ");
-        sql.append("(CASE column_key WHEN 'PRI' THEN 1 ELSE 0 END) AS pk, ");
-        sql.append("(CASE column_key WHEN 'MUL' THEN 1 ELSE 0 END) AS fk, ");
-        sql.append("(CASE WHEN data_type = 'bit' OR data_type = 'tinyint' OR data_type = 'mediumint' OR data_type = 'int' OR data_type = 'bigint' OR ");
-        sql.append("data_type = 'float' OR data_type = 'double' OR data_type = 'decimal' THEN numeric_precision ELSE character_maximum_length END) AS length, ");
-        sql.append("numeric_scale AS scale, ");
-        sql.append("column_comment AS comm ");
-        sql.append("FROM information_schema.columns ");
-        sql.append("WHERE table_schema = database() AND table_name = '");
-        sql.append(tableName);
-        sql.append("'");
-        return sql.toString();
-    }
-
-    private static String sqlServerColumnInfoSql(String tableName) {
-        StringBuffer sql = new StringBuffer();
-        sql.append("SELECT a.cid, a.name, a.type, (CASE a.notnull WHEN 0 THEN 1 ELSE 0 END) AS notnull, ");
-        sql.append("(CASE LEFT(constraint_name, 2) WHEN 'PK' THEN 1 ELSE 0 END) AS pk, ");
-        sql.append("(CASE LEFT(constraint_name, 2) WHEN 'FK' THEN 1 ELSE 0 END) AS fk, ");
-        sql.append("a.length, a.scale, c.value AS comm ");
-        sql.append("FROM (");
-        sql.append("SELECT syscolumns.id, syscolumns.colid AS cid, syscolumns.name AS name, syscolumns.length AS length, syscolumns.scale, systypes.name AS type, syscolumns.isnullable AS notnull, '");
-        sql.append(tableName);
-        sql.append("' AS table_name ");
-        sql.append("FROM syscolumns, systypes ");
-        sql.append("WHERE syscolumns.xusertype = systypes.xusertype AND syscolumns.id = object_id('");
-        sql.append(tableName);
-        sql.append("')) a ");
-        sql.append("LEFT JOIN information_schema.key_column_usage b ON a.name = b.column_name AND a.table_name = b.table_name ");
-        sql.append("LEFT JOIN sys.extended_properties c ON c.major_id = a.id AND c.minor_id = a.cid ");
-        sql.append("ORDER BY a.cid");
-        return sql.toString();
-    }
-
-    private static String oracleColumnInfoSql(String tableName) {
-        StringBuffer sql = new StringBuffer();
-        sql.append("SELECT col.column_id AS cid, col.column_name AS name, col.data_type AS type, ");
-        sql.append("(CASE col.nullable WHEN 'N' THEN '1' ELSE '0' END) AS notnull, col.data_default AS dflt_value, ");
-        sql.append("(CASE uc1.constraint_type WHEN 'P' THEN '1' ELSE '0' END) AS pk, ");
-        sql.append("(CASE uc2.constraint_type WHEN 'R' THEN '1' ELSE '0' END) AS fk, ");
-        sql.append("(CASE WHEN col.data_type = 'FLOAT' OR col.data_type = 'DOUBLE' OR col.data_type = 'DECIMAL' OR col.data_type = 'NUMBER' THEN col.data_precision ELSE col.char_length END) AS length, ");
-        sql.append("col.data_scale AS scale, ");
-        sql.append("user_col_comments.comments AS comm ");
-        sql.append("FROM user_tab_columns col ");
-        sql.append("LEFT JOIN user_cons_columns ucc ON ucc.table_name = col.table_name AND ucc.column_name = col.column_name AND ucc.position IS NOT NULL ");
-        sql.append("LEFT JOIN user_constraints uc1 ON uc1.constraint_name = ucc.constraint_name AND uc1.constraint_type = 'P' ");
-        sql.append("LEFT JOIN user_constraints uc2 ON uc2.constraint_name = ucc.constraint_name AND uc2.constraint_type = 'R' ");
-        sql.append("INNER JOIN user_col_comments ON user_col_comments.table_name = col.table_name AND user_col_comments.column_name = col.column_name ");
-        sql.append("WHERE col.table_name = '");
-        sql.append(tableName);
-        sql.append("'");
-        return sql.toString();
-    }
-
-    private static String derbyColumnInfoSql(String tableName) {
-        StringBuffer sql = new StringBuffer();
-        sql.append("SELECT cl.COLUMNNUMBER AS cid, cl.COLUMNNAME AS name, cl.COLUMNDATATYPE AS type, cl.COLUMNDEFAULT AS dflt_value, ");
-        //由于Derby的缺陷无法查询是否为主键和外键，所以默认第一个字段为主键，其余字段都不是外键
-        sql.append("(CASE WHEN cl.COLUMNNUMBER = 1 THEN '1' ELSE '0' END) AS pk, 0 AS pk ");
-        sql.append("FROM SYS.SYSTABLES AS tb, SYS.SYSCOLUMNS AS cl ");
-        sql.append("WHERE cl.REFERENCEID = tb.TABLEID ");
-        sql.append("AND tb.TABLENAME = '");
-        sql.append(tableName);
-        sql.append("' ORDER BY cl.COLUMNNUMBER");
-        return sql.toString();
-    }
-
-    private static String h2ColumnInfoSql(String tableName) {
-        StringBuffer sql = new StringBuffer();
-        sql.append("SELECT cl.ORDINAL_POSITION AS cid, ");
-        sql.append("cl.COLUMN_NAME AS name, ");
-        sql.append("cl.DATA_TYPE AS type, ");
-        sql.append("cl.IS_NULLABLE AS notnull, ");
-        sql.append("cl.COLUMN_DEFAULT AS dflt_value, ");
-        sql.append("cl.CHARACTER_MAXIMUM_LENGTH AS length, ");
-        sql.append("cl.NUMERIC_SCALE AS scale, ");
-        sql.append("CASE WHEN tc.CONSTRAINT_TYPE = 'PRIMARY KEY' THEN 1 ELSE 0 END AS pk, ");
-        sql.append("CASE WHEN tc.CONSTRAINT_TYPE = 'FOREIGN KEY' THEN 1 ELSE 0 END AS fk, ");
-        sql.append("cl.REMARKS AS comm ");
-        sql.append("FROM INFORMATION_SCHEMA.COLUMNS cl ");
-        sql.append("LEFT JOIN INDEX_COLUMNS ic ");
-        sql.append("ON ic.TABLE_NAME = cl.TABLE_NAME AND ic.COLUMN_NAME = cl.COLUMN_NAME ");
-        sql.append("LEFT JOIN TABLE_CONSTRAINTS tc ");
-        sql.append("ON tc.INDEX_NAME = ic.INDEX_NAME ");
-        sql.append("WHERE cl.TABLE_NAME = '");
-        sql.append(tableName);
-        sql.append("'");
-        return sql.toString();
-    }
-
-    private static String hqlColumnInfoSql(String tableName) {
-        StringBuffer sql = new StringBuffer();
-        sql.append("SELECT cl.ORDINAL_POSITION AS cid, ");
-        sql.append("cl.COLUMN_NAME AS name,");
-        sql.append("cl.DTD_IDENTIFIER AS type, ");
-        sql.append("cl.IS_NULLABLE AS notnull, ");
-        sql.append("cl.COLUMN_DEFAULT AS dflt_value, ");
-        sql.append("cl.CHARACTER_MAXIMUM_LENGTH AS length, ");
-        sql.append("cl.NUMERIC_SCALE AS scale, ");
-        sql.append("CASE WHEN kcu.TABLE_NAME = cl.TABLE_NAME AND kcu.POSITION_IN_UNIQUE_CONSTRAINT is null THEN 1 ELSE 0 END AS pk ");
-        sql.append("CASE WHEN kcu.TABLE_NAME = cl.TABLE_NAME AND kcu.POSITION_IN_UNIQUE_CONSTRAINT = 1 THEN 1 ELSE 0 END AS fk ");
-        sql.append("sc.COMMENT AS comm ");
-        sql.append("FROM INFORMATION_SCHEMA.COLUMNS cl ");
-        sql.append("LEFT JOIN INFORMATION_SCHEMA.SYSTEM_COMMENTS sc ");
-        sql.append("ON sc.OBJECT_NAME = cl.TABLE_NAME AND sc.COLUMN_NAME = cl.COLUMN_NAME ");
-        sql.append("LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ");
-        sql.append("ON kcu.TABLE_NAME = cl.TABLE_NAME AND kcu.COLUMN_NAME = cl.COLUMN_NAME ");
-        sql.append("WHERE cl.TABLE_NAME = '");
-        sql.append(tableName);
-        sql.append("'");
-        return sql.toString();
-    }
-
-    private static String sqliteColumnInfoSql(String tableName) {
-        StringBuffer sql = new StringBuffer();
-        sql.append("pragma table_info('");
-        sql.append(tableName);
-        sql.append("')");
-        return sql.toString();
     }
 
     /**

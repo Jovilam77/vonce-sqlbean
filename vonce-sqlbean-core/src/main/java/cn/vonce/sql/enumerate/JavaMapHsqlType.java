@@ -1,5 +1,8 @@
 package cn.vonce.sql.enumerate;
 
+import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.uitls.StringUtil;
+
 import java.math.BigDecimal;
 
 /**
@@ -47,6 +50,55 @@ public enum JavaMapHsqlType {
 
     public static String getTypeName(Class<?> clazz) {
         return getType(clazz).name();
+    }
+
+    /**
+     * 获取表数据列表的SQL
+     *
+     * @param sqlBeanDB
+     * @param schema
+     * @param tableName
+     * @return
+     */
+    public static String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT table_name AS \"name\" ");
+        sql.append("FROM information_schema.tables ");
+        sql.append("WHERE table_type = 'BASE TABLE'");
+        if (StringUtil.isNotEmpty(tableName)) {
+            sql.append(" AND table_name = '" + tableName + "'");
+        }
+        return sql.toString();
+    }
+
+    /**
+     * 获取列数据列表的SQL
+     *
+     * @param sqlBeanDB
+     * @param tableName
+     * @return
+     */
+    public static String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT cl.ORDINAL_POSITION AS cid, ");
+        sql.append("cl.COLUMN_NAME AS name,");
+        sql.append("cl.DTD_IDENTIFIER AS type, ");
+        sql.append("cl.IS_NULLABLE AS notnull, ");
+        sql.append("cl.COLUMN_DEFAULT AS dflt_value, ");
+        sql.append("cl.CHARACTER_MAXIMUM_LENGTH AS length, ");
+        sql.append("cl.NUMERIC_SCALE AS scale, ");
+        sql.append("CASE WHEN kcu.TABLE_NAME = cl.TABLE_NAME AND kcu.POSITION_IN_UNIQUE_CONSTRAINT is null THEN 1 ELSE 0 END AS pk ");
+        sql.append("CASE WHEN kcu.TABLE_NAME = cl.TABLE_NAME AND kcu.POSITION_IN_UNIQUE_CONSTRAINT = 1 THEN 1 ELSE 0 END AS fk ");
+        sql.append("sc.COMMENT AS comm ");
+        sql.append("FROM INFORMATION_SCHEMA.COLUMNS cl ");
+        sql.append("LEFT JOIN INFORMATION_SCHEMA.SYSTEM_COMMENTS sc ");
+        sql.append("ON sc.OBJECT_NAME = cl.TABLE_NAME AND sc.COLUMN_NAME = cl.COLUMN_NAME ");
+        sql.append("LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ");
+        sql.append("ON kcu.TABLE_NAME = cl.TABLE_NAME AND kcu.COLUMN_NAME = cl.COLUMN_NAME ");
+        sql.append("WHERE cl.TABLE_NAME = '");
+        sql.append(tableName);
+        sql.append("'");
+        return sql.toString();
     }
 
 }

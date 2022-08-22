@@ -16,7 +16,6 @@ import cn.vonce.sql.service.SqlBeanService;
 import cn.vonce.sql.spring.enumerate.DbRole;
 import cn.vonce.sql.uitls.DateUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
-import cn.vonce.sql.uitls.StringUtil;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -53,7 +53,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Autowired
     private SqlSession sqlSession;
 
-    private String productName;
+    private boolean initDBInfo;
 
     private Class<?> clazz;
 
@@ -81,17 +81,21 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     }
 
     @Override
-    public String getProductName() {
-        if (StringUtil.isEmpty(productName)) {
+    public SqlBeanDB initDBInfo() {
+        SqlBeanDB sqlBeanDB = new SqlBeanDB();
+        if (!initDBInfo) {
             try {
                 Connection connection = sqlSession.getConfiguration().getEnvironment().getDataSource().getConnection();
-                productName = connection.getMetaData().getDatabaseProductName();
+                DatabaseMetaData metaData = connection.getMetaData();
+                super.sqlBeanDBFill(sqlBeanDB, metaData);
+                System.out.println("sqlBeanDB：" + sqlBeanDB);
                 connection.close();
+                initDBInfo = true;
             } catch (SQLException e) {
                 logger.error(e.getMessage(), e);
             }
         }
-        return productName;
+        return sqlBeanDB;
     }
 
     @Override

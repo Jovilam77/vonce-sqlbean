@@ -6,6 +6,8 @@ import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.uitls.StringUtil;
 
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,11 +25,11 @@ public abstract class BaseSqlBeanServiceImpl {
 
     public abstract SqlBeanConfig getSqlBeanConfig();
 
-    public abstract String getProductName();
+    public abstract SqlBeanDB initDBInfo();
 
     public SqlBeanDB getSqlBeanDB() {
         if (sqlBeanDB == null) {
-            sqlBeanDB = new SqlBeanDB();
+            sqlBeanDB = initDBInfo();
             sqlBeanDB.setSqlBeanConfig(getSqlBeanConfig());
             //如果用户未进行配置
             boolean isUserConfig = true;
@@ -35,11 +37,9 @@ public abstract class BaseSqlBeanServiceImpl {
                 isUserConfig = false;
                 sqlBeanDB.setSqlBeanConfig(new SqlBeanConfig());
             }
-            DbType dbType = DbType.getDbType(getProductName());
-            sqlBeanDB.setDbType(dbType);
             //如果用户未进行配置则对某些数据库进行设置
             if (!isUserConfig) {
-                switch (Objects.requireNonNull(dbType)) {
+                switch (Objects.requireNonNull(sqlBeanDB.getDbType())) {
                     case Oracle:
                     case DB2:
                     case Derby:
@@ -89,6 +89,27 @@ public abstract class BaseSqlBeanServiceImpl {
                 }
             }
         }
+    }
+
+    /**
+     * 填充数据
+     *
+     * @param sqlBeanDB
+     * @param metaData
+     * @throws SQLException
+     */
+    public void sqlBeanDBFill(SqlBeanDB sqlBeanDB, DatabaseMetaData metaData) throws SQLException {
+        sqlBeanDB.setProductName(metaData.getDatabaseProductName());
+        sqlBeanDB.setDatabaseMajorVersion(metaData.getDatabaseMajorVersion());
+        sqlBeanDB.setDatabaseMinorVersion(metaData.getDatabaseMinorVersion());
+        sqlBeanDB.setDatabaseProductVersion(metaData.getDatabaseProductVersion());
+        sqlBeanDB.setJdbcMajorVersion(metaData.getJDBCMajorVersion());
+        sqlBeanDB.setJdbcMinorVersion(metaData.getJDBCMinorVersion());
+        sqlBeanDB.setDriverMajorVersion(metaData.getDatabaseMajorVersion());
+        sqlBeanDB.setDriverMinorVersion(metaData.getDriverMinorVersion());
+        sqlBeanDB.setDriverVersion(metaData.getDriverVersion());
+        sqlBeanDB.setDriverName(metaData.getDriverName());
+        sqlBeanDB.setDbType(DbType.getDbType(sqlBeanDB.getProductName()));
     }
 
 }

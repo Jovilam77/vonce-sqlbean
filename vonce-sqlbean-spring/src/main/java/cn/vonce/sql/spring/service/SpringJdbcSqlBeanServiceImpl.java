@@ -17,7 +17,6 @@ import cn.vonce.sql.provider.SqlBeanProvider;
 import cn.vonce.sql.service.SqlBeanService;
 import cn.vonce.sql.uitls.DateUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
-import cn.vonce.sql.uitls.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
@@ -54,7 +54,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private String productName;
+    private boolean initDBInfo;
 
     private Class<?> clazz;
 
@@ -82,17 +82,20 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     }
 
     @Override
-    public String getProductName() {
-        if (StringUtil.isEmpty(productName)) {
+    public SqlBeanDB initDBInfo() {
+        SqlBeanDB sqlBeanDB = new SqlBeanDB();
+        if (!initDBInfo) {
             try {
                 Connection connection = jdbcTemplate.getDataSource().getConnection();
-                productName = connection.getMetaData().getDatabaseProductName();
+                DatabaseMetaData metaData = connection.getMetaData();
+                super.sqlBeanDBFill(sqlBeanDB, metaData);
                 connection.close();
+                initDBInfo = true;
             } catch (SQLException e) {
-                logger.error(e.getMessage());
+                logger.error(e.getMessage(), e);
             }
         }
-        return productName;
+        return sqlBeanDB;
     }
 
     @Override
@@ -606,7 +609,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public void dropTable() {
         SqlBeanDB sqlBeanDB = getSqlBeanDB();
         if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.PostgreSQL && sqlBeanDB.getDbType() != DbType.SQLServer && sqlBeanDB.getDbType() != DbType.H2) {
-            List<TableInfo> nameList = jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(sqlBeanDB, SqlBeanUtil.getTable(clazz).getName()), TableInfo.class);
+            List<TableInfo> nameList = jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(sqlBeanDB, null, SqlBeanUtil.getTable(clazz).getName()), TableInfo.class);
             if (nameList == null || nameList.isEmpty()) {
                 return;
             }
@@ -630,7 +633,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<TableInfo> getTableList(String tableName) {
-        return jdbcTemplate.query(SqlBeanProvider.selectTableListSql(getSqlBeanDB(), tableName), new SpringJbdcSqlBeanMapper<TableInfo>(TableInfo.class, TableInfo.class));
+        return jdbcTemplate.query(SqlBeanProvider.selectTableListSql(getSqlBeanDB(), null, tableName), new SpringJbdcSqlBeanMapper<TableInfo>(TableInfo.class, TableInfo.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
