@@ -59,9 +59,16 @@ public enum JavaMapDerbyType {
      */
     public static String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT tablename AS \"name\" ");
-        sql.append("FROM SYS.systables ");
-        sql.append("WHERE tabletype = 'T'");
+        sql.append("SELECT tb.TABLENAME AS \"name\", sc.SCHEMANAME AS \"schema\" ");
+        sql.append("FROM SYS.SYSTABLES tb ");
+        sql.append("INNER JOIN SYS.SYSSCHEMAS sc ");
+        sql.append("ON sc.SCHEMAID = tb.SCHEMAID ");
+        sql.append("WHERE TABLETYPE = 'T' AND sc.SCHEMANAME = ");
+        if (StringUtil.isNotEmpty(schema)) {
+            sql.append("'" + schema + "'");
+        } else {
+            sql.append("'SA'");
+        }
         if (StringUtil.isNotEmpty(tableName)) {
             sql.append(" AND tablename = '" + tableName + "'");
         }
@@ -80,9 +87,18 @@ public enum JavaMapDerbyType {
         sql.append("SELECT cl.COLUMNNUMBER AS cid, cl.COLUMNNAME AS name, cl.COLUMNDATATYPE AS type, cl.COLUMNDEFAULT AS dflt_value, ");
         //由于Derby的缺陷无法查询是否为主键和外键，所以默认第一个字段为主键，其余字段都不是外键
         sql.append("(CASE WHEN cl.COLUMNNUMBER = 1 THEN '1' ELSE '0' END) AS pk, 0 AS pk ");
-        sql.append("FROM SYS.SYSTABLES AS tb, SYS.SYSCOLUMNS AS cl ");
-        sql.append("WHERE cl.REFERENCEID = tb.TABLEID ");
-        sql.append("AND tb.TABLENAME = '");
+        sql.append("FROM SYS.SYSTABLES AS tb ");
+        sql.append("INNER JOIN SYS.SYSCOLUMNS cl ");
+        sql.append("ON cl.REFERENCEID = tb.TABLEID ");
+        sql.append("INNER JOIN SYS.SYSSCHEMAS sc ");
+        sql.append("ON sc.SCHEMAID = tb.SCHEMAID ");
+        sql.append("WHERE sc.SCHEMANAME = ");
+        if (StringUtil.isNotEmpty(schema)) {
+            sql.append("'" + schema + "'");
+        } else {
+            sql.append("'SA'");
+        }
+        sql.append(" AND tb.TABLENAME = '");
         sql.append(tableName);
         sql.append("' ORDER BY cl.COLUMNNUMBER");
         return sql.toString();

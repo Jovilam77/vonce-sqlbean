@@ -48,7 +48,7 @@ public class ColumnInfo {
     /**
      * 注释
      */
-    private String comm;
+    private String remarks;
 
     public Integer getCid() {
         return cid;
@@ -122,11 +122,11 @@ public class ColumnInfo {
         this.scale = scale;
     }
 
-    public String getComm() {
-        return comm;
+    public String getRemarks() {
+        return remarks;
     }
 
-    public void setComm(String comm) {
-        this.comm = comm;
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 }

@@ -91,7 +91,7 @@ public enum JavaMapPostgreSqlType {
         sql.append("(CASE uc2.constraint_type WHEN 'R' THEN '1' ELSE '0' END) AS fk, ");
         sql.append("(CASE WHEN col.data_type = 'FLOAT' OR col.data_type = 'DOUBLE' OR col.data_type = 'DECIMAL' OR col.data_type = 'NUMBER' THEN col.data_precision ELSE col.char_length END) AS length, ");
         sql.append("col.data_scale AS scale, ");
-        sql.append("user_col_comments.comments AS comm ");
+        sql.append("user_col_comments.comments AS remarks ");
         sql.append("FROM user_tab_columns col ");
         sql.append("LEFT JOIN user_cons_columns ucc ON ucc.table_name = col.table_name AND ucc.column_name = col.column_name AND ucc.position IS NOT NULL ");
         sql.append("LEFT JOIN user_constraints uc1 ON uc1.constraint_name = ucc.constraint_name AND uc1.constraint_type = 'P' ");

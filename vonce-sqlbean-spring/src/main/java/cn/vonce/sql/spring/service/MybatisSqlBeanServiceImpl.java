@@ -88,7 +88,6 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
                 Connection connection = sqlSession.getConfiguration().getEnvironment().getDataSource().getConnection();
                 DatabaseMetaData metaData = connection.getMetaData();
                 super.sqlBeanDBFill(sqlBeanDB, metaData);
-                System.out.println("sqlBeanDB：" + sqlBeanDB);
                 connection.close();
                 initDBInfo = true;
             } catch (SQLException e) {

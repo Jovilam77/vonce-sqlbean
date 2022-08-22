@@ -61,16 +61,15 @@ public enum JavaMapH2Type {
      */
     public static String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT TABLE_SCHEMA \"schema\",TABLE_NAME \"name\",REMARKS \"comm\" ");
+        sql.append("SELECT TABLE_SCHEMA AS schema,TABLE_NAME AS name,REMARKS AS remarks ");
         sql.append("FROM information_schema.tables ");
         sql.append("WHERE (table_type = 'TABLE' OR TABLE_TYPE = 'BASE TABLE') ");
-        sql.append(" AND TABLE_SCHEMA = '");
+        sql.append(" AND TABLE_SCHEMA = ");
         if (StringUtil.isNotEmpty(schema)) {
-            sql.append(schema);
+            sql.append("'" + schema + "'");
         } else {
-            sql.append("PUBLIC");
+            sql.append("'PUBLIC'");
         }
-        sql.append("'");
         if (StringUtil.isNotEmpty(tableName)) {
             sql.append(" AND TABLE_NAME = '" + tableName + "'");
         }
@@ -93,19 +92,25 @@ public enum JavaMapH2Type {
         } else {
             sql.append("cl.DATA_TYPE AS type, ");
         }
-        sql.append("cl.IS_NULLABLE AS notnull, ");
+        sql.append("CASE WHEN cl.IS_NULLABLE  = 'NO' THEN 1 ELSE 0 END AS notnull, ");
         sql.append("cl.COLUMN_DEFAULT AS dflt_value, ");
         sql.append("cl.CHARACTER_MAXIMUM_LENGTH AS length, ");
         sql.append("cl.NUMERIC_SCALE AS scale, ");
         sql.append("CASE WHEN tc.CONSTRAINT_TYPE = 'PRIMARY KEY' THEN 1 ELSE 0 END AS pk, ");
         sql.append("CASE WHEN tc.CONSTRAINT_TYPE = 'FOREIGN KEY' THEN 1 ELSE 0 END AS fk, ");
-        sql.append("cl.REMARKS AS comm ");
+        sql.append("cl.REMARKS AS remarks ");
         sql.append("FROM INFORMATION_SCHEMA.COLUMNS cl ");
         sql.append("LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ");
         sql.append("ON kcu.TABLE_NAME = cl.TABLE_NAME AND kcu.COLUMN_NAME = cl.COLUMN_NAME ");
         sql.append("LEFT JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc ");
         sql.append("ON tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME ");
-        sql.append("WHERE cl.TABLE_NAME = '");
+        sql.append("WHERE cl.TABLE_SCHEMA = ");
+        if (StringUtil.isNotEmpty(schema)) {
+            sql.append("'" + schema + "'");
+        } else {
+            sql.append("'PUBLIC'");
+        }
+        sql.append(" AND cl.TABLE_NAME = '");
         sql.append(tableName);
         sql.append("'");
         return sql.toString();

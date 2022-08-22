@@ -21,7 +21,7 @@ public class TableInfo {
     /**
      * 注释
      */
-    private String comm;
+    private String remarks;
 
     public String getSchema() {
         return schema;
@@ -39,11 +39,12 @@ public class TableInfo {
         this.name = name;
     }
 
-    public String getComm() {
-        return comm;
+    public String getRemarks() {
+        return remarks;
     }
 
-    public void setComm(String comm) {
-        this.comm = comm;
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
+
 }

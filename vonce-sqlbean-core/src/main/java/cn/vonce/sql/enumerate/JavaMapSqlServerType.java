@@ -63,7 +63,7 @@ public enum JavaMapSqlServerType {
      */
     public static String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT o.name, p.value AS comm ");
+        sql.append("SELECT o.name, p.value AS remarks ");
         sql.append("FROM sysobjects o ");
         sql.append("LEFT JOIN sys.extended_properties p ");
         sql.append("ON p.major_id = o.id AND p.minor_id = 0 ");
@@ -86,7 +86,7 @@ public enum JavaMapSqlServerType {
         sql.append("SELECT a.cid, a.name, a.type, (CASE a.notnull WHEN 0 THEN 1 ELSE 0 END) AS notnull, ");
         sql.append("(CASE LEFT(constraint_name, 2) WHEN 'PK' THEN 1 ELSE 0 END) AS pk, ");
         sql.append("(CASE LEFT(constraint_name, 2) WHEN 'FK' THEN 1 ELSE 0 END) AS fk, ");
-        sql.append("a.length, a.scale, c.value AS comm ");
+        sql.append("a.length, a.scale, c.value AS remarks ");
         sql.append("FROM (");
         sql.append("SELECT syscolumns.id, syscolumns.colid AS cid, syscolumns.name AS name, syscolumns.length AS length, syscolumns.scale, systypes.name AS type, syscolumns.isnullable AS notnull, '");
         sql.append(tableName);

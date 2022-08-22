@@ -63,9 +63,14 @@ public enum JavaMapMySqlType {
      */
     public static String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT table_name AS `name`, table_comment AS comm ");
+        sql.append("SELECT table_schema AS `schema`, table_name AS `name`, table_comment AS `remarks` ");
         sql.append("FROM information_schema.tables ");
-        sql.append("WHERE table_schema = database() AND table_type = 'BASE TABLE'");
+        sql.append("WHERE table_type = 'BASE TABLE' AND table_schema = ");
+        if (StringUtil.isNotEmpty(schema)) {
+            sql.append("'" + schema + "'");
+        } else {
+            sql.append("database()");
+        }
         if (StringUtil.isNotEmpty(tableName)) {
             sql.append(" AND table_name = '" + tableName + "'");
         }
@@ -88,9 +93,15 @@ public enum JavaMapMySqlType {
         sql.append("(CASE WHEN data_type = 'bit' OR data_type = 'tinyint' OR data_type = 'mediumint' OR data_type = 'int' OR data_type = 'bigint' OR ");
         sql.append("data_type = 'float' OR data_type = 'double' OR data_type = 'decimal' THEN numeric_precision ELSE character_maximum_length END) AS length, ");
         sql.append("numeric_scale AS scale, ");
-        sql.append("column_comment AS comm ");
+        sql.append("column_comment AS remarks ");
         sql.append("FROM information_schema.columns ");
-        sql.append("WHERE table_schema = database() AND table_name = '");
+        sql.append("WHERE table_schema = ");
+        if (StringUtil.isNotEmpty(schema)) {
+            sql.append("'" + schema + "'");
+        } else {
+            sql.append("database()");
+        }
+        sql.append(" AND table_name = '");
         sql.append(tableName);
         sql.append("'");
         return sql.toString();
