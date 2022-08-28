@@ -6,10 +6,7 @@ import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.JdbcType;
 import cn.vonce.sql.uitls.StringUtil;
-
 import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
@@ -115,26 +112,6 @@ public abstract class BaseSqlBeanServiceImpl {
         sqlBeanDB.setDriverMinorVersion(metaData.getDriverMinorVersion());
         sqlBeanDB.setDriverVersion(metaData.getDriverVersion());
         sqlBeanDB.setDriverName(metaData.getDriverName());
-        ResultSet set = metaData.getCatalogs();
-        ResultSetMetaData resultSetMetaData = set.getMetaData();
-        for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
-            System.out.println(resultSetMetaData.getColumnName(i));
-        }
-        System.out.println("_________________");
-        ResultSet set2 = metaData.getSchemas();
-        ResultSetMetaData resultSetMetaData2 = set2.getMetaData();
-        for (int i = 1; i <= resultSetMetaData2.getColumnCount(); i++) {
-            System.out.println(resultSetMetaData2.getColumnName(i));
-        }
-        System.out.println("_________________");
-        ResultSet set3 = metaData.getTables("vivi", null, "%", new String[]{"TABLE", "VIEW"});
-        ResultSetMetaData resultSetMetaData3 = set3.getMetaData();
-        for (int i = 1; i <= resultSetMetaData3.getColumnCount(); i++) {
-            System.out.println(resultSetMetaData3.getColumnName(i));
-        }
-        System.out.println("getCatalogTerm:" + metaData.getCatalogTerm());
-        System.out.println("getProcedureTerm:" + metaData.getProcedureTerm());
-        System.out.println("getSchemaTerm:" + metaData.getSchemaTerm());
         sqlBeanDB.setDbType(DbType.getDbType(sqlBeanDB.getProductName()));
     }
 
