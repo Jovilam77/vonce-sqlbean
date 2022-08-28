@@ -12,7 +12,7 @@ import cn.vonce.sql.uitls.StringUtil;
  */
 public enum DbType {
 
-    MySQL, MariaDB, SQLServer, Oracle, PostgreSQL, DB2, H2, Hsql, Derby, SQLite;
+    MySQL, MariaDB, SQLServer, Oracle, Postgresql, DB2, H2, Hsql, Derby, SQLite;
 
     public static DbType getDbType(String productName) {
         if (StringUtil.isNotEmpty(productName)) {
@@ -25,8 +25,8 @@ public enum DbType {
                 return DbType.Oracle;
             } else if (productName.indexOf(DbType.SQLServer.name().toLowerCase()) >= 0) {
                 return DbType.SQLServer;
-            } else if (productName.indexOf(DbType.PostgreSQL.name().toLowerCase()) >= 0) {
-                return DbType.PostgreSQL;
+            } else if (productName.indexOf(DbType.Postgresql.name().toLowerCase()) >= 0) {
+                return DbType.Postgresql;
             } else if (productName.indexOf(DbType.DB2.name().toLowerCase()) >= 0) {
                 return DbType.DB2;
             } else if (productName.indexOf(DbType.Derby.name().toLowerCase()) >= 0) {

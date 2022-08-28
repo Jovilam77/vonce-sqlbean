@@ -588,8 +588,8 @@ public class SqlBeanProvider {
                 return JavaMapSqlServerType.getTableListSql(sqlBeanDB, schema, name);
             case Oracle:
                 return JavaMapOracleType.getTableListSql(sqlBeanDB, schema, name);
-            case PostgreSQL:
-                return JavaMapPostgreSqlType.getTableListSql(sqlBeanDB, schema, name);
+            case Postgresql:
+                return JavaMapPostgresqlType.getTableListSql(sqlBeanDB, schema, name);
             case DB2:
                 return JavaMapDB2Type.getTableListSql(sqlBeanDB, schema, name);
             case H2:
@@ -620,7 +620,8 @@ public class SqlBeanProvider {
                 return JavaMapSqlServerType.getColumnListSql(sqlBeanDB, null, name);
             case Oracle:
                 return JavaMapOracleType.getColumnListSql(sqlBeanDB, null, name);
-            case PostgreSQL:
+            case Postgresql:
+                return JavaMapPostgresqlType.getColumnListSql(sqlBeanDB, null, name);
             case DB2:
             case H2:
                 return JavaMapH2Type.getColumnListSql(sqlBeanDB, null, name);

@@ -106,9 +106,9 @@ public class SqlHelper {
         if (select.getSqlBeanDB().getDbType() == DbType.MySQL || select.getSqlBeanDB().getDbType() == DbType.MariaDB || select.getSqlBeanDB().getDbType() == DbType.H2) {
             mysqlPageDispose(select, sqlSb);
         }
-        //PostgreSQL,SQLite,Hsql 分页处理
-        else if (select.getSqlBeanDB().getDbType() == DbType.PostgreSQL || select.getSqlBeanDB().getDbType() == DbType.SQLite || select.getSqlBeanDB().getDbType() == DbType.Hsql) {
-            postgreSqlPageDispose(select, sqlSb);
+        //Postgresql,SQLite,Hsql 分页处理
+        else if (select.getSqlBeanDB().getDbType() == DbType.Postgresql || select.getSqlBeanDB().getDbType() == DbType.SQLite || select.getSqlBeanDB().getDbType() == DbType.Hsql) {
+            PostgresqlPageDispose(select, sqlSb);
         }
         //Oracle 分页处理
         else if (select.getSqlBeanDB().getDbType() == DbType.Oracle) {
@@ -265,8 +265,8 @@ public class SqlHelper {
             targetSchema = backup.getTable().getSchema();
         }
         StringBuffer backupSql = new StringBuffer();
-        //非SQLServer、PostgreSQL数据库则使用：create table A as select * from B
-        if (DbType.SQLServer != backup.getSqlBeanDB().getDbType() && DbType.PostgreSQL != backup.getSqlBeanDB().getDbType()) {
+        //非SQLServer、Postgresql数据库则使用：create table A as select * from B
+        if (DbType.SQLServer != backup.getSqlBeanDB().getDbType() && DbType.Postgresql != backup.getSqlBeanDB().getDbType()) {
             backupSql.append(SqlConstant.CREATE_TABLE);
             backupSql.append(getTableName(targetSchema, backup.getTargetTableName()));
             backupSql.append(SqlConstant.SPACES);
@@ -282,8 +282,8 @@ public class SqlHelper {
         } else {
             backupSql.append(SqlConstant.ALL);
         }
-        //如果是SQLServer、PostgreSQL数据库则需要拼接INTO：select * into A from B
-        if (DbType.SQLServer == backup.getSqlBeanDB().getDbType() || DbType.PostgreSQL == backup.getSqlBeanDB().getDbType()) {
+        //如果是SQLServer、Postgresql数据库则需要拼接INTO：select * into A from B
+        if (DbType.SQLServer == backup.getSqlBeanDB().getDbType() || DbType.Postgresql == backup.getSqlBeanDB().getDbType()) {
             backupSql.append(SqlConstant.INTO);
             backupSql.append(getTableName(targetSchema, backup.getTargetTableName()));
         }
@@ -347,7 +347,7 @@ public class SqlHelper {
     public static String buildDrop(Drop drop) {
         StringBuffer dropSql = new StringBuffer();
         String tableName = getTableName(drop.getTable(), drop);
-        if (drop.getSqlBeanDB().getDbType() == DbType.MySQL || drop.getSqlBeanDB().getDbType() == DbType.MariaDB || drop.getSqlBeanDB().getDbType() == DbType.PostgreSQL || drop.getSqlBeanDB().getDbType() == DbType.H2) {
+        if (drop.getSqlBeanDB().getDbType() == DbType.MySQL || drop.getSqlBeanDB().getDbType() == DbType.MariaDB || drop.getSqlBeanDB().getDbType() == DbType.Postgresql || drop.getSqlBeanDB().getDbType() == DbType.H2) {
             dropSql.append("DROP TABLE IF EXISTS ");
             dropSql.append(tableName);
         } else if (drop.getSqlBeanDB().getDbType() == DbType.MySQL) {
@@ -387,8 +387,8 @@ public class SqlHelper {
                 case Oracle:
                     jdbcType = JdbcType.getType(JavaMapOracleType.getType(clazz).name());
                     break;
-                case PostgreSQL:
-                    jdbcType = JdbcType.getType(JavaMapPostgreSqlType.getType(clazz).name());
+                case Postgresql:
+                    jdbcType = JdbcType.getType(JavaMapPostgresqlType.getType(clazz).name());
                     break;
                 case DB2:
                     jdbcType = JdbcType.getType(JavaMapDB2Type.getType(clazz).name());
@@ -949,7 +949,7 @@ public class SqlHelper {
                 logicallyDeleteSql.append(SqlConstant.BEGIN_BRACKET);
                 logicallyDeleteSql.append(SqlBeanUtil.getTableFieldFullName(common, common.getTable().getAlias(), SqlBeanUtil.getTableFieldName(logicallyDeleteField, sqlTable)));
                 logicallyDeleteSql.append(SqlConstant.EQUAL_TO);
-                logicallyDeleteSql.append(0);
+                logicallyDeleteSql.append("'0'");
                 logicallyDeleteSql.append(SqlConstant.END_BRACKET);
             }
             return logicallyDeleteSql.toString();
@@ -1162,12 +1162,12 @@ public class SqlHelper {
     }
 
     /**
-     * 返回PostgreSql,Sqlite,Hsql 分页语句
+     * 返回Postgresql,Sqlite,Hsql 分页语句
      *
      * @param select
      * @return
      */
-    private static void postgreSqlPageDispose(Select select, StringBuffer sqlSb) {
+    private static void PostgresqlPageDispose(Select select, StringBuffer sqlSb) {
         if (SqlBeanUtil.isUsePage(select)) {
             Integer[] param = pageParam(select);
             sqlSb.append(SqlConstant.LIMIT);
@@ -1274,7 +1274,7 @@ public class SqlHelper {
             int endIndex = (pagenum * select.getPage().getPagesize()) + select.getPage().getPagesize();
             param = new Integer[]{startIndex, endIndex};
         }
-        //Mysql,MariaDB,PostgreSQL,Sqlite,Hsql
+        //Mysql,MariaDB,Postgresql,Sqlite,Hsql
         else {
             int pagenum = select.getPage().getStartByZero() ? select.getPage().getPagenum() : select.getPage().getPagenum() > 0 ? select.getPage().getPagenum() - 1 : select.getPage().getPagenum();
             int limitOffset = pagenum * select.getPage().getPagesize();

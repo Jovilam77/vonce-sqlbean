@@ -848,7 +848,7 @@ public class SqlBeanUtil {
                 if (jdbcType != null) {
                     sqlValue = (String) value;
                 } else {
-                    sqlValue = Boolean.parseBoolean(value.toString()) == true ? "1" : "0";
+                    sqlValue = Boolean.parseBoolean(value.toString()) == true ? "'1'" : "'0'";
                 }
                 break;
             case DATE_TYPE:
