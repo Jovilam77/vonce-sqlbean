@@ -149,7 +149,7 @@ public class SqlBeanUtil {
      */
     public static String getTableFieldName(Common common, Field field, SqlTable sqlTable) {
         String name = getTableFieldName(field, sqlTable);
-        if (SqlBeanUtil.isToUpperCase(common)){
+        if (SqlBeanUtil.isToUpperCase(common)) {
             name = name.toUpperCase();
         }
         String transferred = SqlBeanUtil.getTransferred(common);
@@ -848,7 +848,14 @@ public class SqlBeanUtil {
                 if (jdbcType != null) {
                     sqlValue = (String) value;
                 } else {
-                    sqlValue = Boolean.parseBoolean(value.toString()) == true ? "'1'" : "'0'";
+                    DbType dbType = common.getSqlBeanDB().getDbType();
+                    if (dbType == DbType.Postgresql) {
+                        sqlValue = Boolean.parseBoolean(value.toString()) == true ? "'1'" : "'0'";
+                    } else if (dbType == DbType.H2 || dbType == DbType.Hsql) {
+                        sqlValue = Boolean.parseBoolean(value.toString()) == true ? "true" : "false";
+                    } else {
+                        sqlValue = Boolean.parseBoolean(value.toString()) == true ? "1" : "0";
+                    }
                 }
                 break;
             case DATE_TYPE:

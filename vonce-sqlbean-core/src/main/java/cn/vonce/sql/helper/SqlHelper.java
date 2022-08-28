@@ -949,7 +949,14 @@ public class SqlHelper {
                 logicallyDeleteSql.append(SqlConstant.BEGIN_BRACKET);
                 logicallyDeleteSql.append(SqlBeanUtil.getTableFieldFullName(common, common.getTable().getAlias(), SqlBeanUtil.getTableFieldName(logicallyDeleteField, sqlTable)));
                 logicallyDeleteSql.append(SqlConstant.EQUAL_TO);
-                logicallyDeleteSql.append("'0'");
+                DbType dbType = common.getSqlBeanDB().getDbType();
+                if (dbType == DbType.Postgresql) {
+                    logicallyDeleteSql.append("'0'");
+                } else if (dbType == DbType.H2 || dbType == DbType.Hsql) {
+                    logicallyDeleteSql.append("false");
+                } else {
+                    logicallyDeleteSql.append(0);
+                }
                 logicallyDeleteSql.append(SqlConstant.END_BRACKET);
             }
             return logicallyDeleteSql.toString();
