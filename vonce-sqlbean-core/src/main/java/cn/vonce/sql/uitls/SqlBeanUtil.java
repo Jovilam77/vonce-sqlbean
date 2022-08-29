@@ -450,7 +450,8 @@ public class SqlBeanUtil {
                 String subTableAlias = StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias();
                 columnSet.add(new Column(subTableAlias, tableFieldName, getColumnAlias(subTableAlias, field.getName())));
             } else {
-                columnSet.add(new Column(tableAlias, getTableFieldName(field, sqlTable), getColumnAlias(tableAlias, field.getName())));
+//                columnSet.add(new Column(tableAlias, getTableFieldName(field, sqlTable), getColumnAlias(tableAlias, field.getName())));
+                columnSet.add(new Column(tableAlias, getTableFieldName(field, sqlTable), field.getName()));
             }
         }
         return new ArrayList<>(columnSet);

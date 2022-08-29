@@ -816,10 +816,12 @@ public class SqlHelper {
                     groupByAndOrderBySql.append(column.getTableAlias());
                     groupByAndOrderBySql.append(transferred);
                     groupByAndOrderBySql.append(SqlConstant.POINT);
+                    groupByAndOrderBySql.append(transferred);
+                    groupByAndOrderBySql.append(isToUpperCase ? column.getName().toUpperCase() : column.getName());
+                    groupByAndOrderBySql.append(transferred);
+                } else {
+                    groupByAndOrderBySql.append(isToUpperCase ? column.getName().toUpperCase() : column.getName());
                 }
-                groupByAndOrderBySql.append(transferred);
-                groupByAndOrderBySql.append(isToUpperCase ? column.getName().toUpperCase() : column.getName());
-                groupByAndOrderBySql.append(transferred);
                 if (SqlConstant.ORDER_BY.equals(type)) {
                     groupByAndOrderBySql.append(SqlConstant.SPACES);
                     groupByAndOrderBySql.append(select.getOrderBy().get(i).getSqlSort().name());
