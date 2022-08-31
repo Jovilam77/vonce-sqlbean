@@ -228,11 +228,14 @@ public class SqlHelper {
             }
             //是否为null
             if (columnInfo.getNotnull()) {
+                sqlSb.append(SqlConstant.SPACES);
                 sqlSb.append(SqlConstant.NOT_NULL);
             }
             //默认值
             if (StringUtil.isNotEmpty(columnInfo.getDfltValue())) {
+                sqlSb.append(SqlConstant.SPACES);
                 sqlSb.append(SqlConstant.DEFAULT);
+                sqlSb.append(SqlConstant.SPACES);
                 sqlSb.append(SqlBeanUtil.getSqlValue(create, columnInfo.getDfltValue(), jdbcType));
             }
             //如果是Mysql或MariaDB可直接保存备注

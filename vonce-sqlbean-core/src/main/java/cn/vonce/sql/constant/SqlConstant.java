@@ -58,7 +58,8 @@ public class SqlConstant {
     public static final String CREATE_TABLE = "CREATE TABLE ";
     public static final String PRIMARY_KEY = "PRIMARY KEY";
     public static final String NOT_NULL = "NOT NULL";
-    public static final String DEFAULT = "DEFAULT ";
+    public static final String DEFAULT = "DEFAULT";
+    public static final String COMMENT = "COMMENT";
 
     // mssql
     public static final String TOP = " TOP ";
@@ -85,5 +86,4 @@ public class SqlConstant {
     public static final String TEXT = "TEXT";
     public static final String BLOB = "BLOB";
 
-    public static final String COMMENT = "COMMENT";
 }
