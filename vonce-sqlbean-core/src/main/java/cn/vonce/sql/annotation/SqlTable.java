@@ -65,4 +65,11 @@ public @interface SqlTable {
      */
     String schema() default "";
 
+    /**
+     * 表注释
+     *
+     * @return
+     */
+    String remarks() default "";
+
 }

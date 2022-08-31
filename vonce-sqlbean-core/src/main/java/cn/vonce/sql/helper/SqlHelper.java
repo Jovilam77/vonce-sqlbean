@@ -199,7 +199,7 @@ public class SqlHelper {
         Field idField = null;
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(create.getBeanClass());
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(create.getBeanClass());
-        String transferred = SqlBeanUtil.getTransferred(create);
+        DbType dbType = create.getSqlBeanDB().getDbType();
         for (int i = 0; i < fieldList.size(); i++) {
             if (SqlBeanUtil.isIgnore(fieldList.get(i))) {
                 continue;
@@ -235,6 +235,15 @@ public class SqlHelper {
                 sqlSb.append(SqlConstant.DEFAULT);
                 sqlSb.append(SqlBeanUtil.getSqlValue(create, columnInfo.getDfltValue(), jdbcType));
             }
+            //如果是Mysql或MariaDB可直接保存备注
+            if (sqlColumn != null && StringUtil.isNotBlank(sqlColumn.remarks()) && (dbType == DbType.MySQL || dbType == DbType.MariaDB)) {
+                sqlSb.append(SqlConstant.SPACES);
+                sqlSb.append(SqlConstant.COMMENT);
+                sqlSb.append(SqlConstant.SPACES);
+                sqlSb.append(SqlConstant.SINGLE_QUOTATION_MARK);
+                sqlSb.append(sqlColumn.remarks());
+                sqlSb.append(SqlConstant.SINGLE_QUOTATION_MARK);
+            }
             sqlSb.append(SqlConstant.COMMA);
         }
 
@@ -249,6 +258,15 @@ public class SqlHelper {
             sqlSb.deleteCharAt(sqlSb.length() - SqlConstant.COMMA.length());
         }
         sqlSb.append(SqlConstant.END_BRACKET);
+        //如果是Mysql或MariaDB可直接保存备注
+        if (sqlTable != null && StringUtil.isNotBlank(sqlTable.remarks()) && (dbType == DbType.MySQL || dbType == DbType.MariaDB)) {
+            sqlSb.append(SqlConstant.SPACES);
+            sqlSb.append(SqlConstant.COMMENT);
+            sqlSb.append(SqlConstant.EQUAL_TO);
+            sqlSb.append(SqlConstant.SINGLE_QUOTATION_MARK);
+            sqlSb.append(sqlTable.remarks());
+            sqlSb.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        }
         return sqlSb.toString();
     }
 

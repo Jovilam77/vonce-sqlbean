@@ -61,6 +61,13 @@ public @interface SqlColumn {
     String def() default "";
 
     /**
+     * 字段注释
+     *
+     * @return
+     */
+    String remarks() default "";
+
+    /**
      * 是否忽略该字段
      *
      * @return

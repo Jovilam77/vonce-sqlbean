@@ -85,4 +85,5 @@ public class SqlConstant {
     public static final String TEXT = "TEXT";
     public static final String BLOB = "BLOB";
 
+    public static final String COMMENT = "COMMENT";
 }
