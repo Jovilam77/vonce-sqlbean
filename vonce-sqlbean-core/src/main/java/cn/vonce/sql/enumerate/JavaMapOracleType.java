@@ -58,7 +58,6 @@ public enum JavaMapOracleType {
         sql.append("FROM user_tables t ");
         sql.append("LEFT JOIN user_tab_comments c ");
         sql.append("ON c.table_name = t.table_name");
-        sql.append("LEFT JOIN user_tab_comments c ");
         if (StringUtil.isNotEmpty(tableName)) {
             sql.append(" AND t.table_name = '" + tableName + "'");
         }
