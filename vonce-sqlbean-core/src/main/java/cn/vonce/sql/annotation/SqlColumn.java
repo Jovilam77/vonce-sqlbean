@@ -23,7 +23,7 @@ public @interface SqlColumn {
      *
      * @return
      */
-    String value();
+    String value() default "";
 
     /**
      * 不能是null
