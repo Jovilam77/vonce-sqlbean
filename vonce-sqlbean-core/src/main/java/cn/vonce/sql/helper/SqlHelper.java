@@ -1289,7 +1289,7 @@ public class SqlHelper {
         Integer[] param;
         //SQLServer2008
         if (DbType.SQLServer == select.getSqlBeanDB().getDbType()) {
-            int pagenum = select.getPage().getStartByZero() ? select.getPage().getPagenum() + 1 : select.getPage().getPagenum();
+            int pagenum = select.getPage().getStartByZero() ? select.getPage().getPagenum() + 1 : select.getPage().getPagenum() == 0 ? select.getPage().getPagenum() + 1 : select.getPage().getPagenum();
             int top = pagenum * select.getPage().getPagesize();
             int begin = top - select.getPage().getPagesize();
             param = new Integer[]{top, begin};

@@ -149,7 +149,7 @@ public class SqlBeanProvider {
                 SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
                 select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
                 if (select.getPage() != null && select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
-                    select.getPage().setIdName(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), SqlBeanUtil.getIdField(clazz), sqlTable));
+                    select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz), sqlTable));
                 }
             } catch (SqlBeanException e) {
                 e.printStackTrace();
@@ -802,7 +802,7 @@ public class SqlBeanProvider {
             if (select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
                 try {
                     SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-                    select.page(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), SqlBeanUtil.getIdField(clazz), sqlTable), paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
+                    select.page(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz), sqlTable), paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
                 } catch (SqlBeanException e) {
                     e.printStackTrace();
                 }
