@@ -1247,10 +1247,12 @@ public class SqlHelper {
             beginSqlSb.append(SqlConstant.OVER + SqlConstant.BEGIN_BRACKET + SqlConstant.SPACES + SqlConstant.END_BRACKET + SqlConstant.AS + SqlConstant.RN + SqlConstant.FROM + SqlConstant.BEGIN_BRACKET);
             sqlSb.insert(0, beginSqlSb);
             StringBuffer endSb = new StringBuffer();
-            endSb.append(SqlConstant.END_BRACKET + SqlConstant.T + SqlConstant.SPACES + SqlConstant.END_BRACKET + SqlConstant.TB + SqlConstant.WHERE + SqlConstant.TB + SqlConstant.POINT + SqlConstant.RN + SqlConstant.BETWEEN);
-            endSb.append(param[0]);
-            endSb.append(SqlConstant.AND);
+            endSb.append(SqlConstant.END_BRACKET + SqlConstant.T + SqlConstant.SPACES + SqlConstant.END_BRACKET + SqlConstant.TB);
+            endSb.append(SqlConstant.WHERE + SqlConstant.BEGIN_BRACKET + SqlConstant.TB + SqlConstant.POINT + SqlConstant.RN + SqlConstant.LESS_THAN_OR_EQUAL_TO);
             endSb.append(param[1]);
+            endSb.append(SqlConstant.AND + SqlConstant.TB + SqlConstant.POINT + SqlConstant.RN + SqlConstant.GREATER_THAN);
+            endSb.append(param[0]);
+            endSb.append(SqlConstant.END_BRACKET);
             sqlSb.append(endSb);
         }
     }
