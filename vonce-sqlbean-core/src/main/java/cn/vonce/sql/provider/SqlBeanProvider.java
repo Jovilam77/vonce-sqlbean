@@ -623,6 +623,7 @@ public class SqlBeanProvider {
             case Postgresql:
                 return JavaMapPostgresqlType.getColumnListSql(sqlBeanDB, null, name);
             case DB2:
+                return JavaMapDB2Type.getColumnListSql(sqlBeanDB, null, name);
             case H2:
                 return JavaMapH2Type.getColumnListSql(sqlBeanDB, null, name);
             case Hsql:

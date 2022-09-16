@@ -61,13 +61,17 @@ public enum JavaMapDB2Type {
      */
     public static String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT name ");
+        sql.append("SELECT name, remarks ");
         sql.append("FROM sysibm.systables ");
         sql.append("WHERE type = 'T' ");
-        sql.append("AND creator = current user");
+        sql.append("AND creator = ");
+        if (StringUtil.isNotEmpty(schema)) {
+            sql.append("'" + schema + "'");
+        } else {
+            sql.append("current user");
+        }
         if (StringUtil.isNotEmpty(tableName)) {
             sql.append(" AND name = '" + tableName + "'");
-            sql.append(" AND table_name = '" + tableName + "'");
         }
         return sql.toString();
     }
