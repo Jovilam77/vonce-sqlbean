@@ -210,7 +210,7 @@ public class SqlHelper {
                 }
             }
             SqlColumn sqlColumn = fieldList.get(i).getAnnotation(SqlColumn.class);
-            ColumnInfo columnInfo = getColumnInfo(create.getSqlBeanDB().getDbType(), fieldList.get(i).getType(), sqlColumn);
+            ColumnInfo columnInfo = getColumnInfo(create.getSqlBeanDB().getDbType(), fieldList.get(i), sqlColumn);
             JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
             String columnName = SqlBeanUtil.getTableFieldName(create, fieldList.get(i), sqlTable);
             sqlSb.append(columnName);
@@ -227,7 +227,7 @@ public class SqlHelper {
                 sqlSb.append(SqlConstant.END_BRACKET);
             }
             //是否为null
-            if (columnInfo.getNotnull()) {
+            if (columnInfo.getNotnull() || columnInfo.getPk()) {
                 sqlSb.append(SqlConstant.SPACES);
                 sqlSb.append(SqlConstant.NOT_NULL);
             }
@@ -389,8 +389,9 @@ public class SqlHelper {
      * @param sqlColumn
      * @return
      */
-    private static ColumnInfo getColumnInfo(DbType dbType, Class<?> clazz, SqlColumn sqlColumn) {
+    private static ColumnInfo getColumnInfo(DbType dbType, Field clazz, SqlColumn sqlColumn) {
         ColumnInfo columnInfo = new ColumnInfo();
+        columnInfo.setPk(clazz.isAnnotationPresent(SqlId.class));
         JdbcType jdbcType;
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
             jdbcType = sqlColumn.type();
@@ -400,31 +401,31 @@ public class SqlHelper {
             switch (dbType) {
                 case MySQL:
                 case MariaDB:
-                    jdbcType = JdbcType.getType(JavaMapMySqlType.getType(clazz).name());
+                    jdbcType = JdbcType.getType(JavaMapMySqlType.getType(clazz.getType()).name());
                     break;
                 case SQLServer:
-                    jdbcType = JdbcType.getType(JavaMapSqlServerType.getType(clazz).name());
+                    jdbcType = JdbcType.getType(JavaMapSqlServerType.getType(clazz.getType()).name());
                     break;
                 case Oracle:
-                    jdbcType = JdbcType.getType(JavaMapOracleType.getType(clazz).name());
+                    jdbcType = JdbcType.getType(JavaMapOracleType.getType(clazz.getType()).name());
                     break;
                 case Postgresql:
-                    jdbcType = JdbcType.getType(JavaMapPostgresqlType.getType(clazz).name());
+                    jdbcType = JdbcType.getType(JavaMapPostgresqlType.getType(clazz.getType()).name());
                     break;
                 case DB2:
-                    jdbcType = JdbcType.getType(JavaMapDB2Type.getType(clazz).name());
+                    jdbcType = JdbcType.getType(JavaMapDB2Type.getType(clazz.getType()).name());
                     break;
                 case H2:
-                    jdbcType = JdbcType.getType(JavaMapH2Type.getType(clazz).name());
+                    jdbcType = JdbcType.getType(JavaMapH2Type.getType(clazz.getType()).name());
                     break;
                 case Hsql:
-                    jdbcType = JdbcType.getType(JavaMapHsqlType.getType(clazz).name());
+                    jdbcType = JdbcType.getType(JavaMapHsqlType.getType(clazz.getType()).name());
                     break;
                 case Derby:
-                    jdbcType = JdbcType.getType(JavaMapDerbyType.getType(clazz).name());
+                    jdbcType = JdbcType.getType(JavaMapDerbyType.getType(clazz.getType()).name());
                     break;
                 case SQLite:
-                    jdbcType = JdbcType.getType(JavaMapSqliteType.getType(clazz).name());
+                    jdbcType = JdbcType.getType(JavaMapSqliteType.getType(clazz.getType()).name());
                     break;
                 default:
                     throw new SqlBeanException("请配置正确的数据库");
