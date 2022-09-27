@@ -209,44 +209,45 @@ public class SqlHelper {
                     idField = fieldList.get(i);
                 }
             }
+//            SqlColumn sqlColumn = fieldList.get(i).getAnnotation(SqlColumn.class);
+//            ColumnInfo columnInfo = getColumnInfo(create.getSqlBeanDB().getDbType(), fieldList.get(i), SqlBeanUtil.getTableFieldName(create, fieldList.get(i), sqlTable), sqlColumn);
+//            JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
+//            sqlSb.append(columnInfo.getName());
+//            sqlSb.append(SqlConstant.SPACES);
+//            sqlSb.append(jdbcType.name());
+//            if (columnInfo.getLength() > 0) {
+//                sqlSb.append(SqlConstant.BEGIN_BRACKET);
+//                //字段长度
+//                sqlSb.append(columnInfo.getLength());
+//                if (jdbcType.isFloat()) {
+//                    sqlSb.append(SqlConstant.COMMA);
+//                    sqlSb.append(columnInfo.getScale());
+//                }
+//                sqlSb.append(SqlConstant.END_BRACKET);
+//            }
+//            //是否为null
+//            if (columnInfo.getNotnull() || columnInfo.getPk()) {
+//                sqlSb.append(SqlConstant.SPACES);
+//                sqlSb.append(SqlConstant.NOT_NULL);
+//            }
+//            //默认值
+//            if (StringUtil.isNotEmpty(columnInfo.getDfltValue())) {
+//                sqlSb.append(SqlConstant.SPACES);
+//                sqlSb.append(SqlConstant.DEFAULT);
+//                sqlSb.append(SqlConstant.SPACES);
+//                sqlSb.append(SqlBeanUtil.getSqlValue(create, columnInfo.getDfltValue(), jdbcType));
+//            }
+//            //如果是Mysql或MariaDB可直接保存备注
+//            if (sqlColumn != null && StringUtil.isNotBlank(sqlColumn.remarks()) && (dbType == DbType.MySQL || dbType == DbType.MariaDB)) {
+//                sqlSb.append(SqlConstant.SPACES);
+//                sqlSb.append(SqlConstant.COMMENT);
+//                sqlSb.append(SqlConstant.SPACES);
+//                sqlSb.append(SqlConstant.SINGLE_QUOTATION_MARK);
+//                sqlSb.append(sqlColumn.remarks());
+//                sqlSb.append(SqlConstant.SINGLE_QUOTATION_MARK);
+//            }
             SqlColumn sqlColumn = fieldList.get(i).getAnnotation(SqlColumn.class);
-            ColumnInfo columnInfo = getColumnInfo(create.getSqlBeanDB().getDbType(), fieldList.get(i), sqlColumn);
-            JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
-            String columnName = SqlBeanUtil.getTableFieldName(create, fieldList.get(i), sqlTable);
-            sqlSb.append(columnName);
-            sqlSb.append(SqlConstant.SPACES);
-            sqlSb.append(jdbcType.name());
-            if (columnInfo.getLength() > 0) {
-                sqlSb.append(SqlConstant.BEGIN_BRACKET);
-                //字段长度
-                sqlSb.append(columnInfo.getLength());
-                if (jdbcType.isFloat()) {
-                    sqlSb.append(SqlConstant.COMMA);
-                    sqlSb.append(columnInfo.getScale());
-                }
-                sqlSb.append(SqlConstant.END_BRACKET);
-            }
-            //是否为null
-            if (columnInfo.getNotnull() || columnInfo.getPk()) {
-                sqlSb.append(SqlConstant.SPACES);
-                sqlSb.append(SqlConstant.NOT_NULL);
-            }
-            //默认值
-            if (StringUtil.isNotEmpty(columnInfo.getDfltValue())) {
-                sqlSb.append(SqlConstant.SPACES);
-                sqlSb.append(SqlConstant.DEFAULT);
-                sqlSb.append(SqlConstant.SPACES);
-                sqlSb.append(SqlBeanUtil.getSqlValue(create, columnInfo.getDfltValue(), jdbcType));
-            }
-            //如果是Mysql或MariaDB可直接保存备注
-            if (sqlColumn != null && StringUtil.isNotBlank(sqlColumn.remarks()) && (dbType == DbType.MySQL || dbType == DbType.MariaDB)) {
-                sqlSb.append(SqlConstant.SPACES);
-                sqlSb.append(SqlConstant.COMMENT);
-                sqlSb.append(SqlConstant.SPACES);
-                sqlSb.append(SqlConstant.SINGLE_QUOTATION_MARK);
-                sqlSb.append(sqlColumn.remarks());
-                sqlSb.append(SqlConstant.SINGLE_QUOTATION_MARK);
-            }
+            sqlSb.append(SqlBeanUtil.addColumn(create, getColumnInfo(create.getSqlBeanDB().getDbType(), fieldList.get(i), SqlBeanUtil.getTableFieldName(create, fieldList.get(i), sqlTable), sqlColumn)));
             sqlSb.append(SqlConstant.COMMA);
         }
 
@@ -389,8 +390,9 @@ public class SqlHelper {
      * @param sqlColumn
      * @return
      */
-    private static ColumnInfo getColumnInfo(DbType dbType, Field clazz, SqlColumn sqlColumn) {
+    private static ColumnInfo getColumnInfo(DbType dbType, Field clazz, String columnName, SqlColumn sqlColumn) {
         ColumnInfo columnInfo = new ColumnInfo();
+        columnInfo.setName(columnName);
         columnInfo.setPk(clazz.isAnnotationPresent(SqlId.class));
         JdbcType jdbcType;
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
@@ -446,6 +448,9 @@ public class SqlHelper {
         }
         if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.def())) {
             columnInfo.setDfltValue(sqlColumn.def());
+        }
+        if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.remarks())) {
+            columnInfo.setRemarks(sqlColumn.remarks());
         }
         return columnInfo;
     }

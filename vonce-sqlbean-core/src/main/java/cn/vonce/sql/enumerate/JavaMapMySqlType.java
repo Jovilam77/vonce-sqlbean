@@ -1,9 +1,14 @@
 package cn.vonce.sql.enumerate;
 
+import cn.vonce.sql.bean.Alter;
+import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.constant.SqlConstant;
+import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Java类型对应的Oracle类型枚举类
@@ -105,6 +110,35 @@ public enum JavaMapMySqlType {
         sql.append(tableName);
         sql.append("'");
         return sql.toString();
+    }
+
+    public static String alterTable(List<Alter> alterList) {
+        if (alterList == null || alterList.size() == 0) {
+            return null;
+        }
+        Table table = alterList.get(0).getTable();
+        StringBuffer sql = new StringBuffer();
+        sql.append("ALTER TABLE ");
+        sql.append(table.getSchema());
+        sql.append(".");
+        sql.append(table.getName());
+        for (Alter alter : alterList) {
+            if (alter.getType() == AlterType.ADD) {
+                sql.append("ADD COLUMN ");
+                sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo()));
+                sql.append(SqlConstant.COMMA);
+            } else if (alter.getType() == AlterType.CHANGE) {
+                sql.append("CHANGE COLUMN ");
+            } else if (alter.getType() == AlterType.MODIFY) {
+                sql.append("MODIFY COLUMN ");
+            } else if (alter.getType() == AlterType.DROP) {
+                sql.append("DROP COLUMN ");
+                sql.append(alter.getColumnInfo().getName());
+                sql.append(",");
+            }
+        }
+        sql.append(table.getName());
+        return null;
     }
 
 }

@@ -1033,4 +1033,51 @@ public class SqlBeanUtil {
         return null;
     }
 
+    /**
+     * 增加一列
+     *
+     * @param common
+     * @param columnInfo
+     * @return
+     */
+    public static String addColumn(Common common, ColumnInfo columnInfo) {
+        StringBuffer sql = new StringBuffer();
+        JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
+        sql.append(columnInfo.getName());
+        sql.append(SqlConstant.SPACES);
+        sql.append(jdbcType.name());
+        if (columnInfo.getLength() > 0) {
+            sql.append(SqlConstant.BEGIN_BRACKET);
+            //字段长度
+            sql.append(columnInfo.getLength());
+            if (jdbcType.isFloat()) {
+                sql.append(SqlConstant.COMMA);
+                sql.append(columnInfo.getScale());
+            }
+            sql.append(SqlConstant.END_BRACKET);
+        }
+        //是否为null
+        if (columnInfo.getNotnull() || columnInfo.getPk()) {
+            sql.append(SqlConstant.SPACES);
+            sql.append(SqlConstant.NOT_NULL);
+        }
+        //默认值
+        if (StringUtil.isNotEmpty(columnInfo.getDfltValue())) {
+            sql.append(SqlConstant.SPACES);
+            sql.append(SqlConstant.DEFAULT);
+            sql.append(SqlConstant.SPACES);
+            sql.append(SqlBeanUtil.getSqlValue(common, columnInfo.getDfltValue(), jdbcType));
+        }
+        //如果是Mysql或MariaDB可直接保存备注
+        if (StringUtil.isNotBlank(columnInfo.getRemarks()) && (common.getSqlBeanDB().getDbType() == DbType.MySQL || common.getSqlBeanDB().getDbType() == DbType.MariaDB)) {
+            sql.append(SqlConstant.SPACES);
+            sql.append(SqlConstant.COMMENT);
+            sql.append(SqlConstant.SPACES);
+            sql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+            sql.append(columnInfo.getRemarks());
+            sql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        }
+        return sql.toString();
+    }
+
 }

@@ -91,4 +91,12 @@ public enum JavaMapOracleType {
         return sql.toString();
     }
 
+    public static String alterTableAddColumn() {
+        return null;
+    }
+
+    public static String alterTableRenameColumn() {
+        return null;
+    }
+
 }
