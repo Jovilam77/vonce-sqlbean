@@ -1,9 +1,13 @@
 package cn.vonce.sql.enumerate;
 
+import cn.vonce.sql.bean.Alter;
+import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.uitls.StringUtil;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Java类型对应的SQLite类型枚举类
@@ -73,6 +77,26 @@ public enum JavaMapSqliteType {
         sql.append(tableName);
         sql.append("')");
         return sql.toString();
+    }
+
+    /**
+     * 更改表结构
+     *
+     * @param alterList
+     * @return
+     */
+    public static String[] alterTable(List<Alter> alterList) {
+        Table table = alterList.get(0).getTable();
+        Class<?> beanClass = alterList.get(0).getBeanClass();
+        StringBuffer sql = new StringBuffer();
+        sql.append(SqlConstant.ALTER_TABLE);
+        sql.append(SqlConstant.DOUBLE_ESCAPE_CHARACTER);
+        sql.append(table.getName());
+        sql.append(SqlConstant.DOUBLE_ESCAPE_CHARACTER);
+        sql.append(SqlConstant.SPACES);
+        sql.append(SqlConstant.RENAME);
+        sql.append(SqlConstant.COLUMN);
+        return null;
     }
 
 }

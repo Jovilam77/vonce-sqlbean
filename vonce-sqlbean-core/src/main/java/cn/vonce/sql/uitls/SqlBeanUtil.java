@@ -1040,7 +1040,7 @@ public class SqlBeanUtil {
      * @param columnInfo
      * @return
      */
-    public static String addColumn(Common common, ColumnInfo columnInfo) {
+    public static String addColumn(Common common, ColumnInfo columnInfo, String afterColumnName) {
         StringBuffer sql = new StringBuffer();
         JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
         sql.append(columnInfo.getName());
@@ -1068,14 +1068,27 @@ public class SqlBeanUtil {
             sql.append(SqlConstant.SPACES);
             sql.append(SqlBeanUtil.getSqlValue(common, columnInfo.getDfltValue(), jdbcType));
         }
-        //如果是Mysql或MariaDB可直接保存备注
-        if (StringUtil.isNotBlank(columnInfo.getRemarks()) && (common.getSqlBeanDB().getDbType() == DbType.MySQL || common.getSqlBeanDB().getDbType() == DbType.MariaDB)) {
-            sql.append(SqlConstant.SPACES);
-            sql.append(SqlConstant.COMMENT);
-            sql.append(SqlConstant.SPACES);
-            sql.append(SqlConstant.SINGLE_QUOTATION_MARK);
-            sql.append(columnInfo.getRemarks());
-            sql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        //如果是Mysql或MariaDB
+        if (common.getSqlBeanDB().getDbType() == DbType.MySQL || common.getSqlBeanDB().getDbType() == DbType.MariaDB) {
+            //存在备注
+            if (StringUtil.isNotBlank(columnInfo.getRemarks())) {
+                sql.append(SqlConstant.SPACES);
+                sql.append(SqlConstant.COMMENT);
+                sql.append(SqlConstant.SPACES);
+                sql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+                sql.append(columnInfo.getRemarks());
+                sql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+            }
+            //存在排序
+            if (StringUtil.isNotBlank(afterColumnName)) {
+                String transferred = SqlBeanUtil.getTransferred(common);
+                sql.append(SqlConstant.SPACES);
+                sql.append(SqlConstant.AFTER);
+                sql.append(SqlConstant.SPACES);
+                sql.append(transferred);
+                sql.append(afterColumnName);
+                sql.append(transferred);
+            }
         }
         return sql.toString();
     }

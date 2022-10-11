@@ -112,33 +112,55 @@ public enum JavaMapMySqlType {
         return sql.toString();
     }
 
+    /**
+     * 更改表结构
+     *
+     * @param alterList
+     * @return
+     */
     public static String alterTable(List<Alter> alterList) {
         if (alterList == null || alterList.size() == 0) {
             return null;
         }
+        String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
         Table table = alterList.get(0).getTable();
         StringBuffer sql = new StringBuffer();
-        sql.append("ALTER TABLE ");
+        sql.append(SqlConstant.ALTER_TABLE);
+        sql.append(transferred);
         sql.append(table.getSchema());
-        sql.append(".");
+        sql.append(transferred);
+        sql.append(SqlConstant.POINT);
+        sql.append(transferred);
         sql.append(table.getName());
-        for (Alter alter : alterList) {
+        sql.append(transferred);
+        sql.append(SqlConstant.SPACES);
+        for (int i = 0; i < alterList.size(); i++) {
+            Alter alter = alterList.get(i);
             if (alter.getType() == AlterType.ADD) {
-                sql.append("ADD COLUMN ");
-                sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo()));
-                sql.append(SqlConstant.COMMA);
-            } else if (alter.getType() == AlterType.CHANGE) {
-                sql.append("CHANGE COLUMN ");
+                sql.append(SqlConstant.ADD);
+                sql.append(SqlConstant.COLUMN);
+                sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
             } else if (alter.getType() == AlterType.MODIFY) {
-                sql.append("MODIFY COLUMN ");
+                sql.append(SqlConstant.MODIFY);
+                sql.append(SqlConstant.COLUMN);
+                sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
+            } else if (alter.getType() == AlterType.CHANGE) {
+                sql.append(SqlConstant.CHANGE);
+                sql.append(SqlConstant.COLUMN);
+                sql.append(alter.getOldColumnName());
+                sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
             } else if (alter.getType() == AlterType.DROP) {
-                sql.append("DROP COLUMN ");
+                sql.append(SqlConstant.DROP);
+                sql.append(SqlConstant.COLUMN);
                 sql.append(alter.getColumnInfo().getName());
-                sql.append(",");
+            }
+            sql.append(SqlConstant.SPACES);
+            if (i > alterList.size() - 1) {
+                sql.append(SqlConstant.COMMA);
             }
         }
         sql.append(table.getName());
-        return null;
+        return sql.toString();
     }
 
 }

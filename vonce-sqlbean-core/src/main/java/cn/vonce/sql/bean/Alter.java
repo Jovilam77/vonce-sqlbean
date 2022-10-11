@@ -13,6 +13,8 @@ public class Alter extends Common {
 
     private AlterType type;
     private ColumnInfo columnInfo;
+    private String oldColumnName;
+    private String afterColumnName;
 
     public AlterType getType() {
         return type;
@@ -28,6 +30,22 @@ public class Alter extends Common {
 
     public void setColumnInfo(ColumnInfo columnInfo) {
         this.columnInfo = columnInfo;
+    }
+
+    public String getOldColumnName() {
+        return oldColumnName;
+    }
+
+    public void setOldColumnName(String oldColumnName) {
+        this.oldColumnName = oldColumnName;
+    }
+
+    public String getAfterColumnName() {
+        return afterColumnName;
+    }
+
+    public void setAfterColumnName(String afterColumnName) {
+        this.afterColumnName = afterColumnName;
     }
 
 }

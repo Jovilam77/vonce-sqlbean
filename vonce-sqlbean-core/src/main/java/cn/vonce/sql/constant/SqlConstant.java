@@ -61,6 +61,15 @@ public class SqlConstant {
     public static final String DEFAULT = "DEFAULT";
     public static final String COMMENT = "COMMENT";
 
+    public static final String ALTER_TABLE = "ALTER TABLE ";
+    public static final String COLUMN = "COLUMN ";
+    public static final String ADD = "ADD ";
+    public static final String CHANGE = "CHANGE ";
+    public static final String RENAME = "RENAME ";
+    public static final String MODIFY = "MODIFY ";
+    public static final String DROP = "DROP ";
+    public static final String AFTER = "AFTER ";
+
     // mssql
     public static final String TOP = " TOP ";
     public static final String ROW_NUMBER = " ROW_NUMBER() ";

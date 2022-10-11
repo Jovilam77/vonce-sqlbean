@@ -1,9 +1,14 @@
 package cn.vonce.sql.enumerate;
 
+import cn.vonce.sql.bean.Alter;
+import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.constant.SqlConstant;
+import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Java类型对应的Oracle类型枚举类
@@ -14,13 +19,7 @@ import java.math.BigDecimal;
  */
 public enum JavaMapOracleType {
 
-    FLOAT(new Class[]{float.class, Float.class, double.class, Double.class, BigDecimal.class}),
-    NUMBER(new Class[]{boolean.class, Boolean.class, byte.class, Byte.class, short.class, Short.class, int.class, Integer.class, long.class, Long.class}),
-    CHAR(new Class[]{char.class, Character.class}),
-    VARCHAR2(new Class[]{String.class}),
-    DATE(new Class[]{java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class, java.util.Date.class}),
-    CLOB(new Class[]{java.sql.Clob.class}),
-    BLOB(new Class[]{java.sql.Blob.class, Object.class});
+    FLOAT(new Class[]{float.class, Float.class, double.class, Double.class, BigDecimal.class}), NUMBER(new Class[]{boolean.class, Boolean.class, byte.class, Byte.class, short.class, Short.class, int.class, Integer.class, long.class, Long.class}), CHAR(new Class[]{char.class, Character.class}), VARCHAR2(new Class[]{String.class}), DATE(new Class[]{java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class, java.util.Date.class}), CLOB(new Class[]{java.sql.Clob.class}), BLOB(new Class[]{java.sql.Blob.class, Object.class});
 
 
     JavaMapOracleType(Class<?>[] classes) {
@@ -91,12 +90,67 @@ public enum JavaMapOracleType {
         return sql.toString();
     }
 
-    public static String alterTableAddColumn() {
-        return null;
-    }
-
-    public static String alterTableRenameColumn() {
-        return null;
+    /**
+     * 更改表结构
+     *
+     * @param alterList
+     * @return
+     */
+    public static String alterTable(List<Alter> alterList) {
+        if (alterList == null || alterList.size() == 0) {
+            return null;
+        }
+        String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
+        Table table = alterList.get(0).getTable();
+        StringBuffer sql = new StringBuffer();
+        sql.append(SqlConstant.ALTER_TABLE);
+        sql.append(transferred);
+        sql.append(table.getSchema());
+        sql.append(transferred);
+        sql.append(SqlConstant.POINT);
+        sql.append(transferred);
+        sql.append(table.getName());
+        sql.append(transferred);
+        sql.append(SqlConstant.SPACES);
+        Alter alter = alterList.get(0);
+        if (alterList.get(0).getType() == AlterType.CHANGE) {
+            sql.append(SqlConstant.RENAME);
+            sql.append(SqlConstant.COLUMN);
+            sql.append(alter.getOldColumnName());
+            sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
+        } else if (alterList.get(0).getType() == AlterType.DROP) {
+            sql.append(transferred);
+            sql.append(SqlConstant.BEGIN_BRACKET);
+            for (int i = 0; i < alterList.size(); i++) {
+                sql.append(transferred);
+                sql.append(alterList.get(i).getColumnInfo().getName());
+                if (i > alterList.size() - 1) {
+                    sql.append(SqlConstant.COMMA);
+                }
+                sql.append(transferred);
+            }
+            sql.append(SqlConstant.END_BRACKET);
+        } else {
+            for (int i = 0; i < alterList.size(); i++) {
+                Alter item = alterList.get(i);
+                if (item.getType() == AlterType.ADD) {
+                    sql.append(SqlConstant.ADD);
+                    sql.append(SqlConstant.BEGIN_BRACKET);
+                    sql.append(SqlBeanUtil.addColumn(item, item.getColumnInfo(), item.getAfterColumnName()));
+                    sql.append(SqlConstant.END_BRACKET);
+                } else if (item.getType() == AlterType.MODIFY) {
+                    sql.append(SqlConstant.MODIFY);
+                    sql.append(SqlConstant.BEGIN_BRACKET);
+                    sql.append(SqlBeanUtil.addColumn(item, item.getColumnInfo(), item.getAfterColumnName()));
+                    sql.append(SqlConstant.END_BRACKET);
+                }
+                if (i > alterList.size() - 1) {
+                    sql.append(SqlConstant.COMMA);
+                }
+            }
+        }
+        sql.append(table.getName());
+        return sql.toString();
     }
 
 }
