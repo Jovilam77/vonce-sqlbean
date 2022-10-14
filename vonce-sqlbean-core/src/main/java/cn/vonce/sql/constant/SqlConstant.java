@@ -66,6 +66,7 @@ public class SqlConstant {
     public static final String ADD = "ADD ";
     public static final String CHANGE = "CHANGE ";
     public static final String RENAME = "RENAME ";
+    public static final String RENAME_TO = "RENAME TO ";
     public static final String MODIFY = "MODIFY ";
     public static final String DROP = "DROP ";
     public static final String AFTER = "AFTER ";

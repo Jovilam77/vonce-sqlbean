@@ -349,7 +349,15 @@ public class SqlHelper {
         }
         copySql.append(SqlConstant.SPACES);
         copySql.append(SqlConstant.SELECT);
-        if (copy.getColumns() != null && copy.getColumns().length > 0) {
+        if (copy.getTargetColumns() != null && copy.getTargetColumns().length > 0) {
+            StringBuffer targetColumnSql = new StringBuffer();
+            for (Column column : copy.getTargetColumns()) {
+                targetColumnSql.append(column.getName());
+                targetColumnSql.append(SqlConstant.COMMA);
+            }
+            targetColumnSql.delete(columnSql.length() - SqlConstant.COMMA.length(), columnSql.length());
+            copySql.append(targetColumnSql);
+        } else if (copy.getTargetColumns() != null && copy.getTargetColumns().length > 0) {
             copySql.append(columnSql);
         } else {
             copySql.append(SqlConstant.ALL);
@@ -847,7 +855,8 @@ public class SqlHelper {
      * @param wrapper         条件包装器（优先级2）
      * @return
      */
-    private static String conditionHandle(ConditionType conditionType, Common common, String conditionString, Object[] args, Object bean, Condition condition, Wrapper wrapper) {
+    private static String conditionHandle(ConditionType conditionType, Common common, String
+            conditionString, Object[] args, Object bean, Condition condition, Wrapper wrapper) {
         StringBuffer conditionSql = new StringBuffer();
         if (ConditionType.WHERE == conditionType) {
             conditionSql.append(versionCondition(common, bean));

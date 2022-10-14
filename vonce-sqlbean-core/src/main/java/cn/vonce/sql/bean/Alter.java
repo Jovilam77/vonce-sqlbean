@@ -11,9 +11,21 @@ import cn.vonce.sql.enumerate.AlterType;
  */
 public class Alter extends Common {
 
+    /**
+     * 改变类型
+     */
     private AlterType type;
+    /**
+     * 字段信息
+     */
     private ColumnInfo columnInfo;
+    /**
+     * 旧字段名称
+     */
     private String oldColumnName;
+    /**
+     * 排序再哪个后面
+     */
     private String afterColumnName;
 
     public AlterType getType() {

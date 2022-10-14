@@ -117,7 +117,7 @@ public enum JavaMapOracleType {
             sql.append(SqlConstant.RENAME);
             sql.append(SqlConstant.COLUMN);
             sql.append(alter.getOldColumnName());
-            sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
+            sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), null));
         } else if (alterList.get(0).getType() == AlterType.DROP) {
             sql.append(transferred);
             sql.append(SqlConstant.BEGIN_BRACKET);
@@ -136,12 +136,12 @@ public enum JavaMapOracleType {
                 if (item.getType() == AlterType.ADD) {
                     sql.append(SqlConstant.ADD);
                     sql.append(SqlConstant.BEGIN_BRACKET);
-                    sql.append(SqlBeanUtil.addColumn(item, item.getColumnInfo(), item.getAfterColumnName()));
+                    sql.append(SqlBeanUtil.addColumn(item, item.getColumnInfo(), null));
                     sql.append(SqlConstant.END_BRACKET);
                 } else if (item.getType() == AlterType.MODIFY) {
                     sql.append(SqlConstant.MODIFY);
                     sql.append(SqlConstant.BEGIN_BRACKET);
-                    sql.append(SqlBeanUtil.addColumn(item, item.getColumnInfo(), item.getAfterColumnName()));
+                    sql.append(SqlBeanUtil.addColumn(item, item.getColumnInfo(), null));
                     sql.append(SqlConstant.END_BRACKET);
                 }
                 if (i > alterList.size() - 1) {
