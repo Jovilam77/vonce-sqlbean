@@ -62,6 +62,7 @@ public class SqlConstant {
     public static final String COMMENT = "COMMENT";
 
     public static final String ALTER_TABLE = "ALTER TABLE ";
+    public static final String ALTER = "ALTER ";
     public static final String COLUMN = "COLUMN ";
     public static final String ADD = "ADD ";
     public static final String CHANGE = "CHANGE ";
@@ -78,6 +79,11 @@ public class SqlConstant {
     public static final String ID = "ID";
     public static final String ROWNUM = " ROWNUM ";
     public static final String T = " T";
+    public static final String EXEC_SP_RENAME = "EXEC sp_rename ";
+    public static final String GO = " GO";
+    public static final String BEGIN_SQUARE_BRACKETS = "[";
+    public static final String END_SQUARE_BRACKETS = "]";
+    public static final String DBO = "DBO";
 
     // oracle
     public static final String RN = "RN";

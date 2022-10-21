@@ -140,7 +140,13 @@ public enum JavaMapSqliteType {
             targetColumn.setAlias(column.getName());
             targetColumnList.add(targetColumn);
         }
-        return null;
+        Copy copy = new Copy();
+        copy.setBeanClass(beanClass);
+        copy.setColumns(columnList.toArray(new Column[]{}));
+        copy.setTargetTableName(oldTableName);
+        copy.setTargetColumns(targetColumnList.toArray(new Column[]{}));
+        sqlList.add(SqlHelper.buildCopy(copy));
+        return sqlList;
     }
 
 }

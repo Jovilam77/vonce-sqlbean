@@ -97,9 +97,6 @@ public enum JavaMapOracleType {
      * @return
      */
     public static String alterTable(List<Alter> alterList) {
-        if (alterList == null || alterList.size() == 0) {
-            return null;
-        }
         String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
         Table table = alterList.get(0).getTable();
         StringBuffer sql = new StringBuffer();
