@@ -1,6 +1,7 @@
 package cn.vonce.sql.spring.config;
 
 import cn.vonce.sql.annotation.SqlTable;
+import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.bean.TableInfo;
 import cn.vonce.sql.config.SqlBeanConfig;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * 自动创建表监听类
@@ -49,22 +49,28 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                         continue;
                     }
                     SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
+                    Table table = SqlBeanUtil.getTable(clazz);
+                    boolean isExist = false;
+                    //创建表
                     if (sqlTable != null && !sqlTable.isView() && sqlTable.autoCreate()) {
-                        Table table = SqlBeanUtil.getTable(clazz);
                         if (tableList != null && !tableList.isEmpty()) {
-                            boolean isExist = false;
                             for (TableInfo tableInfo : tableList) {
                                 if (tableInfo.getName().equalsIgnoreCase(table.getName())) {
                                     isExist = true;
                                     break;
                                 }
                             }
-                            if (isExist) {
-                                continue;
-                            }
                         }
+                    }
+                    if (!isExist) {
                         tableService.createTable();
                         logger.info("-----'{}'表不存在，已为你自动创建-----", table.getName());
+                        continue;
+                    }
+                    //更新表结构
+                    if (sqlTable != null && !sqlTable.isView() && sqlTable.autoAlter()) {
+                        List<ColumnInfo> columnInfoList = tableService.getColumnInfoList(table.getName());
+                        tableService.alter(table, columnInfoList);
                     }
                 }
             }

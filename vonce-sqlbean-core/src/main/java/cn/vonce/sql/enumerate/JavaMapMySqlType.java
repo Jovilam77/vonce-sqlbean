@@ -109,10 +109,12 @@ public enum JavaMapMySqlType {
         Table table = alterList.get(0).getTable();
         StringBuffer sql = new StringBuffer();
         sql.append(SqlConstant.ALTER_TABLE);
-        sql.append(transferred);
-        sql.append(table.getSchema());
-        sql.append(transferred);
-        sql.append(SqlConstant.POINT);
+        if (StringUtil.isNotBlank(table.getSchema())) {
+            sql.append(transferred);
+            sql.append(table.getSchema());
+            sql.append(transferred);
+            sql.append(SqlConstant.POINT);
+        }
         sql.append(transferred);
         sql.append(table.getName());
         sql.append(transferred);
@@ -138,11 +140,10 @@ public enum JavaMapMySqlType {
                 sql.append(alter.getColumnInfo().getName());
             }
             sql.append(SqlConstant.SPACES);
-            if (i > alterList.size() - 1) {
+            if (i < alterList.size() - 1) {
                 sql.append(SqlConstant.COMMA);
             }
         }
-        sql.append(table.getName());
         List<String> sqlList = new ArrayList<>();
         sqlList.add(sql.toString());
         return sqlList;

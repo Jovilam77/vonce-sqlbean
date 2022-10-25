@@ -1,5 +1,6 @@
 package cn.vonce.sql.provider;
 
+import cn.vonce.sql.annotation.SqlColumn;
 import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanDB;
@@ -14,6 +15,7 @@ import cn.vonce.sql.uitls.StringUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -678,6 +680,100 @@ public class SqlBeanProvider {
         copy.setTargetTableName(targetTableName);
         copy.where(wrapper);
         return SqlHelper.buildCopy(copy);
+    }
+
+    /**
+     * 更改表结构
+     *
+     * @param sqlBeanDB
+     * @param clazz
+     * @param columnInfoList
+     * @return
+     */
+    public static List<String> alterSql(SqlBeanDB sqlBeanDB, Class<?> clazz, List<ColumnInfo> columnInfoList) {
+        SqlTable sqlTable = clazz.getAnnotation(SqlTable.class);
+        List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
+        List<Alter> alterList = new ArrayList<>();
+        for (Field field : fieldList) {
+            if (SqlBeanUtil.isIgnore(field)) {
+                continue;
+            }
+            //如果该字段不设置自动同步表结构，则不会处理
+            SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
+//            if (sqlColumn == null || !sqlColumn.autoAlter()) {
+//                continue;
+//            }
+            Alter alter = new Alter();
+            alter.setSqlBeanDB(sqlBeanDB);
+            alter.setTable(clazz);
+            String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
+            ColumnInfo columnInfo = SqlBeanUtil.getColumnInfo(alter, field, sqlTable, sqlColumn);
+            boolean exist = false;
+            boolean fit = true;
+            //优先比较字段改名的
+            for (int i = 0; i < columnInfoList.size(); i++) {
+                if (sqlColumn != null && sqlColumn.oldName().equals(columnInfoList.get(i).getName())) {
+                    //存在此字段
+                    exist = true;
+                    //使用实体类中的字段信息与数据库中的字段信息做比较
+                    fit = SqlBeanUtil.columnInfoCompare(columnInfo, columnInfoList.get(i));
+                    if (!fit) {
+                        alter.setType(AlterType.CHANGE);
+                        alter.setColumnInfo(columnInfo);
+                        alter.setOldColumnName(sqlColumn.oldName());
+                        if (i > 0) {
+                            alter.setAfterColumnName(columnInfoList.get(i - 1).getName());
+                        }
+                        alterList.add(alter);
+                    }
+                    break;
+                }
+            }
+            //如果改名的字段已存在则跳过外层循环
+            if (!fit) {
+                continue;
+            }
+            //其次比较变更内容
+            for (int i = 0; i < columnInfoList.size(); i++) {
+                if (columnName.equals(columnInfoList.get(i).getName())) {
+                    //存在此字段
+                    exist = true;
+                    //使用实体类中的字段信息与数据库中的字段信息做比较
+                    fit = SqlBeanUtil.columnInfoCompare(columnInfo, columnInfoList.get(i));
+                    if (!fit) {
+                        alter.setType(AlterType.MODIFY);
+                        alter.setColumnInfo(columnInfo);
+                        alter.setOldColumnName(sqlColumn.oldName());
+                        if (i > 0) {
+                            alter.setAfterColumnName(columnInfoList.get(i - 1).getName());
+                        }
+                        alterList.add(alter);
+                    }
+                    break;
+                }
+            }
+            if (!fit) {
+                continue;
+            }
+            //如果比较之后数据库中的表字段仍不存在实体类中的字段时，说明是新增
+            if (!exist) {
+                alter.setType(AlterType.ADD);
+                alter.setColumnInfo(columnInfo);
+                alterList.add(alter);
+            }
+        }
+        switch (sqlBeanDB.getDbType()) {
+            case MySQL:
+            case MariaDB:
+                return JavaMapMySqlType.alterTable(alterList);
+            case SQLServer:
+                return JavaMapSqlServerType.alterTable(alterList);
+            case Oracle:
+                return JavaMapOracleType.alterTable(alterList);
+            case SQLite:
+                return JavaMapSqliteType.alterTable(alterList);
+        }
+        return null;
     }
 
     /**

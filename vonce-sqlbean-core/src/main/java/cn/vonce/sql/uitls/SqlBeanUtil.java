@@ -148,7 +148,17 @@ public class SqlBeanUtil {
      * @return
      */
     public static String getTableFieldName(Common common, Field field, SqlTable sqlTable) {
-        String name = getTableFieldName(field, sqlTable);
+        return getTableFieldName(common, getTableFieldName(field, sqlTable));
+    }
+
+    /**
+     * 获取Bean字段中实际对于的表字段
+     *
+     * @param common
+     * @param name
+     * @return
+     */
+    public static String getTableFieldName(Common common, String name) {
         if (SqlBeanUtil.isToUpperCase(common)) {
             name = name.toUpperCase();
         }
@@ -166,7 +176,7 @@ public class SqlBeanUtil {
     public static String getTableFieldName(Field field, SqlTable sqlTable) {
         SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
         String name = field.getName();
-        if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.value())) {
+        if (sqlColumn != null && StringUtil.isNotBlank(sqlColumn.value())) {
             name = sqlColumn.value();
         } else {
             if (sqlTable == null || sqlTable.mapUsToCc()) {
@@ -260,6 +270,87 @@ public class SqlBeanUtil {
             throw new SqlBeanException("请检查实体类申明逻辑删除的字段是否正确标识@SqlLogically注解");
         }
         return logicallyField;
+    }
+
+    /**
+     * 获取列信息
+     *
+     * @param common
+     * @param field
+     * @param sqlTable
+     * @param sqlColumn
+     * @return
+     */
+    public static ColumnInfo getColumnInfo(Common common, Field field, SqlTable sqlTable, SqlColumn sqlColumn) {
+        String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
+        ColumnInfo columnInfo = new ColumnInfo();
+        columnInfo.setName(columnName);
+        columnInfo.setPk(field.isAnnotationPresent(SqlId.class));
+        JdbcType jdbcType;
+        if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
+            jdbcType = sqlColumn.type();
+            columnInfo.setType(jdbcType.name());
+            columnInfo.setNotnull(sqlColumn.notNull());
+        } else {
+            jdbcType = JdbcType.getType(common.getSqlBeanDB().getDbType(), field);
+            columnInfo.setType(jdbcType.name());
+            columnInfo.setNotnull(false);
+        }
+        if (sqlColumn != null && sqlColumn.length() != 0) {
+            columnInfo.setLength(sqlColumn.length());
+            columnInfo.setScale(sqlColumn.scale());
+        } else {
+            columnInfo.setLength(jdbcType.getLength() > 0 ? jdbcType.getLength() : null);
+        }
+        if (sqlColumn != null && sqlColumn.scale() != 0) {
+            columnInfo.setScale(sqlColumn.scale());
+        } else {
+            columnInfo.setScale(jdbcType.getScale() > 0 ? jdbcType.getScale() : null);
+        }
+        if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.def())) {
+            columnInfo.setDfltValue(sqlColumn.def());
+        }
+        if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.remarks())) {
+            columnInfo.setRemarks(sqlColumn.remarks());
+        } else {
+            columnInfo.setRemarks("");
+        }
+        return columnInfo;
+    }
+
+    /**
+     * 比较两个字段信息是否一致
+     *
+     * @param columnInfo
+     * @param toColumnInfo
+     * @return
+     */
+    public static boolean columnInfoCompare(ColumnInfo columnInfo, ColumnInfo toColumnInfo) {
+        if (!columnInfo.getPk().equals(toColumnInfo.getPk())) {
+            return false;
+        }
+        if (!columnInfo.getName().equals(toColumnInfo.getName())) {
+            return false;
+        }
+        if (!columnInfo.getType().equalsIgnoreCase(toColumnInfo.getType())) {
+            return false;
+        }
+        if (!columnInfo.getNotnull().equals(toColumnInfo.getNotnull())) {
+            return false;
+        }
+        if ((columnInfo.getDfltValue() == null && columnInfo.getDfltValue() != toColumnInfo.getDfltValue()) || (columnInfo.getDfltValue() != null && toColumnInfo.getDfltValue() != null && !columnInfo.getDfltValue().equals(toColumnInfo.getDfltValue()))) {
+            return false;
+        }
+        if (columnInfo.getLength() != null && !columnInfo.getLength().equals(toColumnInfo.getLength())) {
+            return false;
+        }
+        if (columnInfo.getScale() != null && !columnInfo.getScale().equals(toColumnInfo.getScale())) {
+            return false;
+        }
+        if (!columnInfo.getRemarks().equals(toColumnInfo.getRemarks())) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -1043,16 +1134,16 @@ public class SqlBeanUtil {
     public static String addColumn(Common common, ColumnInfo columnInfo, String afterColumnName) {
         StringBuffer sql = new StringBuffer();
         JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
-        sql.append(columnInfo.getName());
+        sql.append(getTableFieldName(common, columnInfo.getName()));
         sql.append(SqlConstant.SPACES);
         sql.append(jdbcType.name());
-        if (columnInfo.getLength() > 0) {
+        if (columnInfo.getLength() != null && columnInfo.getLength() > 0) {
             sql.append(SqlConstant.BEGIN_BRACKET);
             //字段长度
             sql.append(columnInfo.getLength());
             if (jdbcType.isFloat()) {
                 sql.append(SqlConstant.COMMA);
-                sql.append(columnInfo.getScale());
+                sql.append(columnInfo.getScale() == null ? 0 : columnInfo.getScale());
             }
             sql.append(SqlConstant.END_BRACKET);
         }

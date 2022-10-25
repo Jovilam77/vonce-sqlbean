@@ -2,6 +2,7 @@ package cn.vonce.sql.service;
 
 import cn.vonce.sql.bean.Column;
 import cn.vonce.sql.bean.ColumnInfo;
+import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.bean.TableInfo;
 import cn.vonce.sql.helper.Wrapper;
 
@@ -143,5 +144,14 @@ public interface TableService {
      * @return
      */
     int copy(String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper);
+
+    /**
+     * 更改表结构
+     *
+     * @param table
+     * @param columnInfoList
+     * @return
+     */
+    int alter(Table table, List<ColumnInfo> columnInfoList);
 
 }

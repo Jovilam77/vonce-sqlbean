@@ -247,7 +247,7 @@ public class SqlHelper {
 //                sqlSb.append(SqlConstant.SINGLE_QUOTATION_MARK);
 //            }
             SqlColumn sqlColumn = fieldList.get(i).getAnnotation(SqlColumn.class);
-            sqlSb.append(SqlBeanUtil.addColumn(create, getColumnInfo(create.getSqlBeanDB().getDbType(), fieldList.get(i), SqlBeanUtil.getTableFieldName(create, fieldList.get(i), sqlTable), sqlColumn), null));
+            sqlSb.append(SqlBeanUtil.addColumn(create, SqlBeanUtil.getColumnInfo(create, fieldList.get(i), sqlTable, sqlColumn), null));
             sqlSb.append(SqlConstant.COMMA);
         }
 
@@ -388,47 +388,6 @@ public class SqlHelper {
             dropSql.append(tableName);
         }
         return dropSql.toString();
-    }
-
-    /**
-     * 获取列信息
-     *
-     * @param dbType
-     * @param clazz
-     * @param sqlColumn
-     * @return
-     */
-    private static ColumnInfo getColumnInfo(DbType dbType, Field clazz, String columnName, SqlColumn sqlColumn) {
-        ColumnInfo columnInfo = new ColumnInfo();
-        columnInfo.setName(columnName);
-        columnInfo.setPk(clazz.isAnnotationPresent(SqlId.class));
-        JdbcType jdbcType = null;
-        if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
-            jdbcType = sqlColumn.type();
-            columnInfo.setType(jdbcType.name());
-            columnInfo.setNotnull(sqlColumn.notNull());
-        } else {
-            columnInfo.setType(JdbcType.getType(dbType, clazz).name());
-            columnInfo.setNotnull(false);
-        }
-        if (sqlColumn != null && sqlColumn.length() != 0) {
-            columnInfo.setLength(sqlColumn.length());
-            columnInfo.setScale(sqlColumn.scale());
-        } else {
-            columnInfo.setLength(jdbcType.getLength());
-        }
-        if (sqlColumn != null && sqlColumn.scale() != 0) {
-            columnInfo.setScale(sqlColumn.scale());
-        } else {
-            columnInfo.setScale(jdbcType.getScale());
-        }
-        if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.def())) {
-            columnInfo.setDfltValue(sqlColumn.def());
-        }
-        if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.remarks())) {
-            columnInfo.setRemarks(sqlColumn.remarks());
-        }
-        return columnInfo;
     }
 
     /**

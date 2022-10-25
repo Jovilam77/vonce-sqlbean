@@ -137,7 +137,7 @@ public enum JavaMapSqlServerType {
                 sql.append(alter.getColumnInfo().getName());
             }
             sql.append(SqlConstant.SPACES);
-            if (i > alterList.size() - 1) {
+            if (i < alterList.size() - 1) {
                 sql.append(SqlConstant.GO);
             }
             sqlList.add(sql.toString());

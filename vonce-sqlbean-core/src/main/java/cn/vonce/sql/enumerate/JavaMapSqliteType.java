@@ -117,6 +117,9 @@ public enum JavaMapSqliteType {
         List<Column> targetColumnList = new ArrayList<>();
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(beanClass);
         for (Field field : fieldList) {
+            if (SqlBeanUtil.isIgnore(field)) {
+                continue;
+            }
             String targetColumnName = "";
             String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
             Alter alter = alterMap.get(columnName);

@@ -8,6 +8,7 @@ import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -96,7 +97,7 @@ public enum JavaMapOracleType {
      * @param alterList
      * @return
      */
-    public static String alterTable(List<Alter> alterList) {
+    public static List<String> alterTable(List<Alter> alterList) {
         String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
         Table table = alterList.get(0).getTable();
         StringBuffer sql = new StringBuffer();
@@ -141,13 +142,14 @@ public enum JavaMapOracleType {
                     sql.append(SqlBeanUtil.addColumn(item, item.getColumnInfo(), null));
                     sql.append(SqlConstant.END_BRACKET);
                 }
-                if (i > alterList.size() - 1) {
+                if (i < alterList.size() - 1) {
                     sql.append(SqlConstant.COMMA);
                 }
             }
         }
-        sql.append(table.getName());
-        return sql.toString();
+        List<String> sqlList = new ArrayList<>();
+        sqlList.add(sql.toString());
+        return sqlList;
     }
 
 }

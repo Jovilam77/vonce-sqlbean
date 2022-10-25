@@ -74,4 +74,18 @@ public @interface SqlColumn {
      */
     boolean ignore() default false;
 
+    /**
+     * 是否自动更改表结构
+     *
+     * @return
+     */
+    boolean autoAlter() default false;
+
+    /**
+     * 旧字段名称
+     *
+     * @return
+     */
+    String oldName() default "";
+
 }

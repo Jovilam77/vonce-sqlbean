@@ -604,6 +604,16 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetSchema, targetTableName, columns, wrapper));
     }
 
+    @Override
+    public int alter(Table table, List<ColumnInfo> columnInfoList) {
+        List<String> sqlList = SqlBeanProvider.alterSql(getSqlBeanDB(), clazz, columnInfoList);
+        int count = 0;
+        for (String sql : sqlList) {
+            count += jdbcTemplate.update(sql);
+        }
+        return count;
+    }
+
     @DbSwitch(DbRole.MASTER)
     @Override
     public void dropTable() {

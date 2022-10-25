@@ -23,6 +23,13 @@ public @interface SqlTable {
     boolean autoCreate() default true;
 
     /**
+     * 是否自动更改表结构
+     *
+     * @return
+     */
+    boolean autoAlter() default false;
+
+    /**
      * 生成实体类生成对应表的字段常量
      *
      * @return

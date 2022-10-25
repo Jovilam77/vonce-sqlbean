@@ -329,4 +329,14 @@ public class MybatisSqlBeanProvider {
         return SqlBeanProvider.copySql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("targetSchema"), (String) map.get("targetTableName"), (Column[]) map.get("columns"), (Wrapper) map.get("wrapper"));
     }
 
+    /**
+     * 执行Sql
+     *
+     * @param sql
+     * @return
+     */
+    public String executeSql(String sql) {
+        return sql;
+    }
+
 }

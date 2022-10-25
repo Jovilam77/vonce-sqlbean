@@ -8,6 +8,7 @@ import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.page.PageHelper;
 import cn.vonce.sql.page.ResultData;
+import cn.vonce.sql.provider.SqlBeanProvider;
 import cn.vonce.sql.service.TableService;
 import cn.vonce.sql.spring.annotation.DbSwitch;
 import cn.vonce.sql.spring.config.UseMybatis;
@@ -603,6 +604,17 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Override
     public int copy(String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper) {
         return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, targetSchema, targetTableName, columns, wrapper);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int alter(Table table, List<ColumnInfo> columnInfoList) {
+        List<String> sqlList = SqlBeanProvider.alterSql(getSqlBeanDB(), clazz, columnInfoList);
+        int count = 0;
+        for (String sql : sqlList) {
+            count += mybatisSqlBeanDao.executeSql(sql);
+        }
+        return count;
     }
 
     @DbSwitch(DbRole.MASTER)
