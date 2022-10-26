@@ -294,7 +294,6 @@ public class SqlBeanUtil {
         } else {
             jdbcType = JdbcType.getType(common.getSqlBeanDB().getDbType(), field);
             columnInfo.setType(jdbcType.name());
-            columnInfo.setNotnull(false);
         }
         if (sqlColumn != null && sqlColumn.length() != 0) {
             columnInfo.setLength(sqlColumn.length());
@@ -335,7 +334,7 @@ public class SqlBeanUtil {
         if (!columnInfo.getType().equalsIgnoreCase(toColumnInfo.getType())) {
             return false;
         }
-        if (!columnInfo.getNotnull().equals(toColumnInfo.getNotnull())) {
+        if (columnInfo.getNotnull() != null && !columnInfo.getNotnull().equals(toColumnInfo.getNotnull())) {
             return false;
         }
         if ((columnInfo.getDfltValue() == null && columnInfo.getDfltValue() != toColumnInfo.getDfltValue()) || (columnInfo.getDfltValue() != null && toColumnInfo.getDfltValue() != null && !columnInfo.getDfltValue().equals(toColumnInfo.getDfltValue()))) {
@@ -1148,7 +1147,7 @@ public class SqlBeanUtil {
             sql.append(SqlConstant.END_BRACKET);
         }
         //是否为null
-        if (columnInfo.getNotnull() || columnInfo.getPk()) {
+        if ((columnInfo.getNotnull() != null && columnInfo.getNotnull()) || columnInfo.getPk()) {
             sql.append(SqlConstant.SPACES);
             sql.append(SqlConstant.NOT_NULL);
         }

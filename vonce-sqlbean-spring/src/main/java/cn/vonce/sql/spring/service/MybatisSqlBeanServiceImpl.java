@@ -509,8 +509,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBean(T bean, String where) {
-        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, true,
-                false, null, where);
+        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, true, false, null, where);
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -611,8 +610,10 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     public int alter(Table table, List<ColumnInfo> columnInfoList) {
         List<String> sqlList = SqlBeanProvider.alterSql(getSqlBeanDB(), clazz, columnInfoList);
         int count = 0;
-        for (String sql : sqlList) {
-            count += mybatisSqlBeanDao.executeSql(sql);
+        if (sqlList != null && sqlList.size() > 0) {
+            for (String sql : sqlList) {
+                count += mybatisSqlBeanDao.executeSql(sql);
+            }
         }
         return count;
     }

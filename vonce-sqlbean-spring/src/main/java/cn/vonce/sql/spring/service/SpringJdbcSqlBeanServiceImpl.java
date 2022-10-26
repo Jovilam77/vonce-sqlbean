@@ -608,8 +608,10 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public int alter(Table table, List<ColumnInfo> columnInfoList) {
         List<String> sqlList = SqlBeanProvider.alterSql(getSqlBeanDB(), clazz, columnInfoList);
         int count = 0;
-        for (String sql : sqlList) {
-            count += jdbcTemplate.update(sql);
+        if (sqlList != null && sqlList.size() > 0) {
+            for (String sql : sqlList) {
+                count += jdbcTemplate.update(sql);
+            }
         }
         return count;
     }

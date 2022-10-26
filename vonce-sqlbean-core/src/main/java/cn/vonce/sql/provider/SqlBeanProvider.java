@@ -16,7 +16,9 @@ import cn.vonce.sql.uitls.StringUtil;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 通用的数据库操作sql语句生成
@@ -694,15 +696,13 @@ public class SqlBeanProvider {
         SqlTable sqlTable = clazz.getAnnotation(SqlTable.class);
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
         List<Alter> alterList = new ArrayList<>();
+        Map<String, String> renameMap = new HashMap<>();
         for (Field field : fieldList) {
             if (SqlBeanUtil.isIgnore(field)) {
                 continue;
             }
             //如果该字段不设置自动同步表结构，则不会处理
             SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
-//            if (sqlColumn == null || !sqlColumn.autoAlter()) {
-//                continue;
-//            }
             Alter alter = new Alter();
             alter.setSqlBeanDB(sqlBeanDB);
             alter.setTable(clazz);
@@ -721,8 +721,11 @@ public class SqlBeanProvider {
                         alter.setType(AlterType.CHANGE);
                         alter.setColumnInfo(columnInfo);
                         alter.setOldColumnName(sqlColumn.oldName());
+                        //改名的需要记录
+                        renameMap.put(sqlColumn.oldName(), columnInfo.getName());
                         if (i > 0) {
-                            alter.setAfterColumnName(columnInfoList.get(i - 1).getName());
+                            String afterName = renameMap.get(columnInfoList.get(i - 1).getName());
+                            alter.setAfterColumnName(StringUtil.isNotBlank(afterName) ? afterName : columnInfoList.get(i - 1).getName());
                         }
                         alterList.add(alter);
                     }
@@ -743,9 +746,9 @@ public class SqlBeanProvider {
                     if (!fit) {
                         alter.setType(AlterType.MODIFY);
                         alter.setColumnInfo(columnInfo);
-                        alter.setOldColumnName(sqlColumn.oldName());
                         if (i > 0) {
-                            alter.setAfterColumnName(columnInfoList.get(i - 1).getName());
+                            String afterName = renameMap.get(columnInfoList.get(i - 1).getName());
+                            alter.setAfterColumnName(StringUtil.isNotBlank(afterName) ? afterName : columnInfoList.get(i - 1).getName());
                         }
                         alterList.add(alter);
                     }
@@ -762,16 +765,18 @@ public class SqlBeanProvider {
                 alterList.add(alter);
             }
         }
-        switch (sqlBeanDB.getDbType()) {
-            case MySQL:
-            case MariaDB:
-                return JavaMapMySqlType.alterTable(alterList);
-            case SQLServer:
-                return JavaMapSqlServerType.alterTable(alterList);
-            case Oracle:
-                return JavaMapOracleType.alterTable(alterList);
-            case SQLite:
-                return JavaMapSqliteType.alterTable(alterList);
+        if (alterList.size() > 0) {
+            switch (sqlBeanDB.getDbType()) {
+                case MySQL:
+                case MariaDB:
+                    return JavaMapMySqlType.alterTable(alterList);
+                case SQLServer:
+                    return JavaMapSqlServerType.alterTable(alterList);
+                case Oracle:
+                    return JavaMapOracleType.alterTable(alterList);
+                case SQLite:
+                    return JavaMapSqliteType.alterTable(alterList);
+            }
         }
         return null;
     }
