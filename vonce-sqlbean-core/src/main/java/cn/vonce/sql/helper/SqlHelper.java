@@ -335,7 +335,7 @@ public class SqlHelper {
         StringBuffer copySql = new StringBuffer();
         StringBuffer columnSql = new StringBuffer();
         copySql.append(SqlConstant.INSERT_INTO);
-        copySql.append(getTableName(targetSchema, copy.getTargetTableName()));
+        copySql.append(getTableName(copy.getTable(), copy));
         if (copy.getColumns() != null && copy.getColumns().length > 0) {
             for (Column column : copy.getColumns()) {
                 columnSql.append(column.getName());
@@ -355,7 +355,7 @@ public class SqlHelper {
                 targetColumnSql.append(column.getName());
                 targetColumnSql.append(SqlConstant.COMMA);
             }
-            targetColumnSql.delete(columnSql.length() - SqlConstant.COMMA.length(), columnSql.length());
+            targetColumnSql.delete(targetColumnSql.length() - SqlConstant.COMMA.length(), targetColumnSql.length());
             copySql.append(targetColumnSql);
         } else if (copy.getTargetColumns() != null && copy.getTargetColumns().length > 0) {
             copySql.append(columnSql);
@@ -363,7 +363,7 @@ public class SqlHelper {
             copySql.append(SqlConstant.ALL);
         }
         copySql.append(SqlConstant.FROM);
-        copySql.append(getTableName(copy.getTable(), copy));
+        copySql.append(getTableName(targetSchema, copy.getTargetTableName()));
         copySql.append(whereSql(copy, null));
         return copySql.toString();
     }

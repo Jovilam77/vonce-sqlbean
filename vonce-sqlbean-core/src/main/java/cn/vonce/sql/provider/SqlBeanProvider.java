@@ -696,7 +696,7 @@ public class SqlBeanProvider {
         SqlTable sqlTable = clazz.getAnnotation(SqlTable.class);
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
         List<Alter> alterList = new ArrayList<>();
-        Map<String, String> renameMap = new HashMap<>();
+        Map<String, String> renameMap = (sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) ? new HashMap<>() : null;
         for (Field field : fieldList) {
             if (SqlBeanUtil.isIgnore(field)) {
                 continue;
@@ -706,26 +706,29 @@ public class SqlBeanProvider {
             Alter alter = new Alter();
             alter.setSqlBeanDB(sqlBeanDB);
             alter.setTable(clazz);
-            String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
+//            String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
+            String oldName = (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) ? sqlColumn.oldName().toUpperCase() : sqlColumn.oldName();
             ColumnInfo columnInfo = SqlBeanUtil.getColumnInfo(alter, field, sqlTable, sqlColumn);
             boolean exist = false;
             boolean fit = true;
             //优先比较字段改名的
             for (int i = 0; i < columnInfoList.size(); i++) {
-                if (sqlColumn != null && sqlColumn.oldName().equals(columnInfoList.get(i).getName())) {
+                if (sqlColumn != null && oldName.equals(columnInfoList.get(i).getName())) {
                     //存在此字段
                     exist = true;
                     //使用实体类中的字段信息与数据库中的字段信息做比较
-                    fit = SqlBeanUtil.columnInfoCompare(columnInfo, columnInfoList.get(i));
+                    fit = SqlBeanUtil.columnInfoCompare(sqlBeanDB, columnInfo, columnInfoList.get(i));
                     if (!fit) {
                         alter.setType(AlterType.CHANGE);
                         alter.setColumnInfo(columnInfo);
-                        alter.setOldColumnName(sqlColumn.oldName());
-                        //改名的需要记录
-                        renameMap.put(sqlColumn.oldName(), columnInfo.getName());
-                        if (i > 0) {
-                            String afterName = renameMap.get(columnInfoList.get(i - 1).getName());
-                            alter.setAfterColumnName(StringUtil.isNotBlank(afterName) ? afterName : columnInfoList.get(i - 1).getName());
+                        alter.setOldColumnName(oldName);
+                        //只有MySQL、MariaDB需要处理
+                        if (sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) {
+                            renameMap.put(oldName, columnInfo.getName());
+                            if (i > 0) {
+                                String afterName = renameMap.get(columnInfoList.get(i - 1).getName());
+                                alter.setAfterColumnName(StringUtil.isNotBlank(afterName) ? afterName : columnInfoList.get(i - 1).getName());
+                            }
                         }
                         alterList.add(alter);
                     }
@@ -738,15 +741,16 @@ public class SqlBeanProvider {
             }
             //其次比较变更内容
             for (int i = 0; i < columnInfoList.size(); i++) {
-                if (columnName.equals(columnInfoList.get(i).getName())) {
+                if (columnInfo.getName().equals(columnInfoList.get(i).getName())) {
                     //存在此字段
                     exist = true;
                     //使用实体类中的字段信息与数据库中的字段信息做比较
-                    fit = SqlBeanUtil.columnInfoCompare(columnInfo, columnInfoList.get(i));
+                    fit = SqlBeanUtil.columnInfoCompare(sqlBeanDB, columnInfo, columnInfoList.get(i));
                     if (!fit) {
                         alter.setType(AlterType.MODIFY);
                         alter.setColumnInfo(columnInfo);
-                        if (i > 0) {
+                        //只有MySQL、MariaDB需要处理
+                        if ((sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) && i > 0) {
                             String afterName = renameMap.get(columnInfoList.get(i - 1).getName());
                             alter.setAfterColumnName(StringUtil.isNotBlank(afterName) ? afterName : columnInfoList.get(i - 1).getName());
                         }

@@ -87,6 +87,7 @@ public enum JavaMapSqliteType {
      */
     public static List<String> alterTable(List<Alter> alterList) {
         List<String> sqlList = new ArrayList<>();
+        SqlBeanDB sqlBeanDB = alterList.get(0).getSqlBeanDB();
         Table table = alterList.get(0).getTable();
         Class<?> beanClass = alterList.get(0).getBeanClass();
         SqlTable sqlTable = beanClass.getAnnotation(SqlTable.class);
@@ -105,6 +106,7 @@ public enum JavaMapSqliteType {
         sqlList.add(alterTableSql.toString());
         //创建表
         Create create = new Create();
+        create.setSqlBeanDB(sqlBeanDB);
         create.setBeanClass(beanClass);
         create.setTable(beanClass);
         sqlList.add(SqlHelper.buildCreateSql(create));
@@ -120,31 +122,35 @@ public enum JavaMapSqliteType {
             if (SqlBeanUtil.isIgnore(field)) {
                 continue;
             }
-            String targetColumnName = "";
+            String targetColumnName;
             String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
             Alter alter = alterMap.get(columnName);
-            if (alter.getType() == AlterType.ADD || alter.getType() == AlterType.DROP) {
+            if (alter != null && (alter.getType() == AlterType.ADD || alter.getType() == AlterType.DROP)) {
                 continue;
             }
             //如果CHANGE说明是改字段名
-            if (alter.getType() == AlterType.CHANGE) {
+            if (alter != null && alter.getType() == AlterType.CHANGE) {
                 targetColumnName = alter.getOldColumnName();
+            } else {
+                targetColumnName = columnName;
             }
             //新建表的字段
             Column column = new Column();
-            column.setTableAlias(alter.getTable().getAlias());
+            column.setTableAlias(table.getAlias());
             column.setName(columnName);
             column.setAlias(column.getName());
             columnList.add(column);
             //备份表的字段
             Column targetColumn = new Column();
-            targetColumn.setTableAlias(alter.getTable().getAlias());
+            targetColumn.setTableAlias(table.getAlias());
             targetColumn.setName(targetColumnName);
             targetColumn.setAlias(column.getName());
             targetColumnList.add(targetColumn);
         }
         Copy copy = new Copy();
+        copy.setSqlBeanDB(sqlBeanDB);
         copy.setBeanClass(beanClass);
+        copy.setTable(beanClass);
         copy.setColumns(columnList.toArray(new Column[]{}));
         copy.setTargetTableName(oldTableName);
         copy.setTargetColumns(targetColumnList.toArray(new Column[]{}));

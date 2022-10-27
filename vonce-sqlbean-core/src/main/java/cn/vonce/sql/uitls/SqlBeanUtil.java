@@ -2,6 +2,7 @@ package cn.vonce.sql.uitls;
 
 import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.bean.*;
+import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.JdbcType;
@@ -284,7 +285,7 @@ public class SqlBeanUtil {
     public static ColumnInfo getColumnInfo(Common common, Field field, SqlTable sqlTable, SqlColumn sqlColumn) {
         String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
         ColumnInfo columnInfo = new ColumnInfo();
-        columnInfo.setName(columnName);
+        columnInfo.setName(SqlBeanUtil.isToUpperCase(common) ? columnName.toUpperCase() : columnName);
         columnInfo.setPk(field.isAnnotationPresent(SqlId.class));
         JdbcType jdbcType;
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
@@ -320,11 +321,12 @@ public class SqlBeanUtil {
     /**
      * 比较两个字段信息是否一致
      *
+     * @param sqlBeanDB
      * @param columnInfo
      * @param toColumnInfo
      * @return
      */
-    public static boolean columnInfoCompare(ColumnInfo columnInfo, ColumnInfo toColumnInfo) {
+    public static boolean columnInfoCompare(SqlBeanDB sqlBeanDB, ColumnInfo columnInfo, ColumnInfo toColumnInfo) {
         if (!columnInfo.getPk().equals(toColumnInfo.getPk())) {
             return false;
         }
@@ -346,8 +348,10 @@ public class SqlBeanUtil {
         if (columnInfo.getScale() != null && !columnInfo.getScale().equals(toColumnInfo.getScale())) {
             return false;
         }
-        if (!columnInfo.getRemarks().equals(toColumnInfo.getRemarks())) {
-            return false;
+        if (sqlBeanDB.getDbType() != DbType.SQLite && sqlBeanDB.getDbType() != DbType.Derby) {
+            if (StringUtil.isNotBlank(columnInfo.getRemarks()) && !columnInfo.getRemarks().equals(toColumnInfo.getRemarks())) {
+                return false;
+            }
         }
         return true;
     }

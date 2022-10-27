@@ -64,6 +64,7 @@ public class SqlConstant {
     public static final String ALTER_TABLE = "ALTER TABLE ";
     public static final String ALTER = "ALTER ";
     public static final String COLUMN = "COLUMN ";
+    public static final String TO = " TO ";
     public static final String ADD = "ADD ";
     public static final String CHANGE = "CHANGE ";
     public static final String RENAME = "RENAME ";

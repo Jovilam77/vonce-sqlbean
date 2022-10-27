@@ -66,11 +66,12 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                         tableService.createTable();
                         logger.info("-----'{}'表不存在，已为你自动创建-----", table.getName());
                         continue;
-                    }
-                    //更新表结构
-                    if (sqlTable != null && !sqlTable.isView() && sqlTable.autoAlter()) {
-                        List<ColumnInfo> columnInfoList = tableService.getColumnInfoList(table.getName());
-                        tableService.alter(table, columnInfoList);
+                    } else {
+                        //更新表结构
+                        if (sqlTable != null && !sqlTable.isView() && sqlTable.autoAlter()) {
+                            List<ColumnInfo> columnInfoList = tableService.getColumnInfoList(table.getName());
+                            tableService.alter(table, columnInfoList);
+                        }
                     }
                 }
             }
