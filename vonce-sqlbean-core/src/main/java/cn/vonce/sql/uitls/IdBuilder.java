@@ -21,6 +21,16 @@ public class IdBuilder {
     }
 
     /**
+     * 生成ulid
+     *
+     * @return
+     */
+    public static String ulid() {
+        return UlidCreator.getUlid().toString();
+    }
+
+
+    /**
      * 生成16位雪花id
      *
      * @return

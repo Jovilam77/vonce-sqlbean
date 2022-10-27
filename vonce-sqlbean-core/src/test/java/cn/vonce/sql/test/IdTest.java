@@ -17,6 +17,7 @@ public class IdTest {
         System.out.println(uniqueIdProcessor.uniqueId(IdType.SNOWFLAKE_ID_16));
         System.out.println(uniqueIdProcessor.uniqueId(IdType.SNOWFLAKE_ID_18));
         System.out.println(uniqueIdProcessor.uniqueId(IdType.UUID));
+        System.out.println(uniqueIdProcessor.uniqueId(IdType.ULID));
     }
 
 }

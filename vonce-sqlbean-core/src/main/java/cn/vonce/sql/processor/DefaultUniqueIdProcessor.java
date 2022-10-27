@@ -2,10 +2,6 @@ package cn.vonce.sql.processor;
 
 import cn.vonce.sql.enumerate.IdType;
 import cn.vonce.sql.uitls.IdBuilder;
-import cn.vonce.sql.uitls.SnowflakeId16;
-import cn.vonce.sql.uitls.SnowflakeId18;
-
-import java.util.UUID;
 
 /**
  * 唯一id处理器 默认实现
@@ -22,6 +18,8 @@ public class DefaultUniqueIdProcessor implements UniqueIdProcessor {
         switch (idType) {
             case UUID:
                 return IdBuilder.uuid();
+            case ULID:
+                return IdBuilder.ulid();
             case SNOWFLAKE_ID_16:
                 return IdBuilder.snowflake16();
             case SNOWFLAKE_ID_18:

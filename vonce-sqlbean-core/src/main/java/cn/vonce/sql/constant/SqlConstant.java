@@ -81,7 +81,7 @@ public class SqlConstant {
     public static final String ROWNUM = " ROWNUM ";
     public static final String T = " T";
     public static final String EXEC_SP_RENAME = "EXEC sp_rename ";
-    public static final String GO = " GO";
+    public static final String SEMICOLON = ";";
     public static final String BEGIN_SQUARE_BRACKETS = "[";
     public static final String END_SQUARE_BRACKETS = "]";
     public static final String DBO = "DBO";

@@ -108,21 +108,21 @@ public enum JavaMapOracleType {
         addOrModifySql.append(SqlConstant.ALTER_TABLE);
         addOrModifySql.append(getFullName(alterList.get(0), table));
         for (int i = 0; i < alterList.size(); i++) {
-            Alter item = alterList.get(i);
-            if (item.getType() == AlterType.ADD) {
+            Alter alter = alterList.get(i);
+            if (alter.getType() == AlterType.ADD) {
                 addOrModifySql.append(SqlConstant.ADD);
                 addOrModifySql.append(SqlConstant.BEGIN_BRACKET);
-                addOrModifySql.append(SqlBeanUtil.addColumn(item, item.getColumnInfo(), null));
+                addOrModifySql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), null));
                 addOrModifySql.append(SqlConstant.END_BRACKET);
                 addOrModifySql.append(SqlConstant.SPACES);
-                sqlList.add(addRemarks(item, table, transferred));
-            } else if (item.getType() == AlterType.MODIFY) {
-                addOrModifySql.append(modifyColumn(item));
-                sqlList.add(addRemarks(item, table, transferred));
-            } else if (item.getType() == AlterType.DROP) {
+                sqlList.add(addRemarks(alter, transferred));
+            } else if (alter.getType() == AlterType.MODIFY) {
+                addOrModifySql.append(modifyColumn(alter));
+                sqlList.add(addRemarks(alter, transferred));
+            } else if (alter.getType() == AlterType.DROP) {
                 StringBuffer dropSql = new StringBuffer();
                 dropSql.append(SqlConstant.ALTER_TABLE);
-                dropSql.append(getFullName(item, table));
+                dropSql.append(getFullName(alter, table));
                 dropSql.append(SqlConstant.DROP);
                 dropSql.append(SqlConstant.BEGIN_BRACKET);
                 dropSql.append(transferred);
@@ -130,20 +130,20 @@ public enum JavaMapOracleType {
                 dropSql.append(transferred);
                 dropSql.append(SqlConstant.END_BRACKET);
                 sqlList.add(dropSql.toString());
-            } else if (item.getType() == AlterType.CHANGE) {
+            } else if (alter.getType() == AlterType.CHANGE) {
                 StringBuffer changeSql = new StringBuffer();
                 changeSql.append(SqlConstant.ALTER_TABLE);
-                changeSql.append(getFullName(item, table));
+                changeSql.append(getFullName(alter, table));
                 changeSql.append(SqlConstant.RENAME);
                 changeSql.append(SqlConstant.COLUMN);
-                changeSql.append(item.getOldColumnName());
+                changeSql.append(alter.getOldColumnName());
                 changeSql.append(SqlConstant.TO);
-                changeSql.append(item.getColumnInfo().getName());
+                changeSql.append(alter.getColumnInfo().getName());
                 sqlList.add(changeSql.toString());
-                sqlList.add(addRemarks(item, table, transferred));
+                sqlList.add(addRemarks(alter, transferred));
                 //更改名称的同时可能也更改其他信息
-                item.getColumnInfo().setName(item.getOldColumnName());
-                addOrModifySql.append(modifyColumn(item));
+                alter.getColumnInfo().setName(alter.getOldColumnName());
+                addOrModifySql.append(modifyColumn(alter));
             }
         }
         //新增更改类型信息的语句需要先执行
@@ -178,14 +178,14 @@ public enum JavaMapOracleType {
     /**
      * 更改列信息
      *
-     * @param item
+     * @param alter
      * @return
      */
-    private static String modifyColumn(Alter item) {
+    private static String modifyColumn(Alter alter) {
         StringBuffer modifySql = new StringBuffer();
         modifySql.append(SqlConstant.MODIFY);
         modifySql.append(SqlConstant.BEGIN_BRACKET);
-        modifySql.append(SqlBeanUtil.addColumn(item, item.getColumnInfo(), null));
+        modifySql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), null));
         modifySql.append(SqlConstant.END_BRACKET);
         modifySql.append(SqlConstant.SPACES);
         return modifySql.toString();
@@ -195,17 +195,16 @@ public enum JavaMapOracleType {
      * 增加列备注
      *
      * @param item
-     * @param table
      * @param transferred
      * @return
      */
-    private static String addRemarks(Alter item, Table table, String transferred) {
+    private static String addRemarks(Alter item, String transferred) {
         StringBuffer remarksSql = new StringBuffer();
         if (StringUtil.isNotBlank(item.getColumnInfo().getRemarks())) {
             remarksSql.append(SqlConstant.COMMENT);
             remarksSql.append(SqlConstant.ON);
             remarksSql.append(SqlConstant.COLUMN);
-            remarksSql.append(getFullName(item, table));
+            remarksSql.append(getFullName(item, item.getTable()));
             remarksSql.append(SqlConstant.POINT);
             remarksSql.append(transferred);
             remarksSql.append(item.getColumnInfo().getName());
