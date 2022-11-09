@@ -293,10 +293,10 @@ public class PageHelper<T> {
             // 衍生一个对象用于select查询
             Select countSelect = select.copy();
             //标识为克隆对象
-            ReflectUtil.instance().set(Select.class, countSelect, "clone", true);
+            ReflectUtil.instance().set(Select.class, countSelect, "count", true);
             // 预防设置了查询字段，故将查询字段换位统计字段
-            countSelect.getColumnList().clear();
-            countSelect.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
+//            countSelect.getColumnList().clear();
+//            countSelect.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
             //设置分页
             select.page(pagenum, pagesize, startByZero);
             select.orderBy(orders);

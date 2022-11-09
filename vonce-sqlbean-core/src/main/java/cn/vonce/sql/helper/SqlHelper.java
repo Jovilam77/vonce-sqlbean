@@ -74,7 +74,11 @@ public class SqlHelper {
             }
         }
         //标准Sql
-        sqlSb.append(column(select));
+        if (select.isCount() && !select.isDistinct()) {
+            sqlSb.append(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
+        } else {
+            sqlSb.append(column(select));
+        }
         sqlSb.append(SqlConstant.FROM);
         sqlSb.append(fromFullName(select));
         sqlSb.append(joinSql(select));
@@ -82,7 +86,7 @@ public class SqlHelper {
         String groupBySql = groupBySql(select);
         sqlSb.append(groupBySql);
         sqlSb.append(havingSql(select));
-        if (!select.isClone()) {
+        if (!select.isCount()) {
             sqlSb.append(orderSql);
         }
         //SQLServer2008 分页处理
@@ -98,7 +102,7 @@ public class SqlHelper {
             }
         }
         //标准Sql 如果是克隆的select则为分页时的count
-        if (select.isClone() && StringUtil.isNotEmpty(groupBySql)) {
+        if ((select.isCount() && select.isDistinct()) || (select.isCount() && StringUtil.isNotEmpty(groupBySql))) {
             sqlSb.insert(0, SqlConstant.SELECT + SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET + SqlConstant.FROM + SqlConstant.BEGIN_BRACKET);
             sqlSb.append(SqlConstant.END_BRACKET + SqlConstant.AS + SqlConstant.T);
         }
@@ -853,7 +857,7 @@ public class SqlHelper {
             }
             groupByAndOrderBySql.deleteCharAt(groupByAndOrderBySql.length() - SqlConstant.COMMA.length());
         } else {
-            if (SqlConstant.ORDER_BY.equals(type) && select.getSqlBeanDB().getDbType() == DbType.SQLServer && SqlBeanUtil.isUsePage(select) && !select.isClone()) {
+            if (SqlConstant.ORDER_BY.equals(type) && select.getSqlBeanDB().getDbType() == DbType.SQLServer && SqlBeanUtil.isUsePage(select) && !select.isCount()) {
                 groupByAndOrderBySql.append(type);
                 String tableFieldFullName = SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), select.getPage().getIdName());
                 groupByAndOrderBySql.append(SqlBeanUtil.isToUpperCase(select) ? tableFieldFullName.toUpperCase() : tableFieldFullName);
@@ -876,15 +880,12 @@ public class SqlHelper {
      */
     private static String conditionHandle(ConditionType conditionType, Common common, String conditionString, Object[] args, Object bean, Condition condition, Wrapper wrapper) {
         StringBuffer conditionSql = new StringBuffer();
-        if (ConditionType.WHERE == conditionType) {
+        if (ConditionType.WHERE == conditionType && StringUtil.isBlank(conditionString)) {
             conditionSql.append(versionCondition(common, bean));
             conditionSql.append(logicallyDeleteCondition(common));
         }
         // 优先级1 使用条件字符串拼接
-        if (conditionString != null && !"".equals(conditionString)) {
-            if (conditionSql.length() > 0) {
-                conditionSql.append(SqlConstant.AND);
-            }
+        if (StringUtil.isNotBlank(conditionString)) {
             conditionSql.append(SqlConstant.BEGIN_BRACKET);
             if (args != null && args.length > 0) {
                 conditionSql.append(SqlBeanUtil.getCondition(common, conditionString, args));
