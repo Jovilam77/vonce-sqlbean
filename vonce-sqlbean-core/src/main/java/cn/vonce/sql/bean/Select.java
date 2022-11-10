@@ -27,10 +27,6 @@ public class Select extends CommonCondition<Select> implements Serializable {
         super.setReturnObj(this);
     }
 
-//    /**
-//     * 是否为分页时克隆的副本
-//     */
-//    private boolean clone;
     /**
      * 是否为查询
      */
@@ -99,24 +95,6 @@ public class Select extends CommonCondition<Select> implements Serializable {
         return this;
     }
 
-//    /**
-//     * 是否为克隆对象
-//     *
-//     * @return
-//     */
-//    public boolean isClone() {
-//        return clone;
-//    }
-//
-//    /**
-//     * 标识为克隆对象
-//     *
-//     * @param clone 是否为克隆对象
-//     */
-//    protected void setClone(boolean clone) {
-//        this.clone = clone;
-//    }
-
     /**
      * 是否为查询
      *
@@ -131,7 +109,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      *
      * @param count
      */
-    public void setCount(boolean count) {
+    public void count(boolean count) {
         this.count = count;
     }
 
