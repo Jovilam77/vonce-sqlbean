@@ -180,19 +180,7 @@ public class SqlBeanProvider {
         if (select.getSqlBeanDB() == null) {
             select.setSqlBeanDB(sqlBeanDB);
         }
-        if (select.getColumnList() == null || select.getColumnList().isEmpty()) {
-            select.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
-        } else if (select.getColumnList().size() > 1 || select.getColumnList().get(0).getName().toLowerCase().indexOf("count") == -1) {
-            try {
-                select = select.copy();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-            select.getColumnList().clear();
-            select.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
-        }
+        select.setCount(true);
         return setSelectAndBuild(clazz, select);
     }
 
@@ -798,10 +786,9 @@ public class SqlBeanProvider {
         select.setSqlBeanDB(sqlBeanDB);
         select.setTable(clazz);
         select.setBeanClass(clazz);
+        select.setCount(isCount);
         try {
-            if (isCount) {
-                select.column(SqlConstant.COUNT + SqlConstant.BEGIN_BRACKET + SqlConstant.ALL + SqlConstant.END_BRACKET);
-            } else {
+            if (!isCount) {
                 select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
             }
             SqlBeanUtil.setJoin(select, clazz);
