@@ -131,15 +131,7 @@ public enum JavaMapOracleType {
                 dropSql.append(SqlConstant.END_BRACKET);
                 sqlList.add(dropSql.toString());
             } else if (alter.getType() == AlterType.CHANGE) {
-                StringBuffer changeSql = new StringBuffer();
-                changeSql.append(SqlConstant.ALTER_TABLE);
-                changeSql.append(getFullName(alter, table));
-                changeSql.append(SqlConstant.RENAME);
-                changeSql.append(SqlConstant.COLUMN);
-                changeSql.append(alter.getOldColumnName());
-                changeSql.append(SqlConstant.TO);
-                changeSql.append(alter.getColumnInfo().getName());
-                sqlList.add(changeSql.toString());
+                sqlList.add(changeColumn(alter));
                 sqlList.add(addRemarks(alter, transferred));
                 //更改名称的同时可能也更改其他信息
                 alter.getColumnInfo().setName(alter.getOldColumnName());
@@ -189,6 +181,24 @@ public enum JavaMapOracleType {
         modifySql.append(SqlConstant.END_BRACKET);
         modifySql.append(SqlConstant.SPACES);
         return modifySql.toString();
+    }
+
+    /**
+     * 更改字段名
+     *
+     * @param alter
+     * @return
+     */
+    private static String changeColumn(Alter alter) {
+        StringBuffer changeSql = new StringBuffer();
+        changeSql.append(SqlConstant.ALTER_TABLE);
+        changeSql.append(getFullName(alter, alter.getTable()));
+        changeSql.append(SqlConstant.RENAME);
+        changeSql.append(SqlConstant.COLUMN);
+        changeSql.append(alter.getOldColumnName());
+        changeSql.append(SqlConstant.TO);
+        changeSql.append(alter.getColumnInfo().getName());
+        return changeSql.toString();
     }
 
     /**

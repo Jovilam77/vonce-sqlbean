@@ -1,9 +1,17 @@
 package cn.vonce.sql.enumerate;
 
+import cn.vonce.sql.bean.Alter;
+import cn.vonce.sql.bean.ColumnInfo;
+import cn.vonce.sql.bean.Common;
+import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.constant.SqlConstant;
+import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Java类型对应的Oracle类型枚举类
@@ -14,19 +22,7 @@ import java.math.BigDecimal;
  */
 public enum JavaMapDB2Type {
 
-    INTEGER(new Class[]{int.class, Integer.class}),
-    BIGINT(new Class[]{long.class, Long.class}),
-    SMALLINT(new Class[]{boolean.class, Boolean.class, byte.class, Byte.class, short.class, Short.class}),
-    REAL(new Class[]{float.class, Float.class}),
-    DOUBLE(new Class[]{double.class, Double.class}),
-    DECIMAL(new Class[]{BigDecimal.class}),
-    CHAR(new Class[]{char.class, Character.class}),
-    VARCHAR(new Class[]{String.class}),
-    DATE(new Class[]{java.sql.Date.class}),
-    TIME(new Class[]{java.sql.Time.class}),
-    TIMESTAMP(new Class[]{java.sql.Timestamp.class, java.util.Date.class}),
-    CLOB(new Class[]{java.sql.Clob.class}),
-    BLOB(new Class[]{java.sql.Blob.class, Object.class});
+    INTEGER(new Class[]{int.class, Integer.class}), BIGINT(new Class[]{long.class, Long.class}), SMALLINT(new Class[]{boolean.class, Boolean.class, byte.class, Byte.class, short.class, Short.class}), REAL(new Class[]{float.class, Float.class}), DOUBLE(new Class[]{double.class, Double.class}), DECIMAL(new Class[]{BigDecimal.class}), CHAR(new Class[]{char.class, Character.class}), VARCHAR(new Class[]{String.class}), DATE(new Class[]{java.sql.Date.class}), TIME(new Class[]{java.sql.Time.class}), TIMESTAMP(new Class[]{java.sql.Timestamp.class, java.util.Date.class}), CLOB(new Class[]{java.sql.Clob.class}), BLOB(new Class[]{java.sql.Blob.class, Object.class});
 
 
     JavaMapDB2Type(Class<?>[] classes) {
@@ -101,6 +97,173 @@ public enum JavaMapDB2Type {
         sql.append(tableName);
         sql.append("'");
         return sql.toString();
+    }
+
+    /**
+     * 更改表结构
+     *
+     * @param alterList
+     * @return
+     */
+    public static List<String> alterTable(List<Alter> alterList) {
+        List<String> sqlList = new ArrayList<>();
+        String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
+        StringBuffer sql = new StringBuffer();
+        StringBuffer remarksSql = new StringBuffer();
+        for (int i = 0; i < alterList.size(); i++) {
+            Alter alter = alterList.get(i);
+            if (alter.getType() == AlterType.ADD) {
+                sql.append(SqlConstant.ALTER_TABLE);
+                sql.append(getFullName(alter, alter.getTable()));
+                sql.append(SqlConstant.ADD);
+                sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
+                remarksSql.append(addRemarks(alter, transferred));
+            } else if (alter.getType() == AlterType.CHANGE) {
+                sql.append(changeColumn(alter));
+                sql.append(SqlConstant.SEMICOLON);
+                //先改名后修改信息
+                StringBuffer modifySql = modifyColumn(alter);
+                if (modifySql.length() > 0) {
+                    sql.append(SqlConstant.ALTER_TABLE);
+                    sql.append(modifySql);
+                }
+                remarksSql.append(addRemarks(alter, transferred));
+            } else if (alter.getType() == AlterType.MODIFY) {
+                sql.append(SqlConstant.ALTER_TABLE);
+                sql.append(modifyColumn(alter));
+                remarksSql.append(addRemarks(alter, transferred));
+            } else if (alter.getType() == AlterType.DROP) {
+                sql.append(SqlConstant.ALTER_TABLE);
+                sql.append(getFullName(alter, alter.getTable()));
+                sql.append(SqlConstant.DROP);
+                sql.append(SqlConstant.COLUMN);
+                sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
+                sql.append(alter.getColumnInfo().getName());
+                sql.append(SqlConstant.END_SQUARE_BRACKETS);
+            }
+            sql.append(SqlConstant.SPACES);
+            sql.append(SqlConstant.SEMICOLON);
+        }
+        sqlList.add(sql.toString());
+        sqlList.add(remarksSql.toString());
+        sqlList.add(recast(alterList.get(0)));
+        return sqlList;
+    }
+
+    /**
+     * 获取全名
+     *
+     * @param common
+     * @param table
+     * @return
+     */
+    private static String getFullName(Common common, Table table) {
+        String transferred = SqlBeanUtil.getTransferred(common);
+        boolean toUpperCase = SqlBeanUtil.isToUpperCase(common);
+        StringBuffer sql = new StringBuffer();
+        if (StringUtil.isNotBlank(table.getSchema())) {
+            sql.append(transferred);
+            sql.append(toUpperCase ? table.getSchema().toUpperCase() : table.getSchema());
+            sql.append(transferred);
+            sql.append(SqlConstant.POINT);
+        }
+        sql.append(transferred);
+        sql.append(toUpperCase ? table.getName().toUpperCase() : table.getName());
+        sql.append(transferred);
+        sql.append(SqlConstant.SPACES);
+        return sql.toString();
+    }
+
+    /**
+     * 更改列信息
+     *
+     * @param alter
+     * @return
+     */
+    private static StringBuffer modifyColumn(Alter alter) {
+        StringBuffer modifySql = new StringBuffer();
+        modifySql.append(getFullName(alter, alter.getTable()));
+        modifySql.append(SqlConstant.ALTER);
+        modifySql.append(SqlConstant.COLUMN);
+        ColumnInfo columnInfo = alter.getColumnInfo();
+        JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
+        if ((columnInfo.getNotnull() != null && columnInfo.getNotnull()) || columnInfo.getPk()) {
+            modifySql.append("SET ");
+            modifySql.append(SqlConstant.NOT_NULL);
+        }
+        if (columnInfo.getLength() != null && columnInfo.getLength() > 0) {
+            modifySql.append("SET ");
+            modifySql.append(SqlConstant.BEGIN_BRACKET);
+            //字段长度
+            modifySql.append(columnInfo.getLength());
+            if (jdbcType.isFloat()) {
+                modifySql.append(SqlConstant.COMMA);
+                modifySql.append(columnInfo.getScale() == null ? 0 : columnInfo.getScale());
+            }
+            modifySql.append(SqlConstant.END_BRACKET);
+        }
+        return modifySql;
+    }
+
+    /**
+     * 更改字段名
+     *
+     * @param alter
+     * @return
+     */
+    private static String changeColumn(Alter alter) {
+        StringBuffer changeSql = new StringBuffer();
+        changeSql.append(SqlConstant.ALTER_TABLE);
+        changeSql.append(getFullName(alter, alter.getTable()));
+        changeSql.append(SqlConstant.RENAME);
+        changeSql.append(SqlConstant.COLUMN);
+        changeSql.append(alter.getOldColumnName());
+        changeSql.append(SqlConstant.TO);
+        changeSql.append(alter.getColumnInfo().getName());
+        return changeSql.toString();
+    }
+
+    /**
+     * 增加列备注
+     *
+     * @param item
+     * @param transferred
+     * @return
+     */
+    private static String addRemarks(Alter item, String transferred) {
+        StringBuffer remarksSql = new StringBuffer();
+        if (StringUtil.isNotBlank(item.getColumnInfo().getRemarks())) {
+            remarksSql.append(SqlConstant.COMMENT);
+            remarksSql.append(SqlConstant.ON);
+            remarksSql.append(SqlConstant.COLUMN);
+            remarksSql.append(getFullName(item, item.getTable()));
+            remarksSql.append(SqlConstant.POINT);
+            remarksSql.append(transferred);
+            remarksSql.append(item.getColumnInfo().getName());
+            remarksSql.append(transferred);
+            remarksSql.append(SqlConstant.IS);
+            remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+            remarksSql.append(item.getColumnInfo().getRemarks());
+            remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        }
+        return remarksSql.toString();
+    }
+
+    /**
+     * 重组
+     *
+     * @param item
+     * @return
+     */
+    private static String recast(Alter item) {
+        StringBuffer recastSql = new StringBuffer();
+        recastSql.append("CALL SYSPROC.ADMIN_CMD");
+        recastSql.append(SqlConstant.BEGIN_BRACKET);
+        recastSql.append("'REORG TABLE ");
+        recastSql.append(getFullName(item, item.getTable()));
+        recastSql.append("'");
+        recastSql.append(SqlConstant.END_BRACKET);
+        return recastSql.toString();
     }
 
 }
