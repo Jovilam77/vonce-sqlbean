@@ -293,7 +293,7 @@ public class PageHelper<T> {
             // 衍生一个对象用于select查询
             Select countSelect = select.copy();
             //标识为克隆对象
-            ReflectUtil.instance().set(Select.class, countSelect, "count", true);
+            ReflectUtil.instance().invoke(Select.class, countSelect, "count", true);
             //设置分页
             select.page(pagenum, pagesize, startByZero);
             select.orderBy(orders);
