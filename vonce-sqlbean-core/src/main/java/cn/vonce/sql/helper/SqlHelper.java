@@ -397,6 +397,7 @@ public class SqlHelper {
         ColumnInfo columnInfo = new ColumnInfo();
         columnInfo.setPk(clazz.isAnnotationPresent(SqlId.class));
         JdbcType jdbcType;
+
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
             jdbcType = sqlColumn.type();
             columnInfo.setType(jdbcType.name());
@@ -435,7 +436,11 @@ public class SqlHelper {
                     throw new SqlBeanException("请配置正确的数据库");
             }
             columnInfo.setType(jdbcType.name());
-            columnInfo.setNotnull(false);
+            if (sqlColumn != null) {
+                columnInfo.setNotnull(sqlColumn.notNull());
+            } else {
+                columnInfo.setNotnull(false);
+            }
         }
         if (sqlColumn != null && sqlColumn.length() != 0) {
             columnInfo.setLength(sqlColumn.length());
