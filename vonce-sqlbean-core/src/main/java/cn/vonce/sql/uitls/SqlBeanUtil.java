@@ -290,11 +290,12 @@ public class SqlBeanUtil {
         JdbcType jdbcType;
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
             jdbcType = sqlColumn.type();
-            columnInfo.setType(jdbcType.name());
-            columnInfo.setNotnull(sqlColumn.notNull());
         } else {
             jdbcType = JdbcType.getType(common.getSqlBeanDB().getDbType(), field);
-            columnInfo.setType(jdbcType.name());
+        }
+        columnInfo.setType(jdbcType.name());
+        if (sqlColumn != null) {
+            columnInfo.setNotnull(sqlColumn.notNull());
         }
         if (sqlColumn != null && sqlColumn.length() != 0) {
             columnInfo.setLength(sqlColumn.length());
