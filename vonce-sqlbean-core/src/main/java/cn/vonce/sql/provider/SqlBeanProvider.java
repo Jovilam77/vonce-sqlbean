@@ -180,7 +180,7 @@ public class SqlBeanProvider {
         if (select.getSqlBeanDB() == null) {
             select.setSqlBeanDB(sqlBeanDB);
         }
-        select.setCount(true);
+        select.count(true);
         return setSelectAndBuild(clazz, select);
     }
 
@@ -786,7 +786,7 @@ public class SqlBeanProvider {
         select.setSqlBeanDB(sqlBeanDB);
         select.setTable(clazz);
         select.setBeanClass(clazz);
-        select.setCount(isCount);
+        select.count(isCount);
         try {
             if (!isCount) {
                 select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
