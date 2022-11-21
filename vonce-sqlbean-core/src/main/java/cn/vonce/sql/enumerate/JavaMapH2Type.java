@@ -144,16 +144,15 @@ public enum JavaMapH2Type {
                 sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
                 remarksSql.append(addRemarks(alter, transferred));
             } else if (alter.getType() == AlterType.CHANGE) {
-                //H2暂时不支持改名
-//                sql.append(changeColumn(alter));
-//                sql.append(SqlConstant.SEMICOLON);
-//                //先改名后修改信息
-//                StringBuffer modifySql = modifyColumn(alter);
-//                if (modifySql.length() > 0) {
-//                    sql.append(SqlConstant.ALTER_TABLE);
-//                    sql.append(modifySql);
-//                }
-//                remarksSql.append(addRemarks(alter, transferred));
+                sql.append(changeColumn(alter));
+                sql.append(SqlConstant.SEMICOLON);
+                //先改名后修改信息
+                StringBuffer modifySql = modifyColumn(alter);
+                if (modifySql.length() > 0) {
+                    sql.append(SqlConstant.ALTER_TABLE);
+                    sql.append(modifySql);
+                }
+                remarksSql.append(addRemarks(alter, transferred));
             } else if (alter.getType() == AlterType.MODIFY) {
                 sql.append(SqlConstant.ALTER_TABLE);
                 sql.append(modifyColumn(alter));
@@ -163,16 +162,13 @@ public enum JavaMapH2Type {
                 sql.append(getFullName(alter, alter.getTable()));
                 sql.append(SqlConstant.DROP);
                 sql.append(SqlConstant.COLUMN);
-                sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
-                sql.append(alter.getColumnInfo().getName());
-                sql.append(SqlConstant.END_SQUARE_BRACKETS);
+                sql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
             }
             sql.append(SqlConstant.SPACES);
             sql.append(SqlConstant.SEMICOLON);
         }
         sqlList.add(sql.toString());
         sqlList.add(remarksSql.toString());
-        sqlList.add(recast(alterList.get(0)));
         return sqlList;
     }
 
@@ -227,9 +223,9 @@ public enum JavaMapH2Type {
         changeSql.append(getFullName(alter, alter.getTable()));
         changeSql.append(SqlConstant.RENAME);
         changeSql.append(SqlConstant.COLUMN);
-        changeSql.append(alter.getOldColumnName());
+        changeSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getOldColumnName().toUpperCase() : alter.getOldColumnName());
         changeSql.append(SqlConstant.TO);
-        changeSql.append(alter.getColumnInfo().getName());
+        changeSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
         return changeSql.toString();
     }
 
@@ -257,23 +253,6 @@ public enum JavaMapH2Type {
             remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
         }
         return remarksSql.toString();
-    }
-
-    /**
-     * 重组
-     *
-     * @param item
-     * @return
-     */
-    private static String recast(Alter item) {
-        StringBuffer recastSql = new StringBuffer();
-        recastSql.append("CALL SYSPROC.ADMIN_CMD");
-        recastSql.append(SqlConstant.BEGIN_BRACKET);
-        recastSql.append("'REORG TABLE ");
-        recastSql.append(getFullName(item, item.getTable()));
-        recastSql.append("'");
-        recastSql.append(SqlConstant.END_BRACKET);
-        return recastSql.toString();
     }
 
 }

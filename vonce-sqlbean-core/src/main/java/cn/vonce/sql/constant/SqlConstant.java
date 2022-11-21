@@ -57,6 +57,7 @@ public class SqlConstant {
 
     public static final String CREATE_TABLE = "CREATE TABLE ";
     public static final String PRIMARY_KEY = "PRIMARY KEY";
+    public static final String NULL = "NULL";
     public static final String NOT_NULL = "NOT NULL";
     public static final String DEFAULT = "DEFAULT";
     public static final String COMMENT = "COMMENT";

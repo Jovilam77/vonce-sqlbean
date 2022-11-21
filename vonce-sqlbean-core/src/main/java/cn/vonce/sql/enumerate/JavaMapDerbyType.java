@@ -1,9 +1,16 @@
 package cn.vonce.sql.enumerate;
 
+import cn.vonce.sql.bean.Alter;
+import cn.vonce.sql.bean.ColumnInfo;
+import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.constant.SqlConstant;
+import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Java类型对应的Derby类型枚举类
@@ -14,19 +21,7 @@ import java.math.BigDecimal;
  */
 public enum JavaMapDerbyType {
 
-    INTEGER(new Class[]{int.class, Integer.class}),
-    BIGINT(new Class[]{long.class, Long.class}),
-    SMALLINT(new Class[]{byte.class, Byte.class, short.class, Short.class, boolean.class, Boolean.class}),
-    FLOAT(new Class[]{float.class, Float.class}),
-    DOUBLE(new Class[]{double.class, Double.class}),
-    NUMERIC(new Class[]{BigDecimal.class}),
-    CHAR(new Class[]{char.class, Character.class}),
-    VARCHAR(new Class[]{String.class}),
-    DATE(new Class[]{java.sql.Date.class}),
-    TIME(new Class[]{java.sql.Time.class}),
-    TIMESTAMP(new Class[]{java.sql.Timestamp.class, java.util.Date.class}),
-    CLOB(new Class[]{java.sql.Clob.class}),
-    BLOB(new Class[]{java.sql.Blob.class, Object.class});
+    INTEGER(new Class[]{int.class, Integer.class}), BIGINT(new Class[]{long.class, Long.class}), SMALLINT(new Class[]{byte.class, Byte.class, short.class, Short.class, boolean.class, Boolean.class}), FLOAT(new Class[]{float.class, Float.class}), DOUBLE(new Class[]{double.class, Double.class}), NUMERIC(new Class[]{BigDecimal.class}), CHAR(new Class[]{char.class, Character.class}), VARCHAR(new Class[]{String.class}), DATE(new Class[]{java.sql.Date.class}), TIME(new Class[]{java.sql.Time.class}), TIMESTAMP(new Class[]{java.sql.Timestamp.class, java.util.Date.class}), CLOB(new Class[]{java.sql.Clob.class}), BLOB(new Class[]{java.sql.Blob.class, Object.class});
 
     JavaMapDerbyType(Class<?>[] classes) {
         this.classes = classes;
@@ -102,6 +97,110 @@ public enum JavaMapDerbyType {
         sql.append(tableName);
         sql.append("' ORDER BY cl.COLUMNNUMBER");
         return sql.toString();
+    }
+
+    /**
+     * 更改表结构
+     *
+     * @param alterList
+     * @return
+     */
+    public static List<String> alterTable(List<Alter> alterList) {
+        List<String> sqlList = new ArrayList<>();
+        for (int i = 0; i < alterList.size(); i++) {
+            Alter alter = alterList.get(i);
+            if (alter.getType() == AlterType.ADD) {
+                StringBuffer sql = new StringBuffer();
+                sql.append(SqlConstant.ALTER_TABLE);
+                sql.append(getFullName(alter, alter.getTable(), null));
+                sql.append(SqlConstant.ADD);
+                sql.append(SqlConstant.COLUMN);
+                sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
+                sqlList.add(sql.toString());
+            } else if (alter.getType() == AlterType.CHANGE) {
+                sqlList.add(changeColumn(alter));
+                //先改名后修改信息
+                StringBuffer modifySql = modifyColumn(alter);
+                if (modifySql.length() > 0) {
+                    sqlList.add(SqlConstant.ALTER_TABLE + modifySql);
+                }
+            } else if (alter.getType() == AlterType.MODIFY) {
+                sqlList.add(SqlConstant.ALTER_TABLE + modifyColumn(alter));
+            } else if (alter.getType() == AlterType.DROP) {
+                StringBuffer sql = new StringBuffer();
+                sql.append(SqlConstant.ALTER_TABLE);
+                sql.append(getFullName(alter, alter.getTable(), null));
+                sql.append(SqlConstant.DROP);
+                sql.append(SqlConstant.COLUMN);
+                sql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
+                sqlList.add(sql.toString());
+            }
+        }
+        return sqlList;
+    }
+
+    /**
+     * 获取全名
+     *
+     * @param alter
+     * @param table
+     * @return
+     */
+    private static String getFullName(Alter alter, Table table, String columnName) {
+        boolean rename = alter.getType() == AlterType.CHANGE && StringUtil.isNotBlank(columnName);
+        boolean toUpperCase = SqlBeanUtil.isToUpperCase(alter);
+        StringBuffer sql = new StringBuffer();
+        if (StringUtil.isNotBlank(table.getSchema())) {
+            sql.append(toUpperCase ? table.getSchema().toUpperCase() : table.getSchema());
+            sql.append(SqlConstant.POINT);
+        }
+        sql.append(toUpperCase ? table.getName().toUpperCase() : table.getName());
+        if (rename) {
+            sql.append(SqlConstant.POINT);
+            sql.append(SqlBeanUtil.isToUpperCase(alter) ? columnName : columnName);
+        }
+        sql.append(SqlConstant.SPACES);
+        return sql.toString();
+    }
+
+    /**
+     * 更改列信息
+     *
+     * @param alter
+     * @return
+     */
+    private static StringBuffer modifyColumn(Alter alter) {
+        ColumnInfo columnInfo = alter.getColumnInfo();
+        StringBuffer modifySql = new StringBuffer();
+        modifySql.append(getFullName(alter, alter.getTable(), null));
+        modifySql.append(SqlConstant.ALTER);
+        modifySql.append(SqlConstant.COLUMN);
+        modifySql.append(SqlBeanUtil.getTableFieldName(alter, columnInfo.getName()));
+        //是否为null
+        if (columnInfo.getNotnull() != null && columnInfo.getNotnull()) {
+            modifySql.append(SqlConstant.SPACES);
+            modifySql.append(SqlConstant.NOT_NULL);
+        } else if (alter.getType() == AlterType.MODIFY && columnInfo.getNotnull() != null && !columnInfo.getNotnull()) {
+            modifySql.append(SqlConstant.SPACES);
+            modifySql.append(SqlConstant.NULL);
+        }
+        return modifySql;
+    }
+
+    /**
+     * 更改字段名
+     *
+     * @param alter
+     * @return
+     */
+    private static String changeColumn(Alter alter) {
+        StringBuffer changeSql = new StringBuffer();
+        changeSql.append(SqlConstant.RENAME);
+        changeSql.append(SqlConstant.COLUMN);
+        changeSql.append(getFullName(alter, alter.getTable(), alter.getOldColumnName()));
+        changeSql.append(SqlConstant.TO);
+        changeSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
+        return changeSql.toString();
     }
 
 }

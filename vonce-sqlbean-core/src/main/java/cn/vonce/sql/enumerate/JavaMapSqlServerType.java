@@ -141,7 +141,7 @@ public enum JavaMapSqlServerType {
                 sql.append(SqlConstant.DROP);
                 sql.append(SqlConstant.COLUMN);
                 sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
-                sql.append(alter.getColumnInfo().getName());
+                sql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
                 sql.append(SqlConstant.END_SQUARE_BRACKETS);
             }
             sql.append(SqlConstant.SPACES);
@@ -177,7 +177,7 @@ public enum JavaMapSqlServerType {
         sql.append(SqlConstant.END_SQUARE_BRACKETS);
         sql.append(SqlConstant.POINT);
         sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
-        sql.append(table.getName());
+        sql.append(SqlBeanUtil.isToUpperCase(alter) ? table.getName().toUpperCase() : table.getName());
         sql.append(SqlConstant.END_SQUARE_BRACKETS);
         if (rename) {
             sql.append(SqlConstant.POINT);

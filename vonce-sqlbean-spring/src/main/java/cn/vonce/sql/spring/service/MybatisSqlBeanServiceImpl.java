@@ -5,6 +5,7 @@ import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.exception.SqlBeanException;
+import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.page.PageHelper;
 import cn.vonce.sql.page.ResultData;
@@ -608,7 +609,28 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.MASTER)
     @Override
     public int alter(Table table, List<ColumnInfo> columnInfoList) {
-        List<String> sqlList = SqlBeanProvider.alterSql(getSqlBeanDB(), clazz, columnInfoList);
+        List<String> sqlList = SqlBeanProvider.buildAlterSql(getSqlBeanDB(), clazz, columnInfoList);
+        int count = 0;
+        if (sqlList != null && sqlList.size() > 0) {
+            for (String sql : sqlList) {
+                count += mybatisSqlBeanDao.executeSql(sql);
+            }
+        }
+        return count;
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int alter(Alter alter) {
+        List<Alter> alterList = new ArrayList<>();
+        alterList.add(alter);
+        return alter(alterList);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int alter(List<Alter> alterList) {
+        List<String> sqlList = SqlBeanProvider.alterSql(getSqlBeanDB().getDbType(), alterList);
         int count = 0;
         if (sqlList != null && sqlList.size() > 0) {
             for (String sql : sqlList) {

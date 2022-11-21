@@ -108,17 +108,18 @@ public enum JavaMapDB2Type {
     public static List<String> alterTable(List<Alter> alterList) {
         List<String> sqlList = new ArrayList<>();
         String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
-        StringBuffer sql = new StringBuffer();
-        StringBuffer remarksSql = new StringBuffer();
         for (int i = 0; i < alterList.size(); i++) {
             Alter alter = alterList.get(i);
             if (alter.getType() == AlterType.ADD) {
+                StringBuffer sql = new StringBuffer();
                 sql.append(SqlConstant.ALTER_TABLE);
                 sql.append(getFullName(alter, alter.getTable()));
                 sql.append(SqlConstant.ADD);
                 sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
-                remarksSql.append(addRemarks(alter, transferred));
+                sqlList.add(sql.toString());
+                sqlList.add(addRemarks(alter, transferred));
             } else if (alter.getType() == AlterType.CHANGE) {
+                StringBuffer sql = new StringBuffer();
                 sql.append(changeColumn(alter));
                 sql.append(SqlConstant.SEMICOLON);
                 //先改名后修改信息
@@ -127,25 +128,21 @@ public enum JavaMapDB2Type {
                     sql.append(SqlConstant.ALTER_TABLE);
                     sql.append(modifySql);
                 }
-                remarksSql.append(addRemarks(alter, transferred));
+                sqlList.add(sql.toString());
+                sqlList.add(addRemarks(alter, transferred));
             } else if (alter.getType() == AlterType.MODIFY) {
-                sql.append(SqlConstant.ALTER_TABLE);
-                sql.append(modifyColumn(alter));
-                remarksSql.append(addRemarks(alter, transferred));
+                sqlList.add(SqlConstant.ALTER_TABLE + modifyColumn(alter));
+                sqlList.add(addRemarks(alter, transferred));
             } else if (alter.getType() == AlterType.DROP) {
+                StringBuffer sql = new StringBuffer();
                 sql.append(SqlConstant.ALTER_TABLE);
                 sql.append(getFullName(alter, alter.getTable()));
                 sql.append(SqlConstant.DROP);
                 sql.append(SqlConstant.COLUMN);
-                sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
-                sql.append(alter.getColumnInfo().getName());
-                sql.append(SqlConstant.END_SQUARE_BRACKETS);
+                sql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
+                sqlList.add(sql.toString());
             }
-            sql.append(SqlConstant.SPACES);
-            sql.append(SqlConstant.SEMICOLON);
         }
-        sqlList.add(sql.toString());
-        sqlList.add(remarksSql.toString());
         sqlList.add(recast(alterList.get(0)));
         return sqlList;
     }
@@ -186,13 +183,18 @@ public enum JavaMapDB2Type {
         modifySql.append(SqlConstant.ALTER);
         modifySql.append(SqlConstant.COLUMN);
         ColumnInfo columnInfo = alter.getColumnInfo();
-        JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
+        modifySql.append(SqlBeanUtil.isToUpperCase(alter) ? columnInfo.getName().toUpperCase() : columnInfo.getName());
         if ((columnInfo.getNotnull() != null && columnInfo.getNotnull()) || columnInfo.getPk()) {
-            modifySql.append("SET ");
+            modifySql.append(" SET ");
             modifySql.append(SqlConstant.NOT_NULL);
-        }
+        }/* else if (columnInfo.getNotnull() != null && !columnInfo.getNotnull()) {
+            modifySql.append(" DROP ");
+            modifySql.append(SqlConstant.NOT_NULL);
+        }*/
+        JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
+        modifySql.append(" SET DATA TYPE ");
+        modifySql.append(jdbcType.name());
         if (columnInfo.getLength() != null && columnInfo.getLength() > 0) {
-            modifySql.append("SET ");
             modifySql.append(SqlConstant.BEGIN_BRACKET);
             //字段长度
             modifySql.append(columnInfo.getLength());
@@ -217,9 +219,9 @@ public enum JavaMapDB2Type {
         changeSql.append(getFullName(alter, alter.getTable()));
         changeSql.append(SqlConstant.RENAME);
         changeSql.append(SqlConstant.COLUMN);
-        changeSql.append(alter.getOldColumnName());
+        changeSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getOldColumnName().toUpperCase() : alter.getOldColumnName());
         changeSql.append(SqlConstant.TO);
-        changeSql.append(alter.getColumnInfo().getName());
+        changeSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
         return changeSql.toString();
     }
 

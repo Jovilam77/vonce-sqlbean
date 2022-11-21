@@ -4,7 +4,6 @@ import cn.vonce.sql.annotation.SqlColumn;
 import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanDB;
-import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.SqlHelper;
@@ -13,7 +12,6 @@ import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -604,6 +602,9 @@ public class SqlBeanProvider {
      * @return
      */
     public static String selectColumnListSql(SqlBeanDB sqlBeanDB, String name) {
+        if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase() && StringUtil.isNotEmpty(name)) {
+            name = name.toUpperCase();
+        }
         switch (sqlBeanDB.getDbType()) {
             case MySQL:
             case MariaDB:
@@ -673,14 +674,14 @@ public class SqlBeanProvider {
     }
 
     /**
-     * 更改表结构
+     * 构建更改表结构sql
      *
      * @param sqlBeanDB
      * @param clazz
      * @param columnInfoList
      * @return
      */
-    public static List<String> alterSql(SqlBeanDB sqlBeanDB, Class<?> clazz, List<ColumnInfo> columnInfoList) {
+    public static List<String> buildAlterSql(SqlBeanDB sqlBeanDB, Class<?> clazz, List<ColumnInfo> columnInfoList) {
         SqlTable sqlTable = clazz.getAnnotation(SqlTable.class);
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
         List<Alter> alterList = new ArrayList<>();
@@ -694,7 +695,6 @@ public class SqlBeanProvider {
             Alter alter = new Alter();
             alter.setSqlBeanDB(sqlBeanDB);
             alter.setTable(clazz);
-//            String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
             String oldName = (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) ? sqlColumn.oldName().toUpperCase() : sqlColumn.oldName();
             ColumnInfo columnInfo = SqlBeanUtil.getColumnInfo(alter, field, sqlTable, sqlColumn);
             boolean exist = false;
@@ -758,19 +758,42 @@ public class SqlBeanProvider {
             }
         }
         if (alterList.size() > 0) {
-            switch (sqlBeanDB.getDbType()) {
-                case MySQL:
-                case MariaDB:
-                    return JavaMapMySqlType.alterTable(alterList);
-                case SQLServer:
-                    return JavaMapSqlServerType.alterTable(alterList);
-                case Oracle:
-                    return JavaMapOracleType.alterTable(alterList);
-                case SQLite:
-                    return JavaMapSqliteType.alterTable(alterList);
-            }
+            return alterSql(sqlBeanDB.getDbType(), alterList);
         }
         return null;
+    }
+
+    /**
+     * 更改表结构sql
+     *
+     * @param dbType
+     * @param alterList
+     * @return
+     */
+    public static List<String> alterSql(DbType dbType, List<Alter> alterList) {
+        switch (dbType) {
+            case MySQL:
+            case MariaDB:
+                return JavaMapMySqlType.alterTable(alterList);
+            case SQLServer:
+                return JavaMapSqlServerType.alterTable(alterList);
+            case Oracle:
+                return JavaMapOracleType.alterTable(alterList);
+//                case Postgresql:
+//                    return JavaMapPostgresqlType.alterTable(alterList);
+            case DB2:
+                return JavaMapDB2Type.alterTable(alterList);
+            case H2:
+                return JavaMapH2Type.alterTable(alterList);
+            case Hsql:
+                return JavaMapHsqlType.alterTable(alterList);
+            case Derby:
+                return JavaMapDerbyType.alterTable(alterList);
+            case SQLite:
+                return JavaMapSqliteType.alterTable(alterList);
+            default:
+                throw new SqlBeanException("请配置正确的数据库");
+        }
     }
 
     /**

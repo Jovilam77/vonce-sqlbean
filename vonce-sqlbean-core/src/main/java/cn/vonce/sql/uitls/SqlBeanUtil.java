@@ -4,6 +4,7 @@ import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
+import cn.vonce.sql.enumerate.AlterType;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.JdbcType;
 import cn.vonce.sql.enumerate.WhatType;
@@ -278,6 +279,17 @@ public class SqlBeanUtil {
      *
      * @param common
      * @param field
+     * @return
+     */
+    public static ColumnInfo getColumnInfo(Common common, Field field) {
+        return getColumnInfo(common, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class));
+    }
+
+    /**
+     * 获取列信息
+     *
+     * @param common
+     * @param field
      * @param sqlTable
      * @param sqlColumn
      * @return
@@ -295,7 +307,11 @@ public class SqlBeanUtil {
         }
         columnInfo.setType(jdbcType.name());
         if (sqlColumn != null) {
-            columnInfo.setNotnull(sqlColumn.notNull());
+            if (columnInfo.getPk()) {
+                columnInfo.setNotnull(true);
+            } else {
+                columnInfo.setNotnull(sqlColumn.notNull());
+            }
         }
         if (sqlColumn != null && sqlColumn.length() != 0) {
             columnInfo.setLength(sqlColumn.length());
@@ -1155,6 +1171,12 @@ public class SqlBeanUtil {
         if ((columnInfo.getNotnull() != null && columnInfo.getNotnull()) || columnInfo.getPk()) {
             sql.append(SqlConstant.SPACES);
             sql.append(SqlConstant.NOT_NULL);
+        } else if (common instanceof Alter) {
+            Alter alter = (Alter) common;
+            if (alter.getType() == AlterType.MODIFY && columnInfo.getNotnull() != null && !columnInfo.getNotnull()) {
+                sql.append(SqlConstant.SPACES);
+                sql.append(SqlConstant.NULL);
+            }
         }
         //默认值
         if (StringUtil.isNotEmpty(columnInfo.getDfltValue())) {

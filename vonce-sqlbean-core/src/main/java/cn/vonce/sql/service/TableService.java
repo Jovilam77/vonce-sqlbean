@@ -1,9 +1,6 @@
 package cn.vonce.sql.service;
 
-import cn.vonce.sql.bean.Column;
-import cn.vonce.sql.bean.ColumnInfo;
-import cn.vonce.sql.bean.Table;
-import cn.vonce.sql.bean.TableInfo;
+import cn.vonce.sql.bean.*;
 import cn.vonce.sql.helper.Wrapper;
 
 import java.util.List;
@@ -153,5 +150,21 @@ public interface TableService {
      * @return
      */
     int alter(Table table, List<ColumnInfo> columnInfoList);
+
+    /**
+     * 更改表结构
+     *
+     * @param alter
+     * @return
+     */
+    int alter(Alter alter);
+
+    /**
+     * 更改表结构
+     *
+     * @param alterList
+     * @return
+     */
+    int alter(List<Alter> alterList);
 
 }

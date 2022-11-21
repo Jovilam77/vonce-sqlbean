@@ -147,12 +147,12 @@ public enum JavaMapMySqlType {
             } else if (alter.getType() == AlterType.CHANGE) {
                 sql.append(SqlConstant.CHANGE);
                 sql.append(SqlConstant.COLUMN);
-                sql.append(alter.getOldColumnName());
+                sql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getOldColumnName().toUpperCase() : alter.getOldColumnName());
                 sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
             } else if (alter.getType() == AlterType.DROP) {
                 sql.append(SqlConstant.DROP);
                 sql.append(SqlConstant.COLUMN);
-                sql.append(alter.getColumnInfo().getName());
+                sql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
             }
             sql.append(SqlConstant.SPACES);
             if (i < alterList.size() - 1) {
