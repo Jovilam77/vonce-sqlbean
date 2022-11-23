@@ -89,7 +89,7 @@ public enum JavaMapOracleType {
         sql.append("LEFT JOIN user_constraints uc2 ON uc2.constraint_name = ucc.constraint_name AND uc2.constraint_type = 'R' ");
         sql.append("INNER JOIN user_col_comments ON user_col_comments.table_name = col.table_name AND user_col_comments.column_name = col.column_name ");
         sql.append("WHERE col.table_name = '");
-        sql.append((sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) ? tableName.toUpperCase() : tableName);
+        sql.append(tableName);
         sql.append("'");
         return sql.toString();
     }
@@ -126,7 +126,7 @@ public enum JavaMapOracleType {
                 dropSql.append(SqlConstant.DROP);
                 dropSql.append(SqlConstant.BEGIN_BRACKET);
                 dropSql.append(transferred);
-                dropSql.append(alterList.get(i).getColumnInfo().getName());
+                dropSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
                 dropSql.append(transferred);
                 dropSql.append(SqlConstant.END_BRACKET);
                 sqlList.add(dropSql.toString());
@@ -195,9 +195,9 @@ public enum JavaMapOracleType {
         changeSql.append(getFullName(alter, alter.getTable()));
         changeSql.append(SqlConstant.RENAME);
         changeSql.append(SqlConstant.COLUMN);
-        changeSql.append(alter.getOldColumnName());
+        changeSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getOldColumnName().toUpperCase() : alter.getOldColumnName());
         changeSql.append(SqlConstant.TO);
-        changeSql.append(alter.getColumnInfo().getName());
+        changeSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
         return changeSql.toString();
     }
 
