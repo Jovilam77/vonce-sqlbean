@@ -4,6 +4,7 @@ import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.enumerate.SqlSort;
 import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.helper.Wrapper;
+import cn.vonce.sql.uitls.SqlBeanUtil;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -237,6 +238,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param tableKeyword 关联的表关键列字段
      * @param mainKeyword  主表关键列字段
      */
+    @Deprecated
     public Select join(String table, String tableKeyword, String mainKeyword) {
         return join(JoinType.INNER_JOIN, "", table, table, tableKeyword, mainKeyword);
     }
@@ -249,6 +251,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param tableKeyword 关联的表关键列字段
      * @param mainKeyword  主表关键列字段
      */
+    @Deprecated
     public Select join(JoinType joinType, String table, String tableKeyword, String mainKeyword) {
         return join(joinType, "", table, table, tableKeyword, mainKeyword);
     }
@@ -260,6 +263,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param tableKeyword 关联的表关键列字段
      * @param mainKeyword  主表关键列字段
      */
+    @Deprecated
     public Select join(String schema, String table, String tableAlias, String tableKeyword, String mainKeyword) {
         return join(JoinType.INNER_JOIN, schema, table, tableAlias, tableKeyword, mainKeyword);
     }
@@ -273,6 +277,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param tableKeyword 关联的表关键列字段
      * @param mainKeyword  主表关键列字段
      */
+    @Deprecated
     public Select join(JoinType joinType, String schema, String table, String tableAlias, String tableKeyword, String mainKeyword) {
         joinList.add(new Join(joinType, schema, table, tableAlias, tableKeyword, mainKeyword, ""));
         return this;
@@ -284,6 +289,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param table 关联的表名
      * @param on    连接条件
      */
+    @Deprecated
     public Select join(String table, String on) {
         return join(JoinType.INNER_JOIN, "", table, table, on);
     }
@@ -295,6 +301,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param table    关联的表名
      * @param on       连接条件
      */
+    @Deprecated
     public Select join(JoinType joinType, String table, String on) {
         return join(joinType, "", table, table, on);
     }
@@ -307,9 +314,74 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param table    关联的表名
      * @param on       连接条件
      */
+    @Deprecated
     public Select join(JoinType joinType, String schema, String table, String tableAlias, String on) {
         joinList.add(new Join(joinType, schema, table, tableAlias, "", "", on));
         return this;
+    }
+
+    public Join innerJoin(Class<?> clazz) {
+        Table table = SqlBeanUtil.getTable(clazz);
+        return innerJoin(table.getSchema(), table.getName(), table.getAlias());
+    }
+
+    public Join innerJoin(String table, String tableAlias) {
+        return innerJoin(null, table, tableAlias);
+    }
+
+    public Join innerJoin(String schema, String table, String tableAlias) {
+        Join join = new Join(JoinType.INNER_JOIN, schema, table, tableAlias, null, null, null);
+        join.setReturnObj(this);
+        joinList.add(join);
+        return join;
+    }
+
+    public Join leftJoin(Class<?> clazz) {
+        Table table = SqlBeanUtil.getTable(clazz);
+        return leftJoin(table.getSchema(), table.getName(), table.getAlias());
+    }
+
+    public Join leftJoin(String table, String tableAlias) {
+        return leftJoin(null, table, tableAlias);
+    }
+
+    public Join leftJoin(String schema, String table, String tableAlias) {
+        Join join = new Join(JoinType.LEFT_JOIN, schema, table, tableAlias, null, null, null);
+        join.setReturnObj(this);
+        joinList.add(join);
+        return join;
+    }
+
+    public Join rightJoin(Class<?> clazz) {
+        Table table = SqlBeanUtil.getTable(clazz);
+        return rightJoin(table.getSchema(), table.getName(), table.getAlias());
+    }
+
+    public Join rightJoin(String table, String tableAlias) {
+        return rightJoin(null, table, tableAlias);
+    }
+
+    public Join rightJoin(String schema, String table, String tableAlias) {
+        Join join = new Join(JoinType.RIGHT_JOIN, schema, table, tableAlias, null, null, null);
+        join.setReturnObj(this);
+        joinList.add(join);
+        return join;
+    }
+
+    public Join fullJoin(Class<?> clazz) {
+        Table table = SqlBeanUtil.getTable(clazz);
+        return fullJoin(table.getSchema(), table.getName(), table.getAlias());
+    }
+
+    public Join fullJoin(String table, String tableAlias) {
+        return fullJoin(null, table, tableAlias);
+    }
+
+    public Join fullJoin(String schema, String table, String tableAlias) {
+        Join join = new Join(JoinType.FULL_JOIN, schema, table, tableAlias, null, null, null);
+        join.setReturnObj(this);
+        joinList.add(join);
+        return join;
     }
 
     /**
@@ -318,6 +390,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @return
      */
     public List<Group> getGroupBy() {
+        Select select = new Select().leftJoin(Select.class).on().eq("1", 1).and().eq("", 1).back().leftJoin(Select.class).on().eq("", "").back();
         return groupByList;
     }
 

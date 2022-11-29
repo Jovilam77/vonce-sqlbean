@@ -1,6 +1,8 @@
 package cn.vonce.sql.bean;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 更新
@@ -35,75 +37,68 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
     private boolean optimisticLock = false;
 
     /**
-     * 是否只更新不为null的字段
-     *
-     * @return
+     * 更新的字段列表
      */
-    public boolean isUpdateNotNull() {
-        return updateNotNull;
-    }
+    private List<SetInfo> setInfoList = new ArrayList<>();
 
-    /**
-     * 设置是否只更新不为null的字段
-     *
-     * @param updateNotNull
-     */
-    public void setUpdateNotNull(boolean updateNotNull) {
-        this.updateNotNull = updateNotNull;
-    }
-
-    /**
-     * 是否使用乐观锁
-     *
-     * @return
-     */
-    public boolean isOptimisticLock() {
-        return optimisticLock;
-    }
-
-    /**
-     * 设置是否使用乐观锁
-     *
-     * @param optimisticLock
-     */
-    public void setOptimisticLock(boolean optimisticLock) {
-        this.optimisticLock = optimisticLock;
-    }
-
-    /**
-     * 获取更新实体类
-     *
-     * @return
-     */
     public T getUpdateBean() {
         return updateBean;
     }
 
-    /**
-     * 设置更新实体类
-     *
-     * @param updateBean
-     */
     public void setUpdateBean(T updateBean) {
         this.updateBean = updateBean;
     }
 
-    /**
-     * 获取过滤的字段
-     *
-     * @return
-     */
     public String[] getFilterFields() {
         return filterFields;
     }
 
-    /**
-     * 设置过滤的字段
-     *
-     * @param filterField
-     */
-    public void setFilterFields(String... filterField) {
-        this.filterFields = filterField;
+    public void setFilterFields(String... filterFields) {
+        this.filterFields = filterFields;
+    }
+
+    public boolean isUpdateNotNull() {
+        return updateNotNull;
+    }
+
+    public void setUpdateNotNull(boolean updateNotNull) {
+        this.updateNotNull = updateNotNull;
+    }
+
+    public boolean isOptimisticLock() {
+        return optimisticLock;
+    }
+
+    public void setOptimisticLock(boolean optimisticLock) {
+        this.optimisticLock = optimisticLock;
+    }
+
+    public List<SetInfo> getSetInfoList() {
+        return setInfoList;
+    }
+
+    public void setSetInfoList(List<SetInfo> setInfoList) {
+        this.setInfoList = setInfoList;
+    }
+
+    public Update<T> set(String columnName, Object value) {
+        setInfoList.add(new SetInfo(columnName, value));
+        return this;
+    }
+
+    public Update<T> set(String tableAlias, String columnName, Object value) {
+        setInfoList.add(new SetInfo(tableAlias, columnName, value));
+        return this;
+    }
+
+    public Update<T> set(Column column, Object value) {
+        setInfoList.add(new SetInfo(column.getTableAlias(), column.getName(), value));
+        return this;
+    }
+
+    public static void main(String[] args) {
+
+        new Update<>().set("", "").set("", 1).where().eq("", 1);
     }
 
 }

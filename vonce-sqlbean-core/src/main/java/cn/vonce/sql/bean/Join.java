@@ -1,6 +1,7 @@
 package cn.vonce.sql.bean;
 
 import cn.vonce.sql.enumerate.JoinType;
+import cn.vonce.sql.enumerate.SqlOperator;
 
 import java.io.Serializable;
 
@@ -31,9 +32,26 @@ public class Join implements Serializable {
     private String schema;
     private String tableName;
     private String tableAlias;
+    @Deprecated
     private String tableKeyword;
+    @Deprecated
     private String mainKeyword;
+    @Deprecated
     private String on;
+    /**
+     * 链式返回对象
+     */
+    private Select returnObj;
+    /**
+     * Join 条件
+     */
+    private Condition<Select> joinCondition;
+
+    protected void setReturnObj(Select returnObj) {
+        this.returnObj = returnObj;
+        joinCondition = new Condition<>(returnObj);
+    }
+
 
     public JoinType getJoinType() {
         return joinType;
@@ -67,28 +85,50 @@ public class Join implements Serializable {
         this.tableAlias = tableAlias;
     }
 
+    @Deprecated
     public String getTableKeyword() {
         return tableKeyword;
     }
 
+    @Deprecated
     public void setTableKeyword(String tableKeyword) {
         this.tableKeyword = tableKeyword;
     }
 
+    @Deprecated
     public String getMainKeyword() {
         return mainKeyword;
     }
 
+    @Deprecated
     public void setMainKeyword(String mainKeyword) {
         this.mainKeyword = mainKeyword;
     }
 
+    @Deprecated
     public String getOn() {
         return on;
     }
 
+    @Deprecated
     public void setOn(String on) {
         this.on = on;
+    }
+
+    public void on(String field, Object value) {
+        joinCondition.eq(field, value);
+    }
+
+    public void on(String tableAlias, String field, Object value) {
+        joinCondition.eq(tableAlias, field, value);
+    }
+
+    public void on(Column column, Object value) {
+        joinCondition.eq(column, value);
+    }
+
+    public Condition<Select> on() {
+        return joinCondition;
     }
 
     @Override

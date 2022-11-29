@@ -514,8 +514,6 @@ public class SqlHelper {
                 String schema = join.getSchema();
                 String tableName = join.getTableName();
                 String tableAlias = join.getTableAlias();
-                String tableKeyword = SqlBeanUtil.getTableFieldFullName(select, tableAlias, join.getTableKeyword());
-                String mainKeyword = SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), join.getMainKeyword());
                 if (SqlBeanUtil.isToUpperCase(select)) {
                     schema = schema.toUpperCase();
                     tableName = tableName.toUpperCase();
@@ -531,15 +529,21 @@ public class SqlHelper {
                 joinSql.append(tableAlias);
                 joinSql.append(transferred);
                 joinSql.append(SqlConstant.ON);
-                if (StringUtil.isNotEmpty(join.getOn())) {
-                    joinSql.append(join.getOn());
+                if (join.on() != null && join.on().getDataList().size() > 0) {
+                    joinSql.append(simpleConditionHandle(select, join.on().getDataList()));
                 } else {
-                    joinSql.append(tableKeyword);
-                    joinSql.append(SqlConstant.EQUAL_TO);
-                    joinSql.append(mainKeyword);
-                }
-                if (i < select.getJoin().size() - 1) {
-                    joinSql.append(SqlConstant.SPACES);
+                    String tableKeyword = SqlBeanUtil.getTableFieldFullName(select, tableAlias, join.getTableKeyword());
+                    String mainKeyword = SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), join.getMainKeyword());
+                    if (StringUtil.isNotEmpty(join.getOn())) {
+                        joinSql.append(join.getOn());
+                    } else {
+                        joinSql.append(tableKeyword);
+                        joinSql.append(SqlConstant.EQUAL_TO);
+                        joinSql.append(mainKeyword);
+                    }
+                    if (i < select.getJoin().size() - 1) {
+                        joinSql.append(SqlConstant.SPACES);
+                    }
                 }
             }
         }
@@ -560,7 +564,6 @@ public class SqlHelper {
         StringBuffer valueSql = new StringBuffer();
         StringBuffer fieldAndValuesSql = new StringBuffer();
         List<String> valueSqlList = new ArrayList<>();
-        String transferred = SqlBeanUtil.getTransferred(common);
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(objectList.get(0).getClass());
         //获取sqlbean的全部字段
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(objectList.get(0).getClass());
@@ -675,44 +678,59 @@ public class SqlHelper {
         String transferred = SqlBeanUtil.getTransferred(update);
         String[] filterFields = update.getFilterFields();
         Object bean = update.getUpdateBean();
-        SqlTable sqlTable = SqlBeanUtil.getSqlTable(bean.getClass());
-        List<Field> fieldList = SqlBeanUtil.getBeanAllField(bean.getClass());
-        for (Field field : fieldList) {
-            if (SqlBeanUtil.isIgnore(field)) {
-                continue;
+        if (bean != null) {
+            SqlTable sqlTable = SqlBeanUtil.getSqlTable(bean.getClass());
+            List<Field> fieldList = SqlBeanUtil.getBeanAllField(bean.getClass());
+            for (Field field : fieldList) {
+                if (SqlBeanUtil.isIgnore(field)) {
+                    continue;
+                }
+                String name = SqlBeanUtil.getTableFieldName(field, sqlTable);
+                if (SqlBeanUtil.isFilter(filterFields, name)) {
+                    continue;
+                }
+                Object objectValue = ReflectUtil.instance().get(bean.getClass(), bean, field.getName());
+                SqlDefaultValue sqlDefaultValue = field.getAnnotation(SqlDefaultValue.class);
+                SqlVersion sqlVersion = field.getAnnotation(SqlVersion.class);
+                //如果是只更新不为null的字段，那么该字段如果是null并且也不是乐观锁字段，也不是更新时填充默认值的字段则跳过
+                if (update.isUpdateNotNull() && objectValue == null && sqlVersion == null && (sqlDefaultValue == null || sqlDefaultValue.with() == FillWith.INSERT)) {
+                    continue;
+                }
+                //如果不是乐观锁字段，那么字段如果是null并且没有标识乐观锁注解则跳过
+                if (!update.isOptimisticLock() && objectValue == null && sqlVersion != null) {
+                    continue;
+                }
+                setSql.append(transferred);
+                setSql.append(SqlBeanUtil.isToUpperCase(update) ? name.toUpperCase() : name);
+                setSql.append(transferred);
+                setSql.append(SqlConstant.EQUAL_TO);
+                if (update.isOptimisticLock() && sqlVersion != null) {
+                    Object o = SqlBeanUtil.updateVersion(field.getType().getName(), objectValue);
+                    setSql.append(SqlBeanUtil.getSqlValue(update, o));
+                } else if (objectValue == null && sqlDefaultValue != null && (sqlDefaultValue.with() == FillWith.UPDATE || sqlDefaultValue.with() == FillWith.TOGETHER)) {
+                    Object defaultValue = SqlBeanUtil.getDefaultValue(field.getType().getName());
+                    setSql.append(SqlBeanUtil.getSqlValue(update, defaultValue));
+                    ReflectUtil.instance().set(bean.getClass(), bean, field.getName(), defaultValue);
+                } else {
+                    setSql.append(SqlBeanUtil.getSqlValue(update, objectValue));
+                }
+                setSql.append(SqlConstant.COMMA);
             }
-            String name = SqlBeanUtil.getTableFieldName(field, sqlTable);
-            if (SqlBeanUtil.isFilter(filterFields, name)) {
-                continue;
+            setSql.deleteCharAt(setSql.length() - SqlConstant.COMMA.length());
+        } else {
+            List<SetInfo> setInfoList = update.getSetInfoList();
+            if (setInfoList != null && setInfoList.size() > 0) {
+                for (SetInfo setInfo : setInfoList) {
+                    setSql.append(transferred);
+                    setSql.append(SqlBeanUtil.isToUpperCase(update) ? setInfo.getName().toUpperCase() : setInfo.getName());
+                    setSql.append(transferred);
+                    setSql.append(SqlConstant.EQUAL_TO);
+                    setSql.append(SqlBeanUtil.getSqlValue(update, setInfo.getValue()));
+                    setSql.append(SqlConstant.COMMA);
+                }
+                setSql.deleteCharAt(setSql.length() - SqlConstant.COMMA.length());
             }
-            Object objectValue = ReflectUtil.instance().get(bean.getClass(), bean, field.getName());
-            SqlDefaultValue sqlDefaultValue = field.getAnnotation(SqlDefaultValue.class);
-            SqlVersion sqlVersion = field.getAnnotation(SqlVersion.class);
-            //如果是只更新不为null的字段，那么该字段如果是null并且也不是乐观锁字段，也不是更新时填充默认值的字段则跳过
-            if (update.isUpdateNotNull() && objectValue == null && sqlVersion == null && (sqlDefaultValue == null || sqlDefaultValue.with() == FillWith.INSERT)) {
-                continue;
-            }
-            //如果不是乐观锁字段，那么字段如果是null并且没有标识乐观锁注解则跳过
-            if (!update.isOptimisticLock() && objectValue == null && sqlVersion != null) {
-                continue;
-            }
-            setSql.append(transferred);
-            setSql.append(SqlBeanUtil.isToUpperCase(update) ? name.toUpperCase() : name);
-            setSql.append(transferred);
-            setSql.append(SqlConstant.EQUAL_TO);
-            if (update.isOptimisticLock() && sqlVersion != null) {
-                Object o = SqlBeanUtil.updateVersion(field.getType().getName(), objectValue);
-                setSql.append(SqlBeanUtil.getSqlValue(update, o));
-            } else if (objectValue == null && sqlDefaultValue != null && (sqlDefaultValue.with() == FillWith.UPDATE || sqlDefaultValue.with() == FillWith.TOGETHER)) {
-                Object defaultValue = SqlBeanUtil.getDefaultValue(field.getType().getName());
-                setSql.append(SqlBeanUtil.getSqlValue(update, defaultValue));
-                ReflectUtil.instance().set(bean.getClass(), bean, field.getName(), defaultValue);
-            } else {
-                setSql.append(SqlBeanUtil.getSqlValue(update, objectValue));
-            }
-            setSql.append(SqlConstant.COMMA);
         }
-        setSql.deleteCharAt(setSql.length() - SqlConstant.COMMA.length());
         return setSql.toString();
     }
 
@@ -842,7 +860,7 @@ public class SqlHelper {
             if (conditionSql.length() > 0) {
                 conditionSql.append(SqlConstant.AND);
             }
-            conditionSql.append(conditionWrapperHandle(common, wrapper));
+            conditionSql.append(wrapperConditionHandle(common, wrapper));
         }
         // 优先级3 使用简单的条件
         else if (condition != null && condition.getDataList().size() > 0) {
@@ -850,20 +868,70 @@ public class SqlHelper {
                 conditionSql.append(SqlConstant.AND);
             }
             conditionSql.append(SqlConstant.BEGIN_BRACKET);
-            // 遍历所有条件
-            List<ConditionData> conditionDataList = condition.getDataList();
-            for (int i = 0; i < conditionDataList.size(); i++) {
-                ConditionInfo conditionInfo = (ConditionInfo) conditionDataList.get(i).getItem();
-                // 遍历sql逻辑处理
-                if (i != 0 && i < condition.getDataList().size()) {
-                    conditionSql.append(getLogic(conditionDataList.get(i).getSqlLogic()));
-                }
-                conditionSql.append(valueOperator(common, conditionInfo));
-            }
+//            // 遍历所有条件
+//            List<ConditionData> conditionDataList = condition.getDataList();
+//            for (int i = 0; i < conditionDataList.size(); i++) {
+//                ConditionInfo conditionInfo = (ConditionInfo) conditionDataList.get(i).getItem();
+//                // 遍历sql逻辑处理
+//                if (i != 0 && i < condition.getDataList().size()) {
+//                    conditionSql.append(getLogic(conditionDataList.get(i).getSqlLogic()));
+//                }
+//                conditionSql.append(valueOperator(common, conditionInfo));
+//            }
+            conditionSql.append(simpleConditionHandle(common, condition.getDataList()));
             conditionSql.append(SqlConstant.END_BRACKET);
         }
         if (conditionSql.length() != 0) {
             conditionSql.insert(0, ConditionType.WHERE == conditionType ? SqlConstant.WHERE : SqlConstant.HAVING);
+        }
+        return conditionSql.toString();
+    }
+
+    /**
+     * 简单条件处理
+     *
+     * @param common
+     * @param conditionDataList
+     * @return
+     */
+    private static String simpleConditionHandle(Common common, List<ConditionData> conditionDataList) {
+        StringBuffer conditionSql = new StringBuffer();
+        for (int i = 0; i < conditionDataList.size(); i++) {
+            ConditionInfo conditionInfo = (ConditionInfo) conditionDataList.get(i).getItem();
+            // 遍历sql逻辑处理
+            if (i != 0 && i < conditionDataList.size()) {
+                conditionSql.append(getLogic(conditionDataList.get(i).getSqlLogic()));
+            }
+            conditionSql.append(valueOperator(common, conditionInfo));
+        }
+        return conditionSql.toString();
+    }
+
+    /**
+     * 条件包装器解析
+     *
+     * @param common
+     * @param wrapper
+     * @return
+     */
+    private static String wrapperConditionHandle(Common common, Wrapper wrapper) {
+        StringBuffer conditionSql = new StringBuffer();
+        if (!wrapper.getDataList().isEmpty()) {
+            conditionSql.append(SqlConstant.BEGIN_BRACKET);
+            for (int i = 0; i < wrapper.getDataList().size(); i++) {
+                ConditionData data = wrapper.getDataList().get(i);
+                // 遍历sql逻辑处理
+                if (i != 0 && i < wrapper.getDataList().size()) {
+                    conditionSql.append(getLogic(data.getSqlLogic()));
+                }
+                Object item = data.getItem();
+                if (item instanceof Cond) {
+                    conditionSql.append(valueOperator(common, (Cond) item));
+                } else {
+                    conditionSql.append(wrapperConditionHandle(common, (Wrapper) item));
+                }
+            }
+            conditionSql.append(SqlConstant.END_BRACKET);
         }
         return conditionSql.toString();
     }
@@ -928,35 +996,6 @@ public class SqlHelper {
             return logicallyDeleteSql.toString();
         }
         return "";
-    }
-
-    /**
-     * 条件包装器解析
-     *
-     * @param common
-     * @param wrapper
-     * @return
-     */
-    private static String conditionWrapperHandle(Common common, Wrapper wrapper) {
-        StringBuffer conditionSql = new StringBuffer();
-        if (!wrapper.getDataList().isEmpty()) {
-            conditionSql.append(SqlConstant.BEGIN_BRACKET);
-            for (int i = 0; i < wrapper.getDataList().size(); i++) {
-                ConditionData data = wrapper.getDataList().get(i);
-                // 遍历sql逻辑处理
-                if (i != 0 && i < wrapper.getDataList().size()) {
-                    conditionSql.append(getLogic(data.getSqlLogic()));
-                }
-                Object item = data.getItem();
-                if (item instanceof Cond) {
-                    conditionSql.append(valueOperator(common, (Cond) item));
-                } else {
-                    conditionSql.append(conditionWrapperHandle(common, (Wrapper) item));
-                }
-            }
-            conditionSql.append(SqlConstant.END_BRACKET);
-        }
-        return conditionSql.toString();
     }
 
     /**
@@ -1086,6 +1125,9 @@ public class SqlHelper {
                     value = value + SqlConstant.PERCENT;
                 }
                 value = SqlConstant.SINGLE_QUOTATION_MARK + value + SqlConstant.SINGLE_QUOTATION_MARK;
+            } else if (value instanceof Column) {
+                Column column = (Column) conditionInfo.getValue();
+                value = SqlBeanUtil.getTableFieldFullName(common, column.getTableAlias(), column.getName());
             } else if (value instanceof Original) {
                 Original original = (Original) conditionInfo.getValue();
                 value = original.getValue();
