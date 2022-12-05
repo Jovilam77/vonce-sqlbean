@@ -531,7 +531,7 @@ public class Cond extends ConditionInfo {
      * @return
      */
     public static Cond isNotNull(String field) {
-        return new Cond(null, field, SqlOperator.IS_NULL, null);
+        return new Cond(null, field, SqlOperator.IS_NOT_NULL, null);
     }
 
     /**
@@ -542,7 +542,7 @@ public class Cond extends ConditionInfo {
      * @return
      */
     public static Cond isNotNull(String tableAlias, String field) {
-        return new Cond(tableAlias, field, SqlOperator.IS_NULL, null);
+        return new Cond(tableAlias, field, SqlOperator.IS_NOT_NULL, null);
     }
 
     /**
@@ -552,7 +552,7 @@ public class Cond extends ConditionInfo {
      * @return
      */
     public static Cond isNotNull(Column column) {
-        return new Cond(column, SqlOperator.IS_NULL, null);
+        return new Cond(column, SqlOperator.IS_NOT_NULL, null);
     }
 
     /**
