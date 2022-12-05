@@ -330,7 +330,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     public Join innerJoin(String schema, String table, String tableAlias) {
-        Join join = new Join(JoinType.INNER_JOIN, schema, table, tableAlias, null, null, null);
+        Join join = new Join(JoinType.INNER_JOIN, schema, table, tableAlias);
         join.setReturnObj(this);
         joinList.add(join);
         return join;
@@ -346,7 +346,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     public Join leftJoin(String schema, String table, String tableAlias) {
-        Join join = new Join(JoinType.LEFT_JOIN, schema, table, tableAlias, null, null, null);
+        Join join = new Join(JoinType.LEFT_JOIN, schema, table, tableAlias);
         join.setReturnObj(this);
         joinList.add(join);
         return join;
@@ -362,7 +362,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     public Join rightJoin(String schema, String table, String tableAlias) {
-        Join join = new Join(JoinType.RIGHT_JOIN, schema, table, tableAlias, null, null, null);
+        Join join = new Join(JoinType.RIGHT_JOIN, schema, table, tableAlias);
         join.setReturnObj(this);
         joinList.add(join);
         return join;
@@ -378,7 +378,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     public Join fullJoin(String schema, String table, String tableAlias) {
-        Join join = new Join(JoinType.FULL_JOIN, schema, table, tableAlias, null, null, null);
+        Join join = new Join(JoinType.FULL_JOIN, schema, table, tableAlias);
         join.setReturnObj(this);
         joinList.add(join);
         return join;
@@ -390,7 +390,6 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @return
      */
     public List<Group> getGroupBy() {
-        Select select = new Select().leftJoin(Select.class).on().eq("1", 1).and().eq("", 1).back().leftJoin(Select.class).on().eq("", "").back();
         return groupByList;
     }
 

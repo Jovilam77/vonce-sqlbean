@@ -18,6 +18,13 @@ public class Join implements Serializable {
     public Join() {
     }
 
+    public Join(JoinType joinType, String schema, String tableName, String tableAlias) {
+        this.joinType = joinType;
+        this.schema = schema;
+        this.tableName = tableName;
+        this.tableAlias = tableAlias;
+    }
+
     public Join(JoinType joinType, String schema, String tableName, String tableAlias, String tableKeyword, String mainKeyword, String on) {
         this.joinType = joinType;
         this.schema = schema;
@@ -115,16 +122,19 @@ public class Join implements Serializable {
         this.on = on;
     }
 
-    public void on(String field, Object value) {
+    public Condition<Select> on(String field, Object value) {
         joinCondition.eq(field, value);
+        return joinCondition;
     }
 
-    public void on(String tableAlias, String field, Object value) {
+    public Condition<Select> on(String tableAlias, String field, Object value) {
         joinCondition.eq(tableAlias, field, value);
+        return joinCondition;
     }
 
-    public void on(Column column, Object value) {
+    public Condition<Select> on(Column column, Object value) {
         joinCondition.eq(column, value);
+        return joinCondition;
     }
 
     public Condition<Select> on() {

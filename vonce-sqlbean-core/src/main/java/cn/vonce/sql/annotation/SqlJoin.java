@@ -1,6 +1,7 @@
 package cn.vonce.sql.annotation;
 
 import cn.vonce.sql.enumerate.JoinType;
+
 import java.lang.annotation.*;
 
 /**
@@ -74,10 +75,18 @@ public @interface SqlJoin {
     String mainKeyword() default "";
 
     /**
+     * 连接的表（通常情况下可代替schema、table、tableAlias，优先级高）
+     *
+     * @return
+     */
+    Class<?> from() default void.class;
+
+    /**
      * 连接条件（优先级高）
      *
      * @return
      */
-    String on() default "";
+//    String on() default "";
+    Class<?> on() default void.class;
 
 }

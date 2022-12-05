@@ -522,6 +522,9 @@ public class SqlBeanUtil {
             SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
             if (sqlJoin != null && sqlJoin.isBean()) {
                 Class<?> subBeanClazz = field.getType();
+                if (sqlJoin.from() != null) {
+                    subBeanClazz = sqlJoin.from();
+                }
                 SqlTable subSqlTable = getSqlTable(subBeanClazz);
                 //如果有指定查询的字段
                 List<Field> subBeanFieldList = getBeanAllField(subBeanClazz);
@@ -575,7 +578,7 @@ public class SqlBeanUtil {
      * @param clazz
      * @return
      */
-    public static Map<String, Join> getJoin(Class<?> clazz) throws SqlBeanException {
+    public static Map<String, Join> getJoin(Select select, Class<?> clazz) throws SqlBeanException, InstantiationException, IllegalAccessException {
         SqlTable sqlTable = getSqlTable(clazz);
         List<Field> fieldList = getBeanAllField(clazz);
         Map<String, Join> joinFieldMap = new HashMap<>();
@@ -590,13 +593,19 @@ public class SqlBeanUtil {
                 join.setSchema(sqlJoin.schema());
                 join.setTableName(sqlJoin.table());
                 join.setTableAlias(StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias());
-                join.setTableKeyword(sqlJoin.tableKeyword());
-                join.setMainKeyword(sqlJoin.mainKeyword());
-                join.setOn(sqlJoin.on());
+                if (sqlJoin.on() != null && sqlJoin.on() != void.class) {
+                    JoinOn joinOn = (JoinOn) sqlJoin.on().newInstance();
+                    joinOn.on(join);
+                } else {
+                    join.on(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), sqlJoin.tableKeyword()), new Original(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
+                }
                 //key是唯一的，作用是为了去重复，因为可能连接相同的表取不同的字段，但连接相同的表，连接条件不同是可以允许的
                 joinFieldMap.put(sqlJoin.table().toLowerCase() + sqlJoin.tableKeyword().toLowerCase() + sqlJoin.mainKeyword().toLowerCase(), join);
             } else if (sqlJoin != null && sqlJoin.isBean()) {
                 Class<?> subClazz = field.getType();
+                if (sqlJoin.from() != null) {
+                    subClazz = sqlJoin.from();
+                }
                 //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
                 Table table = getTable(subClazz, sqlJoin);
                 String tableKeyword = getTableFieldName(getIdField(subClazz), sqlTable);
@@ -604,9 +613,12 @@ public class SqlBeanUtil {
                 join.setSchema(table.getSchema());
                 join.setTableName(table.getName());
                 join.setTableAlias(table.getAlias());
-                join.setTableKeyword(tableKeyword);
-                join.setMainKeyword(sqlJoin.mainKeyword());
-                join.setOn(sqlJoin.on());
+                if (sqlJoin.on() != null && sqlJoin.on() != void.class) {
+                    JoinOn joinOn = (JoinOn) sqlJoin.on().newInstance();
+                    joinOn.on(join);
+                } else {
+                    join.on(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), tableKeyword), new Original(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
+                }
                 //key是唯一的，作用是为了去重复，因为可能连接相同的表取不同的字段，但连接相同的表，连接条件不同是可以允许的
                 joinFieldMap.put(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlJoin.mainKeyword().toLowerCase(), join);
             }
@@ -621,8 +633,8 @@ public class SqlBeanUtil {
      * @param clazz
      * @throws SqlBeanException
      */
-    public static void setJoin(Select select, Class<?> clazz) throws SqlBeanException {
-        Map<String, Join> joinFieldMap = getJoin(clazz);
+    public static void setJoin(Select select, Class<?> clazz) throws SqlBeanException, InstantiationException, IllegalAccessException {
+        Map<String, Join> joinFieldMap = getJoin(select, clazz);
         for (Join join : joinFieldMap.values()) {
             String schema = join.getSchema();
             String tableName = join.getTableName();

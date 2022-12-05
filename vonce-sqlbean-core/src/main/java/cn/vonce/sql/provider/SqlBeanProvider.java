@@ -816,7 +816,7 @@ public class SqlBeanProvider {
             }
             SqlBeanUtil.setJoin(select, clazz);
             setSchema(select, clazz);
-        } catch (SqlBeanException e) {
+        } catch (SqlBeanException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
             return null;
         }
@@ -845,7 +845,7 @@ public class SqlBeanProvider {
         setSchema(select, clazz);
         try {
             SqlBeanUtil.setJoin(select, clazz);
-        } catch (SqlBeanException e) {
+        } catch (SqlBeanException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
             return null;
         }
