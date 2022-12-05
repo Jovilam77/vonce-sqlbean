@@ -567,6 +567,18 @@ public class Condition<Action> implements Serializable {
     }
 
     /**
+     * 不是
+     *
+     * @param column
+     * @param value
+     * @return
+     */
+    public Logic<Action> isNot(Column column, Object value) {
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(column, SqlOperator.IS_NOT, value)));
+        return logic;
+    }
+
+    /**
      * 是null
      *
      * @param column
@@ -608,7 +620,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> isNotNull(Column column) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(column, SqlOperator.IS_NULL, null)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(column, SqlOperator.IS_NOT_NULL, null)));
         return logic;
     }
 
@@ -619,7 +631,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> isNotNull(String field) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.IS_NULL, null)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(null, field, SqlOperator.IS_NOT_NULL, null)));
         return logic;
     }
 
@@ -631,20 +643,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public Logic<Action> isNotNull(String tableAlias, String field) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.IS_NULL, null)));
-        return logic;
-    }
-
-
-    /**
-     * 不是
-     *
-     * @param column
-     * @param value
-     * @return
-     */
-    public Logic<Action> isNot(Column column, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(column, SqlOperator.IS_NOT, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(tableAlias, field, SqlOperator.IS_NOT_NULL, null)));
         return logic;
     }
 
