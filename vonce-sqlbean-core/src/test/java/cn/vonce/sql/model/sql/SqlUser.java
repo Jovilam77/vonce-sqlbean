@@ -28,4 +28,7 @@ public class SqlUser {
 
     public static final String gender = "gender";
     public static final Column gender$ = new Column(_tableAlias,"gender","");
+
+    public static final String integral = "integral";
+    public static final Column integral$ = new Column(_tableAlias,"integral","");
 }

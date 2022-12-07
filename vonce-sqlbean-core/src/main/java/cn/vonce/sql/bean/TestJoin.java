@@ -7,7 +7,7 @@ package cn.vonce.sql.bean;
  */
 public class TestJoin implements JoinOn {
     @Override
-    public void on(Join join) {
-        join.on("", "");
+    public Condition<Select> on(Join join) {
+        return join.on("", "");
     }
 }

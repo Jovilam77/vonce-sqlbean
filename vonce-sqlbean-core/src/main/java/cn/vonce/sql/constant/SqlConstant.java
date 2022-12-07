@@ -39,6 +39,8 @@ public class SqlConstant {
     public static final String LESS_THAN = " < ";
     public static final String LESS_THAN_OR_EQUAL_TO = " <= ";
     public static final String EQUAL_TO = " = ";
+    public static final String ADDITION = " + ";
+    public static final String SUBTRACT = " - ";
     public static final String NOT_EQUAL_TO = " <> ";
     public static final String SPACES = " ";
     public static final String COMMA = ", ";

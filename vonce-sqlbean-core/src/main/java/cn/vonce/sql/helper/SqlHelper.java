@@ -23,33 +23,13 @@ import java.util.*;
 public class SqlHelper {
 
     /**
-     * 参数为空抛出异常
-     *
-     * @param object
-     * @param message
-     */
-    public static void isNull(Object object, String message) {
-        if (object == null) {
-            throw new IllegalArgumentException(message);
-        }
-    }
-
-    /**
-     * 检查
-     */
-    public static void check(Common common) {
-        isNull(common.getSqlBeanDB(), "请设置sqlBeanConfig");
-        isNull(common.getSqlBeanDB().getDbType(), "请设置sqlBeanConfig -> dbType");
-    }
-
-    /**
      * 生成select sql语句
      *
      * @param select
      * @return
      */
     public static String buildSelectSql(Select select) {
-        check(select);
+        SqlBeanUtil.check(select);
         StringBuffer sqlSb = new StringBuffer();
         Integer[] pageParam = null;
         String orderSql = orderBySql(select);
@@ -80,7 +60,7 @@ public class SqlHelper {
             sqlSb.append(column(select));
         }
         sqlSb.append(SqlConstant.FROM);
-        sqlSb.append(fromFullName(select));
+        sqlSb.append(SqlBeanUtil.fromFullName(select.getTable().getSchema(), select.getTable().getName(), select.getTable().getAlias(), select));
         sqlSb.append(joinSql(select));
         sqlSb.append(whereSql(select, null));
         String groupBySql = groupBySql(select);
@@ -137,11 +117,11 @@ public class SqlHelper {
      * @throws SqlBeanException
      */
     public static String buildUpdateSql(Update update) {
-        check(update);
+        SqlBeanUtil.check(update);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlConstant.UPDATE);
         if (update.getSqlBeanDB().getDbType() == DbType.H2 || update.getSqlBeanDB().getDbType() == DbType.Oracle) {
-            sqlSb.append(fromFullName(update));
+            sqlSb.append(SqlBeanUtil.fromFullName(update.getTable().getSchema(), update.getTable().getName(), update.getTable().getAlias(), update));
         } else {
             sqlSb.append(getTableName(update.getTable(), update));
         }
@@ -159,7 +139,7 @@ public class SqlHelper {
      */
     @SuppressWarnings("unchecked")
     public static String buildInsertSql(Insert insert) {
-        check(insert);
+        SqlBeanUtil.check(insert);
         String sql = null;
         try {
             sql = fieldAndValuesSql(insert, insert.getInsertBean());
@@ -176,11 +156,11 @@ public class SqlHelper {
      * @return
      */
     public static String buildDeleteSql(Delete delete) {
-        check(delete);
+        SqlBeanUtil.check(delete);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlConstant.DELETE_FROM);
         if (delete.getSqlBeanDB().getDbType() == DbType.H2 || delete.getSqlBeanDB().getDbType() == DbType.Oracle) {
-            sqlSb.append(fromFullName(delete));
+            sqlSb.append(SqlBeanUtil.fromFullName(delete.getTable().getSchema(), delete.getTable().getName(), delete.getTable().getAlias(), delete));
         } else {
             sqlSb.append(getTableName(delete.getTable(), delete));
         }
@@ -195,7 +175,7 @@ public class SqlHelper {
      * @return
      */
     public static String buildCreateSql(Create create) {
-        check(create);
+        SqlBeanUtil.check(create);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlConstant.CREATE_TABLE);
         sqlSb.append(getTableName(create.getTable(), create));
@@ -285,7 +265,7 @@ public class SqlHelper {
      * @return
      */
     public static String buildBackup(Backup backup) {
-        check(backup);
+        SqlBeanUtil.check(backup);
         String targetSchema = backup.getTargetSchema();
         if (StringUtil.isEmpty(targetSchema)) {
             targetSchema = backup.getTable().getSchema();
@@ -331,7 +311,7 @@ public class SqlHelper {
      * @return
      */
     public static String buildCopy(Copy copy) {
-        check(copy);
+        SqlBeanUtil.check(copy);
         String targetSchema = copy.getTargetSchema();
         if (StringUtil.isEmpty(targetSchema)) {
             targetSchema = copy.getTable().getSchema();
@@ -460,33 +440,6 @@ public class SqlHelper {
     }
 
     /**
-     * 返回from的表名包括别名
-     *
-     * @param common
-     * @return
-     */
-    private static String fromFullName(Common common) {
-        String transferred = SqlBeanUtil.getTransferred(common);
-        StringBuffer fromSql = new StringBuffer();
-        String tableName = common.getTable().getName();
-        String schema = common.getTable().getSchema();
-        if (SqlBeanUtil.isToUpperCase(common)) {
-            tableName = tableName.toUpperCase();
-            schema = schema.toUpperCase();
-        }
-        if (StringUtil.isNotEmpty(schema)) {
-            fromSql.append(schema);
-            fromSql.append(SqlConstant.POINT);
-        }
-        fromSql.append(tableName);
-        fromSql.append(SqlConstant.SPACES);
-        fromSql.append(transferred);
-        fromSql.append(common.getTable().getAlias());
-        fromSql.append(transferred);
-        return fromSql.toString();
-    }
-
-    /**
      * 返回innerJoin语句
      *
      * @param select
@@ -514,24 +467,12 @@ public class SqlHelper {
                 String schema = join.getSchema();
                 String tableName = join.getTableName();
                 String tableAlias = join.getTableAlias();
-                if (SqlBeanUtil.isToUpperCase(select)) {
-                    schema = schema.toUpperCase();
-                    tableName = tableName.toUpperCase();
-                }
-                if (StringUtil.isNotEmpty(schema)) {
-                    joinSql.append(schema);
-                    joinSql.append(SqlConstant.POINT);
-                }
-                joinSql.append(tableName);
-                joinSql.append(SqlConstant.SPACES);
-                String transferred = SqlBeanUtil.getTransferred(select);
-                joinSql.append(transferred);
-                joinSql.append(tableAlias);
-                joinSql.append(transferred);
+                joinSql.append(SqlBeanUtil.fromFullName(schema, tableName, tableAlias, select));
                 joinSql.append(SqlConstant.ON);
                 if (join.on() != null && join.on().getDataList().size() > 0) {
                     joinSql.append(simpleConditionHandle(select, join.on().getDataList()));
                 } else {
+                    //过时暂时兼容
                     String tableKeyword = SqlBeanUtil.getTableFieldFullName(select, tableAlias, join.getTableKeyword());
                     String mainKeyword = SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), join.getMainKeyword());
                     if (StringUtil.isNotEmpty(join.getOn())) {
@@ -678,6 +619,7 @@ public class SqlHelper {
         String transferred = SqlBeanUtil.getTransferred(update);
         String[] filterFields = update.getFilterFields();
         Object bean = update.getUpdateBean();
+        boolean isToUpperCase = SqlBeanUtil.isToUpperCase(update);
         if (bean != null) {
             SqlTable sqlTable = SqlBeanUtil.getSqlTable(bean.getClass());
             List<Field> fieldList = SqlBeanUtil.getBeanAllField(bean.getClass());
@@ -700,8 +642,14 @@ public class SqlHelper {
                 if (!update.isOptimisticLock() && objectValue == null && sqlVersion != null) {
                     continue;
                 }
+                if (StringUtil.isNotBlank(sqlTable.alias())) {
+                    setSql.append(transferred);
+                    setSql.append(isToUpperCase ? sqlTable.alias().toUpperCase() : sqlTable.alias());
+                    setSql.append(transferred);
+                    setSql.append(SqlConstant.POINT);
+                }
                 setSql.append(transferred);
-                setSql.append(SqlBeanUtil.isToUpperCase(update) ? name.toUpperCase() : name);
+                setSql.append(isToUpperCase ? name.toUpperCase() : name);
                 setSql.append(transferred);
                 setSql.append(SqlConstant.EQUAL_TO);
                 if (update.isOptimisticLock() && sqlVersion != null) {
@@ -721,11 +669,28 @@ public class SqlHelper {
             List<SetInfo> setInfoList = update.getSetInfoList();
             if (setInfoList != null && setInfoList.size() > 0) {
                 for (SetInfo setInfo : setInfoList) {
+                    if (StringUtil.isNotBlank(setInfo.getTableAlias())) {
+                        setSql.append(transferred);
+                        setSql.append(isToUpperCase ? setInfo.getTableAlias().toUpperCase() : setInfo.getTableAlias());
+                        setSql.append(transferred);
+                        setSql.append(SqlConstant.POINT);
+                    }
                     setSql.append(transferred);
-                    setSql.append(SqlBeanUtil.isToUpperCase(update) ? setInfo.getName().toUpperCase() : setInfo.getName());
+                    setSql.append(isToUpperCase ? setInfo.getName().toUpperCase() : setInfo.getName());
                     setSql.append(transferred);
                     setSql.append(SqlConstant.EQUAL_TO);
-                    setSql.append(SqlBeanUtil.getSqlValue(update, setInfo.getValue()));
+                    if (setInfo.getValue().getClass().isArray()) {
+                        Object[] values = (Object[]) setInfo.getValue();
+                        setSql.append(SqlBeanUtil.getOriginal(update, values[0]));
+                        if (setInfo.getOperator() == SetInfo.Operator.ADDITION) {
+                            setSql.append(SqlConstant.ADDITION);
+                        } else if (setInfo.getOperator() == SetInfo.Operator.SUBTRACT) {
+                            setSql.append(SqlConstant.SUBTRACT);
+                        }
+                        setSql.append(SqlBeanUtil.getOriginal(update, values[1]));
+                    } else {
+                        setSql.append(SqlBeanUtil.getOriginal(update, setInfo.getValue()));
+                    }
                     setSql.append(SqlConstant.COMMA);
                 }
                 setSql.deleteCharAt(setSql.length() - SqlConstant.COMMA.length());
@@ -836,8 +801,7 @@ public class SqlHelper {
      * @param wrapper         条件包装器（优先级2）
      * @return
      */
-    private static String conditionHandle(ConditionType conditionType, Common common, String
-            conditionString, Object[] args, Object bean, Condition condition, Wrapper wrapper) {
+    private static String conditionHandle(ConditionType conditionType, Common common, String conditionString, Object[] args, Object bean, Condition condition, Wrapper wrapper) {
         StringBuffer conditionSql = new StringBuffer();
         if (ConditionType.WHERE == conditionType && StringUtil.isBlank(conditionString)) {
             conditionSql.append(versionCondition(common, bean));
@@ -1125,14 +1089,8 @@ public class SqlHelper {
                     value = value + SqlConstant.PERCENT;
                 }
                 value = SqlConstant.SINGLE_QUOTATION_MARK + value + SqlConstant.SINGLE_QUOTATION_MARK;
-            } else if (value instanceof Column) {
-                Column column = (Column) conditionInfo.getValue();
-                value = SqlBeanUtil.getTableFieldFullName(common, column.getTableAlias(), column.getName());
-            } else if (value instanceof Original) {
-                Original original = (Original) conditionInfo.getValue();
-                value = original.getValue();
             } else {
-                value = SqlBeanUtil.getSqlValue(common, value);
+                value = SqlBeanUtil.getOriginal(common, value);
             }
         }
         //如果存在表别名

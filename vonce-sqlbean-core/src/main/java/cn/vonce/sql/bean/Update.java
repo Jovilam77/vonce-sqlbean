@@ -96,6 +96,36 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
         return this;
     }
 
+    public Update<T> setAdd(String columnName, Object value1, Object value2) {
+        setInfoList.add(new SetInfo(SetInfo.Operator.ADDITION, columnName, value1, value2));
+        return this;
+    }
+
+    public Update<T> setAdd(String tableAlias, String columnName, Object value1, Object value2) {
+        setInfoList.add(new SetInfo(SetInfo.Operator.ADDITION, tableAlias, columnName, value1, value2));
+        return this;
+    }
+
+    public Update<T> setAdd(Column column, Object value1, Object value2) {
+        setInfoList.add(new SetInfo(SetInfo.Operator.ADDITION, column.getTableAlias(), column.getName(), value1, value2));
+        return this;
+    }
+
+    public Update<T> setSub(String columnName, Object value1, Object value2) {
+        setInfoList.add(new SetInfo(SetInfo.Operator.SUBTRACT, columnName, value1, value2));
+        return this;
+    }
+
+    public Update<T> setSub(String tableAlias, String columnName, Object value1, Object value2) {
+        setInfoList.add(new SetInfo(SetInfo.Operator.SUBTRACT, tableAlias, columnName, value1, value2));
+        return this;
+    }
+
+    public Update<T> setSub(Column column, Object value1, Object value2) {
+        setInfoList.add(new SetInfo(SetInfo.Operator.SUBTRACT, column.getTableAlias(), column.getName(), value1, value2));
+        return this;
+    }
+
     public static void main(String[] args) {
 
         new Update<>().set("", "").set("", 1).where().eq("", 1);

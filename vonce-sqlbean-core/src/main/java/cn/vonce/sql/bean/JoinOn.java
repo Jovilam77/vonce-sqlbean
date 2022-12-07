@@ -7,6 +7,6 @@ package cn.vonce.sql.bean;
  */
 public interface JoinOn {
 
-    void on(Join join);
+    Condition<Select> on(Join join);
 
 }

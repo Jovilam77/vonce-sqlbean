@@ -220,8 +220,7 @@ public class SqlHelperTest {
         update.setFilterFields("username");//java字段名
         update.setUpdateBean(user);
         update.setUpdateNotNull(true);
-        update.where().gt(SqlUser.id, 0);
-        update.where().lt(SqlUser.id, 10);
+        update.where().gt(SqlUser.id, 0).and().lt(SqlUser.id, 10);
         System.out.println("---update---");
         System.out.println(SqlHelper.buildUpdateSql(update));
     }
@@ -235,9 +234,11 @@ public class SqlHelperTest {
         Update update = new Update();
         update.setTable(User.class);
         update.setSqlBeanDB(sqlBeanDB);
-        update.set("id", 1).set("name", "jovi");
-        update.where().gt(SqlUser.id, 0);
-        update.where().lt(SqlUser.id, 10);
+        update.set(SqlUser.id, 1).
+                set(SqlUser.nickname, "jovi").
+                setAdd(SqlUser.integral$, SqlUser.integral$, SqlUser.integral$).
+                setSub("size", new Original("`size`"), 1).
+                where().gt(SqlUser.id, 0).and().lt(SqlUser.id, 10);
         System.out.println("---update2---");
         System.out.println(SqlHelper.buildUpdateSql(update));
     }
@@ -249,11 +250,9 @@ public class SqlHelperTest {
      */
     private static void delete(SqlBeanDB sqlBeanDB) {
         Delete delete = new Delete();
-        delete.where().eq("", null).back();
-        delete.setSqlBeanDB(sqlBeanDB);
-        delete.where().gt(SqlUser.id, 1);
-        delete.where().eq(SqlUser.nickname, "jovi");
         delete.setTable(User.class);
+        delete.setSqlBeanDB(sqlBeanDB);
+        delete.where().gt(SqlUser.id, 1).and().eq(SqlUser.nickname, "jovi");
         System.out.println("---delete---");
         System.out.println(SqlHelper.buildDeleteSql(delete));
     }

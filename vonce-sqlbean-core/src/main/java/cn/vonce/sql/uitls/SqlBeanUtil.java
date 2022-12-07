@@ -223,6 +223,34 @@ public class SqlBeanUtil {
     }
 
     /**
+     * 返回from的表名包括别名
+     *
+     * @param schema
+     * @param tableName
+     * @param tableAlias
+     * @param common
+     * @return
+     */
+    public static String fromFullName(String schema, String tableName, String tableAlias, Common common) {
+        String transferred = SqlBeanUtil.getTransferred(common);
+        StringBuffer fromSql = new StringBuffer();
+        if (SqlBeanUtil.isToUpperCase(common)) {
+            tableName = tableName.toUpperCase();
+            schema = schema.toUpperCase();
+        }
+        if (StringUtil.isNotEmpty(schema)) {
+            fromSql.append(schema);
+            fromSql.append(SqlConstant.POINT);
+        }
+        fromSql.append(tableName);
+        fromSql.append(SqlConstant.SPACES);
+        fromSql.append(transferred);
+        fromSql.append(tableAlias);
+        fromSql.append(transferred);
+        return fromSql.toString();
+    }
+
+    /**
      * 获取id标识字段
      *
      * @param clazz
@@ -564,7 +592,6 @@ public class SqlBeanUtil {
                 String subTableAlias = StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias();
                 columnSet.add(new Column(subTableAlias, tableFieldName, getColumnAlias(subTableAlias, field.getName())));
             } else {
-//                columnSet.add(new Column(tableAlias, getTableFieldName(field, sqlTable), getColumnAlias(tableAlias, field.getName())));
                 columnSet.add(new Column(tableAlias, getTableFieldName(field, sqlTable), field.getName()));
             }
         }
@@ -639,13 +666,15 @@ public class SqlBeanUtil {
             String schema = join.getSchema();
             String tableName = join.getTableName();
             String tableAlias = join.getTableAlias();
-            String tableKeyword = join.getTableKeyword();
-            String mainKeyword = join.getMainKeyword();
+            //过时暂时兼容
             String on = join.getOn();
             if (StringUtil.isNotEmpty(on)) {
                 select.join(join.getJoinType(), schema, tableName, tableAlias, on);
             } else {
-                select.join(join.getJoinType(), schema, tableName, tableAlias, tableKeyword, mainKeyword);
+                select.getJoin().add(join);
+//                String tableKeyword = join.getTableKeyword();
+//                String mainKeyword = join.getMainKeyword();
+//                select.join(join.getJoinType(), schema, tableName, tableAlias, tableKeyword, mainKeyword);
             }
         }
     }
@@ -739,15 +768,18 @@ public class SqlBeanUtil {
      * 获取实际类型值
      *
      * @param common
-     * @param object
+     * @param value
      * @return
      */
-    public static Object getOriginal(Common common, Object object) {
-        if (object instanceof Original) {
-            Original original = (Original) object;
+    public static Object getOriginal(Common common, Object value) {
+        if (value instanceof Column) {
+            Column column = (Column) value;
+            return SqlBeanUtil.getTableFieldFullName(common, column.getTableAlias(), column.getName());
+        } else if (value instanceof Original) {
+            Original original = (Original) value;
             return original.getValue();
         }
-        return getSqlValue(common, object);
+        return getSqlValue(common, value);
     }
 
     /**
@@ -1220,6 +1252,26 @@ public class SqlBeanUtil {
             }
         }
         return sql.toString();
+    }
+
+    /**
+     * 参数为空抛出异常
+     *
+     * @param object
+     * @param message
+     */
+    public static void isNull(Object object, String message) {
+        if (object == null) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    /**
+     * 检查
+     */
+    public static void check(Common common) {
+        isNull(common.getSqlBeanDB(), "请设置sqlBeanConfig");
+        isNull(common.getSqlBeanDB().getDbType(), "请设置sqlBeanConfig -> dbType");
     }
 
 }
