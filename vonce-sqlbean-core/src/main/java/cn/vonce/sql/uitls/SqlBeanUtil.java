@@ -4,12 +4,15 @@ import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
+import cn.vonce.sql.define.JoinOn;
 import cn.vonce.sql.enumerate.AlterType;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.JdbcType;
 import cn.vonce.sql.enumerate.WhatType;
 import cn.vonce.sql.exception.SqlBeanException;
 
+import java.beans.Introspector;
+import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
@@ -88,11 +91,7 @@ public class SqlBeanUtil {
             return new Table(sqlTable.schema(), sqlTable.value(), StringUtil.isEmpty(sqlTable.alias()) ? sqlTable.value() : sqlTable.alias());
         }
         String tableName = clazz.getSimpleName();
-        String tableAlias = tableName;
-        if (StringUtil.isEmpty(tableAlias)) {
-            tableAlias = tableName;
-        }
-        return new Table("", tableName, tableAlias);
+        return new Table("", tableName, tableName);
     }
 
     /**
@@ -1272,6 +1271,30 @@ public class SqlBeanUtil {
     public static void check(Common common) {
         isNull(common.getSqlBeanDB(), "请设置sqlBeanConfig");
         isNull(common.getSqlBeanDB().getDbType(), "请设置sqlBeanConfig -> dbType");
+    }
+
+    /**
+     * 获取列字段对象
+     *
+     * @param lambda
+     * @return Column
+     */
+    public static Column getColumnByLambda(SerializedLambda lambda) {
+        String getter = lambda.getImplMethodName();
+        String fieldName = Introspector.decapitalize(getter.replace("get", ""));
+        try {
+            Class<?> tableClass = Class.forName(lambda.getImplClass().replace("/", "."));
+            Field field = tableClass.getDeclaredField(fieldName);
+            SqlTable sqlTable = SqlBeanUtil.getSqlTable(tableClass);
+            String tableAlias = sqlTable != null ? (StringUtil.isNotBlank(sqlTable.alias()) ? sqlTable.alias() : sqlTable.value()) : tableClass.getSimpleName();
+            String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
+            return new Column(tableAlias, columnName, columnName);
+        } catch (ClassNotFoundException e) {
+            throw new SqlBeanException("找不到类：" + e.getMessage());
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+            throw new SqlBeanException("找不到字段,请检查:" + getter + "方法名与所对应的字段名是否符合标准,如：id字段对应的get方法名应该为getId()");
+        }
     }
 
 }

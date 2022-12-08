@@ -231,14 +231,14 @@ public class SqlHelperTest {
      * @param sqlBeanDB
      */
     private static void update2(SqlBeanDB sqlBeanDB) {
-        Update update = new Update();
+        Update<User> update = new Update();
         update.setTable(User.class);
         update.setSqlBeanDB(sqlBeanDB);
         update.set(SqlUser.id, 1).
                 set(SqlUser.nickname, "jovi").
                 setAdd(SqlUser.integral$, SqlUser.integral$, SqlUser.integral$).
                 setSub("size", new Original("`size`"), 1).
-                where().gt(SqlUser.id, 0).and().lt(SqlUser.id, 10);
+                where().gt(User::getId, 0).and().lt(User::getId, 10);
         System.out.println("---update2---");
         System.out.println(SqlHelper.buildUpdateSql(update));
     }
@@ -252,7 +252,7 @@ public class SqlHelperTest {
         Delete delete = new Delete();
         delete.setTable(User.class);
         delete.setSqlBeanDB(sqlBeanDB);
-        delete.where().gt(SqlUser.id, 1).and().eq(SqlUser.nickname, "jovi");
+        delete.where().gt(User::getId, 1).and().eq(User::getNickname, "jovi");
         System.out.println("---delete---");
         System.out.println(SqlHelper.buildDeleteSql(delete));
     }

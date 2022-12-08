@@ -1,8 +1,7 @@
 package cn.vonce.sql.bean;
 
+import cn.vonce.sql.define.ColumnFunction;
 import cn.vonce.sql.enumerate.JoinType;
-import cn.vonce.sql.enumerate.SqlOperator;
-
 import java.io.Serializable;
 
 /**
@@ -134,6 +133,11 @@ public class Join implements Serializable {
 
     public Condition<Select> on(Column column, Object value) {
         joinCondition.eq(column, value);
+        return joinCondition;
+    }
+
+    public <T, R> Condition<Select> on(ColumnFunction<T, R> columnFunction, Object value) {
+        joinCondition.eq(columnFunction, value);
         return joinCondition;
     }
 

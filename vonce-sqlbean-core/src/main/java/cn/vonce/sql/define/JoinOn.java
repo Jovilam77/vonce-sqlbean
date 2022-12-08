@@ -1,4 +1,8 @@
-package cn.vonce.sql.bean;
+package cn.vonce.sql.define;
+
+import cn.vonce.sql.bean.Condition;
+import cn.vonce.sql.bean.Join;
+import cn.vonce.sql.bean.Select;
 
 /**
  * @author Jovi
