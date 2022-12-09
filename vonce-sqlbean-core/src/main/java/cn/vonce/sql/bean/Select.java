@@ -1,9 +1,11 @@
 package cn.vonce.sql.bean;
 
+import cn.vonce.sql.define.ColumnFunction;
 import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.enumerate.SqlSort;
 import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.helper.Wrapper;
+import cn.vonce.sql.uitls.LambdaUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 
 import java.io.*;
@@ -172,6 +174,17 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加column列字段
      *
+     * @param columnFunction
+     * @return
+     */
+    public <T, R> Select column(ColumnFunction<T, R> columnFunction) {
+        this.columnList.add(LambdaUtil.getColumn(columnFunction));
+        return this;
+    }
+
+    /**
+     * 添加column列字段
+     *
      * @param columnName
      * @return
      */
@@ -205,10 +218,27 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * 添加column列字段
      *
      * @param column
+     * @param columnAlias
      * @return
      */
     public Select column(Column column, String columnAlias) {
-        return column(column.getTableAlias(), column.getName(), columnAlias);
+        column.setAlias(columnAlias);
+        columnList.add(column);
+        return this;
+    }
+
+    /**
+     * 添加column列字段
+     *
+     * @param columnFunction
+     * @param columnAlias
+     * @return
+     */
+    public <T, R> Select column(ColumnFunction<T, R> columnFunction, String columnAlias) {
+        Column column = LambdaUtil.getColumn(columnFunction);
+        column.setAlias(columnAlias);
+        columnList.add(column);
+        return this;
     }
 
     /**

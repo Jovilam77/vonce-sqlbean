@@ -13,7 +13,7 @@ import java.io.Serializable;
  * @email 766255988@qq.com
  * @date 2018年4月16日下午7:15:10
  */
-public class ConditionInfo extends Column implements Serializable {
+public class ConditionInfo/* extends Column*/ implements Serializable {
 
     /**
      *
@@ -24,35 +24,59 @@ public class ConditionInfo extends Column implements Serializable {
         super();
     }
 
-    public ConditionInfo(String columnName, Object value) {
-        this(null, "", columnName, value, null);
-    }
-
-    public ConditionInfo(String tableAlias, String columnName, Object value) {
-        this(null, tableAlias, columnName, value, null);
-    }
-
-    public ConditionInfo(String tableAlias, String columnName, Object value, SqlOperator sqlOperator) {
-        this(null, tableAlias, columnName, value, sqlOperator);
-    }
+//    public ConditionInfo(String columnName, Object value) {
+//        this(null, "", columnName, value, null);
+//    }
+//
+//    public ConditionInfo(String tableAlias, String columnName, Object value) {
+//        this(null, tableAlias, columnName, value, null);
+//    }
+//
+//    public ConditionInfo(String tableAlias, String columnName, Object value, SqlOperator sqlOperator) {
+//        this(null, tableAlias, columnName, value, sqlOperator);
+//    }
 
     public ConditionInfo(SqlLogic sqlLogic, String tableAlias, String columnName, Object value, SqlOperator sqlOperator) {
-        super(tableAlias, columnName, "");
+//        super(tableAlias, columnName, "");
         this.sqlLogic = sqlLogic;
+        this.column = new Column(tableAlias, columnName, null);
+        this.value = value;
+        this.sqlOperator = sqlOperator;
+    }
+
+    public ConditionInfo(SqlLogic sqlLogic, Column column, Object value, SqlOperator sqlOperator) {
+        this.sqlLogic = sqlLogic;
+        this.column = column;
         this.value = value;
         this.sqlOperator = sqlOperator;
     }
 
     private SqlLogic sqlLogic;
+    private Column column;
     private Object value;
     private SqlOperator sqlOperator;
 
+    public SqlLogic getSqlLogic() {
+        return sqlLogic;
+    }
+
+    public void setSqlLogic(SqlLogic sqlLogic) {
+        this.sqlLogic = sqlLogic;
+    }
+
+    public Column getColumn() {
+        return column;
+    }
+
+    public void setColumn(Column column) {
+        this.column = column;
+    }
 
     public Object getValue() {
         return value;
     }
 
-    private void setValue(Object value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 
@@ -60,16 +84,8 @@ public class ConditionInfo extends Column implements Serializable {
         return sqlOperator;
     }
 
-    private void setSqlOperator(SqlOperator sqlOperator) {
+    public void setSqlOperator(SqlOperator sqlOperator) {
         this.sqlOperator = sqlOperator;
-    }
-
-    public SqlLogic getSqlLogic() {
-        return sqlLogic;
-    }
-
-    private void setSqlLogic(SqlLogic sqlLogic) {
-        this.sqlLogic = sqlLogic;
     }
 
 }

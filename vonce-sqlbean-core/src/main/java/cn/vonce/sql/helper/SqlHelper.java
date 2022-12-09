@@ -1,6 +1,7 @@
 package cn.vonce.sql.helper;
 
 import cn.vonce.sql.annotation.*;
+import cn.vonce.sql.define.SqlFun;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.StringUtil;
 import cn.vonce.sql.bean.*;
@@ -410,13 +411,20 @@ public class SqlHelper {
         StringBuffer columnSql = new StringBuffer();
         if (select.getColumnList() != null && select.getColumnList().size() != 0) {
             for (int i = 0; i < select.getColumnList().size(); i++) {
-                String tableAlias = select.getColumnList().get(i).getTableAlias();
-                String columnName = select.getColumnList().get(i).getName();
-                String transferred = SqlBeanUtil.getTransferred(select);
-                if (SqlBeanUtil.isToUpperCase(select)) {
-                    columnName = columnName.toUpperCase();
+                Column column = select.getColumnList().get(i);
+                String tableAlias = null;
+                String columnName;
+                if (column instanceof SqlFun) {
+                    columnName = getSqlFunction(select, (SqlFun) column);
+                } else {
+                    tableAlias = select.getColumnList().get(i).getTableAlias();
+                    columnName = select.getColumnList().get(i).getName();
+                    if (SqlBeanUtil.isToUpperCase(select)) {
+                        columnName = columnName.toUpperCase();
+                    }
                 }
-                boolean existAlias = StringUtil.isNotEmpty(select.getColumnList().get(i).getAlias());
+                String transferred = SqlBeanUtil.getTransferred(select);
+                boolean existAlias = StringUtil.isNotEmpty(column.getAlias());
                 if (existAlias) {
                     columnSql.append(SqlConstant.BEGIN_BRACKET);
                 }
@@ -1062,16 +1070,13 @@ public class SqlHelper {
         } else if (conditionInfo.getSqlOperator() == SqlOperator.IN || conditionInfo.getSqlOperator() == SqlOperator.NOT_IN) {
             needEndBracket = true;
             Object[] in_notInValues = SqlBeanUtil.getObjectArray(value);
-            if (in_notInValues == null) {
-                in_notInValues = new Object[]{value};
-            }
             StringBuffer in_notIn = new StringBuffer();
             if (in_notInValues != null && in_notInValues.length > 0) {
                 for (int k = 0; k < in_notInValues.length; k++) {
-                    if (in_notInValues[k] instanceof Original) {
-                        in_notIn.append(((Original) in_notInValues[k]).getValue());
+                    if (in_notInValues[k] instanceof SqlFun) {
+                        in_notIn.append(getSqlFunction(common, (SqlFun) in_notInValues[k]));
                     } else {
-                        in_notIn.append(SqlBeanUtil.getSqlValue(common, in_notInValues[k]));
+                        in_notIn.append(SqlBeanUtil.getOriginal(common, in_notInValues[k]));
                     }
                     in_notIn.append(SqlConstant.COMMA);
                 }
@@ -1090,22 +1095,28 @@ public class SqlHelper {
                 }
                 value = SqlConstant.SINGLE_QUOTATION_MARK + value + SqlConstant.SINGLE_QUOTATION_MARK;
             } else {
-                value = SqlBeanUtil.getOriginal(common, value);
+                value = value instanceof SqlFun ? getSqlFunction(common, (SqlFun) value) : SqlBeanUtil.getOriginal(common, value);
             }
         }
-        //如果存在表别名
-        if (StringUtil.isNotEmpty(conditionInfo.getTableAlias())) {
-            sql.append(SqlBeanUtil.getTableFieldFullName(common, conditionInfo.getTableAlias(), conditionInfo.getName()));
+        //列
+        Column column = conditionInfo.getColumn();
+        if (column instanceof SqlFun) {
+            sql.append(getSqlFunction(common, (SqlFun) column));
         } else {
-            sql.append(conditionInfo.getName());
+            //如果存在表别名
+            if (StringUtil.isNotEmpty(column.getTableAlias())) {
+                sql.append(SqlBeanUtil.getTableFieldFullName(common, column.getTableAlias(), column.getName()));
+            } else {
+                sql.append(column.getName());
+            }
         }
         //操作符
         sql.append(operator);
         //值
         if (conditionInfo.getSqlOperator() == SqlOperator.BETWEEN) {
-            sql.append(SqlBeanUtil.getSqlValue(common, betweenValues[0]));
+            sql.append(betweenValues[0] instanceof SqlFun ? getSqlFunction(common, (SqlFun) betweenValues[0]) : SqlBeanUtil.getSqlValue(common, betweenValues[0]));
             sql.append(SqlConstant.AND);
-            sql.append(SqlBeanUtil.getSqlValue(common, betweenValues[1]));
+            sql.append(betweenValues[1] instanceof SqlFun ? getSqlFunction(common, (SqlFun) betweenValues[1]) : SqlBeanUtil.getSqlValue(common, betweenValues[1]));
         } else if (conditionInfo.getSqlOperator() == SqlOperator.IS_NULL || conditionInfo.getSqlOperator() == SqlOperator.IS_NOT_NULL) {
             sql.append("NULL ");
         } else {
@@ -1116,6 +1127,28 @@ public class SqlHelper {
             sql.append(SqlConstant.END_BRACKET);
         }
         return sql;
+    }
+
+    /**
+     * 获取Sql函数内容
+     *
+     * @param common
+     * @param sqlFun
+     * @return
+     */
+    private static String getSqlFunction(Common common, SqlFun sqlFun) {
+        StringBuffer fun = new StringBuffer();
+        fun.append(sqlFun.getFunName());
+        fun.append(SqlConstant.BEGIN_BRACKET);
+        if (sqlFun.getValues() != null && sqlFun.getValues().length > 0) {
+            for (Object value : sqlFun.getValues()) {
+                fun.append(value instanceof SqlFun ? getSqlFunction(common, (SqlFun) value) : SqlBeanUtil.getOriginal(common, value));
+                fun.append(SqlConstant.COMMA);
+            }
+            fun.deleteCharAt(fun.length() - SqlConstant.COMMA.length());
+        }
+        fun.append(SqlConstant.END_BRACKET);
+        return fun.toString();
     }
 
     /**

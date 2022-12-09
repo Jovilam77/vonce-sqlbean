@@ -879,7 +879,7 @@ public class Cond extends ConditionInfo {
     }
 
     public Cond(Column column, SqlOperator sqlOperator, Object value) {
-        super(null, column.getTableAlias(), column.getName(), value, sqlOperator);
+        super(null, column, value, sqlOperator);
     }
 
 }

@@ -995,12 +995,11 @@ public class Condition<Action> implements Serializable {
     }
 
     private ConditionInfo newConditionInfo(Column column, SqlOperator sqlOperator, Object value) {
-        return new ConditionInfo(null, column.getTableAlias(), column.getName(), value, sqlOperator);
+        return new ConditionInfo(null, column, value, sqlOperator);
     }
 
     private <T, R> ConditionInfo newConditionInfo(ColumnFunction<T, R> columnFunction, SqlOperator sqlOperator, Object value) {
-        Column column = LambdaUtil.getColumn(columnFunction);
-        return new ConditionInfo(null, column.getTableAlias(), column.getName(), value, sqlOperator);
+        return new ConditionInfo(null, LambdaUtil.getColumn(columnFunction), value, sqlOperator);
     }
 
 }
