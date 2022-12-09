@@ -1,6 +1,7 @@
 package cn.vonce.sql.define;
 
 import cn.vonce.sql.bean.Column;
+import cn.vonce.sql.bean.Original;
 
 import java.util.Arrays;
 
@@ -125,8 +126,8 @@ public class SqlFun extends Column {
      *
      * @return
      */
-    public static SqlFun curdate() {
-        return new SqlFun("curdate", null);
+    public static SqlFun curDate() {
+        return new SqlFun("curDate", null);
     }
 
     /**
@@ -134,8 +135,8 @@ public class SqlFun extends Column {
      *
      * @return
      */
-    public static SqlFun curtime() {
-        return new SqlFun("curtime", null);
+    public static SqlFun curTime() {
+        return new SqlFun("curTime", null);
     }
 
     /**
@@ -164,8 +165,8 @@ public class SqlFun extends Column {
      * @param date 合法的日期
      * @return
      */
-    public static SqlFun monthname(Object date) {
-        return new SqlFun("monthname", new Object[]{date});
+    public static SqlFun monthName(Object date) {
+        return new SqlFun("monthName", new Object[]{date});
     }
 
     /**
@@ -215,8 +216,8 @@ public class SqlFun extends Column {
      * @param date2 合法的日期
      * @return
      */
-    public static SqlFun datediff(Object date1, Object date2) {
-        return new SqlFun("datediff", new Object[]{date1, date2});
+    public static SqlFun dateDiff(Object date1, Object date2) {
+        return new SqlFun("dateDiff", new Object[]{date1, date2});
     }
 
     /**
@@ -336,8 +337,8 @@ public class SqlFun extends Column {
      * @param str2   字符串
      * @return
      */
-    public static SqlFun lpad(Object str1, int length, Object str2) {
-        return new SqlFun("lpad", new Object[]{str1, length, str2});
+    public static SqlFun lPad(Object str1, int length, Object str2) {
+        return new SqlFun("lPad", new Object[]{str1, length, str2});
     }
 
     /**
@@ -348,9 +349,30 @@ public class SqlFun extends Column {
      * @param str2   字符串
      * @return
      */
-    public static SqlFun rpad(Object str1, int length, Object str2) {
-        return new SqlFun("rpad", new Object[]{str1, length, str2});
+    public static SqlFun rPad(Object str1, int length, Object str2) {
+        return new SqlFun("rPad", new Object[]{str1, length, str2});
     }
+
+    /**
+     * 清除字符左边的空格
+     *
+     * @param str 字符串
+     * @return
+     */
+    public static SqlFun ltrim(Object str) {
+        return new SqlFun("ltrim", new Object[]{str});
+    }
+
+    /**
+     * 清除字符右边的空格
+     *
+     * @param str 字符串
+     * @return
+     */
+    public static SqlFun rtrim(Object str) {
+        return new SqlFun("rtrim", new Object[]{str});
+    }
+
 
     /**
      * 把object对象中出现的的search全部替换成replace
@@ -362,6 +384,167 @@ public class SqlFun extends Column {
      */
     public static SqlFun replace(Object str, Object search, Object replace) {
         return new SqlFun("replace", new Object[]{str, search, replace});
+    }
+
+    /************Sqlserver************/
+
+    /**
+     * 查找字符对应的下标
+     *
+     * @param query 查找的内容
+     * @param str   数据源字符串
+     * @return
+     */
+    public static SqlFun charIndex(Object query, Object str) {
+        return new SqlFun("charIndex", new Object[]{query, str});
+    }
+
+    /**
+     * 查找字符对应的下标
+     *
+     * @param query 查找的内容
+     * @param str   数据源字符串
+     * @param index 指定位置开始查找
+     * @return
+     */
+    public static SqlFun charIndex(Object query, Object str, int index) {
+        return new SqlFun("charIndex", new Object[]{query, str, index});
+    }
+
+    /**
+     * 字符串长度
+     *
+     * @param str 字符串
+     * @return
+     */
+    public static SqlFun len(Object str) {
+        return new SqlFun("len", new Object[]{str});
+    }
+
+    /**
+     * 从左边开始截取指定长度的字符串
+     *
+     * @param str    字符串
+     * @param length 长度
+     * @return
+     */
+    public static SqlFun left(Object str, int length) {
+        return new SqlFun("left", new Object[]{str, length});
+    }
+
+    /**
+     * 从右边开始截取指定长度的字符串
+     *
+     * @param str    字符串
+     * @param length 长度
+     * @return
+     */
+    public static SqlFun right(Object str, int length) {
+        return new SqlFun("right", new Object[]{str, length});
+    }
+
+    /**
+     * 从字符串的某个位置删除指定长度的字符串之后插入新字符串
+     *
+     * @param str    数据源字符串
+     * @param index  开始位置
+     * @param length 要删除的字符串长度
+     * @param newStr 新字符串
+     * @return
+     */
+    public static SqlFun stuff(Object str, int index, int length, Object newStr) {
+        return new SqlFun("stuff", new Object[]{str, index, length, newStr});
+    }
+
+    /**
+     * 当前登录的计算机名称
+     *
+     * @return
+     */
+    public static SqlFun host_name() {
+        return new SqlFun("host_name", null);
+    }
+
+    /**
+     * 指定用户名Id的用户名
+     *
+     * @return
+     */
+    public static SqlFun user_name(Object id) {
+        return new SqlFun("user_name", new Object[]{id});
+    }
+
+    /**
+     * 转换数据类型
+     *
+     * @return
+     */
+    public static SqlFun convert(Object type, Object value) {
+        return new SqlFun("convert", new Object[]{type, value});
+    }
+
+    /**
+     * 返回字节数
+     *
+     * @return
+     */
+    public static SqlFun dataLength(Object value) {
+        return new SqlFun("dataLength", new Object[]{value});
+    }
+
+    /**
+     * 获取当前系统日期
+     *
+     * @return
+     */
+    public static SqlFun getDate() {
+        return new SqlFun("getDate", null);
+    }
+
+    /**
+     * 添加指定日期后的日期
+     *
+     * @param datePart 年份(yy . yyyy . year)、季度(qq , q . quarter)、月份(mm , m , month)、年中的日(dy. y)、日(dd ,d ,day)、周(wk ,ww , week)、星期(dw.w)、小时(hh , hour)、分钟(mi , n . minute)、秒(ss , s , second)、毫秒(ms)、微秒(mcs)、纳秒(ns)
+     * @param num      添加的间隔数，最好是整数，对于未来的时间，此数是正数，对于过去的时间，此数是负数
+     * @param date     合法的日期表达式，类型可以是datetime、smalldatetime、char
+     * @return
+     */
+    public static SqlFun dateAdd(Original datePart, int num, Object date) {
+        return new SqlFun("dateAdd", new Object[]{datePart, num, date});
+    }
+
+    /**
+     * 获取时差
+     *
+     * @param datePart  年份(yy . yyyy . year)、季度(qq , q . quarter)、月份(mm , m , month)、年中的日(dy. y)、日(dd ,d ,day)、周(wk ,ww , week)、星期(dw.w)、小时(hh , hour)、分钟(mi , n . minute)、秒(ss , s , second)、毫秒(ms)、微秒(mcs)、纳秒(ns)
+     * @param startDate 开始时间,合法的日期表达式，类型可以是datetime、smalldatetime、char
+     * @param endDate   结束时间,合法的日期表达式，类型可以是datetime、smalldatetime、char
+     * @return
+     */
+    public static SqlFun dateDiff(Original datePart, Object startDate, Object endDate) {
+        return new SqlFun("dateDiff", new Object[]{datePart, startDate, endDate});
+    }
+
+    /**
+     * 获取指定日期部分的字符串形式
+     *
+     * @param datePart 年份(yy . yyyy . year)、季度(qq , q . quarter)、月份(mm , m , month)、年中的日(dy. y)、日(dd ,d ,day)、周(wk ,ww , week)、星期(dw.w)、小时(hh , hour)、分钟(mi , n . minute)、秒(ss , s , second)、毫秒(ms)、微秒(mcs)、纳秒(ns)
+     * @param date     合法的日期表达式，类型可以是datetime、smalldatetime、char
+     * @return
+     */
+    public static SqlFun dateName(Original datePart, Object date) {
+        return new SqlFun("dateName", new Object[]{datePart, date});
+    }
+
+    /**
+     * 获取指定日期部分的整数形式
+     *
+     * @param datePart 年份(yy . yyyy . year)、季度(qq , q . quarter)、月份(mm , m , month)、年中的日(dy. y)、日(dd ,d ,day)、周(wk ,ww , week)、星期(dw.w)、小时(hh , hour)、分钟(mi , n . minute)、秒(ss , s , second)、毫秒(ms)、微秒(mcs)、纳秒(ns)
+     * @param date     合法的日期表达式，类型可以是datetime、smalldatetime、char
+     * @return
+     */
+    public static SqlFun datePart(Original datePart, Object date) {
+        return new SqlFun("datePart", new Object[]{datePart, date});
     }
 
     /**
@@ -382,6 +565,16 @@ public class SqlFun extends Column {
      */
     public static SqlFun ceil(Object num) {
         return new SqlFun("ceil", new Object[]{num});
+    }
+
+    /**
+     * 向上取整
+     *
+     * @param num 数值
+     * @return
+     */
+    public static SqlFun ceiling(Object num) {
+        return new SqlFun("ceiling", new Object[]{num});
     }
 
     /**
@@ -414,6 +607,35 @@ public class SqlFun extends Column {
      */
     public static SqlFun mod(Object num1, Object num2) {
         return new SqlFun("mod", new Object[]{num1, num2});
+    }
+
+    /**
+     * 返回符号或0
+     *
+     * @param num 数值
+     * @return
+     */
+    public static SqlFun sign(Object num) {
+        return new SqlFun("sign", new Object[]{num});
+    }
+
+    /**
+     * 返回平方根
+     *
+     * @param num 数值
+     * @return
+     */
+    public static SqlFun sqrt(Object num) {
+        return new SqlFun("sqrt", new Object[]{num});
+    }
+
+    /**
+     * 获取随机数
+     *
+     * @return
+     */
+    public static SqlFun rand() {
+        return new SqlFun("rand", null);
     }
 
 }
