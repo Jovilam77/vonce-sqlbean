@@ -50,7 +50,6 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
         fieldList.add("testWhileIdle");
         fieldList.add("testOnBorrow");
         fieldList.add("testOnReturn");
-        //不常用
         fieldList.add("validationQueryTimeout");
         fieldList.add("keepAlive");
         fieldList.add("removeAbandoned");
@@ -99,10 +98,15 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
                     }
                     for (String fieldName : fieldList) {
                         String propertyValue = env.getProperty(MULTI_DATA_SOURCE_PREFIX + "." + dataSourceName + "." + fieldName);
-                        if (StringUtil.isNotEmpty(propertyValue)) {
+                        if (StringUtil.isBlank(propertyValue)) {
+                            propertyValue = env.getProperty(MULTI_DATA_SOURCE_PREFIX + "." + dataSourceName + "." + StringUtil.humpToHyphen(fieldName));
+                        }
+                        if (StringUtil.isNotBlank(propertyValue)) {
                             try {
                                 Method method = methodMap.get("set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1));
-                                method.invoke(dataSource, getValueConvert(method.getParameterTypes()[0].getName(), propertyValue));
+                                if (method != null) {
+                                    method.invoke(dataSource, getValueConvert(method.getParameterTypes()[0].getName(), propertyValue));
+                                }
                             } catch (IllegalAccessException e) {
                                 e.printStackTrace();
                             } catch (InvocationTargetException e) {
