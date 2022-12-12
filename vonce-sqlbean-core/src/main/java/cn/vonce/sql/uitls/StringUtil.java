@@ -21,7 +21,15 @@ public class StringUtil {
      */
     public static final String PLACEHOLDER_SUFFIX = "}";
 
+    /**
+     * 下划线
+     */
     private final static String UNDERLINE = "_";
+
+    /**
+     * 连字符
+     */
+    private final static String HYPHEN = "-";
 
     public static boolean isEmpty(Object str) {
         return str == null || "".equals(str);
@@ -148,17 +156,36 @@ public class StringUtil {
     /***
      * 驼峰命名转为下划线命名
      *
-     * @param para
-     *        驼峰命名的字符串
+     * @param hump 驼峰命名的字符串
+     *
      */
+    public static String humpToUnderline(String hump) {
+        return humpTo(hump, UNDERLINE);
+    }
 
-    public static String humpToUnderline(String para) {
-        StringBuilder sb = new StringBuilder(para);
+    /***
+     * 驼峰命名转为连字符命名
+     *
+     * @param hump 驼峰命名的字符串
+     *
+     */
+    public static String humpToHyphen(String hump) {
+        return humpTo(hump, HYPHEN);
+    }
+
+    /***
+     * 驼峰命名转为符号分割命名
+     *
+     * @param hump 驼峰命名的字符串
+     * @param symbol 符号
+     */
+    public static String humpTo(String hump, String symbol) {
+        StringBuilder sb = new StringBuilder(hump);
         int temp = 0;
-        if (!para.contains(UNDERLINE)) {
-            for (int i = 0; i < para.length(); i++) {
-                if (Character.isUpperCase(para.charAt(i)) && (i - 1 >= 0 ? Character.isLowerCase(para.charAt(i - 1)) : false)) {
-                    sb.insert(i + temp, UNDERLINE);
+        if (!hump.contains(symbol)) {
+            for (int i = 0; i < hump.length(); i++) {
+                if (Character.isUpperCase(hump.charAt(i)) && (i - 1 >= 0 ? Character.isLowerCase(hump.charAt(i - 1)) : false)) {
+                    sb.insert(i + temp, symbol);
                     temp += 1;
                 }
             }

@@ -10,11 +10,8 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.type.AnnotationMetadata;
-
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -50,7 +47,6 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
         fieldList.add("testWhileIdle");
         fieldList.add("testOnBorrow");
         fieldList.add("testOnReturn");
-        //不常用
         fieldList.add("validationQueryTimeout");
         fieldList.add("keepAlive");
         fieldList.add("removeAbandoned");
@@ -74,47 +70,64 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
                 Map<String, Object> annotationAttributeMap = annotationMetadata.getAnnotationAttributes(EnableAutoConfigMultiDataSource.class.getName());
                 //取得注解中的属性
                 Class<?> multiDataSourceClass = (Class<?>) annotationAttributeMap.get("multiDataSource");
-                String defaultDataSource = (String) annotationAttributeMap.get("defaultDataSource");
-                List<String> dataSourceNameList = getDataSourceNameList(multiDataSourceClass);
-                if (dataSourceNameList == null || dataSourceNameList.isEmpty()) {
-                    return;
-                }
-                //如果未设置默认数据源将默认设置第一个
-                if (StringUtil.isEmpty(defaultDataSource)) {
-                    defaultDataSource = dataSourceNameList.get(0);
-                }
+                String defaultDataSourceName = null;
                 Map<Object, Object> dataSourceMap = new HashMap<>(8);
                 BeanDefinitionBuilder definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(DynamicDataSource.class);
                 StandardEnvironment env = (StandardEnvironment) environment;
                 Class<?> typeClass = getTypeClass(env.getProperty(MULTI_DATA_SOURCE_TYPE));
-                for (String dataSourceName : dataSourceNameList) {
-                    Map<String, Method> methodMap = getMethodMap(typeClass);
-                    Object dataSource = null;
-                    try {
-                        dataSource = typeClass.newInstance();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
+                try {
+                    Method method = multiDataSourceClass.getDeclaredMethod("values");
+                    Object[] multiDataSources = (Object[]) method.invoke(null);
+                    List<String> dataSourceNameList = new ArrayList<>();
+                    for (Object source : multiDataSources) {
+                        dataSourceNameList.add((String) source.getClass().getSuperclass().getSuperclass().getDeclaredMethod("name").invoke(source));
                     }
-                    for (String fieldName : fieldList) {
-                        String propertyValue = env.getProperty(MULTI_DATA_SOURCE_PREFIX + "." + dataSourceName + "." + fieldName);
-                        if (StringUtil.isNotEmpty(propertyValue)) {
-                            try {
-                                Method method = methodMap.get("set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1));
-                                method.invoke(dataSource, getValueConvert(method.getParameterTypes()[0].getName(), propertyValue));
-                            } catch (IllegalAccessException e) {
-                                e.printStackTrace();
-                            } catch (InvocationTargetException e) {
-                                e.printStackTrace();
+                    for (Object multiDataSource : multiDataSources) {
+                        //获得数据源名称
+                        String dataSourceName = (String) multiDataSource.getClass().getSuperclass().getSuperclass().getDeclaredMethod("name").invoke(multiDataSource);
+                        //先设置第一个数据源为默认数据源
+                        if (defaultDataSourceName == null) {
+                            defaultDataSourceName = dataSourceName;
+                        }
+                        //如果有设置默认数据源则替代
+                        if (multiDataSource instanceof BaseMultiDataSource) {
+                            if (((BaseMultiDataSource) multiDataSource).defaultDataSource()) {
+                                defaultDataSourceName = dataSourceName;
                             }
                         }
+                        Map<String, Method> methodMap = getMethodMap(typeClass);
+                        Object dataSource = null;
+                        try {
+                            dataSource = typeClass.newInstance();
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        } catch (InstantiationException e) {
+                            e.printStackTrace();
+                        }
+                        for (String fieldName : fieldList) {
+                            String propertyValue = env.getProperty(MULTI_DATA_SOURCE_PREFIX + "." + dataSourceName + "." + fieldName);
+                            if (StringUtil.isBlank(propertyValue)) {
+                                propertyValue = env.getProperty(MULTI_DATA_SOURCE_PREFIX + "." + dataSourceName + "." + StringUtil.humpToHyphen(fieldName));
+                            }
+                            if (StringUtil.isNotBlank(propertyValue)) {
+                                try {
+                                    Method propertyMethod = methodMap.get("set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1));
+                                    if (propertyMethod != null) {
+                                        propertyMethod.invoke(dataSource, getValueConvert(propertyMethod.getParameterTypes()[0].getName(), propertyValue));
+                                    }
+                                } catch (IllegalAccessException e) {
+                                    e.printStackTrace();
+                                } catch (InvocationTargetException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                        dataSourceMap.put(dataSourceName, dataSource);
                     }
-                    if (dataSourceName.equals(defaultDataSource)) {
-                        definitionBuilder.addPropertyValue("defaultTargetDataSource", dataSource);
-                    }
-                    dataSourceMap.put(dataSourceName, dataSource);
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
                 }
+                definitionBuilder.addPropertyValue("defaultTargetDataSource", defaultDataSourceName);
                 definitionBuilder.addPropertyValue("targetDataSources", dataSourceMap);
                 beanDefinitionRegistry.registerBeanDefinition("dynamicDataSource", definitionBuilder.getBeanDefinition());
                 for (Map<String, Method> map : classMethodMap.values()) {
@@ -123,35 +136,6 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
                 classMethodMap.clear();
             }
         }
-    }
-
-    /**
-     * 获取多数据源名称
-     *
-     * @param multiDataSourceClass
-     * @return
-     */
-    private List<String> getDataSourceNameList(Class<?> multiDataSourceClass) {
-        Field[] fields = multiDataSourceClass.getFields();
-        if (fields == null || fields.length == 0) {
-            return null;
-        }
-        List<String> dataSourceNameList = new ArrayList<>();
-        for (int i = 0; i < fields.length; i++) {
-            if (!Modifier.isStatic(fields[i].getModifiers())) {
-                continue;
-            }
-            if (!Modifier.isFinal(fields[i].getModifiers())) {
-                continue;
-            }
-            try {
-                Object value = fields[i].get(null);
-                dataSourceNameList.add(value.toString());
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        return dataSourceNameList;
     }
 
     /**

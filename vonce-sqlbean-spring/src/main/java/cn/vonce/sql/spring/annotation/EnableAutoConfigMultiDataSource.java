@@ -26,11 +26,4 @@ public @interface EnableAutoConfigMultiDataSource {
      */
     Class<?> multiDataSource();
 
-    /**
-     * 默认数据源名称
-     *
-     * @return
-     */
-    String defaultDataSource() default "";
-
 }
