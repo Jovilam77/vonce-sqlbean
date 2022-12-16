@@ -2,7 +2,11 @@ package cn.vonce.sql.spring.config;
 
 import cn.vonce.sql.spring.annotation.EnableAutoConfigMultiDataSource;
 import cn.vonce.sql.spring.datasource.DynamicDataSource;
+import cn.vonce.sql.spring.datasource.TransactionalInterceptor;
 import cn.vonce.sql.uitls.StringUtil;
+import org.springframework.aop.aspectj.AspectJExpressionPointcut;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.EnvironmentAware;
@@ -121,6 +125,7 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
                 }
                 definitionBuilder.addPropertyValue("targetDataSources", dataSourceMap);
                 beanDefinitionRegistry.registerBeanDefinition("dynamicDataSource", definitionBuilder.getBeanDefinition());
+                beanDefinitionRegistry.registerBeanDefinition("sqlBeanTransactional", transactionalDefinition());
                 for (Map<String, Method> map : classMethodMap.values()) {
                     map.clear();
                 }
@@ -246,6 +251,15 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
                 break;
         }
         return value;
+    }
+
+    private BeanDefinition transactionalDefinition() {
+        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
+        pointcut.setExpression("@annotation(cn.vonce.sql.spring.annotation.DbTransactional)");
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(DefaultPointcutAdvisor.class);
+        beanDefinitionBuilder.addPropertyValue("pointcut", pointcut);
+        beanDefinitionBuilder.addPropertyValue("advice", new TransactionalInterceptor());
+        return beanDefinitionBuilder.getBeanDefinition();
     }
 
 }
