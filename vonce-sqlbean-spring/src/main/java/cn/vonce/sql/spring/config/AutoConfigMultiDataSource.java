@@ -2,7 +2,11 @@ package cn.vonce.sql.spring.config;
 
 import cn.vonce.sql.spring.annotation.EnableAutoConfigMultiDataSource;
 import cn.vonce.sql.spring.datasource.DynamicDataSource;
+import cn.vonce.sql.spring.datasource.TransactionalInterceptor;
 import cn.vonce.sql.uitls.StringUtil;
+import org.springframework.aop.aspectj.AspectJExpressionPointcut;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.EnvironmentAware;
@@ -10,8 +14,11 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.type.AnnotationMetadata;
+
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -70,72 +77,90 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
                 Map<String, Object> annotationAttributeMap = annotationMetadata.getAnnotationAttributes(EnableAutoConfigMultiDataSource.class.getName());
                 //取得注解中的属性
                 Class<?> multiDataSourceClass = (Class<?>) annotationAttributeMap.get("multiDataSource");
-                String defaultDataSourceName = null;
+                String defaultDataSource = (String) annotationAttributeMap.get("defaultDataSource");
+                List<String> dataSourceNameList = getDataSourceNameList(multiDataSourceClass);
+                if (dataSourceNameList == null || dataSourceNameList.isEmpty()) {
+                    return;
+                }
+                //如果未设置默认数据源将默认设置第一个
+                if (StringUtil.isEmpty(defaultDataSource)) {
+                    defaultDataSource = dataSourceNameList.get(0);
+                }
                 Map<Object, Object> dataSourceMap = new HashMap<>(8);
                 BeanDefinitionBuilder definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(DynamicDataSource.class);
                 StandardEnvironment env = (StandardEnvironment) environment;
                 Class<?> typeClass = getTypeClass(env.getProperty(MULTI_DATA_SOURCE_TYPE));
-                try {
-                    Method method = multiDataSourceClass.getDeclaredMethod("values");
-                    Object[] multiDataSources = (Object[]) method.invoke(null);
-                    List<String> dataSourceNameList = new ArrayList<>();
-                    for (Object source : multiDataSources) {
-                        dataSourceNameList.add((String) source.getClass().getSuperclass().getSuperclass().getDeclaredMethod("name").invoke(source));
+                for (String dataSourceName : dataSourceNameList) {
+                    Map<String, Method> methodMap = getMethodMap(typeClass);
+                    Object dataSource = null;
+                    try {
+                        dataSource = typeClass.newInstance();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
                     }
-                    for (Object multiDataSource : multiDataSources) {
-                        //获得数据源名称
-                        String dataSourceName = (String) multiDataSource.getClass().getSuperclass().getSuperclass().getDeclaredMethod("name").invoke(multiDataSource);
-                        //先设置第一个数据源为默认数据源
-                        if (defaultDataSourceName == null) {
-                            defaultDataSourceName = dataSourceName;
+                    for (String fieldName : fieldList) {
+                        String propertyValue = env.getProperty(MULTI_DATA_SOURCE_PREFIX + "." + dataSourceName + "." + fieldName);
+                        if (StringUtil.isBlank(propertyValue)) {
+                            propertyValue = env.getProperty(MULTI_DATA_SOURCE_PREFIX + "." + dataSourceName + "." + StringUtil.humpToHyphen(fieldName));
                         }
-                        //如果有设置默认数据源则替代
-                        if (multiDataSource instanceof BaseMultiDataSource) {
-                            if (((BaseMultiDataSource) multiDataSource).defaultDataSource()) {
-                                defaultDataSourceName = dataSourceName;
-                            }
-                        }
-                        Map<String, Method> methodMap = getMethodMap(typeClass);
-                        Object dataSource = null;
-                        try {
-                            dataSource = typeClass.newInstance();
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        } catch (InstantiationException e) {
-                            e.printStackTrace();
-                        }
-                        for (String fieldName : fieldList) {
-                            String propertyValue = env.getProperty(MULTI_DATA_SOURCE_PREFIX + "." + dataSourceName + "." + fieldName);
-                            if (StringUtil.isBlank(propertyValue)) {
-                                propertyValue = env.getProperty(MULTI_DATA_SOURCE_PREFIX + "." + dataSourceName + "." + StringUtil.humpToHyphen(fieldName));
-                            }
-                            if (StringUtil.isNotBlank(propertyValue)) {
-                                try {
-                                    Method propertyMethod = methodMap.get("set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1));
-                                    if (propertyMethod != null) {
-                                        propertyMethod.invoke(dataSource, getValueConvert(propertyMethod.getParameterTypes()[0].getName(), propertyValue));
-                                    }
-                                } catch (IllegalAccessException e) {
-                                    e.printStackTrace();
-                                } catch (InvocationTargetException e) {
-                                    e.printStackTrace();
+                        if (StringUtil.isNotBlank(propertyValue)) {
+                            try {
+                                Method method = methodMap.get("set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1));
+                                if (method != null) {
+                                    method.invoke(dataSource, getValueConvert(method.getParameterTypes()[0].getName(), propertyValue));
                                 }
+                            } catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                            } catch (InvocationTargetException e) {
+                                e.printStackTrace();
                             }
                         }
-                        dataSourceMap.put(dataSourceName, dataSource);
                     }
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
+                    if (dataSourceName.equals(defaultDataSource)) {
+                        definitionBuilder.addPropertyValue("defaultTargetDataSource", dataSource);
+                    }
+                    dataSourceMap.put(dataSourceName, dataSource);
                 }
-                definitionBuilder.addPropertyValue("defaultTargetDataSource", defaultDataSourceName);
                 definitionBuilder.addPropertyValue("targetDataSources", dataSourceMap);
                 beanDefinitionRegistry.registerBeanDefinition("dynamicDataSource", definitionBuilder.getBeanDefinition());
+                beanDefinitionRegistry.registerBeanDefinition("sqlBeanTransactional", transactionalDefinition());
                 for (Map<String, Method> map : classMethodMap.values()) {
                     map.clear();
                 }
                 classMethodMap.clear();
             }
         }
+    }
+
+    /**
+     * 获取多数据源名称
+     *
+     * @param multiDataSourceClass
+     * @return
+     */
+    private List<String> getDataSourceNameList(Class<?> multiDataSourceClass) {
+        Field[] fields = multiDataSourceClass.getFields();
+        if (fields == null || fields.length == 0) {
+            return null;
+        }
+        List<String> dataSourceNameList = new ArrayList<>();
+        for (int i = 0; i < fields.length; i++) {
+            if (!Modifier.isStatic(fields[i].getModifiers())) {
+                continue;
+            }
+            if (!Modifier.isFinal(fields[i].getModifiers())) {
+                continue;
+            }
+            try {
+                Object value = fields[i].get(null);
+                dataSourceNameList.add(value.toString());
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return dataSourceNameList;
     }
 
     /**
@@ -226,6 +251,15 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
                 break;
         }
         return value;
+    }
+
+    private BeanDefinition transactionalDefinition() {
+        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
+        pointcut.setExpression("@annotation(cn.vonce.sql.spring.annotation.DbTransactional)");
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(DefaultPointcutAdvisor.class);
+        beanDefinitionBuilder.addPropertyValue("pointcut", pointcut);
+        beanDefinitionBuilder.addPropertyValue("advice", new TransactionalInterceptor());
+        return beanDefinitionBuilder.getBeanDefinition();
     }
 
 }
