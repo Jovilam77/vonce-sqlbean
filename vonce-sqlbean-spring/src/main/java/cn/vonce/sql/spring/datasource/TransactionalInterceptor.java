@@ -29,16 +29,17 @@ public class TransactionalInterceptor implements MethodInterceptor {
         boolean isOk = false;
         DbSource dbSource = null;
         try {
-            //已经存在事务则加入事务并执行
             String xid = TransactionalContextHolder.getXid();
+            //已经存在事务则加入事务并执行
             if (StringUtil.isNotBlank(xid)) {
                 result = methodInvocation.proceed();
                 isOk = true;
                 return result;
-            } else {
+            }
+            //当前没有事务则创建事务
+            else {
                 //多数据源注解
                 dbSource = methodInvocation.getMethod().getDeclaringClass().getAnnotation(DbSource.class);
-                //当前没有事务则创建事务
                 //配置了多数据源
                 if (dbSource != null) {
                     DbRole dbRole = dbTransactional.role();
