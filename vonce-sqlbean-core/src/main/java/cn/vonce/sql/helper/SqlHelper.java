@@ -107,23 +107,23 @@ public class SqlHelper {
             sqlSb.append(SqlConstant.END_BRACKET + SqlConstant.AS + SqlConstant.T);
         }
         //MySQL,MariaDB,H2 分页处理
-        if (select.getSqlBeanDB().getDbType() == DbType.MySQL || select.getSqlBeanDB().getDbType() == DbType.MariaDB || select.getSqlBeanDB().getDbType() == DbType.H2) {
+        if (!select.isCount() && (select.getSqlBeanDB().getDbType() == DbType.MySQL || select.getSqlBeanDB().getDbType() == DbType.MariaDB || select.getSqlBeanDB().getDbType() == DbType.H2)) {
             mysqlPageDispose(select, sqlSb);
         }
         //Postgresql,SQLite,Hsql 分页处理
-        else if (select.getSqlBeanDB().getDbType() == DbType.Postgresql || select.getSqlBeanDB().getDbType() == DbType.SQLite || select.getSqlBeanDB().getDbType() == DbType.Hsql) {
+        else if (!select.isCount() && (select.getSqlBeanDB().getDbType() == DbType.Postgresql || select.getSqlBeanDB().getDbType() == DbType.SQLite || select.getSqlBeanDB().getDbType() == DbType.Hsql)) {
             PostgresqlPageDispose(select, sqlSb);
         }
         //Oracle 分页处理
-        else if (select.getSqlBeanDB().getDbType() == DbType.Oracle) {
+        else if (!select.isCount() && select.getSqlBeanDB().getDbType() == DbType.Oracle) {
             oraclePageDispose(select, sqlSb);
         }
         //DB2 分页处理
-        else if (select.getSqlBeanDB().getDbType() == DbType.DB2) {
+        else if (!select.isCount() && select.getSqlBeanDB().getDbType() == DbType.DB2) {
             db2PageDispose(select, sqlSb);
         }
         //Derby 分页处理
-        else if (select.getSqlBeanDB().getDbType() == DbType.Derby) {
+        else if (!select.isCount() && select.getSqlBeanDB().getDbType() == DbType.Derby) {
             derbyPageDispose(select, sqlSb);
         }
         return sqlSb.toString();
