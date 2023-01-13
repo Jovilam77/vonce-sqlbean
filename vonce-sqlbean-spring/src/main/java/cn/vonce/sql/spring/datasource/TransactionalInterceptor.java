@@ -26,14 +26,12 @@ public class TransactionalInterceptor implements MethodInterceptor {
             dbTransactional = methodInvocation.getMethod().getAnnotation(DbTransactional.class);
         }
         Object result;
-        boolean isOk = false;
         DbSource dbSource = null;
         try {
             String xid = TransactionalContextHolder.getXid();
             //已经存在事务则加入事务并执行
             if (StringUtil.isNotBlank(xid)) {
                 result = methodInvocation.proceed();
-                isOk = true;
                 return result;
             }
             //当前没有事务则创建事务
@@ -55,17 +53,40 @@ public class TransactionalInterceptor implements MethodInterceptor {
                 }
                 TransactionalContextHolder.setXid(IdBuilder.uuid());
                 result = methodInvocation.proceed();
-                isOk = true;
                 //移除事务id
                 TransactionalContextHolder.clearXid();
+                //提交或回滚事务
+                ConnectionContextHolder.commit(true);
             }
         } catch (Throwable e) {
             //移除事务id
             TransactionalContextHolder.clearXid();
+            Class<? extends Throwable>[] rollbackFor = dbTransactional.rollbackFor();
+            Class<? extends Throwable>[] noRollbackFor = dbTransactional.noRollbackFor();
+            if (rollbackFor.length > 0) {
+                //遇到哪些异常回滚
+                for (Class<? extends Throwable> thr : rollbackFor) {
+                    if (thr.getClass().isAssignableFrom(e.getClass())) {
+                        ConnectionContextHolder.commit(false);
+                        break;
+                    }
+                }
+            }
+            if (noRollbackFor.length > 0) {
+                //遇到哪些异常不回滚
+                for (Class<? extends Throwable> thr : noRollbackFor) {
+                    if (thr.getClass().isAssignableFrom(e.getClass())) {
+                        ConnectionContextHolder.commit(true);
+                        break;
+                    }
+                }
+            }
+            if (rollbackFor.length == 0 && noRollbackFor.length == 0) {
+                //回滚事务
+                ConnectionContextHolder.commit(false);
+            }
             throw e;
         } finally {
-            //提交或回滚事务
-            ConnectionContextHolder.commit(isOk);
             //配置了多数据源 则移除当前线程设定的数据源
             if (dbSource != null) {
                 DataSourceContextHolder.clearDataSource();

@@ -43,19 +43,19 @@ public @interface DbTransactional {
 //     * @return
 //     */
 //    int timeout() default TransactionDefinition.TIMEOUT_DEFAULT;
-//
-//    /**
-//     * 什么异常回滚
-//     *
-//     * @return
-//     */
-//    Class<? extends Throwable>[] rollbackFor() default {};
-//
-//    /**
-//     * 什么异常不回滚
-//     *
-//     * @return
-//     */
-//    Class<? extends Throwable>[] noRollbackFor() default {};
+
+    /**
+     * 什么异常回滚
+     *
+     * @return
+     */
+    Class<? extends Throwable>[] rollbackFor() default {};
+
+    /**
+     * 什么异常不回滚
+     *
+     * @return
+     */
+    Class<? extends Throwable>[] noRollbackFor() default {};
 
 }

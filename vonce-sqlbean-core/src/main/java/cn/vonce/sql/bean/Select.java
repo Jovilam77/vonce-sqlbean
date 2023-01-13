@@ -254,6 +254,12 @@ public class Select extends CommonCondition<Select> implements Serializable {
         return this;
     }
 
+    public Join setJoin(Join join) {
+        join.setReturnObj(this);
+        joinList.add(join);
+        return join;
+    }
+
     /**
      * 获取表连接
      */

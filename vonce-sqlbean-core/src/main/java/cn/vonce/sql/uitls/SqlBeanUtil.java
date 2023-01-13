@@ -10,6 +10,7 @@ import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.JdbcType;
 import cn.vonce.sql.enumerate.WhatType;
 import cn.vonce.sql.exception.SqlBeanException;
+import sun.security.provider.MD5;
 
 import java.beans.Introspector;
 import java.lang.invoke.SerializedLambda;
@@ -614,6 +615,7 @@ public class SqlBeanUtil {
             }
             SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
             Join join = new Join();
+            String key = null;
             if (sqlJoin != null && !sqlJoin.isBean()) {
                 join.setJoinType(sqlJoin.type());
                 join.setSchema(sqlJoin.schema());
@@ -621,12 +623,14 @@ public class SqlBeanUtil {
                 join.setTableAlias(StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias());
                 if (sqlJoin.on() != null && sqlJoin.on() != void.class) {
                     JoinOn joinOn = (JoinOn) sqlJoin.on().newInstance();
-                    joinOn.on(join);
+                    Condition condition = new Condition();
+                    joinOn.on(condition);
+                    join.on().setDataList(condition.getDataList());
+                    key = Md5Util.encode(sqlJoin.on().toString() + sqlJoin.on().getClassLoader().toString());
                 } else {
                     join.on(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), sqlJoin.tableKeyword()), new Original(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
+                    key = Md5Util.encode(sqlJoin.table().toLowerCase() + sqlJoin.tableKeyword().toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
                 }
-                //key是唯一的，作用是为了去重复，因为可能连接相同的表取不同的字段，但连接相同的表，连接条件不同是可以允许的
-                joinFieldMap.put(sqlJoin.table().toLowerCase() + sqlJoin.tableKeyword().toLowerCase() + sqlJoin.mainKeyword().toLowerCase(), join);
             } else if (sqlJoin != null && sqlJoin.isBean()) {
                 Class<?> subClazz = field.getType();
                 if (sqlJoin.from() != null) {
@@ -641,13 +645,17 @@ public class SqlBeanUtil {
                 join.setTableAlias(table.getAlias());
                 if (sqlJoin.on() != null && sqlJoin.on() != void.class) {
                     JoinOn joinOn = (JoinOn) sqlJoin.on().newInstance();
-                    joinOn.on(join);
+                    Condition condition = new Condition();
+                    joinOn.on(condition);
+                    join.on().setDataList(condition.getDataList());
+                    key = Md5Util.encode(sqlJoin.on().toString() + sqlJoin.on().getClassLoader().toString());
                 } else {
                     join.on(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), tableKeyword), new Original(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
+                    key = Md5Util.encode(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
                 }
-                //key是唯一的，作用是为了去重复，因为可能连接相同的表取不同的字段，但连接相同的表，连接条件不同是可以允许的
-                joinFieldMap.put(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlJoin.mainKeyword().toLowerCase(), join);
             }
+            //key是唯一的，作用是为了去重复，因为可能连接相同的表取不同的字段，但连接相同的表，连接条件不同是可以允许的
+            joinFieldMap.put(key, join);
         }
         return joinFieldMap;
     }
@@ -670,7 +678,7 @@ public class SqlBeanUtil {
             if (StringUtil.isNotEmpty(on)) {
                 select.join(join.getJoinType(), schema, tableName, tableAlias, on);
             } else {
-                select.getJoin().add(join);
+                select.setJoin(join).on().setDataList(null);
 //                String tableKeyword = join.getTableKeyword();
 //                String mainKeyword = join.getMainKeyword();
 //                select.join(join.getJoinType(), schema, tableName, tableAlias, tableKeyword, mainKeyword);

@@ -1,8 +1,6 @@
 package cn.vonce.sql.define;
 
 import cn.vonce.sql.bean.Condition;
-import cn.vonce.sql.bean.Join;
-import cn.vonce.sql.bean.Select;
 
 /**
  * 表连接条件
@@ -13,6 +11,6 @@ import cn.vonce.sql.bean.Select;
  */
 public interface JoinOn {
 
-    Condition<Select> on(Join join);
+    void on(Condition condition);
 
 }

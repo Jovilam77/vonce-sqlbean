@@ -86,7 +86,6 @@ public @interface SqlJoin {
      *
      * @return
      */
-//    String on() default "";
     Class<?> on() default void.class;
 
 }

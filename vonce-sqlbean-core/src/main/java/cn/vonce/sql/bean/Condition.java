@@ -24,6 +24,9 @@ public class Condition<Action> implements Serializable {
     private Logic<Action> logic = new Logic(this);
     private List<ConditionData> dataList = new ArrayList<>();
 
+    public Condition() {
+    }
+
     protected Condition(Action action) {
         this.action = action;
     }
