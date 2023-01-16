@@ -10,7 +10,6 @@ import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.JdbcType;
 import cn.vonce.sql.enumerate.WhatType;
 import cn.vonce.sql.exception.SqlBeanException;
-import sun.security.provider.MD5;
 
 import java.beans.Introspector;
 import java.lang.invoke.SerializedLambda;
@@ -490,14 +489,14 @@ public class SqlBeanUtil {
         List<Field> fieldList = new ArrayList<>();
         Class<?> superClass = clazz.getSuperclass();
         do {
-            if (!superClass.getName().equals("java.lang.Object")) {
+            if (superClass != null && !superClass.getName().equals("java.lang.Object")) {
                 fieldList.addAll(Arrays.asList(superClass.getDeclaredFields()));
                 superClass = superClass.getSuperclass();
             }
-            if (superClass.getName().equals("java.lang.Object")) {
+            if (superClass != null && superClass.getName().equals("java.lang.Object")) {
                 break;
             }
-        } while (!superClass.getName().equals("java.lang.Object"));
+        } while (superClass != null && !superClass.getName().equals("java.lang.Object"));
         fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
         return fieldList;
     }
@@ -550,7 +549,7 @@ public class SqlBeanUtil {
             SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
             if (sqlJoin != null && sqlJoin.isBean()) {
                 Class<?> subBeanClazz = field.getType();
-                if (sqlJoin.from() != null) {
+                if (sqlJoin.from() != null && sqlJoin.from() != void.class) {
                     subBeanClazz = sqlJoin.from();
                 }
                 SqlTable subSqlTable = getSqlTable(subBeanClazz);
@@ -600,12 +599,12 @@ public class SqlBeanUtil {
 
 
     /**
-     * 获取连表的数据
+     * 设置表连接
      *
      * @param clazz
      * @return
      */
-    public static Map<String, Join> getJoin(Select select, Class<?> clazz) throws SqlBeanException, InstantiationException, IllegalAccessException {
+    public static Map<String, Join> setJoin(Select select, Class<?> clazz) throws SqlBeanException, InstantiationException, IllegalAccessException {
         SqlTable sqlTable = getSqlTable(clazz);
         List<Field> fieldList = getBeanAllField(clazz);
         Map<String, Join> joinFieldMap = new HashMap<>();
@@ -614,76 +613,62 @@ public class SqlBeanUtil {
                 continue;
             }
             SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
-            Join join = new Join();
+            if (sqlJoin == null) {
+                continue;
+            }
+            //key是唯一的，作用是为了去重复，因为可能连接相同的表取不同的字段，但连接相同的表，连接条件不同是可以允许的
             String key = null;
-            if (sqlJoin != null && !sqlJoin.isBean()) {
-                join.setJoinType(sqlJoin.type());
-                join.setSchema(sqlJoin.schema());
-                join.setTableName(sqlJoin.table());
-                join.setTableAlias(StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias());
-                if (sqlJoin.on() != null && sqlJoin.on() != void.class) {
-                    JoinOn joinOn = (JoinOn) sqlJoin.on().newInstance();
-                    Condition condition = new Condition();
-                    joinOn.on(condition);
-                    join.on().setDataList(condition.getDataList());
-                    key = Md5Util.encode(sqlJoin.on().toString() + sqlJoin.on().getClassLoader().toString());
-                } else {
-                    join.on(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), sqlJoin.tableKeyword()), new Original(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
-                    key = Md5Util.encode(sqlJoin.table().toLowerCase() + sqlJoin.tableKeyword().toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
-                }
-            } else if (sqlJoin != null && sqlJoin.isBean()) {
-                Class<?> subClazz = field.getType();
-                if (sqlJoin.from() != null) {
+            Class<?> subClazz = field.getType();
+            Table table = null;
+            //如果字段是bean
+            if (sqlJoin != null && sqlJoin.isBean()) {
+                if (sqlJoin.from() != null && sqlJoin.from() != void.class) {
                     subClazz = sqlJoin.from();
                 }
                 //表名、别名优先从@SqlBeanJoin注解中取，如果不存在则从类注解中取，再其次是类名
-                Table table = getTable(subClazz, sqlJoin);
-                String tableKeyword = getTableFieldName(getIdField(subClazz), sqlTable);
-                join.setJoinType(sqlJoin.type());
-                join.setSchema(table.getSchema());
-                join.setTableName(table.getName());
-                join.setTableAlias(table.getAlias());
-                if (sqlJoin.on() != null && sqlJoin.on() != void.class) {
-                    JoinOn joinOn = (JoinOn) sqlJoin.on().newInstance();
-                    Condition condition = new Condition();
-                    joinOn.on(condition);
-                    join.on().setDataList(condition.getDataList());
-                    key = Md5Util.encode(sqlJoin.on().toString() + sqlJoin.on().getClassLoader().toString());
-                } else {
-                    join.on(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), tableKeyword), new Original(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
+                table = getTable(subClazz, sqlJoin);
+            }
+            Join join = new Join();
+            join.setJoinType(sqlJoin.type());
+            join.setSchema(table != null ? table.getSchema() : sqlJoin.schema());
+            join.setTableName(table != null ? table.getName() : sqlJoin.table());
+            join.setTableAlias(table != null ? table.getAlias() : StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias());
+
+            //如果指定了条件对象
+            if (sqlJoin.on() != null && sqlJoin.on() != void.class) {
+                key = Md5Util.encode(sqlJoin.on() + sqlJoin.on().getClassLoader().toString());
+                if (joinFieldMap.containsKey(key)) {
+                    join = null;
+                    continue;
+                }
+                select.addJoin(join);
+                JoinOn joinOn = (JoinOn) sqlJoin.on().newInstance();
+                Condition condition = new Condition();
+                joinOn.on(condition);
+                join.on().setDataList(condition.getDataList());
+            } else {
+                if (sqlJoin != null && !sqlJoin.isBean()) {
+                    key = Md5Util.encode(sqlJoin.table().toLowerCase() + sqlJoin.tableKeyword().toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
+                    if (joinFieldMap.containsKey(key)) {
+                        join = null;
+                        continue;
+                    }
+                    select.addJoin(join);
+                    join.on(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), sqlJoin.tableKeyword()), new Original(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
+                } else if (sqlJoin != null && sqlJoin.isBean()) {
+                    String tableKeyword = getTableFieldName(getIdField(subClazz), sqlTable);
                     key = Md5Util.encode(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
+                    if (joinFieldMap.containsKey(key)) {
+                        join = null;
+                        continue;
+                    }
+                    select.addJoin(join);
+                    join.on(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), tableKeyword), new Original(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
                 }
             }
-            //key是唯一的，作用是为了去重复，因为可能连接相同的表取不同的字段，但连接相同的表，连接条件不同是可以允许的
             joinFieldMap.put(key, join);
         }
         return joinFieldMap;
-    }
-
-    /**
-     * 设置表连接
-     *
-     * @param select
-     * @param clazz
-     * @throws SqlBeanException
-     */
-    public static void setJoin(Select select, Class<?> clazz) throws SqlBeanException, InstantiationException, IllegalAccessException {
-        Map<String, Join> joinFieldMap = getJoin(select, clazz);
-        for (Join join : joinFieldMap.values()) {
-            String schema = join.getSchema();
-            String tableName = join.getTableName();
-            String tableAlias = join.getTableAlias();
-            //过时暂时兼容
-            String on = join.getOn();
-            if (StringUtil.isNotEmpty(on)) {
-                select.join(join.getJoinType(), schema, tableName, tableAlias, on);
-            } else {
-                select.setJoin(join).on().setDataList(null);
-//                String tableKeyword = join.getTableKeyword();
-//                String mainKeyword = join.getMainKeyword();
-//                select.join(join.getJoinType(), schema, tableName, tableAlias, tableKeyword, mainKeyword);
-            }
-        }
     }
 
     /**
@@ -1296,7 +1281,7 @@ public class SqlBeanUtil {
             SqlTable sqlTable = SqlBeanUtil.getSqlTable(tableClass);
             String tableAlias = sqlTable != null ? (StringUtil.isNotBlank(sqlTable.alias()) ? sqlTable.alias() : sqlTable.value()) : tableClass.getSimpleName();
             String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
-            return new Column(tableAlias, columnName, columnName);
+            return new Column(tableAlias, columnName, "");
         } catch (ClassNotFoundException e) {
             throw new SqlBeanException("找不到类：" + e.getMessage());
         } catch (NoSuchFieldException e) {
