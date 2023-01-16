@@ -222,8 +222,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @return
      */
     public Select column(Column column, String columnAlias) {
-        column.setAlias(columnAlias);
-        columnList.add(column);
+        columnList.add(new Column(column.getTableAlias(), column.getName(), columnAlias));
         return this;
     }
 
@@ -254,7 +253,13 @@ public class Select extends CommonCondition<Select> implements Serializable {
         return this;
     }
 
-    public Join setJoin(Join join) {
+    /**
+     * 增加连表
+     *
+     * @param join
+     * @return
+     */
+    public Join addJoin(Join join) {
         join.setReturnObj(this);
         joinList.add(join);
         return join;

@@ -1,5 +1,7 @@
 package cn.vonce.sql.bean;
 
+import cn.vonce.sql.uitls.StringUtil;
+
 import java.io.Serializable;
 
 /**
@@ -38,7 +40,9 @@ public class Column implements Serializable {
     }
 
     public void setTableAlias(String tableAlias) {
-        this.tableAlias = tableAlias;
+        if (StringUtil.isBlank(this.tableAlias)) {
+            this.tableAlias = tableAlias;
+        }
     }
 
     public String getName() {
@@ -46,7 +50,9 @@ public class Column implements Serializable {
     }
 
     public void setName(String name) {
-        this.name = name;
+        if (StringUtil.isBlank(this.name)) {
+            this.name = name;
+        }
     }
 
     public String getAlias() {
@@ -54,7 +60,9 @@ public class Column implements Serializable {
     }
 
     public void setAlias(String alias) {
-        this.alias = alias;
+        if (StringUtil.isBlank(this.alias)) {
+            this.alias = alias;
+        }
     }
 
     @Override
