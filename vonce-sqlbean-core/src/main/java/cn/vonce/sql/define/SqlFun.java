@@ -4,6 +4,7 @@ import cn.vonce.sql.bean.Column;
 import cn.vonce.sql.bean.Original;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Sql函数
@@ -267,12 +268,24 @@ public class SqlFun extends Column {
     /**
      * 拼接字符
      *
-     * @param str1 字符串1
-     * @param str2 字符串2
+     * @param str 字符串数组
      * @return
      */
-    public static SqlFun concat(Object str1, Object str2) {
-        return new SqlFun("concat", new Object[]{str1, str2});
+    public static SqlFun concat(Object... str) {
+        return new SqlFun("concat", str);
+    }
+
+    /**
+     * 拼接字符
+     *
+     * @param separator 分隔符
+     * @param str       字符串数组
+     * @return
+     */
+    public static SqlFun concat_ws(String separator, Object... str) {
+        List<Object> objectList = Arrays.asList(str);
+        objectList.add(0, separator);
+        return new SqlFun("concat", objectList.toArray());
     }
 
     /**
