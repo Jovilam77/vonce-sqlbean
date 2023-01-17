@@ -1,7 +1,5 @@
 package cn.vonce.sql.spring.annotation;
 
-import cn.vonce.sql.spring.enumerate.DbRole;
-
 import java.lang.annotation.*;
 
 /**
@@ -17,11 +15,11 @@ import java.lang.annotation.*;
 public @interface DbTransactional {
 
     /**
-     * 主库或从库
+     * 是否只读
      *
      * @return
      */
-    DbRole role() default DbRole.MASTER;
+    boolean readOnly() default false;
 
 //    /**
 //     * 传播机制
