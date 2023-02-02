@@ -114,6 +114,15 @@ public class SqlFun extends Column {
     }
 
     /**
+     * 日期
+     *
+     * @return
+     */
+    public static SqlFun date(Object date) {
+        return new SqlFun("date", new Object[]{date});
+    }
+
+    /**
      * 当前系统时间，1997-06-03 19:23:12
      *
      * @return
