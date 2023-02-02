@@ -238,7 +238,7 @@ public class SqlHelperTest {
         update.set(SqlUser.id, 1).
                 set(SqlUser.nickname, "jovi").
                 setAdd(SqlUser.integral$, SqlUser.integral$, SqlUser.integral$).
-                setSub("size", new Original("`size`"), 1).
+                setSub(User::getGender, User::getGender, 1).
                 where().gt(User::getId, 0).and().lt(User::getId, 10);
         System.out.println("---update2---");
         System.out.println(SqlHelper.buildUpdateSql(update));

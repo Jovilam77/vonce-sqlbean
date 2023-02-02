@@ -803,16 +803,6 @@ public class SqlHelper {
                 conditionSql.append(SqlConstant.AND);
             }
             conditionSql.append(SqlConstant.BEGIN_BRACKET);
-//            // 遍历所有条件
-//            List<ConditionData> conditionDataList = condition.getDataList();
-//            for (int i = 0; i < conditionDataList.size(); i++) {
-//                ConditionInfo conditionInfo = (ConditionInfo) conditionDataList.get(i).getItem();
-//                // 遍历sql逻辑处理
-//                if (i != 0 && i < condition.getDataList().size()) {
-//                    conditionSql.append(getLogic(conditionDataList.get(i).getSqlLogic()));
-//                }
-//                conditionSql.append(valueOperator(common, conditionInfo));
-//            }
             conditionSql.append(simpleConditionHandle(common, condition.getDataList()));
             conditionSql.append(SqlConstant.END_BRACKET);
         }

@@ -4,6 +4,7 @@ import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
+import cn.vonce.sql.define.ColumnFunction;
 import cn.vonce.sql.define.JoinOn;
 import cn.vonce.sql.enumerate.AlterType;
 import cn.vonce.sql.enumerate.DbType;
@@ -766,6 +767,9 @@ public class SqlBeanUtil {
     public static Object getOriginal(Common common, Object value) {
         if (value instanceof Column) {
             Column column = (Column) value;
+            return SqlBeanUtil.getTableFieldFullName(common, column.getTableAlias(), column.getName());
+        } else if (value instanceof ColumnFunction) {
+            Column column = LambdaUtil.getColumn((ColumnFunction) value);
             return SqlBeanUtil.getTableFieldFullName(common, column.getTableAlias(), column.getName());
         } else if (value instanceof Original) {
             Original original = (Original) value;

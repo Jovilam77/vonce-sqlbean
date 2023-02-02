@@ -1,5 +1,8 @@
 package cn.vonce.sql.bean;
 
+import cn.vonce.sql.define.ColumnFunction;
+import cn.vonce.sql.uitls.LambdaUtil;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +99,12 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
         return this;
     }
 
+    public <R> Update<T> set(ColumnFunction<T, R> columnFunction, Object value) {
+        Column column = LambdaUtil.getColumn(columnFunction);
+        setInfoList.add(new SetInfo(column.getTableAlias(), column.getName(), value));
+        return this;
+    }
+
     public Update<T> setAdd(String columnName, Object value1, Object value2) {
         setInfoList.add(new SetInfo(SetInfo.Operator.ADDITION, columnName, value1, value2));
         return this;
@@ -107,6 +116,18 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
     }
 
     public Update<T> setAdd(Column column, Object value1, Object value2) {
+        setInfoList.add(new SetInfo(SetInfo.Operator.ADDITION, column.getTableAlias(), column.getName(), value1, value2));
+        return this;
+    }
+
+    public <R> Update<T> setAdd(ColumnFunction<T, R> columnFunction, Object value1, Object value2) {
+        Column column = LambdaUtil.getColumn(columnFunction);
+        setInfoList.add(new SetInfo(SetInfo.Operator.ADDITION, column.getTableAlias(), column.getName(), value1, value2));
+        return this;
+    }
+
+    public <R> Update<T> setAdd(ColumnFunction<T, R> columnFunction, ColumnFunction<T, R> value1, Object value2) {
+        Column column = LambdaUtil.getColumn(columnFunction);
         setInfoList.add(new SetInfo(SetInfo.Operator.ADDITION, column.getTableAlias(), column.getName(), value1, value2));
         return this;
     }
@@ -126,9 +147,16 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
         return this;
     }
 
-    public static void main(String[] args) {
+    public <R> Update<T> setSub(ColumnFunction<T, R> columnFunction, Object value1, Object value2) {
+        Column column = LambdaUtil.getColumn(columnFunction);
+        setInfoList.add(new SetInfo(SetInfo.Operator.SUBTRACT, column.getTableAlias(), column.getName(), value1, value2));
+        return this;
+    }
 
-        new Update<>().set("", "").set("", 1).where().eq("", 1);
+    public <R> Update<T> setSub(ColumnFunction<T, R> columnFunction, ColumnFunction<T, R> value1, Object value2) {
+        Column column = LambdaUtil.getColumn(columnFunction);
+        setInfoList.add(new SetInfo(SetInfo.Operator.SUBTRACT, column.getTableAlias(), column.getName(), value1, value2));
+        return this;
     }
 
 }

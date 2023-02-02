@@ -1,6 +1,5 @@
 package cn.vonce.sql.spring.datasource;
 
-import cn.vonce.sql.spring.annotation.DbSource;
 import cn.vonce.sql.spring.annotation.DbTransactional;
 import cn.vonce.sql.uitls.IdBuilder;
 import cn.vonce.sql.uitls.StringUtil;
@@ -23,7 +22,6 @@ public class TransactionalInterceptor implements MethodInterceptor {
             dbTransactional = methodInvocation.getMethod().getAnnotation(DbTransactional.class);
         }
         Object result;
-        DbSource dbSource = null;
         try {
             String xid = TransactionalContextHolder.getXid();
             //已经存在事务则加入事务并执行
@@ -73,11 +71,6 @@ public class TransactionalInterceptor implements MethodInterceptor {
             }
             ConnectionContextHolder.commit(!needRollback);
             throw e;
-        } finally {
-            //配置了多数据源 则移除当前线程设定的数据源
-            if (dbSource != null) {
-                DataSourceContextHolder.clearDataSource();
-            }
         }
         return result;
     }

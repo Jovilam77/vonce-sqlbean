@@ -457,6 +457,17 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加groupBy分组
      *
+     * @param columnFunction 列字段信息
+     * @return
+     */
+    public <T, R> Select groupBy(ColumnFunction<T, R> columnFunction) {
+        Column column = LambdaUtil.getColumn(columnFunction);
+        return groupBy(column.getTableAlias(), column.getName());
+    }
+
+    /**
+     * 添加groupBy分组
+     *
      * @param tableAlias 表别名
      * @param columNname 列字段名
      * @return
@@ -506,9 +517,29 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加列字段排序
      *
+     * @param columnFunction 列字段名
+     */
+    public <T, R> Select orderByAsc(ColumnFunction<T, R> columnFunction) {
+        Column column = LambdaUtil.getColumn(columnFunction);
+        return orderBy(column.getTableAlias(), column.getName(), SqlSort.ASC);
+    }
+
+    /**
+     * 添加列字段排序
+     *
      * @param column 列字段名
      */
     public Select orderByDesc(Column column) {
+        return orderBy(column.getTableAlias(), column.getName(), SqlSort.DESC);
+    }
+
+    /**
+     * 添加列字段排序
+     *
+     * @param columnFunction 列字段名
+     */
+    public <T, R> Select orderByDesc(ColumnFunction<T, R> columnFunction) {
+        Column column = LambdaUtil.getColumn(columnFunction);
         return orderBy(column.getTableAlias(), column.getName(), SqlSort.DESC);
     }
 
