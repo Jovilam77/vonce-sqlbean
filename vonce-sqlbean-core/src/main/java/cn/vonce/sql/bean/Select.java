@@ -222,7 +222,8 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @return
      */
     public Select column(Column column, String columnAlias) {
-        columnList.add(new Column(column.getTableAlias(), column.getName(), columnAlias));
+        column.setAlias(columnAlias);
+        columnList.add(column);
         return this;
     }
 
