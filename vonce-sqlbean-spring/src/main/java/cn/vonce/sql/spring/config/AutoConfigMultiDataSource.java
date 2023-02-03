@@ -57,7 +57,7 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
         fieldList.add("validationQueryTimeout");
         fieldList.add("keepAlive");
         fieldList.add("removeAbandoned");
-        fieldList.add("removeAbandonedTimeout");
+        fieldList.add("removeAbandonedTimeoutMillis");
         fieldList.add("logAbandoned");
         fieldList.add("connectionProperties");
         fieldList.add("poolPreparedStatements");
