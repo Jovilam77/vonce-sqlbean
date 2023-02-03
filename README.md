@@ -19,12 +19,13 @@
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
-		<version>1.2.0-beta</version>
+		<version>1.2.0-beta1</version>
 	</dependency>
 
 ###### 2.标注实体类
 
 ```java
+
 @SqlTable("d_user")
 public class User {
     @SqlId(type = IdType.SNOWFLAKE_ID_16)
@@ -74,22 +75,22 @@ public class UserController {
     public RS select() {
         //查询列表
         List<User> list = userService.select();
-        list = userService.selectBy(Wrapper.where(gt(User$.id, 10)).and(lt(User$.id, 20)));
+        list = userService.selectBy(Wrapper.where(Cond.gt(User::getId, 10)).and(Cond.lt(User::getId, 20)));
         //指定查询
-        list = userService.select(new Select().column(User$.id$, User$.name$, User$.phone$).where().gt(User$.id$, 10));
+        list = userService.select(new Select().column(User::getId, User::getName, User::getPhone).where().gt(User::getId, 10));
 
         //查询一条
         User user = userService.selectById(1);
-        user = userService.selectOneBy(Wrapper.where(eq(User$.id, 1001)));
+        user = userService.selectOneBy(Wrapper.where(eq(User::getId, 1001)));
 
         //sql语义化查询《20岁且是女性的用户根据创建时间倒序，获取前10条》
-        list = userService.select(new Select().column(User$.id$, User$.name$, User$.phone$).where().eq(User$.age, 22).and().eq(User$.gender, 0).back().orderByDesc(User$.createTime).page(0, 10));
+        list = userService.select(new Select().column(User::getId, User::getName, User::getPhone).where().eq(User::getAge, 22).and().eq(User::getGender, 0).back().orderByDesc(User::getCreateTime).page(0, 10));
 
         //联表查询《20岁且是女性的用户根据创建时间倒序，查询前10条用户的信息和地址》
         Select select = new Select();
-        select.column(User$.id$, User$.name$, User$.phone$, UserAddress$.province$, UserAddress$.city$, UserAddress$.area$, UserAddress$.details$);
+        select.column(User::getId, User::getName, User::getPhone, UserAddress::getProvince, UserAddress::getCity, UserAddress::getArea, UserAddress::getDetails);
         select.join(JoinType.INNER_JOIN, UserAddress$._tableName, UserAddress$.user_id, User$.id);
-        select.where().gt(User$.age$, 22).and().eq(User$.gender$, 0);
+        select.where().gt(User::getAge, 22).and().eq(User::getGender, 0);
         select.orderByDesc(User$.createTime$);
         select.page(0, 10);
 
@@ -116,7 +117,9 @@ public class UserController {
         //根据bean内部id更新
         long i = userService.updateByBeanId(user);
         //根据条件更新
-        //i = userService.updateBy(Wrapper.where(gt(User$.age, 22)).and(eq(User$.gender, 1)));
+        //i = userService.updateBy(Wrapper.where(Cond.gt(User::getAge, 22)).and(Cond.eq(User::getGender, 1)));
+        //指定更新某个字段 UPDATE user SET gender = 1, name = 'Jovi' ,age = age + 1 WHERE = id = 111
+        userService.update(new Update<User>().set(User::getGender, 1).set(User::getName, "Jovi").setAdd(User::getAge, User::getAge, 1).where().eq(User::getId, 111).back());
         if (i > 0) {
             return super.successHint("更新成功");
         }
@@ -129,7 +132,7 @@ public class UserController {
         //根据id删除
         long i = userService.deleteById(id);
         //根据条件删除
-        //i = userService.deleteBy(Wrapper.where(gt(User$.age, 22)).and(eq(User$.gender, 1)));
+        //i = userService.deleteBy(Wrapper.where(gt(User::getAge, 22)).and(eq(User::getGender, 1)));
         if (i > 0) {
             return super.successHint("删除成功");
         }
