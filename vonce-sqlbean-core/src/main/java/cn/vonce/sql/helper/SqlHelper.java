@@ -650,7 +650,7 @@ public class SqlHelper {
                     setSql.append(isToUpperCase ? setInfo.getName().toUpperCase() : setInfo.getName());
                     setSql.append(transferred);
                     setSql.append(SqlConstant.EQUAL_TO);
-                    if (setInfo.getValue().getClass().isArray()) {
+                    if (setInfo.getValue() != null && setInfo.getValue().getClass().isArray()) {
                         Object[] values = (Object[]) setInfo.getValue();
                         setSql.append(SqlBeanUtil.getOriginal(update, values[0]));
                         if (setInfo.getOperator() == SetInfo.Operator.ADDITION) {
