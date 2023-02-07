@@ -23,9 +23,9 @@ public enum JavaMapPostgresqlType {
     CHAR(new Class[]{char.class, Character.class}),
     VARCHAR(new Class[]{String.class}),
     BIT(new Class[]{boolean.class, Boolean.class}),
-    DATE(new Class[]{java.sql.Date.class}),
-    TIME(new Class[]{java.sql.Time.class}),
-    TIMESTAMP(new Class[]{java.sql.Timestamp.class, java.util.Date.class}),
+    DATE(new Class[]{java.sql.Date.class, java.time.LocalDate.class}),
+    TIME(new Class[]{java.sql.Time.class, java.time.LocalTime.class}),
+    TIMESTAMP(new Class[]{java.sql.Timestamp.class, java.util.Date.class, java.time.LocalDateTime.class}),
     TEXT(new Class[]{java.sql.Clob.class}),
     BYTEA(new Class[]{java.sql.Blob.class, Object.class});
 

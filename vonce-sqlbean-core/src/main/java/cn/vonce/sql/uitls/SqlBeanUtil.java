@@ -846,6 +846,9 @@ public class SqlBeanUtil {
             case "java.sql.Date":
             case "java.sql.Timestamp":
             case "java.sql.Time":
+            case "java.time.LocalDate":
+            case "java.time.LocalTime":
+            case "java.time.LocalDateTime":
                 whatType = WhatType.DATE_TYPE;
                 break;
             default:
@@ -1015,8 +1018,7 @@ public class SqlBeanUtil {
                 if (jdbcType != null) {
                     dateString = (String) value;
                 } else {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-                    dateString = sdf.format(value);
+                    dateString = DateUtil.unifyDateToString(value);
                 }
                 switch (common.getSqlBeanDB().getDbType()) {
                     case Oracle:
