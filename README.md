@@ -89,9 +89,9 @@ public class UserController {
         //联表查询《20岁且是女性的用户根据创建时间倒序，查询前10条用户的信息和地址》
         Select select = new Select();
         select.column(User::getId, User::getName, User::getPhone, UserAddress::getProvince, UserAddress::getCity, UserAddress::getArea, UserAddress::getDetails);
-        select.join(JoinType.INNER_JOIN, UserAddress$._tableName, UserAddress$.user_id, User$.id);
+        select.innerJoin(UserAddress.class).on().eq(UserAddress::getId, User::getId);
         select.where().gt(User::getAge, 22).and().eq(User::getGender, 0);
-        select.orderByDesc(User$.createTime$);
+        select.orderByDesc(User::getCreateTime);
         select.page(0, 10);
 
         //查询Map
