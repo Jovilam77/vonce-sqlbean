@@ -1,6 +1,7 @@
 package cn.vonce.sql.bean;
 
 import cn.vonce.sql.define.ColumnFunction;
+import cn.vonce.sql.define.SqlFun;
 import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.enumerate.SqlSort;
 import cn.vonce.sql.helper.SqlHelper;
@@ -222,8 +223,14 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @return
      */
     public Select column(Column column, String columnAlias) {
-        column.setAlias(columnAlias);
-        columnList.add(column);
+        Column newColumn;
+        if (column instanceof SqlFun) {
+            newColumn = SqlBeanUtil.copy(column);
+            newColumn.setAlias(columnAlias);
+        } else {
+            newColumn = new Column(column.getTableAlias(), column.getName(), columnAlias);
+        }
+        columnList.add(newColumn);
         return this;
     }
 

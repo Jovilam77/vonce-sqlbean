@@ -291,7 +291,7 @@ public class PageHelper<T> {
         try {
             Class<?> clazz = pageService.getClass();
             // 衍生一个对象用于select查询
-            Select countSelect = select.copy();
+            Select countSelect = SqlBeanUtil.copy(select);
             //标识为克隆对象
             ReflectUtil.instance().invoke(Select.class, countSelect, "count", true);
             //设置分页
