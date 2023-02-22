@@ -695,7 +695,7 @@ public class SqlBeanProvider {
             Alter alter = new Alter();
             alter.setSqlBeanDB(sqlBeanDB);
             alter.setTable(clazz);
-            String oldName = (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) ? sqlColumn.oldName().toUpperCase() : sqlColumn.oldName();
+            String oldName = sqlColumn == null ? "" : (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) ? sqlColumn.oldName().toUpperCase() : sqlColumn.oldName();
             ColumnInfo columnInfo = SqlBeanUtil.getColumnInfo(alter, field, sqlTable, sqlColumn);
             boolean exist = false;
             boolean fit = true;
