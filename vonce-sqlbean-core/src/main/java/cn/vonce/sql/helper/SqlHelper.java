@@ -378,7 +378,7 @@ public class SqlHelper {
                 String tableAlias = null;
                 String columnName;
                 if (column instanceof SqlFun) {
-                    columnName = getSqlFunction(select, (SqlFun) column);
+                    columnName = SqlBeanUtil.getSqlFunction(select, (SqlFun) column);
                 } else {
                     tableAlias = select.getColumnList().get(i).getTableAlias();
                     columnName = select.getColumnList().get(i).getName();
@@ -1026,11 +1026,7 @@ public class SqlHelper {
             StringBuffer in_notIn = new StringBuffer();
             if (in_notInValues != null && in_notInValues.length > 0) {
                 for (int k = 0; k < in_notInValues.length; k++) {
-                    if (in_notInValues[k] instanceof SqlFun) {
-                        in_notIn.append(getSqlFunction(common, (SqlFun) in_notInValues[k]));
-                    } else {
-                        in_notIn.append(SqlBeanUtil.getOriginal(common, in_notInValues[k]));
-                    }
+                    in_notIn.append(SqlBeanUtil.getOriginal(common, in_notInValues[k]));
                     in_notIn.append(SqlConstant.COMMA);
                 }
                 in_notIn.deleteCharAt(in_notIn.length() - SqlConstant.COMMA.length());
@@ -1048,13 +1044,13 @@ public class SqlHelper {
                 }
                 value = SqlConstant.SINGLE_QUOTATION_MARK + value + SqlConstant.SINGLE_QUOTATION_MARK;
             } else {
-                value = value instanceof SqlFun ? getSqlFunction(common, (SqlFun) value) : SqlBeanUtil.getOriginal(common, value);
+                value = SqlBeanUtil.getOriginal(common, value);
             }
         }
         //列
         Column column = conditionInfo.getColumn();
         if (column instanceof SqlFun) {
-            sql.append(getSqlFunction(common, (SqlFun) column));
+            sql.append(SqlBeanUtil.getSqlFunction(common, (SqlFun) column));
         } else {
             //如果存在表别名
             if (StringUtil.isNotEmpty(column.getTableAlias())) {
@@ -1067,9 +1063,9 @@ public class SqlHelper {
         sql.append(operator);
         //值
         if (conditionInfo.getSqlOperator() == SqlOperator.BETWEEN) {
-            sql.append(betweenValues[0] instanceof SqlFun ? getSqlFunction(common, (SqlFun) betweenValues[0]) : SqlBeanUtil.getSqlValue(common, betweenValues[0]));
+            sql.append(betweenValues[0] instanceof SqlFun ? SqlBeanUtil.getSqlFunction(common, (SqlFun) betweenValues[0]) : SqlBeanUtil.getSqlValue(common, betweenValues[0]));
             sql.append(SqlConstant.AND);
-            sql.append(betweenValues[1] instanceof SqlFun ? getSqlFunction(common, (SqlFun) betweenValues[1]) : SqlBeanUtil.getSqlValue(common, betweenValues[1]));
+            sql.append(betweenValues[1] instanceof SqlFun ? SqlBeanUtil.getSqlFunction(common, (SqlFun) betweenValues[1]) : SqlBeanUtil.getSqlValue(common, betweenValues[1]));
         } else if (conditionInfo.getSqlOperator() == SqlOperator.IS_NULL || conditionInfo.getSqlOperator() == SqlOperator.IS_NOT_NULL) {
             sql.append("NULL ");
         } else {
@@ -1080,28 +1076,6 @@ public class SqlHelper {
             sql.append(SqlConstant.END_BRACKET);
         }
         return sql;
-    }
-
-    /**
-     * 获取Sql函数内容
-     *
-     * @param common
-     * @param sqlFun
-     * @return
-     */
-    private static String getSqlFunction(Common common, SqlFun sqlFun) {
-        StringBuffer fun = new StringBuffer();
-        fun.append(sqlFun.getFunName());
-        fun.append(SqlConstant.BEGIN_BRACKET);
-        if (sqlFun.getValues() != null && sqlFun.getValues().length > 0) {
-            for (Object value : sqlFun.getValues()) {
-                fun.append(value instanceof SqlFun ? getSqlFunction(common, (SqlFun) value) : SqlBeanUtil.getOriginal(common, value));
-                fun.append(SqlConstant.COMMA);
-            }
-            fun.deleteCharAt(fun.length() - SqlConstant.COMMA.length());
-        }
-        fun.append(SqlConstant.END_BRACKET);
-        return fun.toString();
     }
 
     /**

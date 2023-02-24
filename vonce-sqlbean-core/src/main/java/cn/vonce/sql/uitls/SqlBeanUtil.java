@@ -6,6 +6,7 @@ import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.define.ColumnFunction;
 import cn.vonce.sql.define.JoinOn;
+import cn.vonce.sql.define.SqlFun;
 import cn.vonce.sql.enumerate.AlterType;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.JdbcType;
@@ -766,7 +767,9 @@ public class SqlBeanUtil {
      * @return
      */
     public static Object getOriginal(Common common, Object value) {
-        if (value instanceof Column) {
+        if (value instanceof SqlFun) {
+            return getSqlFunction(common, (SqlFun) value);
+        } else if (value instanceof Column) {
             Column column = (Column) value;
             return SqlBeanUtil.getTableFieldFullName(common, column.getTableAlias(), column.getName());
         } else if (value instanceof ColumnFunction) {
@@ -777,6 +780,28 @@ public class SqlBeanUtil {
             return original.getValue();
         }
         return getSqlValue(common, value);
+    }
+
+    /**
+     * 获取Sql函数内容
+     *
+     * @param common
+     * @param sqlFun
+     * @return
+     */
+    public static String getSqlFunction(Common common, SqlFun sqlFun) {
+        StringBuffer fun = new StringBuffer();
+        fun.append(sqlFun.getFunName());
+        fun.append(SqlConstant.BEGIN_BRACKET);
+        if (sqlFun.getValues() != null && sqlFun.getValues().length > 0) {
+            for (Object value : sqlFun.getValues()) {
+                fun.append(value instanceof SqlFun ? getSqlFunction(common, (SqlFun) value) : SqlBeanUtil.getOriginal(common, value));
+                fun.append(SqlConstant.COMMA);
+            }
+            fun.deleteCharAt(fun.length() - SqlConstant.COMMA.length());
+        }
+        fun.append(SqlConstant.END_BRACKET);
+        return fun.toString();
     }
 
     /**
@@ -1285,7 +1310,8 @@ public class SqlBeanUtil {
         try {
             Class<?> tableClass = Class.forName(lambda.getImplClass().replace("/", "."));
             Field field = tableClass.getDeclaredField(fieldName);
-            SqlTable sqlTable = SqlBeanUtil.getSqlTable(tableClass);
+            String methodType = lambda.getInstantiatedMethodType();
+            SqlTable sqlTable = SqlBeanUtil.getSqlTable(Class.forName(methodType.substring(methodType.indexOf("(L") + 2, methodType.indexOf(";")).replace("/", ".")));
             String tableAlias = sqlTable != null ? (StringUtil.isNotBlank(sqlTable.alias()) ? sqlTable.alias() : sqlTable.value()) : tableClass.getSimpleName();
             String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
             return new Column(tableAlias, columnName, "");

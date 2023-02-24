@@ -62,17 +62,6 @@ public class Cond extends ConditionInfo {
     }
 
     /**
-     * 等于
-     *
-     * @param columnFunction
-     * @param value
-     * @return
-     */
-    public static <T, R> Cond eq(ColumnFunction<T, R> columnFunction, ColumnFunction<T, R> value) {
-        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.EQUAL_TO, value);
-    }
-
-    /**
      * 不等于
      *
      * @param field
@@ -114,17 +103,6 @@ public class Cond extends ConditionInfo {
      * @return
      */
     public static <T, R> Cond notEq(ColumnFunction<T, R> columnFunction, Object value) {
-        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.NOT_EQUAL_TO, value);
-    }
-
-    /**
-     * 不等于
-     *
-     * @param columnFunction
-     * @param value
-     * @return
-     */
-    public static <T, R> Cond notEq(ColumnFunction<T, R> columnFunction, ColumnFunction<T, R> value) {
         return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.NOT_EQUAL_TO, value);
     }
 
@@ -174,17 +152,6 @@ public class Cond extends ConditionInfo {
     }
 
     /**
-     * 小于
-     *
-     * @param columnFunction
-     * @param value
-     * @return
-     */
-    public static <T, R> Cond lt(ColumnFunction<T, R> columnFunction, ColumnFunction<T, R> value) {
-        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.LESS_THAN, value);
-    }
-
-    /**
      * 大于
      *
      * @param field
@@ -226,17 +193,6 @@ public class Cond extends ConditionInfo {
      * @return
      */
     public static <T, R> Cond gt(ColumnFunction<T, R> columnFunction, Object value) {
-        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.GREATER_THAN, value);
-    }
-
-    /**
-     * 大于
-     *
-     * @param columnFunction
-     * @param value
-     * @return
-     */
-    public static <T, R> Cond gt(ColumnFunction<T, R> columnFunction, ColumnFunction<T, R> value) {
         return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.GREATER_THAN, value);
     }
 
@@ -286,17 +242,6 @@ public class Cond extends ConditionInfo {
     }
 
     /**
-     * 小于等于
-     *
-     * @param columnFunction
-     * @param value
-     * @return
-     */
-    public static <T, R> Cond ltEq(ColumnFunction<T, R> columnFunction, ColumnFunction<T, R> value) {
-        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.LESS_THAN_OR_EQUAL_TO, value);
-    }
-
-    /**
      * 大于等于
      *
      * @param field
@@ -338,17 +283,6 @@ public class Cond extends ConditionInfo {
      * @return
      */
     public static <T, R> Cond gtEq(ColumnFunction<T, R> columnFunction, Object value) {
-        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.GREAT_THAN_OR_EQUAL_TO, value);
-    }
-
-    /**
-     * 大于等于
-     *
-     * @param columnFunction
-     * @param value
-     * @return
-     */
-    public static <T, R> Cond gtEq(ColumnFunction<T, R> columnFunction, ColumnFunction<T, R> value) {
         return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.GREAT_THAN_OR_EQUAL_TO, value);
     }
 
@@ -669,17 +603,6 @@ public class Cond extends ConditionInfo {
     }
 
     /**
-     * 是
-     *
-     * @param columnFunction
-     * @param value
-     * @return
-     */
-    public static <T, R> Cond is(ColumnFunction<T, R> columnFunction, ColumnFunction<T, R> value) {
-        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.IS, value);
-    }
-
-    /**
      * 不是
      *
      * @param field
@@ -722,17 +645,6 @@ public class Cond extends ConditionInfo {
      * @return
      */
     public static <T, R> Cond isNot(ColumnFunction<T, R> columnFunction, Object value) {
-        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.IS_NOT, value);
-    }
-
-    /**
-     * 不是
-     *
-     * @param columnFunction
-     * @param value
-     * @return
-     */
-    public static <T, R> Cond isNot(ColumnFunction<T, R> columnFunction, ColumnFunction<T, R> value) {
         return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.IS_NOT, value);
     }
 
