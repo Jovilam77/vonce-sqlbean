@@ -1,7 +1,6 @@
 package cn.vonce.sql.spring.config;
 
 import cn.vonce.sql.annotation.SqlTable;
-import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.bean.TableInfo;
 import cn.vonce.sql.config.SqlBeanConfig;
@@ -42,6 +41,9 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
             beanNameList.addAll(Arrays.asList(evt.getApplicationContext().getBeanNamesForType(TableService.class)));
             if (!beanNameList.isEmpty()) {
                 List<TableInfo> tableList = evt.getApplicationContext().getBean(beanNameList.get(0), TableService.class).getTableList(null);
+                if (tableList == null || tableList.size() == 0) {
+                    return;
+                }
                 for (String name : beanNameList) {
                     TableService tableService = evt.getApplicationContext().getBean(name, TableService.class);
                     Class<?> clazz = tableService.getBeanClass();
@@ -50,27 +52,26 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                     }
                     SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
                     Table table = SqlBeanUtil.getTable(clazz);
-                    boolean isExist = false;
-                    //创建表
-                    if (sqlTable != null && !sqlTable.isView() && sqlTable.autoCreate()) {
-                        if (tableList != null && !tableList.isEmpty()) {
+                    //存在@SqlTable注解才会自动创建表和更新表结构
+                    if (sqlTable != null && !sqlTable.isView()) {
+                        boolean isExist = false;
+                        //创建表
+                        if (sqlTable.autoCreate()) {
                             for (TableInfo tableInfo : tableList) {
                                 if (tableInfo.getName().equalsIgnoreCase(table.getName())) {
                                     isExist = true;
                                     break;
                                 }
                             }
+                            if (!isExist) {
+                                tableService.createTable();
+                                logger.info("-----'{}'表不存在，已为你自动创建-----", table.getName());
+                                continue;
+                            }
                         }
-                    }
-                    if (!isExist) {
-                        tableService.createTable();
-                        logger.info("-----'{}'表不存在，已为你自动创建-----", table.getName());
-                        continue;
-                    } else {
                         //更新表结构
-                        if (sqlTable != null && !sqlTable.isView() && sqlTable.autoAlter()) {
-                            List<ColumnInfo> columnInfoList = tableService.getColumnInfoList(table.getName());
-                            tableService.alter(table, columnInfoList);
+                        if (sqlTable.autoAlter()) {
+                            tableService.alter(table, tableService.getColumnInfoList(table.getName()));
                         }
                     }
                 }

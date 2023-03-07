@@ -231,6 +231,30 @@ public class SqlFun extends Column {
     }
 
     /**
+     * 时间增加
+     *
+     * @param date
+     * @param num
+     * @param type
+     * @return
+     */
+    public static SqlFun dateAdd(Object date, int num, String type) {
+        return new SqlFun("date_add", new Object[]{date, num, type});
+    }
+
+    /**
+     * 时间减少
+     *
+     * @param date
+     * @param num
+     * @param type
+     * @return
+     */
+    public static SqlFun dateSub(Object date, int num, String type) {
+        return new SqlFun("date_sub", new Object[]{date, num, type});
+    }
+
+    /**
      * 日期类型格式化成指定格式的字符串
      *
      * @param date   合法的日期
@@ -524,7 +548,7 @@ public class SqlFun extends Column {
     }
 
     /**
-     * 添加指定日期后的日期
+     * 添加指定日期后的日期(SqlServer)
      *
      * @param datePart 年份(yy . yyyy . year)、季度(qq , q . quarter)、月份(mm , m , month)、年中的日(dy. y)、日(dd ,d ,day)、周(wk ,ww , week)、星期(dw.w)、小时(hh , hour)、分钟(mi , n . minute)、秒(ss , s , second)、毫秒(ms)、微秒(mcs)、纳秒(ns)
      * @param num      添加的间隔数，最好是整数，对于未来的时间，此数是正数，对于过去的时间，此数是负数
