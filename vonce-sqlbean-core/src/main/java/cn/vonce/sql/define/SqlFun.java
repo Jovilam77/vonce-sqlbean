@@ -239,7 +239,7 @@ public class SqlFun extends Column {
      * @return
      */
     public static SqlFun dateAdd(Object date, int num, String type) {
-        return new SqlFun("date_add", new Object[]{date, num, type});
+        return new SqlFun("date_add", new Object[]{date, new Original("interval " + num + " " + type)});
     }
 
     /**
@@ -251,7 +251,7 @@ public class SqlFun extends Column {
      * @return
      */
     public static SqlFun dateSub(Object date, int num, String type) {
-        return new SqlFun("date_sub", new Object[]{date, num, type});
+        return new SqlFun("date_sub", new Object[]{date, new Original("interval " + num + " " + type)});
     }
 
     /**
