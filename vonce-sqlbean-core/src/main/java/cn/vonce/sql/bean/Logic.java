@@ -49,7 +49,7 @@ public class Logic<Action> implements Serializable {
      * @return
      */
     public Action back() {
-        return (Action) condition.getAction();
+        return condition.getAction();
     }
 
 }

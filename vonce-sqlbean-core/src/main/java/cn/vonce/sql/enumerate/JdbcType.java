@@ -1,5 +1,9 @@
 package cn.vonce.sql.enumerate;
 
+import cn.vonce.sql.exception.SqlBeanException;
+
+import java.lang.reflect.Field;
+
 /**
  * JdbcType枚举类
  *
@@ -67,9 +71,45 @@ public enum JdbcType {
         return null;
     }
 
+    public static JdbcType getType(DbType dbType, Field clazz) {
+        JdbcType jdbcType;
+        switch (dbType) {
+            case MySQL:
+            case MariaDB:
+                jdbcType = JdbcType.getType(JavaMapMySqlType.getType(clazz.getType()).name());
+                break;
+            case SQLServer:
+                jdbcType = JdbcType.getType(JavaMapSqlServerType.getType(clazz.getType()).name());
+                break;
+            case Oracle:
+                jdbcType = JdbcType.getType(JavaMapOracleType.getType(clazz.getType()).name());
+                break;
+            case Postgresql:
+                jdbcType = JdbcType.getType(JavaMapPostgresqlType.getType(clazz.getType()).name());
+                break;
+            case DB2:
+                jdbcType = JdbcType.getType(JavaMapDB2Type.getType(clazz.getType()).name());
+                break;
+            case H2:
+                jdbcType = JdbcType.getType(JavaMapH2Type.getType(clazz.getType()).name());
+                break;
+            case Hsql:
+                jdbcType = JdbcType.getType(JavaMapHsqlType.getType(clazz.getType()).name());
+                break;
+            case Derby:
+                jdbcType = JdbcType.getType(JavaMapDerbyType.getType(clazz.getType()).name());
+                break;
+            case SQLite:
+                jdbcType = JdbcType.getType(JavaMapSqliteType.getType(clazz.getType()).name());
+                break;
+            default:
+                throw new SqlBeanException("请配置正确的数据库");
+        }
+        return jdbcType;
+    }
+
     public boolean isFloat() {
-        if (this.ordinal() == NUMERIC.ordinal() || this.ordinal() == DECIMAL.ordinal() || this.ordinal() == FLOAT.ordinal() ||
-                this.ordinal() == DOUBLE.ordinal() || this.ordinal() == MONEY.ordinal() || this.ordinal() == SMALLMONEY.ordinal()) {
+        if (this.ordinal() == NUMERIC.ordinal() || this.ordinal() == DECIMAL.ordinal() || this.ordinal() == FLOAT.ordinal() || this.ordinal() == DOUBLE.ordinal() || this.ordinal() == MONEY.ordinal() || this.ordinal() == SMALLMONEY.ordinal()) {
             return true;
         }
         return false;

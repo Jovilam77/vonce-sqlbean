@@ -1,5 +1,7 @@
 package cn.vonce.sql.spring.datasource;
 
+import cn.vonce.sql.uitls.StringUtil;
+
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,9 +50,11 @@ public class ConnectionContextHolder {
      * @param isOk
      */
     public static void commit(boolean isOk) {
-        for (Map.Entry<String, ConnectionProxy> entry : contextHolder.get().entrySet()) {
-            commit(entry.getValue(), isOk);
+        String ds = DataSourceContextHolder.getDataSource();
+        if (StringUtil.isBlank(ds)) {
+            ds = "default";
         }
+        commit(ds, isOk);
     }
 
     /**
@@ -60,23 +64,55 @@ public class ConnectionContextHolder {
      * @param isOk
      */
     public static void commit(String ds, boolean isOk) {
-        commit(contextHolder.get().get(ds), isOk);
+        try {
+            ConcurrentHashMap<String, ConnectionProxy> map = contextHolder.get();
+            if (map != null) {
+                ConnectionProxy connectionProxy = map.get(ds);
+                if (connectionProxy != null) {
+                    if (isOk) {
+                        connectionProxy.commit();
+                    } else {
+                        connectionProxy.rollback();
+                    }
+                    connectionProxy.close();
+                    map.remove(ds);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 设置只读
+     *
+     * @param readOnly
+     */
+    public static void setReadOnly(boolean readOnly) {
+        for (Map.Entry<String, ConnectionProxy> entry : contextHolder.get().entrySet()) {
+            setReadOnly(entry.getValue(), readOnly);
+        }
+    }
+
+    /**
+     * 设置只读
+     *
+     * @param ds
+     * @param readOnly
+     */
+    public static void setReadOnly(String ds, boolean readOnly) {
+        setReadOnly(contextHolder.get().get(ds), readOnly);
     }
 
     /**
      * 提交或回滚
      *
      * @param connectionProxy
-     * @param isOk
+     * @param readOnly
      */
-    public static void commit(ConnectionProxy connectionProxy, boolean isOk) {
+    public static void setReadOnly(ConnectionProxy connectionProxy, boolean readOnly) {
         try {
-            if (isOk) {
-                connectionProxy.commit();
-            } else {
-                connectionProxy.rollback();
-            }
-            connectionProxy.close();
+            connectionProxy.setReadOnly(readOnly);
         } catch (SQLException e) {
             e.printStackTrace();
         }

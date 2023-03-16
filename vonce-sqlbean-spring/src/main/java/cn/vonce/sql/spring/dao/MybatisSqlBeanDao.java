@@ -463,4 +463,14 @@ public interface MybatisSqlBeanDao<T> {
     @InsertProvider(type = MybatisSqlBeanProvider.class, method = "copy")
     int copy(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("targetSchema") String targetSchema, @Param("targetTableName") String targetTableName, @Param("columns") Column[] columns, @Param("wrapper") Wrapper wrapper);
 
+    /**
+     * 执行Sql
+     *
+     * @param sql
+     * @return
+     */
+    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "executeSql")
+    int executeSql(String sql);
+
+
 }

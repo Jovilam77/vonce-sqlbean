@@ -1,9 +1,13 @@
 package cn.vonce.sql.bean;
 
+import cn.vonce.sql.define.ColumnFunction;
+import cn.vonce.sql.define.SqlFun;
 import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.enumerate.SqlSort;
 import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.helper.Wrapper;
+import cn.vonce.sql.uitls.LambdaUtil;
+import cn.vonce.sql.uitls.SqlBeanUtil;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -171,6 +175,17 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加column列字段
      *
+     * @param columnFunction
+     * @return
+     */
+    public <T, R> Select column(ColumnFunction<T, R> columnFunction) {
+        this.columnList.add(LambdaUtil.getColumn(columnFunction));
+        return this;
+    }
+
+    /**
+     * 添加column列字段
+     *
      * @param columnName
      * @return
      */
@@ -204,10 +219,33 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * 添加column列字段
      *
      * @param column
+     * @param columnAlias
      * @return
      */
     public Select column(Column column, String columnAlias) {
-        return column(column.getTableAlias(), column.getName(), columnAlias);
+        Column newColumn;
+        if (column instanceof SqlFun) {
+            newColumn = SqlBeanUtil.copy(column);
+            newColumn.setAlias(columnAlias);
+        } else {
+            newColumn = new Column(column.getTableAlias(), column.getName(), columnAlias);
+        }
+        columnList.add(newColumn);
+        return this;
+    }
+
+    /**
+     * 添加column列字段
+     *
+     * @param columnFunction
+     * @param columnAlias
+     * @return
+     */
+    public <T, R> Select column(ColumnFunction<T, R> columnFunction, String columnAlias) {
+        Column column = LambdaUtil.getColumn(columnFunction);
+        column.setAlias(columnAlias);
+        columnList.add(column);
+        return this;
     }
 
     /**
@@ -224,6 +262,18 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
+     * 增加连表
+     *
+     * @param join
+     * @return
+     */
+    public Join addJoin(Join join) {
+        join.setReturnObj(this);
+        joinList.add(join);
+        return join;
+    }
+
+    /**
      * 获取表连接
      */
     public List<Join> getJoin() {
@@ -237,6 +287,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param tableKeyword 关联的表关键列字段
      * @param mainKeyword  主表关键列字段
      */
+    @Deprecated
     public Select join(String table, String tableKeyword, String mainKeyword) {
         return join(JoinType.INNER_JOIN, "", table, table, tableKeyword, mainKeyword);
     }
@@ -249,6 +300,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param tableKeyword 关联的表关键列字段
      * @param mainKeyword  主表关键列字段
      */
+    @Deprecated
     public Select join(JoinType joinType, String table, String tableKeyword, String mainKeyword) {
         return join(joinType, "", table, table, tableKeyword, mainKeyword);
     }
@@ -260,6 +312,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param tableKeyword 关联的表关键列字段
      * @param mainKeyword  主表关键列字段
      */
+    @Deprecated
     public Select join(String schema, String table, String tableAlias, String tableKeyword, String mainKeyword) {
         return join(JoinType.INNER_JOIN, schema, table, tableAlias, tableKeyword, mainKeyword);
     }
@@ -273,6 +326,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param tableKeyword 关联的表关键列字段
      * @param mainKeyword  主表关键列字段
      */
+    @Deprecated
     public Select join(JoinType joinType, String schema, String table, String tableAlias, String tableKeyword, String mainKeyword) {
         joinList.add(new Join(joinType, schema, table, tableAlias, tableKeyword, mainKeyword, ""));
         return this;
@@ -284,6 +338,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param table 关联的表名
      * @param on    连接条件
      */
+    @Deprecated
     public Select join(String table, String on) {
         return join(JoinType.INNER_JOIN, "", table, table, on);
     }
@@ -295,6 +350,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param table    关联的表名
      * @param on       连接条件
      */
+    @Deprecated
     public Select join(JoinType joinType, String table, String on) {
         return join(joinType, "", table, table, on);
     }
@@ -307,9 +363,74 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param table    关联的表名
      * @param on       连接条件
      */
+    @Deprecated
     public Select join(JoinType joinType, String schema, String table, String tableAlias, String on) {
         joinList.add(new Join(joinType, schema, table, tableAlias, "", "", on));
         return this;
+    }
+
+    public Join innerJoin(Class<?> clazz) {
+        Table table = SqlBeanUtil.getTable(clazz);
+        return innerJoin(table.getSchema(), table.getName(), table.getAlias());
+    }
+
+    public Join innerJoin(String table, String tableAlias) {
+        return innerJoin(null, table, tableAlias);
+    }
+
+    public Join innerJoin(String schema, String table, String tableAlias) {
+        Join join = new Join(JoinType.INNER_JOIN, schema, table, tableAlias);
+        join.setReturnObj(this);
+        joinList.add(join);
+        return join;
+    }
+
+    public Join leftJoin(Class<?> clazz) {
+        Table table = SqlBeanUtil.getTable(clazz);
+        return leftJoin(table.getSchema(), table.getName(), table.getAlias());
+    }
+
+    public Join leftJoin(String table, String tableAlias) {
+        return leftJoin(null, table, tableAlias);
+    }
+
+    public Join leftJoin(String schema, String table, String tableAlias) {
+        Join join = new Join(JoinType.LEFT_JOIN, schema, table, tableAlias);
+        join.setReturnObj(this);
+        joinList.add(join);
+        return join;
+    }
+
+    public Join rightJoin(Class<?> clazz) {
+        Table table = SqlBeanUtil.getTable(clazz);
+        return rightJoin(table.getSchema(), table.getName(), table.getAlias());
+    }
+
+    public Join rightJoin(String table, String tableAlias) {
+        return rightJoin(null, table, tableAlias);
+    }
+
+    public Join rightJoin(String schema, String table, String tableAlias) {
+        Join join = new Join(JoinType.RIGHT_JOIN, schema, table, tableAlias);
+        join.setReturnObj(this);
+        joinList.add(join);
+        return join;
+    }
+
+    public Join fullJoin(Class<?> clazz) {
+        Table table = SqlBeanUtil.getTable(clazz);
+        return fullJoin(table.getSchema(), table.getName(), table.getAlias());
+    }
+
+    public Join fullJoin(String table, String tableAlias) {
+        return fullJoin(null, table, tableAlias);
+    }
+
+    public Join fullJoin(String schema, String table, String tableAlias) {
+        Join join = new Join(JoinType.FULL_JOIN, schema, table, tableAlias);
+        join.setReturnObj(this);
+        joinList.add(join);
+        return join;
     }
 
     /**
@@ -338,6 +459,17 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @return
      */
     public Select groupBy(Column column) {
+        return groupBy(column.getTableAlias(), column.getName());
+    }
+
+    /**
+     * 添加groupBy分组
+     *
+     * @param columnFunction 列字段信息
+     * @return
+     */
+    public <T, R> Select groupBy(ColumnFunction<T, R> columnFunction) {
+        Column column = LambdaUtil.getColumn(columnFunction);
         return groupBy(column.getTableAlias(), column.getName());
     }
 
@@ -393,9 +525,29 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加列字段排序
      *
+     * @param columnFunction 列字段名
+     */
+    public <T, R> Select orderByAsc(ColumnFunction<T, R> columnFunction) {
+        Column column = LambdaUtil.getColumn(columnFunction);
+        return orderBy(column.getTableAlias(), column.getName(), SqlSort.ASC);
+    }
+
+    /**
+     * 添加列字段排序
+     *
      * @param column 列字段名
      */
     public Select orderByDesc(Column column) {
+        return orderBy(column.getTableAlias(), column.getName(), SqlSort.DESC);
+    }
+
+    /**
+     * 添加列字段排序
+     *
+     * @param columnFunction 列字段名
+     */
+    public <T, R> Select orderByDesc(ColumnFunction<T, R> columnFunction) {
+        Column column = LambdaUtil.getColumn(columnFunction);
         return orderBy(column.getTableAlias(), column.getName(), SqlSort.DESC);
     }
 
@@ -421,6 +573,19 @@ public class Select extends CommonCondition<Select> implements Serializable {
      */
     public Select orderBy(String tableAlias, String columName, SqlSort sqlSort) {
         orderByList.add(new Order(tableAlias, columName, sqlSort));
+        return this;
+    }
+
+    /**
+     * 添加列字段排序
+     *
+     * @param columnFunction 列字段名
+     * @param sqlSort        排序方式
+     * @return
+     */
+    public <T, R> Select orderBy(ColumnFunction<T, R> columnFunction, SqlSort sqlSort) {
+        Column column = LambdaUtil.getColumn(columnFunction);
+        orderByList.add(new Order(column.getTableAlias(), column.getName(), sqlSort));
         return this;
     }
 

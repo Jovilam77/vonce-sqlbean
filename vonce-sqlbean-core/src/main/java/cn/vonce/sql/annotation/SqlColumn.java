@@ -74,4 +74,11 @@ public @interface SqlColumn {
      */
     boolean ignore() default false;
 
+    /**
+     * 旧字段名称
+     *
+     * @return
+     */
+    String oldName() default "";
+
 }

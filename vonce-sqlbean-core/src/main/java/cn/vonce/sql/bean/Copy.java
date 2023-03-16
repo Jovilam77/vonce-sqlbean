@@ -18,6 +18,7 @@ public class Copy extends CommonCondition<Copy> {
     private String targetSchema;
     private String targetTableName;
     private Column[] columns;
+    private Column[] targetColumns;
 
     public String getTargetSchema() {
         return targetSchema;
@@ -41,6 +42,14 @@ public class Copy extends CommonCondition<Copy> {
 
     public void setColumns(Column[] columns) {
         this.columns = columns;
+    }
+
+    public Column[] getTargetColumns() {
+        return targetColumns;
+    }
+
+    public void setTargetColumns(Column[] targetColumns) {
+        this.targetColumns = targetColumns;
     }
 
 }

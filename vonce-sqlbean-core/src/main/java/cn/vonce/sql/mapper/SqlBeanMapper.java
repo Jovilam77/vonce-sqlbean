@@ -3,6 +3,7 @@ package cn.vonce.sql.mapper;
 
 import cn.vonce.sql.annotation.SqlJoin;
 import cn.vonce.sql.constant.SqlConstant;
+import cn.vonce.sql.uitls.DateUtil;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
@@ -12,10 +13,8 @@ import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * SqlBean 结果映射
@@ -279,6 +278,15 @@ public class SqlBeanMapper {
                 case "java.util.Date":
                 case "java.sql.Timestamp":
                     value = resultSet.getTimestamp(fieldName);
+                    break;
+                case "java.time.LocalDate":
+                    value = DateUtil.dateToLocalDate(resultSet.getTimestamp(fieldName));
+                    break;
+                case "java.time.LocalTime":
+                    value = DateUtil.dateToLocalTime(resultSet.getTimestamp(fieldName));
+                    break;
+                case "java.time.LocalDateTime":
+                    value = DateUtil.dateToLocalDateTime(resultSet.getTimestamp(fieldName));
                     break;
                 case "java.math.BigDecimal":
                     value = resultSet.getBigDecimal(fieldName);

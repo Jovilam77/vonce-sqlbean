@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * 自动创建表监听类
@@ -38,37 +37,47 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
     public void onApplicationEvent(ContextRefreshedEvent evt) {
         //用户未进行配置或者配置了启用自动创建
         if ((evt.getApplicationContext().getParent() == null || evt.getApplicationContext().getParent().getParent() == null) && (sqlBeanConfig == null || sqlBeanConfig.getAutoCreate())) {
-            List<String> beanNameList = new ArrayList<>();
-            beanNameList.addAll(Arrays.asList(evt.getApplicationContext().getBeanNamesForType(TableService.class)));
-            if (!beanNameList.isEmpty()) {
-                List<TableInfo> tableList = evt.getApplicationContext().getBean(beanNameList.get(0), TableService.class).getTableList(null);
-                for (String name : beanNameList) {
-                    TableService tableService = evt.getApplicationContext().getBean(name, TableService.class);
-                    Class<?> clazz = tableService.getBeanClass();
-                    if (clazz == null) {
-                        continue;
+            new Thread(() -> {
+                List<String> beanNameList = new ArrayList<>();
+                beanNameList.addAll(Arrays.asList(evt.getApplicationContext().getBeanNamesForType(TableService.class)));
+                if (!beanNameList.isEmpty()) {
+                    List<TableInfo> tableList = evt.getApplicationContext().getBean(beanNameList.get(0), TableService.class).getTableList(null);
+                    if (tableList == null || tableList.size() == 0) {
+                        return;
                     }
-                    SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-                    if (sqlTable != null && !sqlTable.isView() && sqlTable.autoCreate()) {
+                    for (String name : beanNameList) {
+                        TableService tableService = evt.getApplicationContext().getBean(name, TableService.class);
+                        Class<?> clazz = tableService.getBeanClass();
+                        if (clazz == null) {
+                            continue;
+                        }
+                        SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
                         Table table = SqlBeanUtil.getTable(clazz);
-                        if (tableList != null && !tableList.isEmpty()) {
+                        //存在@SqlTable注解才会自动创建表和更新表结构
+                        if (sqlTable != null && !sqlTable.isView()) {
                             boolean isExist = false;
-                            for (TableInfo tableInfo : tableList) {
-                                if (tableInfo.getName().equalsIgnoreCase(table.getName())) {
-                                    isExist = true;
-                                    break;
+                            //创建表
+                            if (sqlTable.autoCreate()) {
+                                for (TableInfo tableInfo : tableList) {
+                                    if (tableInfo.getName().equalsIgnoreCase(table.getName())) {
+                                        isExist = true;
+                                        break;
+                                    }
+                                }
+                                if (!isExist) {
+                                    tableService.createTable();
+                                    logger.info("-----'{}'表不存在，已为你自动创建-----", table.getName());
+                                    continue;
                                 }
                             }
-                            if (isExist) {
-                                continue;
+                            //更新表结构
+                            if (sqlTable.autoAlter()) {
+                                tableService.alter(table, tableService.getColumnInfoList(table.getName()));
                             }
                         }
-                        tableService.createTable();
-                        logger.info("-----'{}'表不存在，已为你自动创建-----", table.getName());
                     }
                 }
-            }
-
+            }).start();
         }
     }
 

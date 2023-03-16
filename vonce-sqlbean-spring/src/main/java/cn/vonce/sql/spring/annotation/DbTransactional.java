@@ -1,7 +1,5 @@
 package cn.vonce.sql.spring.annotation;
 
-import cn.vonce.sql.spring.enumerate.DbRole;
-
 import java.lang.annotation.*;
 
 /**
@@ -17,11 +15,11 @@ import java.lang.annotation.*;
 public @interface DbTransactional {
 
     /**
-     * 主库或从库
+     * 是否只读
      *
      * @return
      */
-    DbRole role() default DbRole.MASTER;
+    boolean readOnly() default false;
 
 //    /**
 //     * 传播机制
@@ -43,19 +41,19 @@ public @interface DbTransactional {
 //     * @return
 //     */
 //    int timeout() default TransactionDefinition.TIMEOUT_DEFAULT;
-//
-//    /**
-//     * 什么异常回滚
-//     *
-//     * @return
-//     */
-//    Class<? extends Throwable>[] rollbackFor() default {};
-//
-//    /**
-//     * 什么异常不回滚
-//     *
-//     * @return
-//     */
-//    Class<? extends Throwable>[] noRollbackFor() default {};
+
+    /**
+     * 什么异常回滚
+     *
+     * @return
+     */
+    Class<? extends Throwable>[] rollbackFor() default {};
+
+    /**
+     * 什么异常不回滚
+     *
+     * @return
+     */
+    Class<? extends Throwable>[] noRollbackFor() default {};
 
 }

@@ -28,10 +28,7 @@ import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 通用的业务实现
@@ -602,6 +599,39 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @Override
     public int copy(String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper) {
         return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, targetSchema, targetTableName, columns, wrapper));
+    }
+
+    @Override
+    public int alter(Table table, List<ColumnInfo> columnInfoList) {
+        List<String> sqlList = SqlBeanProvider.buildAlterSql(getSqlBeanDB(), clazz, columnInfoList);
+        int count = 0;
+        if (sqlList != null && sqlList.size() > 0) {
+            for (String sql : sqlList) {
+                count += jdbcTemplate.update(sql);
+            }
+        }
+        return count;
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int alter(Alter alter) {
+        List<Alter> alterList = new ArrayList<>();
+        alterList.add(alter);
+        return alter(alterList);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int alter(List<Alter> alterList) {
+        List<String> sqlList = SqlBeanProvider.alterSql(getSqlBeanDB().getDbType(), alterList);
+        int count = 0;
+        if (sqlList != null && sqlList.size() > 0) {
+            for (String sql : sqlList) {
+                count += jdbcTemplate.update(sql);
+            }
+        }
+        return count;
     }
 
     @DbSwitch(DbRole.MASTER)

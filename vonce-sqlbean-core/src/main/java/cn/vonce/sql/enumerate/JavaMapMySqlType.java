@@ -1,9 +1,15 @@
 package cn.vonce.sql.enumerate;
 
+import cn.vonce.sql.bean.Alter;
+import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.constant.SqlConstant;
+import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Java类型对应的Oracle类型枚举类
@@ -14,20 +20,20 @@ import java.math.BigDecimal;
  */
 public enum JavaMapMySqlType {
 
-    INTEGER(new Class[]{int.class, Integer.class}),
+    INT(new Class[]{int.class, Integer.class}),
     BIGINT(new Class[]{long.class, Long.class}),
     SMALLINT(new Class[]{short.class, Short.class}),
     FLOAT(new Class[]{float.class, Float.class}),
     DOUBLE(new Class[]{double.class, Double.class}),
-    NUMERIC(new Class[]{BigDecimal.class}),
+    DECIMAL(new Class[]{BigDecimal.class}),
     CHAR(new Class[]{char.class, Character.class}),
     VARCHAR(new Class[]{String.class}),
     TINYINT(new Class[]{byte.class, Byte.class}),
     BIT(new Class[]{boolean.class, Boolean.class}),
-    DATE(new Class[]{java.sql.Date.class}),
-    TIME(new Class[]{java.sql.Time.class}),
+    DATE(new Class[]{java.sql.Date.class, java.time.LocalDate.class}),
+    TIME(new Class[]{java.sql.Time.class, java.time.LocalTime.class}),
     TIMESTAMP(new Class[]{java.sql.Timestamp.class}),
-    DATETIME(new Class[]{java.util.Date.class}),
+    DATETIME(new Class[]{java.util.Date.class, java.time.LocalDateTime.class}),
     CLOB(new Class[]{java.sql.Clob.class}),
     BLOB(new Class[]{java.sql.Blob.class, Object.class});
 
@@ -105,6 +111,57 @@ public enum JavaMapMySqlType {
         sql.append(tableName);
         sql.append("'");
         return sql.toString();
+    }
+
+    /**
+     * 更改表结构
+     *
+     * @param alterList
+     * @return
+     */
+    public static List<String> alterTable(List<Alter> alterList) {
+        String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
+        Table table = alterList.get(0).getTable();
+        StringBuffer sql = new StringBuffer();
+        sql.append(SqlConstant.ALTER_TABLE);
+        if (StringUtil.isNotBlank(table.getSchema())) {
+            sql.append(transferred);
+            sql.append(table.getSchema());
+            sql.append(transferred);
+            sql.append(SqlConstant.POINT);
+        }
+        sql.append(transferred);
+        sql.append(table.getName());
+        sql.append(transferred);
+        sql.append(SqlConstant.SPACES);
+        for (int i = 0; i < alterList.size(); i++) {
+            Alter alter = alterList.get(i);
+            if (alter.getType() == AlterType.ADD) {
+                sql.append(SqlConstant.ADD);
+                sql.append(SqlConstant.COLUMN);
+                sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
+            } else if (alter.getType() == AlterType.MODIFY) {
+                sql.append(SqlConstant.MODIFY);
+                sql.append(SqlConstant.COLUMN);
+                sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
+            } else if (alter.getType() == AlterType.CHANGE) {
+                sql.append(SqlConstant.CHANGE);
+                sql.append(SqlConstant.COLUMN);
+                sql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getOldColumnName().toUpperCase() : alter.getOldColumnName());
+                sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
+            } else if (alter.getType() == AlterType.DROP) {
+                sql.append(SqlConstant.DROP);
+                sql.append(SqlConstant.COLUMN);
+                sql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
+            }
+            sql.append(SqlConstant.SPACES);
+            if (i < alterList.size() - 1) {
+                sql.append(SqlConstant.COMMA);
+            }
+        }
+        List<String> sqlList = new ArrayList<>();
+        sqlList.add(sql.toString());
+        return sqlList;
     }
 
 }

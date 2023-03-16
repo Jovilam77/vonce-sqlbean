@@ -39,6 +39,8 @@ public class SqlConstant {
     public static final String LESS_THAN = " < ";
     public static final String LESS_THAN_OR_EQUAL_TO = " <= ";
     public static final String EQUAL_TO = " = ";
+    public static final String ADDITION = " + ";
+    public static final String SUBTRACT = " - ";
     public static final String NOT_EQUAL_TO = " <> ";
     public static final String SPACES = " ";
     public static final String COMMA = ", ";
@@ -57,9 +59,22 @@ public class SqlConstant {
 
     public static final String CREATE_TABLE = "CREATE TABLE ";
     public static final String PRIMARY_KEY = "PRIMARY KEY";
+    public static final String NULL = "NULL";
     public static final String NOT_NULL = "NOT NULL";
     public static final String DEFAULT = "DEFAULT";
     public static final String COMMENT = "COMMENT";
+
+    public static final String ALTER_TABLE = "ALTER TABLE ";
+    public static final String ALTER = "ALTER ";
+    public static final String COLUMN = "COLUMN ";
+    public static final String TO = " TO ";
+    public static final String ADD = "ADD ";
+    public static final String CHANGE = "CHANGE ";
+    public static final String RENAME = "RENAME ";
+    public static final String RENAME_TO = "RENAME TO ";
+    public static final String MODIFY = "MODIFY ";
+    public static final String DROP = "DROP ";
+    public static final String AFTER = "AFTER ";
 
     // mssql
     public static final String TOP = " TOP ";
@@ -68,6 +83,11 @@ public class SqlConstant {
     public static final String ID = "ID";
     public static final String ROWNUM = " ROWNUM ";
     public static final String T = " T";
+    public static final String EXEC_SP_RENAME = "EXEC sp_rename ";
+    public static final String SEMICOLON = ";";
+    public static final String BEGIN_SQUARE_BRACKETS = "[";
+    public static final String END_SQUARE_BRACKETS = "]";
+    public static final String DBO = "DBO";
 
     // oracle
     public static final String RN = "RN";

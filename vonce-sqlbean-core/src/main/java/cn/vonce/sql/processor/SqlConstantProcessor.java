@@ -110,7 +110,7 @@ public class SqlConstantProcessor extends AbstractProcessor {
                                 }
                             }
                             code.append(String.format("\tpublic static final String %s = \"%s\";\n", sqlFieldName, sqlFieldName));
-                            code.append(String.format("\tpublic static final Column %s$ = new Column(_tableAlias,%s,\"\");\n", sqlFieldName, sqlFieldName));
+                            code.append(String.format("\tpublic static final Column %s$ = new Column(true,_tableAlias,%s,\"\");\n", sqlFieldName, sqlFieldName));
                         }
 
                         code.append("\n}");

@@ -57,7 +57,7 @@ public class ConnectionProxy implements Connection {
     @Override
     public void commit() throws SQLException {
         String xid = TransactionalContextHolder.getXid();
-        if (StringUtil.isBlank(xid)) {
+        if (StringUtil.isBlank(xid) && !connection.isClosed()) {
             connection.commit();
         }
     }
@@ -65,7 +65,7 @@ public class ConnectionProxy implements Connection {
     @Override
     public void rollback() throws SQLException {
         String xid = TransactionalContextHolder.getXid();
-        if (StringUtil.isBlank(xid)) {
+        if (StringUtil.isBlank(xid) && !connection.isClosed()) {
             connection.rollback();
         }
     }

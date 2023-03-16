@@ -3,6 +3,7 @@ package cn.vonce.sql.test;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.define.SqlFun;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.helper.Cond;
 import cn.vonce.sql.helper.SqlHelper;
@@ -55,6 +56,9 @@ public class SqlHelperTest {
         // update
         update(sqlBeanDB);
 
+        // update2
+        update2(sqlBeanDB);
+
         // delete
         delete(sqlBeanDB);
 
@@ -75,10 +79,10 @@ public class SqlHelperTest {
         select.column(SqlUser.headPortrait, "头像");
         select.column(SqlUser.nickname, "昵称");
         select.setTable(SqlEssay._tableName);
-        select.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id.getName(), SqlEssay.userId.getName());
+        select.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id, SqlEssay.userId);
         select.where().eq(SqlEssay.userId, "1111");
         //value 直接输入字符串 会当作字符串处理，sql中会带''，如果希望不被做处理则使用Original
-        select.where().eq("DATE_FORMAT( " + SqlEssay.creationTime + ", '%Y-%m-%d' )", new Original("DATE_FORMAT( '2018-01-19 20:24:19', '%Y-%m-%d' ) "));
+        select.where().eq(SqlFun.date_format(SqlEssay.creationTime$, "%Y-%m-%d"), SqlFun.date_format(SqlFun.now(), "%Y-%m-%d"));
         select.orderByDesc(SqlEssay.id);
         System.out.println("---select1---");
         System.out.println(SqlHelper.buildSelectSql(select));
@@ -98,8 +102,10 @@ public class SqlHelperTest {
                 .column(SqlEssay.creationTime, "创建时间")
                 .column(SqlUser.nickname, "用户昵称");
         select2.setTable(SqlEssay._tableName);
-        select2.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id.getName(), SqlEssay.userId.getName());
-        select2.where().gt("DATE_FORMAT( " + SqlEssay.creationTime + ", '%Y-%m-%d' )", "2020-01-01 00:00:00").and().eq(SqlUser.nickname, "vicky");
+//        select2.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id.getName(), SqlEssay.userId.getName());
+//        select2.innerJoin(User.class).on(SqlUser.id$, SqlEssay.userId$);
+        select2.innerJoin(User.class).on().eq(SqlUser.id$, SqlEssay.userId$).and().gt(SqlUser.id$, 1);
+        select2.where().gt(SqlFun.date_format(SqlEssay.creationTime$, "%Y-%m-%d"), "2020-01-01").and().eq(SqlUser.nickname, "vicky");
         System.out.println("---select2---");
         System.out.println(SqlHelper.buildSelectSql(select2));
     }
@@ -210,13 +216,31 @@ public class SqlHelperTest {
         user.setUsername("123");
         user.setGender(1);
         Update update = new Update();
+        update.setTable(User.class);
         update.setSqlBeanDB(sqlBeanDB);
         update.setFilterFields("username");//java字段名
         update.setUpdateBean(user);
         update.setUpdateNotNull(true);
-        update.where().gt(SqlUser.id, 0);
-        update.where().lt(SqlUser.id, 10);
+        update.where().gt(SqlUser.id, 0).and().lt(SqlUser.id, 10);
         System.out.println("---update---");
+        System.out.println(SqlHelper.buildUpdateSql(update));
+    }
+
+    /**
+     * 更新
+     *
+     * @param sqlBeanDB
+     */
+    private static void update2(SqlBeanDB sqlBeanDB) {
+        Update<User> update = new Update();
+        update.setTable(User.class);
+        update.setSqlBeanDB(sqlBeanDB);
+        update.set(SqlUser.id, 1).
+                set(SqlUser.nickname, "jovi").
+                setAdd(SqlUser.integral$, SqlUser.integral$, SqlUser.integral$).
+                setSub(User::getGender, User::getGender, 1).
+                where().gt(User::getId, 0).and().lt(User::getId, 10);
+        System.out.println("---update2---");
         System.out.println(SqlHelper.buildUpdateSql(update));
     }
 
@@ -227,11 +251,9 @@ public class SqlHelperTest {
      */
     private static void delete(SqlBeanDB sqlBeanDB) {
         Delete delete = new Delete();
-        delete.where().eq("",null).back();
-        delete.setSqlBeanDB(sqlBeanDB);
-        delete.where().gt(SqlUser.id, 1);
-        delete.where().eq(SqlUser.nickname, "jovi");
         delete.setTable(User.class);
+        delete.setSqlBeanDB(sqlBeanDB);
+        delete.where().gt(User::getId, 1).and().eq(User::getNickname, "jovi");
         System.out.println("---delete---");
         System.out.println(SqlHelper.buildDeleteSql(delete));
     }

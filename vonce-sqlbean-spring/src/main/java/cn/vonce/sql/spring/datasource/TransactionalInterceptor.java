@@ -1,14 +1,10 @@
 package cn.vonce.sql.spring.datasource;
 
-import cn.vonce.sql.spring.annotation.DbSource;
 import cn.vonce.sql.spring.annotation.DbTransactional;
-import cn.vonce.sql.spring.enumerate.DbRole;
 import cn.vonce.sql.uitls.IdBuilder;
 import cn.vonce.sql.uitls.StringUtil;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-
-import java.util.Random;
 
 /**
  * 事务拦截器
@@ -26,50 +22,55 @@ public class TransactionalInterceptor implements MethodInterceptor {
             dbTransactional = methodInvocation.getMethod().getAnnotation(DbTransactional.class);
         }
         Object result;
-        boolean isOk = false;
-        DbSource dbSource = null;
         try {
             String xid = TransactionalContextHolder.getXid();
             //已经存在事务则加入事务并执行
             if (StringUtil.isNotBlank(xid)) {
                 result = methodInvocation.proceed();
-                isOk = true;
                 return result;
             }
             //当前没有事务则创建事务
             else {
-                //多数据源注解
-                dbSource = methodInvocation.getMethod().getDeclaringClass().getAnnotation(DbSource.class);
-                //配置了多数据源
-                if (dbSource != null) {
-                    DbRole dbRole = dbTransactional.role();
-                    if (dbRole != null && dbRole == DbRole.SLAVE && dbSource.slave().length > 0) {
-                        if (dbSource.slave().length == 1) {
-                            DataSourceContextHolder.setDataSource(dbSource.slave()[0]);
-                        } else {
-                            DataSourceContextHolder.setDataSource(dbSource.slave()[new Random().nextInt(dbSource.slave().length)]);
-                        }
-                    } else {
-                        DataSourceContextHolder.setDataSource(dbSource.master());
-                    }
+                if (dbTransactional.readOnly()) {
+                    ConnectionContextHolder.setReadOnly(true);
                 }
                 TransactionalContextHolder.setXid(IdBuilder.uuid());
                 result = methodInvocation.proceed();
-                isOk = true;
                 //移除事务id
                 TransactionalContextHolder.clearXid();
+                //提交或回滚事务
+                ConnectionContextHolder.commit(true);
             }
         } catch (Throwable e) {
             //移除事务id
             TransactionalContextHolder.clearXid();
-            throw e;
-        } finally {
-            //提交或回滚事务
-            ConnectionContextHolder.commit(isOk);
-            //配置了多数据源 则移除当前线程设定的数据源
-            if (dbSource != null) {
-                DataSourceContextHolder.clearDataSource();
+            Class<? extends Throwable>[] rollbackFor = dbTransactional.rollbackFor();
+            Class<? extends Throwable>[] noRollbackFor = dbTransactional.noRollbackFor();
+            boolean needRollback = false;
+            if (rollbackFor.length > 0) {
+                //遇到哪些异常回滚
+                for (Class<? extends Throwable> thr : rollbackFor) {
+                    if (thr.isAssignableFrom(e.getClass())) {
+                        needRollback = true;
+                        break;
+                    }
+                }
             }
+            if (noRollbackFor.length > 0) {
+                //遇到哪些异常不回滚
+                for (Class<? extends Throwable> thr : noRollbackFor) {
+                    if (thr.isAssignableFrom(e.getClass())) {
+                        needRollback = false;
+                        break;
+                    }
+                }
+            }
+            if (rollbackFor.length == 0 && noRollbackFor.length == 0) {
+                //回滚事务
+                needRollback = true;
+            }
+            ConnectionContextHolder.commit(!needRollback);
+            throw e;
         }
         return result;
     }

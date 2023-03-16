@@ -40,11 +40,11 @@ public class ColumnInfo {
     /**
      * 字段长度
      */
-    private int length;
+    private Integer length;
     /**
      * 字段小数点精度
      */
-    private int scale;
+    private Integer scale;
     /**
      * 注释
      */
@@ -106,19 +106,19 @@ public class ColumnInfo {
         this.fk = fk;
     }
 
-    public int getLength() {
+    public Integer getLength() {
         return length;
     }
 
-    public void setLength(int length) {
+    public void setLength(Integer length) {
         this.length = length;
     }
 
-    public int getScale() {
+    public Integer getScale() {
         return scale;
     }
 
-    public void setScale(int scale) {
+    public void setScale(Integer scale) {
         this.scale = scale;
     }
 

@@ -14,13 +14,18 @@ public class SqlEssay {
 
     public static final String _count = "COUNT(*)";
 
-    public static final Column id = new Column(_tableAlias,"id","");
+    public static final String id = "id";
+    public static final Column id$ = new Column(_tableAlias, "id", "");
 
-    public static final Column categoryId = new Column(_tableAlias,"categoryId","");
+    public static final String categoryId = "categoryId";
+    public static final Column categoryId$ = new Column(_tableAlias, "categoryId", "");
 
-    public static final Column userId = new Column(_tableAlias,"userId","");
+    public static final String userId = "userId";
+    public static final Column userId$ = new Column(_tableAlias, "userId", "");
 
-    public static final Column content = new Column(_tableAlias,"content","");
+    public static final String content = "content";
+    public static final Column content$ = new Column(_tableAlias, "content", "");
 
-    public static final Column creationTime = new Column(_tableAlias,"creationTime","");
+    public static final String creationTime = "creationTime";
+    public static final Column creationTime$ = new Column(_tableAlias, "creationTime", "");
 }

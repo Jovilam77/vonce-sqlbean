@@ -24,11 +24,17 @@ public class Column implements Serializable {
     }
 
     public Column(String tableAlias, String name, String alias) {
+        this(false, tableAlias, name, alias);
+    }
+
+    public Column(boolean immutable, String tableAlias, String name, String alias) {
+        this.immutable = immutable;
         this.tableAlias = tableAlias;
         this.name = name;
         this.alias = alias;
     }
 
+    private boolean immutable;
     private String tableAlias;
     private String name;
     private String alias;
@@ -38,6 +44,9 @@ public class Column implements Serializable {
     }
 
     public void setTableAlias(String tableAlias) {
+        if (immutable) {
+            return;
+        }
         this.tableAlias = tableAlias;
     }
 
@@ -46,6 +55,9 @@ public class Column implements Serializable {
     }
 
     public void setName(String name) {
+        if (immutable) {
+            return;
+        }
         this.name = name;
     }
 
@@ -54,6 +66,9 @@ public class Column implements Serializable {
     }
 
     public void setAlias(String alias) {
+        if (immutable) {
+            return;
+        }
         this.alias = alias;
     }
 

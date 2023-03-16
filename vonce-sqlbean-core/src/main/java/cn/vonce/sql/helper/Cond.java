@@ -2,7 +2,9 @@ package cn.vonce.sql.helper;
 
 import cn.vonce.sql.bean.Column;
 import cn.vonce.sql.bean.ConditionInfo;
+import cn.vonce.sql.define.ColumnFunction;
 import cn.vonce.sql.enumerate.SqlOperator;
+import cn.vonce.sql.uitls.LambdaUtil;
 
 /**
  * 条件包装器内容
@@ -49,6 +51,17 @@ public class Cond extends ConditionInfo {
     }
 
     /**
+     * 等于
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond eq(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.EQUAL_TO, value);
+    }
+
+    /**
      * 不等于
      *
      * @param field
@@ -80,6 +93,17 @@ public class Cond extends ConditionInfo {
      */
     public static Cond notEq(Column column, Object value) {
         return new Cond(column, SqlOperator.NOT_EQUAL_TO, value);
+    }
+
+    /**
+     * 不等于
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond notEq(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.NOT_EQUAL_TO, value);
     }
 
     /**
@@ -117,6 +141,17 @@ public class Cond extends ConditionInfo {
     }
 
     /**
+     * 小于
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond lt(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.LESS_THAN, value);
+    }
+
+    /**
      * 大于
      *
      * @param field
@@ -151,6 +186,17 @@ public class Cond extends ConditionInfo {
     }
 
     /**
+     * 大于
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond gt(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.GREATER_THAN, value);
+    }
+
+    /**
      * 小于等于
      *
      * @param field
@@ -173,7 +219,6 @@ public class Cond extends ConditionInfo {
         return new Cond(tableAlias, field, SqlOperator.LESS_THAN_OR_EQUAL_TO, value);
     }
 
-
     /**
      * 小于等于
      *
@@ -183,6 +228,17 @@ public class Cond extends ConditionInfo {
      */
     public static Cond ltEq(Column column, Object value) {
         return new Cond(column, SqlOperator.LESS_THAN_OR_EQUAL_TO, value);
+    }
+
+    /**
+     * 小于等于
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond ltEq(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.LESS_THAN_OR_EQUAL_TO, value);
     }
 
     /**
@@ -220,6 +276,17 @@ public class Cond extends ConditionInfo {
     }
 
     /**
+     * 大于等于
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond gtEq(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.GREAT_THAN_OR_EQUAL_TO, value);
+    }
+
+    /**
      * 全模糊 包含
      *
      * @param field
@@ -250,6 +317,17 @@ public class Cond extends ConditionInfo {
      */
     public static Cond like(Column column, Object value) {
         return new Cond(column, SqlOperator.LIKE, value);
+    }
+
+    /**
+     * 全模糊 包含
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond like(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.LIKE, value);
     }
 
     /**
@@ -287,6 +365,17 @@ public class Cond extends ConditionInfo {
     }
 
     /**
+     * 左模糊 包含
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond likeL(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.LIKE_L, value);
+    }
+
+    /**
      * 右模糊 包含
      *
      * @param field
@@ -318,6 +407,17 @@ public class Cond extends ConditionInfo {
      */
     public static Cond likeR(Column column, Object value) {
         return new Cond(column, SqlOperator.LIKE_R, value);
+    }
+
+    /**
+     * 右模糊 包含
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond likeR(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.LIKE_R, value);
     }
 
     /**
@@ -356,6 +456,17 @@ public class Cond extends ConditionInfo {
     }
 
     /**
+     * 全模糊 不包含
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond notLike(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.NOT_LIKE, value);
+    }
+
+    /**
      * 左模糊 不包含
      *
      * @param field
@@ -390,6 +501,17 @@ public class Cond extends ConditionInfo {
     }
 
     /**
+     * 左模糊 不包含
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond notLikeL(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.NOT_LIKE_L, value);
+    }
+
+    /**
      * 右模糊 不包含
      *
      * @param field
@@ -421,6 +543,17 @@ public class Cond extends ConditionInfo {
      */
     public static Cond notLikeR(Column column, Object value) {
         return new Cond(column, SqlOperator.NOT_LIKE_R, value);
+    }
+
+    /**
+     * 右模糊 不包含
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond notLikeR(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.NOT_LIKE_R, value);
     }
 
     /**
@@ -459,6 +592,17 @@ public class Cond extends ConditionInfo {
     }
 
     /**
+     * 是
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond is(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.IS, value);
+    }
+
+    /**
      * 不是
      *
      * @param field
@@ -494,6 +638,17 @@ public class Cond extends ConditionInfo {
     }
 
     /**
+     * 不是
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond isNot(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.IS_NOT, value);
+    }
+
+    /**
      * 是null
      *
      * @param field
@@ -525,6 +680,16 @@ public class Cond extends ConditionInfo {
     }
 
     /**
+     * 是null
+     *
+     * @param columnFunction
+     * @return
+     */
+    public static <T, R> Cond isNull(ColumnFunction<T, R> columnFunction) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.IS_NULL, null);
+    }
+
+    /**
      * 不是null
      *
      * @param field
@@ -553,6 +718,16 @@ public class Cond extends ConditionInfo {
      */
     public static Cond isNotNull(Column column) {
         return new Cond(column, SqlOperator.IS_NOT_NULL, null);
+    }
+
+    /**
+     * 不是null
+     *
+     * @param columnFunction
+     * @return
+     */
+    public static <T, R> Cond isNotNull(ColumnFunction<T, R> columnFunction) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.IS_NOT_NULL, null);
     }
 
     /**
@@ -590,6 +765,17 @@ public class Cond extends ConditionInfo {
     }
 
     /**
+     * 包含
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond in(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.IN, value);
+    }
+
+    /**
      * 不包含
      *
      * @param field
@@ -622,6 +808,17 @@ public class Cond extends ConditionInfo {
      */
     public static Cond notIn(Column column, Object value) {
         return new Cond(column, SqlOperator.NOT_IN, value);
+    }
+
+    /**
+     * 不包含
+     *
+     * @param columnFunction
+     * @param value
+     * @return
+     */
+    public static <T, R> Cond notIn(ColumnFunction<T, R> columnFunction, Object value) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.NOT_IN, value);
     }
 
     /**
@@ -661,6 +858,18 @@ public class Cond extends ConditionInfo {
         return new Cond(column, SqlOperator.BETWEEN, new Object[]{value1, value2});
     }
 
+    /**
+     * 介于
+     *
+     * @param columnFunction
+     * @param value1
+     * @param value2
+     * @return
+     */
+    public static <T, R> Cond between(ColumnFunction<T, R> columnFunction, Object value1, Object value2) {
+        return new Cond(LambdaUtil.getColumn(columnFunction), SqlOperator.BETWEEN, new Object[]{value1, value2});
+    }
+
     public Cond() {
         super();
     }
@@ -670,7 +879,7 @@ public class Cond extends ConditionInfo {
     }
 
     public Cond(Column column, SqlOperator sqlOperator, Object value) {
-        super(null, column.getTableAlias(), column.getName(), value, sqlOperator);
+        super(null, column, value, sqlOperator);
     }
 
 }

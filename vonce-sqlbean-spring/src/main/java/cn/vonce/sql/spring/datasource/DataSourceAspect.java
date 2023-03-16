@@ -3,6 +3,7 @@ package cn.vonce.sql.spring.datasource;
 import cn.vonce.sql.spring.annotation.DbSource;
 import cn.vonce.sql.spring.annotation.DbSwitch;
 import cn.vonce.sql.spring.enumerate.DbRole;
+import cn.vonce.sql.uitls.StringUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
@@ -33,7 +34,8 @@ public class DataSourceAspect {
     @Before("pointcut()")
     public void before(JoinPoint joinPoint) {
         Class<?> clazz = joinPoint.getTarget().getClass();
-        if (clazz.isAnnotationPresent(DbSource.class)) {
+        String xid = TransactionalContextHolder.getXid();
+        if (clazz.isAnnotationPresent(DbSource.class) && StringUtil.isBlank(xid)) {
             String methodName = joinPoint.getSignature().getName();
             Class[] parameterTypes = ((MethodSignature) joinPoint.getSignature()).getParameterTypes();
             String dataSource = null;

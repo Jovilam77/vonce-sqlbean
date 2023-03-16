@@ -1,9 +1,15 @@
 package cn.vonce.sql.enumerate;
 
+import cn.vonce.sql.bean.Alter;
+import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.constant.SqlConstant;
+import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Java类型对应的Oracle类型枚举类
@@ -14,20 +20,19 @@ import java.math.BigDecimal;
  */
 public enum JavaMapSqlServerType {
 
-    INTEGER(new Class[]{int.class, Integer.class}),
+    INT(new Class[]{int.class, Integer.class}),
     BIGINT(new Class[]{long.class, Long.class}),
     SMALLINT(new Class[]{short.class, Short.class}),
     REAL(new Class[]{float.class, Float.class}),
     FLOAT(new Class[]{double.class, Double.class}),
     NUMERIC(new Class[]{BigDecimal.class}),
-    NCHAR(new Class[]{char.class, Character.class}),
-    NVARCHAR(new Class[]{String.class}),
+    NCHAR(new Class[]{char.class, Character.class}), NVARCHAR(new Class[]{String.class}),
     TINYINT(new Class[]{byte.class, Byte.class}),
     BIT(new Class[]{boolean.class, Boolean.class}),
-    DATE(new Class[]{java.sql.Date.class}),
-    TIME(new Class[]{java.sql.Time.class}),
+    DATE(new Class[]{java.sql.Date.class, java.time.LocalDate.class}),
+    TIME(new Class[]{java.sql.Time.class, java.time.LocalTime.class}),
     DATETIME2(new Class[]{java.sql.Timestamp.class}),
-    DATETIME(new Class[]{java.util.Date.class}),
+    DATETIME(new Class[]{java.util.Date.class, java.time.LocalDateTime.class}),
     NTEXT(new Class[]{java.sql.Clob.class}),
     IMAGE(new Class[]{java.sql.Blob.class, Object.class});
 
@@ -88,7 +93,7 @@ public enum JavaMapSqlServerType {
         sql.append("(CASE LEFT(constraint_name, 2) WHEN 'FK' THEN 1 ELSE 0 END) AS fk, ");
         sql.append("a.length, a.scale, c.value AS remarks ");
         sql.append("FROM (");
-        sql.append("SELECT syscolumns.id, syscolumns.colid AS cid, syscolumns.name AS name, syscolumns.length AS length, syscolumns.scale, systypes.name AS type, syscolumns.isnullable AS notnull, '");
+        sql.append("SELECT syscolumns.id, syscolumns.colid AS cid, syscolumns.name AS name, syscolumns.prec AS length, syscolumns.scale, systypes.name AS type, syscolumns.isnullable AS notnull, '");
         sql.append(tableName);
         sql.append("' AS table_name ");
         sql.append("FROM syscolumns, systypes ");
@@ -99,6 +104,141 @@ public enum JavaMapSqlServerType {
         sql.append("LEFT JOIN sys.extended_properties c ON c.major_id = a.id AND c.minor_id = a.cid ");
         sql.append("ORDER BY a.cid");
         return sql.toString();
+    }
+
+    /**
+     * 更改表结构
+     *
+     * @param alterList
+     * @return
+     */
+    public static List<String> alterTable(List<Alter> alterList) {
+        List<String> sqlList = new ArrayList<>();
+        StringBuffer sql = new StringBuffer();
+        StringBuffer remarksSql = new StringBuffer();
+        for (int i = 0; i < alterList.size(); i++) {
+            Alter alter = alterList.get(i);
+            if (alter.getType() == AlterType.ADD) {
+                sql.append(SqlConstant.ALTER_TABLE);
+                sql.append(getFullName(alter, alter.getTable(), null));
+                sql.append(SqlConstant.ADD);
+                sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
+                remarksSql.append(addRemarks(alter));
+            } else if (alter.getType() == AlterType.CHANGE) {
+                //改名
+                sql.append(SqlConstant.EXEC_SP_RENAME);
+                sql.append(getFullName(alter, alter.getTable(), alter.getOldColumnName()));
+                sql.append(SqlConstant.COMMA);
+                sql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+                sql.append(alter.getColumnInfo().getName());
+                sql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+                sql.append(SqlConstant.COMMA);
+                sql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+                sql.append(SqlConstant.COLUMN);
+                sql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+                sql.append(SqlConstant.SPACES);
+                sql.append(SqlConstant.SEMICOLON);
+                //先改名后修改信息
+                StringBuffer modifySql = modifyColumn(alter);
+                if (modifySql.length() > 0) {
+                    sql.append(SqlConstant.ALTER_TABLE);
+                    sql.append(modifySql);
+                }
+                remarksSql.append(addRemarks(alter));
+            } else if (alter.getType() == AlterType.MODIFY) {
+                sql.append(SqlConstant.ALTER_TABLE);
+                sql.append(modifyColumn(alter));
+                remarksSql.append(addRemarks(alter));
+            } else if (alter.getType() == AlterType.DROP) {
+                sql.append(SqlConstant.ALTER_TABLE);
+                sql.append(getFullName(alter, alter.getTable(), null));
+                sql.append(SqlConstant.DROP);
+                sql.append(SqlConstant.COLUMN);
+                sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
+                sql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
+                sql.append(SqlConstant.END_SQUARE_BRACKETS);
+            }
+            sql.append(SqlConstant.SPACES);
+            sql.append(SqlConstant.SEMICOLON);
+        }
+        sqlList.add(sql.toString());
+        sqlList.add(remarksSql.toString());
+        return sqlList;
+    }
+
+    /**
+     * 获取全名
+     *
+     * @param alter
+     * @param table
+     * @param columnName
+     * @return
+     */
+    private static String getFullName(Alter alter, Table table, String columnName) {
+        StringBuffer sql = new StringBuffer();
+        boolean rename = alter.getType() == AlterType.CHANGE && StringUtil.isNotBlank(columnName);
+        if (rename) {
+            sql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        }
+        if (StringUtil.isNotBlank(table.getSchema())) {
+            sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
+            sql.append(table.getSchema());
+            sql.append(SqlConstant.END_SQUARE_BRACKETS);
+            sql.append(SqlConstant.POINT);
+        }
+        sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
+        sql.append(SqlConstant.DBO);
+        sql.append(SqlConstant.END_SQUARE_BRACKETS);
+        sql.append(SqlConstant.POINT);
+        sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
+        sql.append(SqlBeanUtil.isToUpperCase(alter) ? table.getName().toUpperCase() : table.getName());
+        sql.append(SqlConstant.END_SQUARE_BRACKETS);
+        if (rename) {
+            sql.append(SqlConstant.POINT);
+            sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
+            sql.append(columnName);
+            sql.append(SqlConstant.END_SQUARE_BRACKETS);
+            sql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        }
+        sql.append(SqlConstant.SPACES);
+        return sql.toString();
+    }
+
+    /**
+     * 更改列信息
+     *
+     * @param alter
+     * @return
+     */
+    private static StringBuffer modifyColumn(Alter alter) {
+        StringBuffer modifySql = new StringBuffer();
+        modifySql.append(getFullName(alter, alter.getTable(), null));
+        modifySql.append(SqlConstant.ALTER);
+        modifySql.append(SqlConstant.COLUMN);
+        modifySql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
+        return modifySql;
+    }
+
+    /**
+     * 增加列备注
+     *
+     * @param item
+     * @return
+     */
+    private static String addRemarks(Alter item) {
+        StringBuffer remarksSql = new StringBuffer();
+        if (StringUtil.isNotBlank(item.getColumnInfo().getRemarks())) {
+            remarksSql.append("IF ((SELECT COUNT(*) FROM ::fn_listextendedproperty(");
+            remarksSql.append("'MS_Description', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + "', 'COLUMN', N'" + item.getColumnInfo().getName() + "'");
+            remarksSql.append(")) > 0)");
+            remarksSql.append("\n  EXEC sp_updateextendedproperty ");
+            remarksSql.append("'MS_Description', N'" + item.getColumnInfo().getRemarks() + "', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + "', 'COLUMN', N'" + item.getColumnInfo().getName() + "'");
+            remarksSql.append("\nELSE");
+            remarksSql.append("\n  EXEC sp_addextendedproperty ");
+            remarksSql.append("'MS_Description', N'" + item.getColumnInfo().getRemarks() + "', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + "', 'COLUMN', N'" + item.getColumnInfo().getName() + "'");
+            remarksSql.append(SqlConstant.SEMICOLON);
+        }
+        return remarksSql.toString();
     }
 
 }
