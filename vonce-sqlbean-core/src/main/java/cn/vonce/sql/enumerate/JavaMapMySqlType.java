@@ -25,7 +25,7 @@ public enum JavaMapMySqlType {
     SMALLINT(new Class[]{short.class, Short.class}),
     FLOAT(new Class[]{float.class, Float.class}),
     DOUBLE(new Class[]{double.class, Double.class}),
-    NUMERIC(new Class[]{BigDecimal.class}),
+    DECIMAL(new Class[]{BigDecimal.class}),
     CHAR(new Class[]{char.class, Character.class}),
     VARCHAR(new Class[]{String.class}),
     TINYINT(new Class[]{byte.class, Byte.class}),

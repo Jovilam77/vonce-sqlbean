@@ -701,7 +701,7 @@ public class SqlBeanProvider {
             boolean fit = true;
             //优先比较字段改名的
             for (int i = 0; i < columnInfoList.size(); i++) {
-                if (sqlColumn != null && oldName.equals(columnInfoList.get(i).getName())) {
+                if (sqlColumn != null && oldName.equalsIgnoreCase(columnInfoList.get(i).getName())) {
                     //存在此字段
                     exist = true;
                     //使用实体类中的字段信息与数据库中的字段信息做比较
@@ -729,7 +729,7 @@ public class SqlBeanProvider {
             }
             //其次比较变更内容
             for (int i = 0; i < columnInfoList.size(); i++) {
-                if (columnInfo.getName().equals(columnInfoList.get(i).getName())) {
+                if (columnInfo.getName().equalsIgnoreCase(columnInfoList.get(i).getName())) {
                     //存在此字段
                     exist = true;
                     //使用实体类中的字段信息与数据库中的字段信息做比较

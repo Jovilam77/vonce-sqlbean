@@ -579,6 +579,19 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加列字段排序
      *
+     * @param columnFunction 列字段名
+     * @param sqlSort        排序方式
+     * @return
+     */
+    public <T, R> Select orderBy(ColumnFunction<T, R> columnFunction, SqlSort sqlSort) {
+        Column column = LambdaUtil.getColumn(columnFunction);
+        orderByList.add(new Order(column.getTableAlias(), column.getName(), sqlSort));
+        return this;
+    }
+
+    /**
+     * 添加列字段排序
+     *
      * @param orders 排序
      * @return
      */
