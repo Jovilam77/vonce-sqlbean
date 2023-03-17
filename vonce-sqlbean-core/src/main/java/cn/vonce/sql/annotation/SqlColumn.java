@@ -44,7 +44,7 @@ public @interface SqlColumn {
      *
      * @return
      */
-    int length() default 0;
+    long length() default 0;
 
     /**
      * 小数点

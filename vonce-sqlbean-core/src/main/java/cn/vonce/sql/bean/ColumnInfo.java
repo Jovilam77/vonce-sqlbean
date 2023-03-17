@@ -40,7 +40,7 @@ public class ColumnInfo {
     /**
      * 字段长度
      */
-    private Integer length;
+    private Long length;
     /**
      * 字段小数点精度
      */
@@ -106,11 +106,11 @@ public class ColumnInfo {
         this.fk = fk;
     }
 
-    public Integer getLength() {
+    public Long getLength() {
         return length;
     }
 
-    public void setLength(Integer length) {
+    public void setLength(Long length) {
         this.length = length;
     }
 

@@ -6,6 +6,7 @@ import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.JdbcType;
 import cn.vonce.sql.uitls.StringUtil;
+
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.List;
@@ -73,7 +74,7 @@ public abstract class BaseSqlBeanServiceImpl {
                 }
                 //设置字段长度范围
                 String range[] = StringUtil.getBracketContent(values[0]).split(",");
-                info.setLength("".equals(range[0]) ? 0 : Integer.parseInt(range[0]));
+                info.setLength("".equals(range[0]) ? 0 : Long.parseLong(range[0]));
                 info.setScale(range.length == 1 ? 0 : Integer.parseInt(range[1]));
             }
         } else if (dbType == DbType.H2 || dbType == DbType.Postgresql) {
