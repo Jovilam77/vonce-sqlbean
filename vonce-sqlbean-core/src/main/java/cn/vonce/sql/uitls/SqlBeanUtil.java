@@ -527,9 +527,11 @@ public class SqlBeanUtil {
      *
      * @param clazz
      * @param filterTableFields
+     * @param columnList
      * @return
+     * @throws SqlBeanException
      */
-    public static List<Column> getSelectColumns(Class<?> clazz, String[] filterTableFields) throws SqlBeanException {
+    public static List<Column> getSelectColumns(Class<?> clazz, String[] filterTableFields, List<Column> columnList) throws SqlBeanException {
         if (clazz == null) {
             return null;
         }
@@ -593,7 +595,7 @@ public class SqlBeanUtil {
                 //可能会连同一个表，但连接条件不一样（这时表需要区分别名），所以查询的字段可能是同一个，但属于不同表别名下，所以用java字段名当sql字段别名不会出错
                 String subTableAlias = StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias();
                 columnSet.add(new Column(subTableAlias, tableFieldName, getColumnAlias(subTableAlias, field.getName())));
-            } else {
+            } else if (columnList == null || columnList.size() == 0) {
                 columnSet.add(new Column(tableAlias, getTableFieldName(field, sqlTable), field.getName()));
             }
         }

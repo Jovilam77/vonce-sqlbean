@@ -146,17 +146,15 @@ public class SqlBeanProvider {
         if (select.getSqlBeanDB() == null) {
             select.setSqlBeanDB(sqlBeanDB);
         }
-        if (select.getColumnList().isEmpty()) {
-            try {
-                SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-                select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
-                if (select.getPage() != null && select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
-                    select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz), sqlTable));
-                }
-            } catch (SqlBeanException e) {
-                e.printStackTrace();
-                return null;
+        try {
+            SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
+            select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields(), select.getColumnList()));
+            if (select.getPage() != null && select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
+                select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz), sqlTable));
             }
+        } catch (SqlBeanException e) {
+            e.printStackTrace();
+            return null;
         }
         return setSelectAndBuild(clazz, select);
     }
@@ -812,7 +810,7 @@ public class SqlBeanProvider {
         select.count(isCount);
         try {
             if (!isCount) {
-                select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
+                select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields(), null));
             }
             SqlBeanUtil.setJoin(select, clazz);
             setSchema(select, clazz);
@@ -849,17 +847,17 @@ public class SqlBeanProvider {
             e.printStackTrace();
             return null;
         }
-        if (!select.getOrderBy().isEmpty()) {
-            for (Order order : select.getOrderBy()) {
-                if (StringUtil.isEmpty(order.getTableAlias())) {
-                    List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
-                    Field field = SqlBeanUtil.getFieldByTableFieldName(fieldList, order.getName());
-                    if (field != null) {
-                        order.setTableAlias(select.getTable().getAlias());
-                    }
-                }
-            }
-        }
+//        if (!select.getOrderBy().isEmpty()) {
+//            for (Order order : select.getOrderBy()) {
+//                if (StringUtil.isEmpty(order.getTableAlias())) {
+//                    List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
+//                    Field field = SqlBeanUtil.getFieldByTableFieldName(fieldList, order.getName());
+//                    if (field != null) {
+//                        order.setTableAlias(select.getTable().getAlias());
+//                    }
+//                }
+//            }
+//        }
         return SqlHelper.buildSelectSql(select);
     }
 
