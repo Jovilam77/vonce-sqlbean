@@ -247,7 +247,7 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      * @param value2         第二个值
      * @return
      */
-    public <R> Update<T> setAdd(ColumnFunction<T, R> columnFunction, ColumnFunction<T, R> value1, Object value2) {
+    public <k, R> Update<T> setAdd(ColumnFunction<T, R> columnFunction, ColumnFunction<k, R> value1, Object value2) {
         Column column = LambdaUtil.getColumn(columnFunction);
         setInfoList.add(new SetInfo(SetInfo.Operator.ADDITION, column.getTableAlias(), column.getName(), value1, value2));
         return this;
@@ -315,7 +315,7 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      * @param value2         第二个值
      * @return
      */
-    public <R> Update<T> setSub(ColumnFunction<T, R> columnFunction, ColumnFunction<T, R> value1, Object value2) {
+    public <k, R> Update<T> setSub(ColumnFunction<T, R> columnFunction, ColumnFunction<k, R> value1, Object value2) {
         Column column = LambdaUtil.getColumn(columnFunction);
         setInfoList.add(new SetInfo(SetInfo.Operator.SUBTRACT, column.getTableAlias(), column.getName(), value1, value2));
         return this;

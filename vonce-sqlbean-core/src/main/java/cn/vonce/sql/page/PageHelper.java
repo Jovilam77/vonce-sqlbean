@@ -10,6 +10,7 @@ import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.List;
  * @email 766255988@qq.com
  * @date 2017年3月14日上午11:59:50
  */
-public class PageHelper<T> {
+public class PageHelper<T> implements Serializable {
 
     public static final String SELECT = "select";
     public static final String SELECT_MAP_LIST = "selectMapList";
