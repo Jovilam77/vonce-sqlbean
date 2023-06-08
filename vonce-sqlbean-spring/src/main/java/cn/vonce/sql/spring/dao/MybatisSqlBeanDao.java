@@ -11,6 +11,7 @@ import cn.vonce.sql.bean.*;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -387,7 +388,7 @@ public interface MybatisSqlBeanDao<T> {
      * @return
      */
     @InsertProvider(type = MybatisSqlBeanProvider.class, method = "insertBean")
-    int insertBean(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("beanList") List<T> beanList);
+    int insertBean(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("beanList") Collection<T> beanList);
 
     /**
      * 插入数据

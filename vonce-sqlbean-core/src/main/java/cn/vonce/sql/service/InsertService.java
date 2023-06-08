@@ -2,6 +2,7 @@ package cn.vonce.sql.service;
 
 import cn.vonce.sql.bean.Insert;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -31,7 +32,7 @@ public interface InsertService<T> {
      * @return
      */
     @SuppressWarnings("unchecked")
-    int insert(List<T> beanList);
+    int insert(Collection<T> beanList);
 
     /**
      * 插入数据
