@@ -186,6 +186,21 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加column列字段
      *
+     * @param columnFunctions
+     * @return
+     */
+    public <T, R> Select column(ColumnFunction<T, R>... columnFunctions) {
+        if (columnFunctions != null && columnFunctions.length > 0) {
+            for (ColumnFunction item : columnFunctions) {
+                this.columnList.add(LambdaUtil.getColumn(item));
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 添加column列字段
+     *
      * @param columnName
      * @return
      */
