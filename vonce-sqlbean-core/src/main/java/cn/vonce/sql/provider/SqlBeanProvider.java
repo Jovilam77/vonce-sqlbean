@@ -148,7 +148,7 @@ public class SqlBeanProvider {
         }
         try {
             SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-            select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields(), select.getColumnList()));
+            select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterColumns(), select.getColumnList()));
             if (select.getPage() != null && select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
                 select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz), sqlTable));
             }
@@ -389,10 +389,10 @@ public class SqlBeanProvider {
      * @param bean
      * @param updateNotNull
      * @param optimisticLock
-     * @param filterFields
+     * @param filterColumns
      * @return
      */
-    public static String updateByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, Object id, boolean updateNotNull, boolean optimisticLock, String[] filterFields) {
+    public static String updateByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, Object id, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns) {
         if (StringUtil.isEmpty(id)) {
             try {
                 throw new SqlBeanException("updateByIdSql id不能为空");
@@ -402,7 +402,7 @@ public class SqlBeanProvider {
             }
         }
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
-        update.setFilterFields(filterFields);
+        update.filterFields(filterColumns);
         Field idField;
         try {
             idField = SqlBeanUtil.getIdField(bean.getClass());
@@ -423,12 +423,12 @@ public class SqlBeanProvider {
      * @param bean
      * @param updateNotNull
      * @param optimisticLock
-     * @param filterFields
+     * @param filterColumns
      * @return
      */
-    public static String updateByBeanIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields) {
+    public static String updateByBeanIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns) {
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
-        update.setFilterFields(filterFields);
+        update.filterFields(filterColumns);
         Field idField;
         try {
             idField = SqlBeanUtil.getIdField(bean.getClass());
@@ -458,14 +458,14 @@ public class SqlBeanProvider {
      * @param bean
      * @param updateNotNull
      * @param optimisticLock
-     * @param filterFields
+     * @param filterColumns
      * @param where
      * @param args
      * @return
      */
-    public static String updateBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where, Object[] args) {
+    public static String updateBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns, String where, Object[] args) {
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
-        update.setFilterFields(filterFields);
+        update.filterFields(filterColumns);
         update.where(where, args);
         return SqlHelper.buildUpdateSql(update);
     }
@@ -478,13 +478,13 @@ public class SqlBeanProvider {
      * @param bean
      * @param updateNotNull
      * @param optimisticLock
-     * @param filterFields
+     * @param filterColumns
      * @param where
      * @return
      */
-    public static String updateByBeanSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where) {
+    public static String updateByBeanSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns, String where) {
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
-        update.setFilterFields(filterFields);
+        update.filterFields(filterColumns);
         update.where(where, null);
         return SqlHelper.buildUpdateSql(update);
     }
@@ -810,7 +810,7 @@ public class SqlBeanProvider {
         select.count(isCount);
         try {
             if (!isCount) {
-                select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields(), null));
+                select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterColumns(), null));
             }
             SqlBeanUtil.setJoin(select, clazz);
             setSchema(select, clazz);

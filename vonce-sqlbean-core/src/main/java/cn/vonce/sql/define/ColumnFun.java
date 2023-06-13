@@ -11,6 +11,6 @@ import java.util.function.Function;
  * @date 2022/12/7 19:16
  */
 @FunctionalInterface
-public interface ColumnFunction<T, R> extends Serializable, Function<T, R> {
+public interface ColumnFun<T, R> extends Serializable, Function<T, R> {
 
 }

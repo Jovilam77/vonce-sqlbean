@@ -3,9 +3,9 @@ package cn.vonce.sql.spring.service;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.exception.SqlBeanException;
-import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.page.PageHelper;
 import cn.vonce.sql.page.ResultData;
@@ -439,8 +439,13 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, String[] filterFields) {
-        return mybatisSqlBeanDao.updateById(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, filterFields);
+    public int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns) {
+        return mybatisSqlBeanDao.updateById(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, filterColumns);
+    }
+
+    @Override
+    public <R> int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>[] filterColumns) {
+        return mybatisSqlBeanDao.updateById(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -457,8 +462,13 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields) {
-        return mybatisSqlBeanDao.updateByBeanId(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, filterFields);
+    public int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns) {
+        return mybatisSqlBeanDao.updateByBeanId(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, filterColumns);
+    }
+
+    @Override
+    public <R> int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>[] filterColumns) {
+        return mybatisSqlBeanDao.updateByBeanId(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -491,20 +501,30 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where, Object... args) {
-        return mybatisSqlBeanDao.updateBy(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, filterFields, where, args);
+    public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns, String where, Object... args) {
+        return mybatisSqlBeanDao.updateBy(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, filterColumns, where, args);
+    }
+
+    @Override
+    public <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>[] filterColumns, String where, Object... args) {
+        return mybatisSqlBeanDao.updateBy(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns), where, args);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, Wrapper wrapper) {
+    public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns, Wrapper wrapper) {
         Update update = new Update();
         update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
         update.setOptimisticLock(optimisticLock);
-        update.setFilterFields(filterFields);
+        update.filterFields(filterColumns);
         update.where(wrapper);
         return mybatisSqlBeanDao.update(getSqlBeanDB(), clazz, update, false);
+    }
+
+    @Override
+    public <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>[] filterColumns, Wrapper wrapper) {
+        return this.updateBy(bean, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns), wrapper);
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -521,8 +541,13 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where) {
-        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, filterFields, where);
+    public int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns, String where) {
+        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, filterColumns, where);
+    }
+
+    @Override
+    public <R> int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>[] filterColumns, String where) {
+        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns), where);
     }
 
     @SuppressWarnings("unchecked")

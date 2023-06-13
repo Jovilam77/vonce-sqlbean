@@ -588,18 +588,19 @@ public class SqlHelper {
     private static String setSql(Update update) {
         StringBuffer setSql = new StringBuffer();
         String transferred = SqlBeanUtil.getTransferred(update);
-        String[] filterFields = update.getFilterFields();
+        List<Column> filterColumns = update.getFilterColumns();
         Object bean = update.getUpdateBean();
         boolean isToUpperCase = SqlBeanUtil.isToUpperCase(update);
         if (bean != null) {
+            Table table = SqlBeanUtil.getTable(bean.getClass());
             SqlTable sqlTable = SqlBeanUtil.getSqlTable(bean.getClass());
             List<Field> fieldList = SqlBeanUtil.getBeanAllField(bean.getClass());
             for (Field field : fieldList) {
                 if (SqlBeanUtil.isIgnore(field)) {
                     continue;
                 }
-                String name = SqlBeanUtil.getTableFieldName(field, sqlTable);
-                if (SqlBeanUtil.isFilter(filterFields, name)) {
+                Column column = SqlBeanUtil.getTableColumn(field, table, sqlTable);
+                if (SqlBeanUtil.isFilter(filterColumns, column)) {
                     continue;
                 }
                 Object objectValue = ReflectUtil.instance().get(bean.getClass(), bean, field.getName());
@@ -620,7 +621,7 @@ public class SqlHelper {
                     setSql.append(SqlConstant.POINT);
                 }
                 setSql.append(transferred);
-                setSql.append(isToUpperCase ? name.toUpperCase() : name);
+                setSql.append(isToUpperCase ? column.getName().toUpperCase() : column.getName());
                 setSql.append(transferred);
                 setSql.append(SqlConstant.EQUAL_TO);
                 if (update.isOptimisticLock() && sqlVersion != null) {
