@@ -1,6 +1,7 @@
 package cn.vonce.sql.service;
 
 import cn.vonce.sql.bean.*;
+import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.helper.Wrapper;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
  * @email imjovi@qq.com
  * @date 2020/6/30 15:40
  */
-public interface TableService {
+public interface TableService<T> {
 
     /**
      * 获取Bean类型
@@ -84,63 +85,105 @@ public interface TableService {
     /**
      * 根据条件备份表和数据到一张指定名称的新表
      *
+     * @param wrapper         条件包装器
      * @param targetTableName 目标表名
      * @param columns         指定的列
-     * @param wrapper         条件包装器
      * @return
      */
-    void backup(String targetTableName, Column[] columns, Wrapper wrapper);
+    void backup(Wrapper wrapper, String targetTableName, Column... columns);
 
     /**
      * 根据条件备份表和数据到一张指定名称的新表
      *
+     * @param wrapper         条件包装器
+     * @param targetTableName 目标表名
+     * @param columns         指定的列
+     * @return
+     */
+    <R> void backup(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns);
+
+    /**
+     * 根据条件备份表和数据到一张指定名称的新表
+     *
+     * @param wrapper         条件包装器
      * @param targetSchema    目标schema
      * @param targetTableName 目标表名
      * @param columns         指定的列
-     * @param wrapper         条件包装器
      * @return
      */
-    void backup(String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper);
+    void backup(Wrapper wrapper, String targetSchema, String targetTableName, Column... columns);
+
+    /**
+     * 根据条件备份表和数据到一张指定名称的新表
+     *
+     * @param wrapper         条件包装器
+     * @param targetSchema    目标schema
+     * @param targetTableName 目标表名
+     * @param columns         指定的列
+     * @return
+     */
+    <R> void backup(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns);
 
     /**
      * 根据条件将数据复制插入到同样结构的表中
      *
-     * @param targetTableName 目标表名
      * @param wrapper         条件包装器
+     * @param targetTableName 目标表名
      * @return
      */
-    int copy(String targetTableName, Wrapper wrapper);
+    int copy(Wrapper wrapper, String targetTableName);
 
     /**
      * 根据条件将数据复制插入到同样结构的表中
      *
+     * @param wrapper         条件包装器
      * @param targetSchema    目标schema
      * @param targetTableName 目标表名
-     * @param wrapper         条件包装器
      * @return
      */
-    int copy(String targetSchema, String targetTableName, Wrapper wrapper);
+    int copy(Wrapper wrapper, String targetSchema, String targetTableName);
 
     /**
      * 根据条件将数据复制插入到指定结构的表中
      *
+     * @param wrapper         条件包装器
      * @param targetTableName 目标表名
      * @param columns         指定的列
-     * @param wrapper         条件包装器
      * @return
      */
-    int copy(String targetTableName, Column[] columns, Wrapper wrapper);
+    int copy(Wrapper wrapper, String targetTableName, Column... columns);
 
     /**
      * 根据条件将数据复制插入到指定结构的表中
      *
-     * @param targetSchema    目标schema
+     * @param wrapper         条件包装器
      * @param targetTableName 目标表名
      * @param columns         指定的列
-     * @param wrapper         条件包装器
      * @return
      */
-    int copy(String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper);
+    <R> int copy(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns);
+
+    /**
+     * 根据条件将数据复制插入到指定结构的表中
+     *
+     * @param wrapper         条件包装器
+     * @param columns         指定的列
+     * @param targetSchema    目标schema
+     * @param targetTableName 目标表名
+     * @return
+     */
+    int copy(Wrapper wrapper, String targetSchema, String targetTableName, Column... columns);
+
+    /**
+     * 根据条件将数据复制插入到指定结构的表中
+     *
+     * @param wrapper         条件包装器
+     * @param columns         指定的列
+     * @param targetSchema    目标schema
+     * @param targetTableName 目标表名
+     * @return
+     */
+    <R> int copy(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns);
 
     /**
      * 更改表结构

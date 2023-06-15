@@ -377,7 +377,7 @@ public interface MybatisSqlBeanDao<T> {
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateByBean")
-    int updateByBean(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("optimisticLock") boolean optimisticLock, @Param("filterColumns") Column[] filterColumns, @Param("where") String where);
+    int updateByBean(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("optimisticLock") boolean optimisticLock, @Param("where") String where, @Param("filterColumns") Column[] filterColumns);
 
     /**
      * 插入数据
@@ -443,26 +443,26 @@ public interface MybatisSqlBeanDao<T> {
      *
      * @param sqlBeanDB
      * @param clazz
+     * @param wrapper
      * @param targetTableName
      * @param columns
-     * @param wrapper
      * @return
      */
     @InsertProvider(type = MybatisSqlBeanProvider.class, method = "backup")
-    int backup(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("targetSchema") String targetSchema, @Param("targetTableName") String targetTableName, @Param("columns") Column[] columns, @Param("wrapper") Wrapper wrapper);
+    int backup(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("wrapper") Wrapper wrapper, @Param("targetSchema") String targetSchema, @Param("targetTableName") String targetTableName, @Param("columns") Column[] columns);
 
     /**
      * 复制数据到指定表
      *
      * @param sqlBeanDB
      * @param clazz
+     * @param wrapper
      * @param targetTableName
      * @param columns
-     * @param wrapper
      * @return
      */
     @InsertProvider(type = MybatisSqlBeanProvider.class, method = "copy")
-    int copy(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("targetSchema") String targetSchema, @Param("targetTableName") String targetTableName, @Param("columns") Column[] columns, @Param("wrapper") Wrapper wrapper);
+    int copy(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("wrapper") Wrapper wrapper, @Param("targetSchema") String targetSchema, @Param("targetTableName") String targetTableName, @Param("columns") Column[] columns);
 
     /**
      * 执行Sql

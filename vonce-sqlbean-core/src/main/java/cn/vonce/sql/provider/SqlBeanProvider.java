@@ -478,11 +478,11 @@ public class SqlBeanProvider {
      * @param bean
      * @param updateNotNull
      * @param optimisticLock
-     * @param filterColumns
      * @param where
+     * @param filterColumns
      * @return
      */
-    public static String updateByBeanSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns, String where) {
+    public static String updateByBeanSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String where, Column[] filterColumns) {
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
         update.filterFields(filterColumns);
         update.where(where, null);
@@ -633,12 +633,12 @@ public class SqlBeanProvider {
      *
      * @param sqlBeanDB
      * @param clazz
+     * @param wrapper
      * @param targetTableName
      * @param columns
-     * @param wrapper
      * @return
      */
-    public static String backupSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper) {
+    public static String backupSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Wrapper wrapper, String targetSchema, String targetTableName, Column[] columns) {
         Backup backup = new Backup();
         backup.setSqlBeanDB(sqlBeanDB);
         backup.setTable(clazz);
@@ -655,12 +655,13 @@ public class SqlBeanProvider {
      *
      * @param sqlBeanDB
      * @param clazz
+     * @param wrapper
      * @param targetTableName
      * @param columns
-     * @param wrapper
+
      * @return
      */
-    public static String copySql(SqlBeanDB sqlBeanDB, Class<?> clazz, String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper) {
+    public static String copySql(SqlBeanDB sqlBeanDB, Class<?> clazz, Wrapper wrapper, String targetSchema, String targetTableName, Column[] columns) {
         Copy copy = new Copy();
         copy.setSqlBeanDB(sqlBeanDB);
         copy.setTable(clazz);

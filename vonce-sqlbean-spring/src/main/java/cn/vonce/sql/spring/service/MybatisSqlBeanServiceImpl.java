@@ -42,7 +42,7 @@ import java.util.*;
  */
 @UseMybatis
 @Service
-public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl implements SqlBeanService<T, ID>, TableService {
+public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl implements SqlBeanService<T, ID>, TableService<T> {
 
     private Logger logger = LoggerFactory.getLogger(MybatisSqlBeanServiceImpl.class);
 
@@ -439,12 +439,12 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns) {
+    public int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, Column... filterColumns) {
         return mybatisSqlBeanDao.updateById(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, filterColumns);
     }
 
     @Override
-    public <R> int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>[] filterColumns) {
+    public <R> int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns) {
         return mybatisSqlBeanDao.updateById(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns));
     }
 
@@ -462,12 +462,12 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns) {
+    public int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, Column... filterColumns) {
         return mybatisSqlBeanDao.updateByBeanId(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, filterColumns);
     }
 
     @Override
-    public <R> int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>[] filterColumns) {
+    public <R> int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns) {
         return mybatisSqlBeanDao.updateByBeanId(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns));
     }
 
@@ -505,14 +505,9 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return mybatisSqlBeanDao.updateBy(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, filterColumns, where, args);
     }
 
-    @Override
-    public <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>[] filterColumns, String where, Object... args) {
-        return mybatisSqlBeanDao.updateBy(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns), where, args);
-    }
-
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns, Wrapper wrapper) {
+    public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper, Column... filterColumns) {
         Update update = new Update();
         update.setUpdateBean(bean);
         update.setUpdateNotNull(updateNotNull);
@@ -523,31 +518,31 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     }
 
     @Override
-    public <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>[] filterColumns, Wrapper wrapper) {
-        return this.updateBy(bean, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns), wrapper);
+    public <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper, ColumnFun<T, R>... filterColumns) {
+        return this.updateBy(bean, updateNotNull, optimisticLock, wrapper, SqlBeanUtil.funToColumn(filterColumns));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBean(T bean, String where) {
-        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, true, false, null, where);
+        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, true, false, null, null);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String where) {
-        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, null, where);
+        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, null, null);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns, String where) {
-        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, filterColumns, where);
+    public int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String where, Column... filterColumns) {
+        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, where, filterColumns);
     }
 
     @Override
-    public <R> int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>[] filterColumns, String where) {
-        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns), where);
+    public <R> int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String where, ColumnFun<T, R>... filterColumns) {
+        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, where, SqlBeanUtil.funToColumn(filterColumns));
     }
 
     @SuppressWarnings("unchecked")
@@ -592,43 +587,63 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(String targetSchema, String targetTableName) {
-        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, targetSchema, targetTableName, null, null);
+        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, null, targetSchema, targetTableName, null);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public void backup(String targetTableName, Column[] columns, Wrapper wrapper) {
-        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, null, targetTableName, columns, wrapper);
+    public void backup(Wrapper wrapper, String targetTableName, Column... columns) {
+        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, wrapper, null, targetTableName, columns);
+    }
+
+    @Override
+    public <R> void backup(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns) {
+        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, wrapper, null, targetTableName, SqlBeanUtil.funToColumn(columns));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public void backup(String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper) {
-        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, targetSchema, targetTableName, columns, wrapper);
+    public void backup(Wrapper wrapper, String targetSchema, String targetTableName, Column... columns) {
+        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, columns);
+    }
+
+    @Override
+    public <R> void backup(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
+        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, SqlBeanUtil.funToColumn(columns));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int copy(String targetTableName, Wrapper wrapper) {
-        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, null, targetTableName, null, wrapper);
+    public int copy(Wrapper wrapper, String targetTableName) {
+        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, wrapper, null, targetTableName, null);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int copy(String targetSchema, String targetTableName, Wrapper wrapper) {
-        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, targetSchema, targetTableName, null, wrapper);
+    public int copy(Wrapper wrapper, String targetSchema, String targetTableName) {
+        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, null);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int copy(String targetTableName, Column[] columns, Wrapper wrapper) {
-        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, null, targetTableName, columns, wrapper);
+    public int copy(Wrapper wrapper, String targetTableName, Column... columns) {
+        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, wrapper, null, targetTableName, columns);
+    }
+
+    @Override
+    public <R> int copy(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns) {
+        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, wrapper, null, targetTableName, SqlBeanUtil.funToColumn(columns));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int copy(String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper) {
-        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, targetSchema, targetTableName, columns, wrapper);
+    public int copy(Wrapper wrapper, String targetSchema, String targetTableName, Column... columns) {
+        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, columns);
+    }
+
+    @Override
+    public <R> int copy(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
+        return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, SqlBeanUtil.funToColumn(columns));
     }
 
     @DbSwitch(DbRole.MASTER)
