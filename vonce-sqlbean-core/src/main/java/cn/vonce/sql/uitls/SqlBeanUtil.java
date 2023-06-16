@@ -318,33 +318,33 @@ public class SqlBeanUtil {
     /**
      * 获取列信息
      *
-     * @param common
+     * @param sqlBeanDB
      * @param field
      * @return
      */
-    public static ColumnInfo getColumnInfo(Common common, Field field) {
-        return getColumnInfo(common, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class));
+    public static ColumnInfo getColumnInfo(SqlBeanDB sqlBeanDB, Field field) {
+        return getColumnInfo(sqlBeanDB, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class));
     }
 
     /**
      * 获取列信息
      *
-     * @param common
+     * @param sqlBeanDB
      * @param field
      * @param sqlTable
      * @param sqlColumn
      * @return
      */
-    public static ColumnInfo getColumnInfo(Common common, Field field, SqlTable sqlTable, SqlColumn sqlColumn) {
+    public static ColumnInfo getColumnInfo(SqlBeanDB sqlBeanDB, Field field, SqlTable sqlTable, SqlColumn sqlColumn) {
         String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
         ColumnInfo columnInfo = new ColumnInfo();
-        columnInfo.setName(SqlBeanUtil.isToUpperCase(common) ? columnName.toUpperCase() : columnName);
+        columnInfo.setName(SqlBeanUtil.isToUpperCase(sqlBeanDB) ? columnName.toUpperCase() : columnName);
         columnInfo.setPk(field.isAnnotationPresent(SqlId.class));
         JdbcType jdbcType;
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
             jdbcType = sqlColumn.type();
         } else {
-            jdbcType = JdbcType.getType(common.getSqlBeanDB().getDbType(), field);
+            jdbcType = JdbcType.getType(sqlBeanDB.getDbType(), field);
         }
         columnInfo.setType(jdbcType.name());
         if (sqlColumn != null) {
@@ -1143,6 +1143,19 @@ public class SqlBeanUtil {
      */
     public static boolean isToUpperCase(Common common) {
         if (common.getSqlBeanDB().getSqlBeanConfig().getToUpperCase() != null && common.getSqlBeanDB().getSqlBeanConfig().getToUpperCase()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 是否需要转大写
+     *
+     * @param sqlBeanDB
+     * @return
+     */
+    public static boolean isToUpperCase(SqlBeanDB sqlBeanDB) {
+        if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) {
             return true;
         }
         return false;

@@ -195,7 +195,7 @@ public class SqlHelper {
                 }
             }
             SqlColumn sqlColumn = fieldList.get(i).getAnnotation(SqlColumn.class);
-            sqlSb.append(SqlBeanUtil.addColumn(create, SqlBeanUtil.getColumnInfo(create, fieldList.get(i), sqlTable, sqlColumn), null));
+            sqlSb.append(SqlBeanUtil.addColumn(create, SqlBeanUtil.getColumnInfo(create.getSqlBeanDB(), fieldList.get(i), sqlTable, sqlColumn), null));
             sqlSb.append(SqlConstant.COMMA);
         }
 

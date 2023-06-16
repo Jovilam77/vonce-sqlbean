@@ -695,7 +695,7 @@ public class SqlBeanProvider {
             alter.setSqlBeanDB(sqlBeanDB);
             alter.setTable(clazz);
             String oldName = sqlColumn == null ? "" : (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) ? sqlColumn.oldName().toUpperCase() : sqlColumn.oldName();
-            ColumnInfo columnInfo = SqlBeanUtil.getColumnInfo(alter, field, sqlTable, sqlColumn);
+            ColumnInfo columnInfo = SqlBeanUtil.getColumnInfo(alter.getSqlBeanDB(), field, sqlTable, sqlColumn);
             boolean exist = false;
             boolean fit = true;
             //优先比较字段改名的
