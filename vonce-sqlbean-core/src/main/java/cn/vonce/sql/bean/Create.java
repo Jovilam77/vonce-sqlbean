@@ -1,7 +1,7 @@
 package cn.vonce.sql.bean;
 
 /**
- * 删除
+ * 创建
  *
  * @author Jovi
  * @version 1.0
@@ -10,14 +10,5 @@ package cn.vonce.sql.bean;
  */
 public class Create extends Common {
 
-    private Class<?> beanClass;
-
-    public Class<?> getBeanClass() {
-        return beanClass;
-    }
-
-    public void setBeanClass(Class<?> beanClass) {
-        this.beanClass = beanClass;
-    }
 
 }
