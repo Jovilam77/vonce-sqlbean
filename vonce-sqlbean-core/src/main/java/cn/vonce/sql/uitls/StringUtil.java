@@ -135,6 +135,9 @@ public class StringUtil {
     public static String underlineToHump(String para) {
         StringBuilder result = new StringBuilder();
         String a[] = para.split(UNDERLINE);
+        if (a.length == 1) {
+            return a[0];
+        }
         for (String s : a) {
             if (!para.contains(UNDERLINE)) {
                 result.append(s.toLowerCase());
