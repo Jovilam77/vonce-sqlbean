@@ -19,7 +19,7 @@
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
-		<version>1.2.0-beta12</version>
+		<version>1.2.0-beta13</version>
 	</dependency>
 
 ###### 2.标注实体类

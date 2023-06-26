@@ -182,6 +182,9 @@ public class DateUtil {
      * @param date 日期
      */
     public static LocalDateTime dateToLocalDateTime(Date date) {
+        if (date == null) {
+            return null;
+        }
         Instant instant = date.toInstant();
         ZoneId zone = ZoneId.systemDefault();
         return LocalDateTime.ofInstant(instant, zone);
@@ -193,6 +196,9 @@ public class DateUtil {
      * @param date 日期
      */
     public static LocalDate dateToLocalDate(Date date) {
+        if (date == null) {
+            return null;
+        }
         Instant instant = date.toInstant();
         ZoneId zone = ZoneId.systemDefault();
         LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
@@ -205,6 +211,9 @@ public class DateUtil {
      * @param date 日期
      */
     public static LocalTime dateToLocalTime(Date date) {
+        if (date == null) {
+            return null;
+        }
         Instant instant = date.toInstant();
         ZoneId zone = ZoneId.systemDefault();
         LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
@@ -218,6 +227,9 @@ public class DateUtil {
      * @return 结果集
      */
     public static Date localDateTimeToDate(LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return null;
+        }
         ZoneId zone = ZoneId.systemDefault();
         Instant instant = localDateTime.atZone(zone).toInstant();
         return Date.from(instant);
@@ -229,6 +241,9 @@ public class DateUtil {
      * @param localDate 结果集
      */
     public static Date localDateToDate(LocalDate localDate) {
+        if (localDate == null) {
+            return null;
+        }
         ZoneId zone = ZoneId.systemDefault();
         Instant instant = localDate.atStartOfDay().atZone(zone).toInstant();
         return Date.from(instant);
@@ -254,6 +269,9 @@ public class DateUtil {
      * @return
      */
     public static String unifyDateToString(Object date) {
+        if (date == null) {
+            return null;
+        }
         if (date instanceof LocalDateTime) {
             return ((LocalDateTime) date).format(FORMATTER_FULL);
         } else if (date instanceof LocalDate) {
@@ -274,6 +292,9 @@ public class DateUtil {
      * @return
      */
     public static String unifyDateToString(Object date, String format) {
+        if (date == null) {
+            return null;
+        }
         if (date instanceof LocalDateTime) {
             return ((LocalDateTime) date).format(DateTimeFormatter.ofPattern(format).withZone(ZoneId.of("+8")));
         } else if (date instanceof LocalDate) {

@@ -20,6 +20,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 /**
@@ -1256,6 +1259,12 @@ public class SqlBeanUtil {
                 return new Timestamp(System.currentTimeMillis());
             case "java.math.BigDecimal":
                 return new BigDecimal(0);
+            case "java.time.LocalDate":
+                return LocalDate.now();
+            case "java.time.LocalTime":
+                return LocalTime.now();
+            case "java.time.LocalDateTime":
+                return LocalDateTime.now();
         }
         return null;
     }
