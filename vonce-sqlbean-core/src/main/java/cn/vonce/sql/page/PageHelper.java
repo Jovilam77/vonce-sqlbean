@@ -283,12 +283,12 @@ public class PageHelper<T> implements Serializable {
     /**
      * 获得分页数据
      *
-     * @param tClazz
+     * @param returnType
      * @param select      SqlBean
      * @param pageService 分页接口
      * @return
      */
-    public PageHelper<T> paging(Class<T> tClazz, Select select, PagingService pageService) {
+    public PageHelper<T> paging(Class<T> returnType, Select select, PagingService pageService) {
         try {
             Class<?> clazz = pageService.getClass();
             // 衍生一个对象用于select查询
@@ -301,9 +301,9 @@ public class PageHelper<T> implements Serializable {
             // 先统计数量
             int count;
             Object obj;
-            if (tClazz != null) {
-                count = (int) ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getCount(), new Class[]{Class.class, Select.class}, new Object[]{tClazz, countSelect});
-                obj = ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getSelect(), new Class[]{Class.class, Select.class}, new Object[]{tClazz, select});
+            if (returnType != null) {
+                count = (int) ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getCount(), new Class[]{Class.class, Select.class}, new Object[]{returnType, countSelect});
+                obj = ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getSelect(), new Class[]{Class.class, Select.class}, new Object[]{returnType, select});
             } else {
                 count = (int) ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getCount(), new Class[]{Select.class}, new Object[]{countSelect});
                 obj = ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getSelect(), new Class[]{Select.class}, new Object[]{select});
