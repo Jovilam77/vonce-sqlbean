@@ -11,6 +11,7 @@ import cn.vonce.sql.bean.*;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -327,11 +328,11 @@ public interface MybatisSqlBeanDao<T> {
      * @param bean
      * @param updateNotNull
      * @param optimisticLock
-     * @param filterFields
+     * @param filterColumns
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateById")
-    int updateById(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("id") Object id, @Param("updateNotNull") boolean updateNotNull, @Param("optimisticLock") boolean optimisticLock, @Param("filterFields") String[] filterFields);
+    int updateById(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("id") Object id, @Param("updateNotNull") boolean updateNotNull, @Param("optimisticLock") boolean optimisticLock, @Param("filterColumns") Column[] filterColumns);
 
     /**
      * 根据实体类id条件更新
@@ -341,11 +342,11 @@ public interface MybatisSqlBeanDao<T> {
      * @param bean
      * @param updateNotNull
      * @param optimisticLock
-     * @param filterFields
+     * @param filterColumns
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateByBeanId")
-    int updateByBeanId(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("optimisticLock") boolean optimisticLock, @Param("filterFields") String[] filterFields);
+    int updateByBeanId(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("optimisticLock") boolean optimisticLock, @Param("filterColumns") Column[] filterColumns);
 
     /**
      * 根据条件更新
@@ -355,13 +356,13 @@ public interface MybatisSqlBeanDao<T> {
      * @param bean
      * @param updateNotNull
      * @param optimisticLock
-     * @param filterFields
+     * @param filterColumns
      * @param where
      * @param args
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateBy")
-    int updateBy(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("optimisticLock") boolean optimisticLock, @Param("filterFields") String[] filterFields, @Param("where") String where, @Param("args") Object... args);
+    int updateBy(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("optimisticLock") boolean optimisticLock, @Param("filterColumns") Column[] filterColumns, @Param("where") String where, @Param("args") Object... args);
 
     /**
      * 根据实体类字段条件更新
@@ -371,12 +372,12 @@ public interface MybatisSqlBeanDao<T> {
      * @param bean
      * @param updateNotNull
      * @param optimisticLock
-     * @param filterFields
+     * @param filterColumns
      * @param where
      * @return
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "updateByBean")
-    int updateByBean(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("optimisticLock") boolean optimisticLock, @Param("filterFields") String[] filterFields, @Param("where") String where);
+    int updateByBean(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("bean") T bean, @Param("updateNotNull") boolean updateNotNull, @Param("optimisticLock") boolean optimisticLock, @Param("where") String where, @Param("filterColumns") Column[] filterColumns);
 
     /**
      * 插入数据
@@ -387,7 +388,7 @@ public interface MybatisSqlBeanDao<T> {
      * @return
      */
     @InsertProvider(type = MybatisSqlBeanProvider.class, method = "insertBean")
-    int insertBean(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("beanList") List<T> beanList);
+    int insertBean(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("beanList") Collection<T> beanList);
 
     /**
      * 插入数据
@@ -442,26 +443,26 @@ public interface MybatisSqlBeanDao<T> {
      *
      * @param sqlBeanDB
      * @param clazz
+     * @param wrapper
      * @param targetTableName
      * @param columns
-     * @param wrapper
      * @return
      */
     @InsertProvider(type = MybatisSqlBeanProvider.class, method = "backup")
-    int backup(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("targetSchema") String targetSchema, @Param("targetTableName") String targetTableName, @Param("columns") Column[] columns, @Param("wrapper") Wrapper wrapper);
+    int backup(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("wrapper") Wrapper wrapper, @Param("targetSchema") String targetSchema, @Param("targetTableName") String targetTableName, @Param("columns") Column[] columns);
 
     /**
      * 复制数据到指定表
      *
      * @param sqlBeanDB
      * @param clazz
+     * @param wrapper
      * @param targetTableName
      * @param columns
-     * @param wrapper
      * @return
      */
     @InsertProvider(type = MybatisSqlBeanProvider.class, method = "copy")
-    int copy(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("targetSchema") String targetSchema, @Param("targetTableName") String targetTableName, @Param("columns") Column[] columns, @Param("wrapper") Wrapper wrapper);
+    int copy(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("wrapper") Wrapper wrapper, @Param("targetSchema") String targetSchema, @Param("targetTableName") String targetTableName, @Param("columns") Column[] columns);
 
     /**
      * 执行Sql

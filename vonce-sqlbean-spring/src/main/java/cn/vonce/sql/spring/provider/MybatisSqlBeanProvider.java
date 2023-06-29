@@ -212,7 +212,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String updateById(Map<String, Object> map) {
-        return SqlBeanProvider.updateByIdSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), map.get("id"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (String[]) map.get("filterFields"));
+        return SqlBeanProvider.updateByIdSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), map.get("id"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (Column[]) map.get("filterColumns"));
     }
 
     /**
@@ -222,7 +222,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String updateByBeanId(Map<String, Object> map) {
-        return SqlBeanProvider.updateByBeanIdSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (String[]) map.get("filterFields"));
+        return SqlBeanProvider.updateByBeanIdSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (Column[]) map.get("filterColumns"));
     }
 
     /**
@@ -236,7 +236,7 @@ public class MybatisSqlBeanProvider {
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return SqlBeanProvider.updateBySql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (String[]) map.get("filterFields"), (String) map.get("where"), args);
+        return SqlBeanProvider.updateBySql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (Column[]) map.get("filterColumns"), (String) map.get("where"), args);
     }
 
     /**
@@ -246,7 +246,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String updateByBean(Map<String, Object> map) {
-        return SqlBeanProvider.updateByBeanSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (String[]) map.get("filterFields"), (String) map.get("where"));
+        return SqlBeanProvider.updateByBeanSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (String) map.get("where"), (Column[]) map.get("filterColumns"));
     }
 
     /**
@@ -316,7 +316,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String backup(Map<String, Object> map) {
-        return SqlBeanProvider.backupSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("targetSchema"), (String) map.get("targetTableName"), (Column[]) map.get("columns"), (Wrapper) map.get("wrapper"));
+        return SqlBeanProvider.backupSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Wrapper) map.get("wrapper"), (String) map.get("targetSchema"), (String) map.get("targetTableName"), (Column[]) map.get("columns"));
     }
 
     /**
@@ -326,7 +326,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String copy(Map<String, Object> map) {
-        return SqlBeanProvider.copySql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("targetSchema"), (String) map.get("targetTableName"), (Column[]) map.get("columns"), (Wrapper) map.get("wrapper"));
+        return SqlBeanProvider.copySql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Wrapper) map.get("wrapper"), (String) map.get("targetSchema"), (String) map.get("targetTableName"), (Column[]) map.get("columns"));
     }
 
     /**

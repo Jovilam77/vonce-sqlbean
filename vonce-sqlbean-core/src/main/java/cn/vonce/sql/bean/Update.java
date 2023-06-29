@@ -1,10 +1,11 @@
 package cn.vonce.sql.bean;
 
-import cn.vonce.sql.define.ColumnFunction;
+import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.uitls.LambdaUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -27,9 +28,9 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      */
     private T updateBean = null;
     /**
-     * 需要过滤的字段
+     * 过滤的字段数组
      */
-    private String[] filterFields = null;
+    private List<Column> filterColumns = new ArrayList<>();
     /**
      * 默认只更新不为空的字段
      */
@@ -63,21 +64,54 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
     }
 
     /**
-     * 获取更新过滤掉字段
-     *
-     * @return
-     */
-    public String[] getFilterFields() {
-        return filterFields;
-    }
-
-    /**
-     * 设置更新过滤掉字段
+     * 设置过滤的列字段
      *
      * @param filterFields
      */
-    public void setFilterFields(String... filterFields) {
-        this.filterFields = filterFields;
+    public Update filterFields(String... filterFields) {
+        if (filterFields != null && filterFields.length > 0) {
+            for (String filterField : filterFields) {
+                this.filterColumns.add(new Column(filterField));
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 获取过滤的列字段
+     *
+     * @return
+     */
+    public List<Column> getFilterColumns() {
+        return filterColumns;
+    }
+
+    /**
+     * 设置过滤的列字段
+     *
+     * @param filterColumns
+     */
+    public Update filterFields(Column... filterColumns) {
+        if (filterColumns != null && filterColumns.length > 0) {
+            for (Column column : filterColumns) {
+                this.filterColumns.add(column);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 设置过滤的列字段
+     *
+     * @param columnFuns
+     */
+    public <R> Update filterFields(ColumnFun<T, R>... columnFuns) {
+        if (columnFuns != null && columnFuns.length > 0) {
+            for (ColumnFun<T, R> columnFun : columnFuns) {
+                this.filterColumns.add(LambdaUtil.getColumn(columnFun));
+            }
+        }
+        return this;
     }
 
     /**
@@ -174,13 +208,13 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
     /**
      * 设置字段值
      *
-     * @param columnFunction 字段信息
+     * @param columnFun 字段信息
      * @param value          值
      * @param <R>
      * @return
      */
-    public <R> Update<T> set(ColumnFunction<T, R> columnFunction, Object value) {
-        Column column = LambdaUtil.getColumn(columnFunction);
+    public <R> Update<T> set(ColumnFun<T, R> columnFun, Object value) {
+        Column column = LambdaUtil.getColumn(columnFun);
         setInfoList.add(new SetInfo(column.getTableAlias(), column.getName(), value));
         return this;
     }
@@ -228,13 +262,13 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
     /**
      * 设置字段值 值相加
      *
-     * @param columnFunction 字段信息
+     * @param columnFun 字段信息
      * @param value1         第一个值
      * @param value2         第二个值
      * @return
      */
-    public <R> Update<T> setAdd(ColumnFunction<T, R> columnFunction, Object value1, Object value2) {
-        Column column = LambdaUtil.getColumn(columnFunction);
+    public <R> Update<T> setAdd(ColumnFun<T, R> columnFun, Object value1, Object value2) {
+        Column column = LambdaUtil.getColumn(columnFun);
         setInfoList.add(new SetInfo(SetInfo.Operator.ADDITION, column.getTableAlias(), column.getName(), value1, value2));
         return this;
     }
@@ -242,13 +276,13 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
     /**
      * 设置字段值 值相加
      *
-     * @param columnFunction 字段信息
+     * @param columnFun 字段信息
      * @param value1         第一个值（字段信息）
      * @param value2         第二个值
      * @return
      */
-    public <R> Update<T> setAdd(ColumnFunction<T, R> columnFunction, ColumnFunction<T, R> value1, Object value2) {
-        Column column = LambdaUtil.getColumn(columnFunction);
+    public <k, R> Update<T> setAdd(ColumnFun<T, R> columnFun, ColumnFun<k, R> value1, Object value2) {
+        Column column = LambdaUtil.getColumn(columnFun);
         setInfoList.add(new SetInfo(SetInfo.Operator.ADDITION, column.getTableAlias(), column.getName(), value1, value2));
         return this;
     }
@@ -296,13 +330,13 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
     /**
      * 设置字段值 值相减
      *
-     * @param columnFunction 字段信息
+     * @param columnFun 字段信息
      * @param value1         第一个值
      * @param value2         第二个值
      * @return
      */
-    public <R> Update<T> setSub(ColumnFunction<T, R> columnFunction, Object value1, Object value2) {
-        Column column = LambdaUtil.getColumn(columnFunction);
+    public <R> Update<T> setSub(ColumnFun<T, R> columnFun, Object value1, Object value2) {
+        Column column = LambdaUtil.getColumn(columnFun);
         setInfoList.add(new SetInfo(SetInfo.Operator.SUBTRACT, column.getTableAlias(), column.getName(), value1, value2));
         return this;
     }
@@ -310,13 +344,13 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
     /**
      * 设置字段值 值相减
      *
-     * @param columnFunction 字段信息
+     * @param columnFun 字段信息
      * @param value1         第一个值（字段信息）
      * @param value2         第二个值
      * @return
      */
-    public <R> Update<T> setSub(ColumnFunction<T, R> columnFunction, ColumnFunction<T, R> value1, Object value2) {
-        Column column = LambdaUtil.getColumn(columnFunction);
+    public <k, R> Update<T> setSub(ColumnFun<T, R> columnFun, ColumnFun<k, R> value1, Object value2) {
+        Column column = LambdaUtil.getColumn(columnFun);
         setInfoList.add(new SetInfo(SetInfo.Operator.SUBTRACT, column.getTableAlias(), column.getName(), value1, value2));
         return this;
     }

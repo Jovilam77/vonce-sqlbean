@@ -59,7 +59,7 @@ public enum JdbcType {
         this.scale = scale;
     }
 
-    private int length;
+    private long length;
     private int scale;
 
     public static JdbcType getType(String name) {
@@ -115,7 +115,7 @@ public enum JdbcType {
         return false;
     }
 
-    public int getLength() {
+    public long getLength() {
         return length;
     }
 

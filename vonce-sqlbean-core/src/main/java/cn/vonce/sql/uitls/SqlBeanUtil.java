@@ -4,7 +4,7 @@ import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
-import cn.vonce.sql.define.ColumnFunction;
+import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.define.JoinOn;
 import cn.vonce.sql.define.SqlFun;
 import cn.vonce.sql.enumerate.AlterType;
@@ -20,7 +20,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 /**
@@ -191,6 +193,18 @@ public class SqlBeanUtil {
     }
 
     /**
+     * 获取Bean字段中实际对于的表字段
+     *
+     * @param field
+     * @param table
+     * @param sqlTable
+     * @return
+     */
+    public static Column getTableColumn(Field field, Table table, SqlTable sqlTable) {
+        return new Column(table.getAlias(), getTableFieldName(field, sqlTable), "");
+    }
+
+    /**
      * 获得新的表字段名
      *
      * @param common
@@ -307,33 +321,33 @@ public class SqlBeanUtil {
     /**
      * 获取列信息
      *
-     * @param common
+     * @param sqlBeanDB
      * @param field
      * @return
      */
-    public static ColumnInfo getColumnInfo(Common common, Field field) {
-        return getColumnInfo(common, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class));
+    public static ColumnInfo getColumnInfo(SqlBeanDB sqlBeanDB, Field field) {
+        return getColumnInfo(sqlBeanDB, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class));
     }
 
     /**
      * 获取列信息
      *
-     * @param common
+     * @param sqlBeanDB
      * @param field
      * @param sqlTable
      * @param sqlColumn
      * @return
      */
-    public static ColumnInfo getColumnInfo(Common common, Field field, SqlTable sqlTable, SqlColumn sqlColumn) {
+    public static ColumnInfo getColumnInfo(SqlBeanDB sqlBeanDB, Field field, SqlTable sqlTable, SqlColumn sqlColumn) {
         String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
         ColumnInfo columnInfo = new ColumnInfo();
-        columnInfo.setName(SqlBeanUtil.isToUpperCase(common) ? columnName.toUpperCase() : columnName);
+        columnInfo.setName(SqlBeanUtil.isToUpperCase(sqlBeanDB) ? columnName.toUpperCase() : columnName);
         columnInfo.setPk(field.isAnnotationPresent(SqlId.class));
         JdbcType jdbcType;
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
             jdbcType = sqlColumn.type();
         } else {
-            jdbcType = JdbcType.getType(common.getSqlBeanDB().getDbType(), field);
+            jdbcType = JdbcType.getType(sqlBeanDB.getDbType(), field);
         }
         columnInfo.setType(jdbcType.name());
         if (sqlColumn != null) {
@@ -483,6 +497,25 @@ public class SqlBeanUtil {
     }
 
     /**
+     * 是否过滤该字段
+     *
+     * @param filterColumns
+     * @param column
+     * @return
+     */
+    public static boolean isFilter(List<Column> filterColumns, Column column) {
+        if (filterColumns != null) {
+            for (Column item : filterColumns) {
+                if ((StringUtil.isNotBlank(item.getTableAlias()) && column.getTableAlias().equals(item.getTableAlias()) && column.getName().equals(item.getName())) ||
+                        (StringUtil.isBlank(item.getTableAlias()) && column.getName().equals(item.getName()))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * 获取该bean所有字段（包括父类）
      *
      * @param clazz
@@ -526,10 +559,12 @@ public class SqlBeanUtil {
      * 返回查询的字段
      *
      * @param clazz
-     * @param filterTableFields
+     * @param filterColumns
+     * @param columnList
      * @return
+     * @throws SqlBeanException
      */
-    public static List<Column> getSelectColumns(Class<?> clazz, String[] filterTableFields) throws SqlBeanException {
+    public static List<Column> getSelectColumns(Class<?> clazz, List<Column> filterColumns, List<Column> columnList) throws SqlBeanException {
         if (clazz == null) {
             return null;
         }
@@ -546,7 +581,7 @@ public class SqlBeanUtil {
             if (sqlColumn != null && sqlColumn.ignore()) {
                 continue;
             }
-            if (isFilter(filterTableFields, getTableFieldName(field, sqlTable))) {
+            if (isFilter(filterColumns, getTableColumn(field, table, sqlTable))) {
                 continue;
             }
             SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
@@ -581,6 +616,9 @@ public class SqlBeanUtil {
                         if (subSqlColumn != null && subSqlColumn.ignore()) {
                             continue;
                         }
+                        if (isFilter(filterColumns, getTableColumn(subBeanField, subTable, subSqlTable))) {
+                            continue;
+                        }
                         columnSet.add(new Column(subTable.getAlias(), getTableFieldName(subBeanField, subSqlTable), getColumnAlias(subTable.getAlias(), subBeanField.getName())));
                     }
                 }
@@ -593,7 +631,7 @@ public class SqlBeanUtil {
                 //可能会连同一个表，但连接条件不一样（这时表需要区分别名），所以查询的字段可能是同一个，但属于不同表别名下，所以用java字段名当sql字段别名不会出错
                 String subTableAlias = StringUtil.isEmpty(sqlJoin.tableAlias()) ? sqlJoin.table() : sqlJoin.tableAlias();
                 columnSet.add(new Column(subTableAlias, tableFieldName, getColumnAlias(subTableAlias, field.getName())));
-            } else {
+            } else if (columnList == null || columnList.size() == 0) {
                 columnSet.add(new Column(tableAlias, getTableFieldName(field, sqlTable), field.getName()));
             }
         }
@@ -772,8 +810,8 @@ public class SqlBeanUtil {
         } else if (value instanceof Column) {
             Column column = (Column) value;
             return SqlBeanUtil.getTableFieldFullName(common, column.getTableAlias(), column.getName());
-        } else if (value instanceof ColumnFunction) {
-            Column column = LambdaUtil.getColumn((ColumnFunction) value);
+        } else if (value instanceof ColumnFun) {
+            Column column = LambdaUtil.getColumn((ColumnFun) value);
             return SqlBeanUtil.getTableFieldFullName(common, column.getTableAlias(), column.getName());
         } else if (value instanceof Original) {
             Original original = (Original) value;
@@ -1114,6 +1152,19 @@ public class SqlBeanUtil {
     }
 
     /**
+     * 是否需要转大写
+     *
+     * @param sqlBeanDB
+     * @return
+     */
+    public static boolean isToUpperCase(SqlBeanDB sqlBeanDB) {
+        if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * 更新乐观锁版本
      *
      * @param typeName
@@ -1208,6 +1259,12 @@ public class SqlBeanUtil {
                 return new Timestamp(System.currentTimeMillis());
             case "java.math.BigDecimal":
                 return new BigDecimal(0);
+            case "java.time.LocalDate":
+                return LocalDate.now();
+            case "java.time.LocalTime":
+                return LocalTime.now();
+            case "java.time.LocalDateTime":
+                return LocalDateTime.now();
         }
         return null;
     }
@@ -1321,6 +1378,22 @@ public class SqlBeanUtil {
             e.printStackTrace();
             throw new SqlBeanException("找不到字段,请检查:" + getter + "方法名与所对应的字段名是否符合标准,如：id字段对应的get方法名应该为getId()");
         }
+    }
+
+    /**
+     * lambda数组转Column数组
+     *
+     * @param filterColumns
+     * @param <T>
+     * @param <R>
+     * @return
+     */
+    public static <T, R> Column[] funToColumn(ColumnFun<T, R>[] filterColumns) {
+        Column[] columns = new Column[filterColumns.length];
+        for (int i = 0; i < filterColumns.length; i++) {
+            columns[i] = LambdaUtil.getColumn(filterColumns[i]);
+        }
+        return columns;
     }
 
     /**

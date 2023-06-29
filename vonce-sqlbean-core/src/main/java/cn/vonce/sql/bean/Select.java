@@ -1,6 +1,6 @@
 package cn.vonce.sql.bean;
 
-import cn.vonce.sql.define.ColumnFunction;
+import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.define.SqlFun;
 import cn.vonce.sql.enumerate.JoinType;
 import cn.vonce.sql.enumerate.SqlSort;
@@ -62,7 +62,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 过滤的字段数组
      */
-    private String[] filterFields = null;
+    private List<Column> filterColumns = new ArrayList<>();
     /**
      * having 条件表达式 优先级一
      */
@@ -175,11 +175,26 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加column列字段
      *
-     * @param columnFunction
+     * @param columnFun
      * @return
      */
-    public <T, R> Select column(ColumnFunction<T, R> columnFunction) {
-        this.columnList.add(LambdaUtil.getColumn(columnFunction));
+    public <T, R> Select column(ColumnFun<T, R> columnFun) {
+        this.columnList.add(LambdaUtil.getColumn(columnFun));
+        return this;
+    }
+
+    /**
+     * 添加column列字段
+     *
+     * @param columnFuns
+     * @return
+     */
+    public <T, R> Select column(ColumnFun<T, R>... columnFuns) {
+        if (columnFuns != null && columnFuns.length > 0) {
+            for (ColumnFun item : columnFuns) {
+                this.columnList.add(LambdaUtil.getColumn(item));
+            }
+        }
         return this;
     }
 
@@ -237,12 +252,12 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加column列字段
      *
-     * @param columnFunction
+     * @param columnFun
      * @param columnAlias
      * @return
      */
-    public <T, R> Select column(ColumnFunction<T, R> columnFunction, String columnAlias) {
-        Column column = LambdaUtil.getColumn(columnFunction);
+    public <T, R> Select column(ColumnFun<T, R> columnFun, String columnAlias) {
+        Column column = LambdaUtil.getColumn(columnFun);
         column.setAlias(columnAlias);
         columnList.add(column);
         return this;
@@ -465,11 +480,11 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加groupBy分组
      *
-     * @param columnFunction 列字段信息
+     * @param columnFun 列字段信息
      * @return
      */
-    public <T, R> Select groupBy(ColumnFunction<T, R> columnFunction) {
-        Column column = LambdaUtil.getColumn(columnFunction);
+    public <T, R> Select groupBy(ColumnFun<T, R> columnFun) {
+        Column column = LambdaUtil.getColumn(columnFun);
         return groupBy(column.getTableAlias(), column.getName());
     }
 
@@ -525,10 +540,10 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加列字段排序
      *
-     * @param columnFunction 列字段名
+     * @param columnFun 列字段名
      */
-    public <T, R> Select orderByAsc(ColumnFunction<T, R> columnFunction) {
-        Column column = LambdaUtil.getColumn(columnFunction);
+    public <T, R> Select orderByAsc(ColumnFun<T, R> columnFun) {
+        Column column = LambdaUtil.getColumn(columnFun);
         return orderBy(column.getTableAlias(), column.getName(), SqlSort.ASC);
     }
 
@@ -544,10 +559,10 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加列字段排序
      *
-     * @param columnFunction 列字段名
+     * @param columnFun 列字段名
      */
-    public <T, R> Select orderByDesc(ColumnFunction<T, R> columnFunction) {
-        Column column = LambdaUtil.getColumn(columnFunction);
+    public <T, R> Select orderByDesc(ColumnFun<T, R> columnFun) {
+        Column column = LambdaUtil.getColumn(columnFun);
         return orderBy(column.getTableAlias(), column.getName(), SqlSort.DESC);
     }
 
@@ -579,12 +594,23 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加列字段排序
      *
-     * @param columnFunction 列字段名
+     * @param column
+     * @param sqlSort
+     * @return
+     */
+    public Select orderBy(Column column, SqlSort sqlSort) {
+        return orderBy(column.getTableAlias(), column.getName(), sqlSort);
+    }
+
+    /**
+     * 添加列字段排序
+     *
+     * @param columnFun 列字段名
      * @param sqlSort        排序方式
      * @return
      */
-    public <T, R> Select orderBy(ColumnFunction<T, R> columnFunction, SqlSort sqlSort) {
-        Column column = LambdaUtil.getColumn(columnFunction);
+    public <T, R> Select orderBy(ColumnFun<T, R> columnFun, SqlSort sqlSort) {
+        Column column = LambdaUtil.getColumn(columnFun);
         orderByList.add(new Order(column.getTableAlias(), column.getName(), sqlSort));
         return this;
     }
@@ -660,21 +686,53 @@ public class Select extends CommonCondition<Select> implements Serializable {
     }
 
     /**
+     * 设置过滤的列字段
+     *
+     * @param filterFields
+     */
+    public Select filterFields(String... filterFields) {
+        if (filterFields != null && filterFields.length > 0) {
+            for (String filterField : filterFields) {
+                this.filterColumns.add(new Column(filterField));
+            }
+        }
+        return this;
+    }
+
+    /**
      * 获取过滤的列字段
      *
      * @return
      */
-    public String[] getFilterFields() {
-        return filterFields;
+    public List<Column> getFilterColumns() {
+        return filterColumns;
     }
 
     /**
      * 设置过滤的列字段
      *
-     * @param filterField
+     * @param filterColumns
      */
-    public Select filterFields(String... filterField) {
-        this.filterFields = filterField;
+    public Select filterFields(Column... filterColumns) {
+        if (filterColumns != null && filterColumns.length > 0) {
+            for (Column column : filterColumns) {
+                this.filterColumns.add(column);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 设置过滤的列字段
+     *
+     * @param columnFuns
+     */
+    public <T, R> Select filterFields(ColumnFun<T, R>... columnFuns) {
+        if (columnFuns != null && columnFuns.length > 0) {
+            for (ColumnFun<T, R> columnFun : columnFuns) {
+                this.filterColumns.add(LambdaUtil.getColumn(columnFun));
+            }
+        }
         return this;
     }
 

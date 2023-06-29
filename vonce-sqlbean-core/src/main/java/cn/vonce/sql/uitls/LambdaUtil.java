@@ -1,7 +1,7 @@
 package cn.vonce.sql.uitls;
 
 import cn.vonce.sql.bean.Column;
-import cn.vonce.sql.define.ColumnFunction;
+import cn.vonce.sql.define.ColumnFun;
 
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.InvocationTargetException;
@@ -24,7 +24,7 @@ public class LambdaUtil {
      * @param <R>
      * @return
      */
-    public static <T, R> Column getColumn(ColumnFunction<T, R> column) {
+    public static <T, R> Column getColumn(ColumnFun<T, R> column) {
         SerializedLambda lambda = null;
         try {
             Method method = column.getClass().getDeclaredMethod("writeReplace");

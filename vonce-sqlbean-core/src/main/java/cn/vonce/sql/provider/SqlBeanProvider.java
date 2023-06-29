@@ -146,17 +146,15 @@ public class SqlBeanProvider {
         if (select.getSqlBeanDB() == null) {
             select.setSqlBeanDB(sqlBeanDB);
         }
-        if (select.getColumnList().isEmpty()) {
-            try {
-                SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-                select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
-                if (select.getPage() != null && select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
-                    select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz), sqlTable));
-                }
-            } catch (SqlBeanException e) {
-                e.printStackTrace();
-                return null;
+        try {
+            SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
+            select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterColumns(), select.getColumnList()));
+            if (select.getPage() != null && select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
+                select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz), sqlTable));
             }
+        } catch (SqlBeanException e) {
+            e.printStackTrace();
+            return null;
         }
         return setSelectAndBuild(clazz, select);
     }
@@ -391,10 +389,10 @@ public class SqlBeanProvider {
      * @param bean
      * @param updateNotNull
      * @param optimisticLock
-     * @param filterFields
+     * @param filterColumns
      * @return
      */
-    public static String updateByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, Object id, boolean updateNotNull, boolean optimisticLock, String[] filterFields) {
+    public static String updateByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, Object id, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns) {
         if (StringUtil.isEmpty(id)) {
             try {
                 throw new SqlBeanException("updateByIdSql id不能为空");
@@ -404,7 +402,7 @@ public class SqlBeanProvider {
             }
         }
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
-        update.setFilterFields(filterFields);
+        update.filterFields(filterColumns);
         Field idField;
         try {
             idField = SqlBeanUtil.getIdField(bean.getClass());
@@ -425,12 +423,12 @@ public class SqlBeanProvider {
      * @param bean
      * @param updateNotNull
      * @param optimisticLock
-     * @param filterFields
+     * @param filterColumns
      * @return
      */
-    public static String updateByBeanIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields) {
+    public static String updateByBeanIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns) {
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
-        update.setFilterFields(filterFields);
+        update.filterFields(filterColumns);
         Field idField;
         try {
             idField = SqlBeanUtil.getIdField(bean.getClass());
@@ -460,14 +458,14 @@ public class SqlBeanProvider {
      * @param bean
      * @param updateNotNull
      * @param optimisticLock
-     * @param filterFields
+     * @param filterColumns
      * @param where
      * @param args
      * @return
      */
-    public static String updateBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where, Object[] args) {
+    public static String updateBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns, String where, Object[] args) {
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
-        update.setFilterFields(filterFields);
+        update.filterFields(filterColumns);
         update.where(where, args);
         return SqlHelper.buildUpdateSql(update);
     }
@@ -480,13 +478,13 @@ public class SqlBeanProvider {
      * @param bean
      * @param updateNotNull
      * @param optimisticLock
-     * @param filterFields
      * @param where
+     * @param filterColumns
      * @return
      */
-    public static String updateByBeanSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String[] filterFields, String where) {
+    public static String updateByBeanSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String where, Column[] filterColumns) {
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
-        update.setFilterFields(filterFields);
+        update.filterFields(filterColumns);
         update.where(where, null);
         return SqlHelper.buildUpdateSql(update);
     }
@@ -635,12 +633,12 @@ public class SqlBeanProvider {
      *
      * @param sqlBeanDB
      * @param clazz
+     * @param wrapper
      * @param targetTableName
      * @param columns
-     * @param wrapper
      * @return
      */
-    public static String backupSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper) {
+    public static String backupSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Wrapper wrapper, String targetSchema, String targetTableName, Column[] columns) {
         Backup backup = new Backup();
         backup.setSqlBeanDB(sqlBeanDB);
         backup.setTable(clazz);
@@ -657,12 +655,13 @@ public class SqlBeanProvider {
      *
      * @param sqlBeanDB
      * @param clazz
+     * @param wrapper
      * @param targetTableName
      * @param columns
-     * @param wrapper
+
      * @return
      */
-    public static String copySql(SqlBeanDB sqlBeanDB, Class<?> clazz, String targetSchema, String targetTableName, Column[] columns, Wrapper wrapper) {
+    public static String copySql(SqlBeanDB sqlBeanDB, Class<?> clazz, Wrapper wrapper, String targetSchema, String targetTableName, Column[] columns) {
         Copy copy = new Copy();
         copy.setSqlBeanDB(sqlBeanDB);
         copy.setTable(clazz);
@@ -696,7 +695,7 @@ public class SqlBeanProvider {
             alter.setSqlBeanDB(sqlBeanDB);
             alter.setTable(clazz);
             String oldName = sqlColumn == null ? "" : (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) ? sqlColumn.oldName().toUpperCase() : sqlColumn.oldName();
-            ColumnInfo columnInfo = SqlBeanUtil.getColumnInfo(alter, field, sqlTable, sqlColumn);
+            ColumnInfo columnInfo = SqlBeanUtil.getColumnInfo(alter.getSqlBeanDB(), field, sqlTable, sqlColumn);
             boolean exist = false;
             boolean fit = true;
             //优先比较字段改名的
@@ -812,7 +811,7 @@ public class SqlBeanProvider {
         select.count(isCount);
         try {
             if (!isCount) {
-                select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterFields()));
+                select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterColumns(), null));
             }
             SqlBeanUtil.setJoin(select, clazz);
             setSchema(select, clazz);
@@ -849,17 +848,17 @@ public class SqlBeanProvider {
             e.printStackTrace();
             return null;
         }
-        if (!select.getOrderBy().isEmpty()) {
-            for (Order order : select.getOrderBy()) {
-                if (StringUtil.isEmpty(order.getTableAlias())) {
-                    List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
-                    Field field = SqlBeanUtil.getFieldByTableFieldName(fieldList, order.getName());
-                    if (field != null) {
-                        order.setTableAlias(select.getTable().getAlias());
-                    }
-                }
-            }
-        }
+//        if (!select.getOrderBy().isEmpty()) {
+//            for (Order order : select.getOrderBy()) {
+//                if (StringUtil.isEmpty(order.getTableAlias())) {
+//                    List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
+//                    Field field = SqlBeanUtil.getFieldByTableFieldName(fieldList, order.getName());
+//                    if (field != null) {
+//                        order.setTableAlias(select.getTable().getAlias());
+//                    }
+//                }
+//            }
+//        }
         return SqlHelper.buildSelectSql(select);
     }
 

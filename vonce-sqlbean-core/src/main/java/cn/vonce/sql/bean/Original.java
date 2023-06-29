@@ -1,6 +1,6 @@
 package cn.vonce.sql.bean;
 
-import cn.vonce.sql.define.ColumnFunction;
+import cn.vonce.sql.define.ColumnFun;
 
 import java.io.Serializable;
 
@@ -9,7 +9,7 @@ import java.io.Serializable;
  */
 public class Original implements Serializable {
 
-    public <T, R> Original(ColumnFunction<T, R> value) {
+    public <T, R> Original(ColumnFun<T, R> value) {
         this.value = value;
     }
 

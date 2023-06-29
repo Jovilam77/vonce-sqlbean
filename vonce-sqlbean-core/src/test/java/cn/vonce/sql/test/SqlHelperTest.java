@@ -218,7 +218,7 @@ public class SqlHelperTest {
         Update update = new Update();
         update.setTable(User.class);
         update.setSqlBeanDB(sqlBeanDB);
-        update.setFilterFields("username");//java字段名
+        update.filterFields("username");//java字段名
         update.setUpdateBean(user);
         update.setUpdateNotNull(true);
         update.where().gt(SqlUser.id, 0).and().lt(SqlUser.id, 10);
