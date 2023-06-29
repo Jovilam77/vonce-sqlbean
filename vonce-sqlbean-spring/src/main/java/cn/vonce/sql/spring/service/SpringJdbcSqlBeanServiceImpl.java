@@ -334,16 +334,16 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public <R> ResultData<R> paging(Class<R> tClazz, Select select, PageHelper<R> pageHelper) {
-        pageHelper.paging(tClazz, select, this);
+    public <R> ResultData<R> paging(Class<R> returnType, Select select, PageHelper<R> pageHelper) {
+        pageHelper.paging(returnType, select, this);
         return pageHelper.getResultData();
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
-    public <R> ResultData<R> paging(Class<R> tClazz, Select select, int pagenum, int pagesize) {
+    public <R> ResultData<R> paging(Class<R> returnType, Select select, int pagenum, int pagesize) {
         PageHelper<R> pageHelper = new PageHelper<>(pagenum, pagesize);
-        pageHelper.paging(tClazz, select, this);
+        pageHelper.paging(returnType, select, this);
         return pageHelper.getResultData();
     }
 

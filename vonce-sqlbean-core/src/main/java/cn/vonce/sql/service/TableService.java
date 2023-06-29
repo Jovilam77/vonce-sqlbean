@@ -188,8 +188,8 @@ public interface TableService<T> {
     /**
      * 更改表结构
      *
-     * @param table
-     * @param columnInfoList
+     * @param table          表对象
+     * @param columnInfoList 列表信息列表
      * @return
      */
     int alter(Table table, List<ColumnInfo> columnInfoList);
@@ -197,7 +197,7 @@ public interface TableService<T> {
     /**
      * 更改表结构
      *
-     * @param alter
+     * @param alter 改变表结构对象
      * @return
      */
     int alter(Alter alter);
@@ -205,7 +205,7 @@ public interface TableService<T> {
     /**
      * 更改表结构
      *
-     * @param alterList
+     * @param alterList 改变表结构对象列表
      * @return
      */
     int alter(List<Alter> alterList);
