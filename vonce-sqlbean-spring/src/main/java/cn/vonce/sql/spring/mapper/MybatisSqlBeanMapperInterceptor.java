@@ -75,7 +75,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             if (resultType.getName().equals(ColumnInfo.class.getName()) || resultType.getName().equals(TableInfo.class.getName())) {
                 return beanHandleResultSet(resultType, resultSet, super.getColumnNameList(resultSet));
             }
-            if (SqlBeanUtil.isBaseType(resultType.getName())) {
+            if (SqlBeanUtil.isBaseType(resultType)) {
                 return baseHandleResultSet(resultSet, resultType);
             }
             if (SqlBeanUtil.isMap(resultType.getName())) {
@@ -88,7 +88,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             } else {
                 returnType = (Class<?>) mapParam.get("clazz");
             }
-            if (SqlBeanUtil.isBaseType(returnType.getName())) {
+            if (SqlBeanUtil.isBaseType(returnType)) {
                 return baseHandleResultSet(resultSet, returnType);
             }
             if (SqlBeanUtil.isMap(returnType.getName())) {

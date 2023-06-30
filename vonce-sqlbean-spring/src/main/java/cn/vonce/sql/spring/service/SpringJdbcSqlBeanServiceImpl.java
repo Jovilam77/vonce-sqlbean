@@ -23,9 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -57,21 +54,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     private Class<?> clazz;
 
     public SpringJdbcSqlBeanServiceImpl() {
-        Type[] typeArray = new Type[]{getClass().getGenericSuperclass()};
-        if (typeArray == null || typeArray.length == 0) {
-            typeArray = getClass().getGenericInterfaces();
-        }
-        for (Type type : typeArray) {
-            if (type instanceof ParameterizedType) {
-                Class<?> trueTypeClass = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
-                try {
-                    clazz = this.getClass().getClassLoader().loadClass(trueTypeClass.getName());
-                    return;
-                } catch (ClassNotFoundException e) {
-                    logger.error(e.getMessage());
-                }
-            }
-        }
+        clazz = SqlBeanUtil.getGenericType(this.getClass());
     }
 
     @Override

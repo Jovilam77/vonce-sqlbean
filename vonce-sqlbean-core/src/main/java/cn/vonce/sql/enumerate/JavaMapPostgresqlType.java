@@ -1,8 +1,11 @@
 package cn.vonce.sql.enumerate;
 
 import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.exception.SqlBeanException;
+import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 
 /**
@@ -37,14 +40,21 @@ public enum JavaMapPostgresqlType {
     private Class<?>[] classes;
 
     public static JavaMapPostgresqlType getType(Class<?> clazz) {
+        if (clazz.isEnum() && SqlEnum.class.isAssignableFrom(clazz)) {
+            Type[] typeArray = clazz.getGenericInterfaces();
+            clazz = SqlBeanUtil.getGenericType(typeArray);
+            if (clazz == null || !SqlBeanUtil.isBaseType(clazz)) {
+                return JavaMapPostgresqlType.INTEGER;
+            }
+        }
         for (JavaMapPostgresqlType javaType : values()) {
             for (Class<?> thisClazz : javaType.classes) {
-                if (thisClazz == clazz) {
+                if (thisClazz == clazz || thisClazz.isAssignableFrom(clazz)) {
                     return javaType;
                 }
             }
         }
-        return null;
+        throw new SqlBeanException("该字段类型不支持：" + clazz.getName());
     }
 
     public static String getTypeName(Class<?> clazz) {

@@ -23,9 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -60,21 +57,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     private Class<?> clazz;
 
     public MybatisSqlBeanServiceImpl() {
-        Type[] typeArray = new Type[]{getClass().getGenericSuperclass()};
-        if (typeArray == null || typeArray.length == 0) {
-            typeArray = getClass().getGenericInterfaces();
-        }
-        for (Type type : typeArray) {
-            if (type instanceof ParameterizedType) {
-                Class<?> trueTypeClass = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
-                try {
-                    clazz = this.getClass().getClassLoader().loadClass(trueTypeClass.getName());
-                    return;
-                } catch (ClassNotFoundException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-        }
+        clazz = SqlBeanUtil.getGenericType(this.getClass());
     }
 
     @Override

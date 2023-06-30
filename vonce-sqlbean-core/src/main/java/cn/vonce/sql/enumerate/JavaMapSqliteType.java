@@ -4,12 +4,14 @@ import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
+import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.uitls.DateUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -35,6 +37,13 @@ public enum JavaMapSqliteType {
     private Class<?>[] classes;
 
     public static JavaMapSqliteType getType(Class<?> clazz) {
+        if (clazz.isEnum() && SqlEnum.class.isAssignableFrom(clazz)) {
+            Type[] typeArray = clazz.getGenericInterfaces();
+            clazz = SqlBeanUtil.getGenericType(typeArray);
+            if (clazz == null || !SqlBeanUtil.isBaseType(clazz)) {
+                return JavaMapSqliteType.INTEGER;
+            }
+        }
         for (JavaMapSqliteType javaType : values()) {
             for (Class<?> thisClazz : javaType.classes) {
                 if (thisClazz == clazz) {
@@ -42,7 +51,7 @@ public enum JavaMapSqliteType {
                 }
             }
         }
-        return null;
+        throw new SqlBeanException("该字段类型不支持：" + clazz.getName());
     }
 
     public static String getTypeName(Class<?> clazz) {
