@@ -10,7 +10,7 @@
 
 ###### 💿数据库: Mysql, MariaDB, Oracle, Sqlserver2008+, Postgresql, DB2, Derby, Sqlite, HSQL, H2
 
-###### Sqlbean For Android请移步这里👉 [gitee(推荐)](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")、 [github(停止更新)](https://github.com/Jovilam77/vonce-sqlbean-android "vonce-sqlbean-android")
+###### Sqlbean For Android请移步这里👉 [gitee(推荐)](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")、 [github](https://github.com/Jovilam77/vonce-sqlbean-android "vonce-sqlbean-android")
 
 #### 简单上手
 
@@ -19,7 +19,7 @@
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
-		<version>1.2.0-beta13</version>
+		<version>1.2.0-beta14</version>
 	</dependency>
 
 ###### 2.标注实体类
