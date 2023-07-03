@@ -11,7 +11,7 @@ import cn.vonce.sql.uitls.LambdaUtil;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2021年4月28日下午5:49:00
  */
 public class Cond extends ConditionInfo {

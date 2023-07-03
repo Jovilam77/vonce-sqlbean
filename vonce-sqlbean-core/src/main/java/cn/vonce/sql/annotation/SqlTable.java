@@ -7,7 +7,7 @@ import java.lang.annotation.*;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2018年2月8日下午2:54:20
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -24,7 +24,7 @@ import java.util.*;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2018年5月15日上午9:21:48
  */
 @Intercepts(@Signature(method = "handleResultSets", type = ResultSetHandler.class, args = {Statement.class}))

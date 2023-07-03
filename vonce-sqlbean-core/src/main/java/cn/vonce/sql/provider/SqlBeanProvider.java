@@ -23,7 +23,7 @@ import java.util.Map;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2018年5月15日下午2:23:47
  */
 public class SqlBeanProvider {

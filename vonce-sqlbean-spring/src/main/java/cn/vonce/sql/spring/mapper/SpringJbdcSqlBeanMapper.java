@@ -11,7 +11,7 @@ import java.sql.ResultSet;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  */
 public class SpringJbdcSqlBeanMapper<T> extends SqlBeanMapper implements RowMapper<T> {
 

@@ -10,7 +10,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2019年6月25日下午12:7:50
  */
 public class ConditionalOnUseMybatis implements Condition {

@@ -7,7 +7,7 @@ import cn.vonce.sql.helper.Wrapper;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2020年3月1日上午10:00:10
  */
 public class CommonCondition<T> extends Common {

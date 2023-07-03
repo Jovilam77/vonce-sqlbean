@@ -11,7 +11,7 @@ import java.util.List;
  * @param <T>
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2019年6月27日下午3:57:33
  */
 public interface InsertService<T> {

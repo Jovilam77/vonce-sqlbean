@@ -10,7 +10,7 @@ import java.io.Serializable;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2018年4月16日下午7:15:10
  */
 public class ConditionInfo/* extends Column*/ implements Serializable {

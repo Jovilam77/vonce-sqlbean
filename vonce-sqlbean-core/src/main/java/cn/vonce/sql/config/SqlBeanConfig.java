@@ -9,7 +9,7 @@ import java.io.Serializable;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2018年6月12日下午2:48:12
  */
 public class SqlBeanConfig implements Serializable {

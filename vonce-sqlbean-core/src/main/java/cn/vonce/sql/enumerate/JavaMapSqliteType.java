@@ -19,7 +19,7 @@ import java.util.*;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  */
 public enum JavaMapSqliteType {
 

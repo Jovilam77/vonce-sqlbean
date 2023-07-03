@@ -34,7 +34,7 @@ import java.util.*;
  * @param <T>
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2018年5月15日下午3:57:58
  */
 @UseMybatis

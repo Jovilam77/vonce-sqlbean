@@ -5,7 +5,7 @@ package cn.vonce.sql.bean;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2021年6月21日下午21:53:00
  */
 public class Drop extends Common{
