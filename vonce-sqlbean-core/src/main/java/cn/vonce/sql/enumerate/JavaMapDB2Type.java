@@ -10,7 +10,7 @@ import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
-import java.lang.reflect.Type;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,14 +45,8 @@ public enum JavaMapDB2Type {
 
     private Class<?>[] classes;
 
-    public static JavaMapDB2Type getType(Class<?> clazz) {
-        if (clazz.isEnum() && SqlEnum.class.isAssignableFrom(clazz)) {
-            Type[] typeArray = clazz.getGenericInterfaces();
-            clazz = SqlBeanUtil.getGenericType(typeArray);
-            if (clazz == null || !SqlBeanUtil.isBaseType(clazz)) {
-                return JavaMapDB2Type.INTEGER;
-            }
-        }
+    public static JavaMapDB2Type getType(Field field) {
+        Class<?> clazz = SqlBeanUtil.getEntityClassFieldType(field);
         for (JavaMapDB2Type javaType : values()) {
             for (Class<?> thisClazz : javaType.classes) {
                 if (thisClazz == clazz) {
@@ -60,11 +54,7 @@ public enum JavaMapDB2Type {
                 }
             }
         }
-        throw new SqlBeanException("该字段类型不支持：" + clazz.getName());
-    }
-
-    public static String getTypeName(Class<?> clazz) {
-        return getType(clazz).name();
+        throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类不支持此字段类型：" + clazz.getSimpleName());
     }
 
     /**

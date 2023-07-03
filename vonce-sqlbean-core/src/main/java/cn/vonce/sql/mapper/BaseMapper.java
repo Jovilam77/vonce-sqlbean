@@ -13,6 +13,8 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 
 /**
+ * 结果映射基类
+ *
  * @author Jovi
  * @email imjovi@qq.com
  * @date 2023/6/30 15:23
@@ -142,7 +144,6 @@ public abstract class BaseMapper {
             for (SqlEnum item : sqlEnums) {
                 if (item.getCode().equals(value)) {
                     sqlEnum = item;
-                    System.out.println("测试的：" + item.getName() + "：" + item.getDesc());
                     break;
                 }
             }

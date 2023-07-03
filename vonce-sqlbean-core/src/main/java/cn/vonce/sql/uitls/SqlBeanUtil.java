@@ -1435,4 +1435,25 @@ public class SqlBeanUtil {
         return clazz;
     }
 
+    /**
+     * 获取获取实体类字段类型
+     *
+     * @param field
+     * @return
+     */
+    public static Class<?> getEntityClassFieldType(Field field) {
+        Class<?> clazz = field.getType();
+        if (clazz.isEnum() && SqlEnum.class.isAssignableFrom(clazz)) {
+            Type[] typeArray = clazz.getGenericInterfaces();
+            clazz = SqlBeanUtil.getGenericType(typeArray);
+            if (clazz == null) {
+                throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类中的枚举类字段：" + field.getType().getSimpleName() + "在实现SqlEnum接口时必须指定泛型类型");
+            }
+            if (!SqlBeanUtil.isBaseType(clazz)) {
+                throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类中的枚举类字段：" + field.getType().getSimpleName() + "在实现SqlEnum接口时指定的泛型类型不支持");
+            }
+        }
+        return clazz;
+    }
+
 }
