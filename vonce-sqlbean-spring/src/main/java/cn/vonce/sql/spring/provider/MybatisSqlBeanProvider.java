@@ -339,4 +339,13 @@ public class MybatisSqlBeanProvider {
         return sql;
     }
 
+    /**
+     * 获取最后插入的自增id
+     *
+     * @return
+     */
+    public String lastInsertId() {
+        return SqlBeanProvider.lastInsertIdSql();
+    }
+
 }

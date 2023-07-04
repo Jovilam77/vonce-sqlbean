@@ -22,25 +22,11 @@ public @interface DbTransactional {
     boolean readOnly() default false;
 
 //    /**
-//     * 传播机制
-//     *
-//     * @return
-//     */
-//    DbPropagation propagation() default DbPropagation.REQUIRED;
-//
-//    /**
-//     * 隔离级别
-//     *
-//     * @return
-//     */
-//    DbIsolation isolation() default DbIsolation.DEFAULT;
-//
-//    /**
 //     * 事务超时时间
 //     *
 //     * @return
 //     */
-//    int timeout() default TransactionDefinition.TIMEOUT_DEFAULT;
+//    int timeout() default -1;
 
     /**
      * 什么异常回滚

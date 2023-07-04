@@ -12,6 +12,7 @@ import cn.vonce.sql.page.ResultData;
 import cn.vonce.sql.provider.SqlBeanProvider;
 import cn.vonce.sql.service.TableService;
 import cn.vonce.sql.spring.annotation.DbSwitch;
+import cn.vonce.sql.spring.annotation.DbTransactional;
 import cn.vonce.sql.spring.config.UseMybatis;
 import cn.vonce.sql.spring.dao.MybatisSqlBeanDao;
 import cn.vonce.sql.service.SqlBeanService;
@@ -23,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -61,12 +64,12 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     }
 
     @Override
-    public SqlBeanConfig getSqlBeanConfig() {
+    SqlBeanConfig getSqlBeanConfig() {
         return sqlBeanConfig;
     }
 
     @Override
-    public SqlBeanDB initDBInfo() {
+    SqlBeanDB initDBInfo() {
         SqlBeanDB sqlBeanDB = new SqlBeanDB();
         if (!initDBInfo) {
             try {
@@ -80,6 +83,14 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
             }
         }
         return sqlBeanDB;
+    }
+
+    @Override
+    Long getAutoIncrId() {
+        if (getSqlBeanDB().getDbType() == DbType.MySQL || getSqlBeanDB().getDbType() == DbType.MariaDB) {
+            return mybatisSqlBeanDao.lastInsertId();
+        }
+        return null;
     }
 
     @Override
@@ -528,29 +539,41 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, where, SqlBeanUtil.funToColumn(filterColumns));
     }
 
-    @SuppressWarnings("unchecked")
+    @Transactional
+    @DbTransactional
     @DbSwitch(DbRole.MASTER)
     @Override
     public int insert(T... bean) {
         if (bean == null || bean.length == 0) {
             throw new SqlBeanException("insert方法bean参数至少拥有一个值");
         }
-        return mybatisSqlBeanDao.insertBean(getSqlBeanDB(), clazz, Arrays.asList(bean));
+        List<T> beanList = Arrays.asList(bean);
+        int count = mybatisSqlBeanDao.insertBean(getSqlBeanDB(), clazz, beanList);
+        super.setAutoIncrId(clazz, beanList);
+        return count;
     }
 
+    @Transactional
+    @DbTransactional
     @DbSwitch(DbRole.MASTER)
     @Override
     public int insert(Collection<T> beanList) {
         if (beanList == null || beanList.size() == 0) {
             throw new SqlBeanException("insert方法beanList参数至少拥有一个值");
         }
-        return mybatisSqlBeanDao.insertBean(getSqlBeanDB(), clazz, beanList);
+        int count = mybatisSqlBeanDao.insertBean(getSqlBeanDB(), clazz, beanList);
+        super.setAutoIncrId(clazz, beanList);
+        return count;
     }
 
+    @Transactional
+    @DbTransactional
     @DbSwitch(DbRole.MASTER)
     @Override
     public int insert(Insert<T> insert) {
-        return mybatisSqlBeanDao.insert(getSqlBeanDB(), clazz, insert);
+        int count = mybatisSqlBeanDao.insert(getSqlBeanDB(), clazz, insert);
+        super.setAutoIncrId(clazz, insert.getInsertBean());
+        return count;
     }
 
     @DbSwitch(DbRole.MASTER)

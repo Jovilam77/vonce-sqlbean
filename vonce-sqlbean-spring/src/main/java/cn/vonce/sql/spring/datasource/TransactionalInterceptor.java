@@ -39,7 +39,7 @@ public class TransactionalInterceptor implements MethodInterceptor {
                 //移除事务id
                 TransactionalContextHolder.clearXid();
                 //提交或回滚事务
-                ConnectionContextHolder.commit(true);
+                ConnectionContextHolder.commitOrRollback(true);
             }
         } catch (Throwable e) {
             //移除事务id
@@ -69,7 +69,7 @@ public class TransactionalInterceptor implements MethodInterceptor {
                 //回滚事务
                 needRollback = true;
             }
-            ConnectionContextHolder.commit(!needRollback);
+            ConnectionContextHolder.commitOrRollback(!needRollback);
             throw e;
         }
         return result;

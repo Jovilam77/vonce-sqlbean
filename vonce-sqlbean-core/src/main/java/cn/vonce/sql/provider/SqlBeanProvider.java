@@ -658,7 +658,6 @@ public class SqlBeanProvider {
      * @param wrapper
      * @param targetTableName
      * @param columns
-
      * @return
      */
     public static String copySql(SqlBeanDB sqlBeanDB, Class<?> clazz, Wrapper wrapper, String targetSchema, String targetTableName, Column[] columns) {
@@ -670,6 +669,15 @@ public class SqlBeanProvider {
         copy.setTargetTableName(targetTableName);
         copy.where(wrapper);
         return SqlHelper.buildCopy(copy);
+    }
+
+    /**
+     * 获取最后插入的自增id
+     *
+     * @return
+     */
+    public static String lastInsertIdSql() {
+        return "select last_insert_id()";
     }
 
     /**
@@ -848,17 +856,6 @@ public class SqlBeanProvider {
             e.printStackTrace();
             return null;
         }
-//        if (!select.getOrderBy().isEmpty()) {
-//            for (Order order : select.getOrderBy()) {
-//                if (StringUtil.isEmpty(order.getTableAlias())) {
-//                    List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
-//                    Field field = SqlBeanUtil.getFieldByTableFieldName(fieldList, order.getName());
-//                    if (field != null) {
-//                        order.setTableAlias(select.getTable().getAlias());
-//                    }
-//                }
-//            }
-//        }
         return SqlHelper.buildSelectSql(select);
     }
 
