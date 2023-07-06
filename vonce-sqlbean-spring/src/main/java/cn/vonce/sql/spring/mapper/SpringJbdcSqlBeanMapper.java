@@ -29,7 +29,7 @@ public class SpringJbdcSqlBeanMapper<T> extends SqlBeanMapper implements RowMapp
         if (SqlBeanUtil.isMap(returnType.getName())) {
             value = super.mapHandleResultSet(resultSet);
         } else if (!SqlBeanUtil.isBaseType(returnType)) {
-            value = super.beanHandleResultSet(clazz, resultSet, super.getColumnNameList(resultSet));
+            value = super.beanHandleResultSet(returnType, resultSet, super.getColumnNameList(resultSet));
         } else {
             value = super.baseHandleResultSet(resultSet);
             if (value != null && !value.getClass().getName().equals(returnType.getName())) {

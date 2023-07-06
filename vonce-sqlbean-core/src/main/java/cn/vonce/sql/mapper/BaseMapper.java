@@ -101,7 +101,7 @@ public abstract class BaseMapper {
                     }
                 }
             } else {
-                //优先使用 表别名+字段名才方式匹配
+                //优先使用 表别名+字段名方式匹配
                 String newFieldName = tableAlias + SqlConstant.UNDERLINE + fieldName;
                 if (!columnNameList.contains(newFieldName)) {
                     //其次通过驼峰转下划线方式匹配
