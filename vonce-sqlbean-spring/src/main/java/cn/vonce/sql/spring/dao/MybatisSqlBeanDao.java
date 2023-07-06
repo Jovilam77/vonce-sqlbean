@@ -21,7 +21,7 @@ import java.util.Map;
  * @param <T>
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2018年5月15日下午3:56:51
  */
 @Repository
@@ -238,6 +238,14 @@ public interface MybatisSqlBeanDao<T> {
      */
     @SelectProvider(type = MybatisSqlBeanProvider.class, method = "count")
     int count(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("clazz") Class<?> clazz, @Param("returnType") Class<?> returnType, @Param("select") Select select);
+
+    /**
+     * 获取最后插入的自增id
+     *
+     * @return
+     */
+    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "lastInsertId")
+    long lastInsertId();
 
     /**
      * 根据id条件删除
@@ -472,6 +480,5 @@ public interface MybatisSqlBeanDao<T> {
      */
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "executeSql")
     int executeSql(String sql);
-
 
 }

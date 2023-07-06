@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2022年3月15日上午10:00:10
  */
 public class Condition<Action> implements Serializable {

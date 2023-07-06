@@ -4,9 +4,11 @@ import cn.vonce.sql.bean.Alter;
 import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
+import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +46,8 @@ public enum JavaMapMySqlType {
 
     private Class<?>[] classes;
 
-    public static JavaMapMySqlType getType(Class<?> clazz) {
+    public static JavaMapMySqlType getType(Field field) {
+        Class<?> clazz = SqlBeanUtil.getEntityClassFieldType(field);
         for (JavaMapMySqlType javaType : values()) {
             for (Class<?> thisClazz : javaType.classes) {
                 if (thisClazz == clazz) {
@@ -52,11 +55,7 @@ public enum JavaMapMySqlType {
                 }
             }
         }
-        return null;
-    }
-
-    public static String getTypeName(Class<?> clazz) {
-        return getType(clazz).name();
+        throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类不支持此字段类型：" + clazz.getSimpleName());
     }
 
     /**
@@ -96,6 +95,7 @@ public enum JavaMapMySqlType {
         sql.append("(CASE is_nullable WHEN 'NO' THEN 1 ELSE 0 END) AS notnull, column_default AS dflt_value, ");
         sql.append("(CASE column_key WHEN 'PRI' THEN 1 ELSE 0 END) AS pk, ");
         sql.append("(CASE column_key WHEN 'MUL' THEN 1 ELSE 0 END) AS fk, ");
+        sql.append("(CASE extra WHEN 'auto_increment' THEN 1 ELSE 0 END) AS auto_incr, ");
         sql.append("(CASE WHEN data_type = 'bit' OR data_type = 'tinyint' OR data_type = 'mediumint' OR data_type = 'int' OR data_type = 'bigint' OR ");
         sql.append("data_type = 'float' OR data_type = 'double' OR data_type = 'decimal' THEN numeric_precision ELSE character_maximum_length END) AS length, ");
         sql.append("numeric_scale AS scale, ");

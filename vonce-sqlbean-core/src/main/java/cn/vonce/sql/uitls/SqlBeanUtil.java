@@ -7,10 +7,7 @@ import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.define.JoinOn;
 import cn.vonce.sql.define.SqlFun;
-import cn.vonce.sql.enumerate.AlterType;
-import cn.vonce.sql.enumerate.DbType;
-import cn.vonce.sql.enumerate.JdbcType;
-import cn.vonce.sql.enumerate.WhatType;
+import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
 
 import java.beans.Introspector;
@@ -18,6 +15,8 @@ import java.io.*;
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -325,8 +324,8 @@ public class SqlBeanUtil {
      * @param field
      * @return
      */
-    public static ColumnInfo getColumnInfo(SqlBeanDB sqlBeanDB, Field field) {
-        return getColumnInfo(sqlBeanDB, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class));
+    public static ColumnInfo buildColumnInfo(SqlBeanDB sqlBeanDB, Field field) {
+        return buildColumnInfo(sqlBeanDB, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class));
     }
 
     /**
@@ -338,11 +337,14 @@ public class SqlBeanUtil {
      * @param sqlColumn
      * @return
      */
-    public static ColumnInfo getColumnInfo(SqlBeanDB sqlBeanDB, Field field, SqlTable sqlTable, SqlColumn sqlColumn) {
+    public static ColumnInfo buildColumnInfo(SqlBeanDB sqlBeanDB, Field field, SqlTable sqlTable, SqlColumn sqlColumn) {
         String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
         ColumnInfo columnInfo = new ColumnInfo();
         columnInfo.setName(SqlBeanUtil.isToUpperCase(sqlBeanDB) ? columnName.toUpperCase() : columnName);
-        columnInfo.setPk(field.isAnnotationPresent(SqlId.class));
+        //是否主键 是否自增
+        SqlId sqlId = field.getAnnotation(SqlId.class);
+        columnInfo.setPk(sqlId != null);
+        columnInfo.setAutoIncr(sqlId == null ? false : sqlId.type() == IdType.AUTO);
         JdbcType jdbcType;
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
             jdbcType = sqlColumn.type();
@@ -411,6 +413,11 @@ public class SqlBeanUtil {
         }
         if (sqlBeanDB.getDbType() != DbType.SQLite && sqlBeanDB.getDbType() != DbType.Derby) {
             if (StringUtil.isNotBlank(columnInfo.getRemarks()) && !columnInfo.getRemarks().equals(toColumnInfo.getRemarks())) {
+                return false;
+            }
+        }
+        if (sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) {
+            if (!columnInfo.getAutoIncr().equals(toColumnInfo.getAutoIncr())) {
                 return false;
             }
         }
@@ -506,8 +513,7 @@ public class SqlBeanUtil {
     public static boolean isFilter(List<Column> filterColumns, Column column) {
         if (filterColumns != null) {
             for (Column item : filterColumns) {
-                if ((StringUtil.isNotBlank(item.getTableAlias()) && column.getTableAlias().equals(item.getTableAlias()) && column.getName().equals(item.getName())) ||
-                        (StringUtil.isBlank(item.getTableAlias()) && column.getName().equals(item.getName()))) {
+                if ((StringUtil.isNotBlank(item.getTableAlias()) && column.getTableAlias().equals(item.getTableAlias()) && column.getName().equals(item.getName())) || (StringUtil.isBlank(item.getTableAlias()) && column.getName().equals(item.getName()))) {
                     return true;
                 }
             }
@@ -977,38 +983,20 @@ public class SqlBeanUtil {
     /**
      * 该类型是否为基本类型
      *
-     * @param typeName
+     * @param clazz
      * @return
      */
-    public static boolean isBaseType(String typeName) {
-        boolean isTrue;
-        switch (typeName) {
-            case "java.lang.String":
-            case "char":
-            case "java.lang.Character":
-            case "boolean":
-            case "java.lang.Boolean":
-            case "byte":
-            case "java.lang.Byte":
-            case "short":
-            case "java.lang.Short":
-            case "int":
-            case "java.lang.Integer":
-            case "long":
-            case "java.lang.Long":
-            case "float":
-            case "java.lang.Float":
-            case "double":
-            case "java.lang.Double":
-            case "java.util.Date":
-            case "java.math.BigDecimal":
-                isTrue = true;
-                break;
-            default:
-                isTrue = false;
-                break;
+    public static boolean isBaseType(Class<?> clazz) {
+        if (clazz == String.class || clazz == char.class || clazz == Character.class
+                || clazz == boolean.class || clazz == Boolean.class || clazz == byte.class
+                || clazz == Byte.class || clazz == short.class || clazz == Short.class
+                || clazz == int.class || clazz == Integer.class || clazz == long.class
+                || clazz == Long.class || clazz == float.class || clazz == Float.class
+                || clazz == double.class || clazz == Double.class || clazz == Date.class
+                || clazz == BigDecimal.class) {
+            return true;
         }
-        return isTrue;
+        return false;
     }
 
     /**
@@ -1094,7 +1082,11 @@ public class SqlBeanUtil {
                 }
                 break;
             default:
-                sqlValue = single_quotation_mark + filterSQLInject(value.toString()) + single_quotation_mark;
+                if (value instanceof SqlEnum) {
+                    sqlValue = ((SqlEnum) value).getCode().toString();
+                } else {
+                    sqlValue = single_quotation_mark + filterSQLInject(value.toString()) + single_quotation_mark;
+                }
                 break;
         }
         return sqlValue;
@@ -1303,6 +1295,13 @@ public class SqlBeanUtil {
                 sql.append(SqlConstant.NULL);
             }
         }
+        //是否自增
+        if (columnInfo.getAutoIncr() != null && columnInfo.getAutoIncr()) {
+            if (common.getSqlBeanDB().getDbType() == DbType.MySQL || common.getSqlBeanDB().getDbType() == DbType.MariaDB) {
+                sql.append(SqlConstant.SPACES);
+                sql.append(SqlConstant.AUTO_INCREMENT);
+            }
+        }
         //默认值
         if (StringUtil.isNotEmpty(columnInfo.getDfltValue())) {
             sql.append(SqlConstant.SPACES);
@@ -1414,6 +1413,62 @@ public class SqlBeanUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 获取泛型类型
+     *
+     * @param clazz
+     * @return
+     */
+    public static Class<?> getGenericType(Class<?> clazz) {
+        Type[] typeArray = new Type[]{clazz.getGenericSuperclass()};
+        if (typeArray == null || typeArray.length == 0) {
+            typeArray = clazz.getGenericInterfaces();
+        }
+        return getGenericType(typeArray);
+    }
+
+    /**
+     * 获取泛型类型
+     *
+     * @param typeArray
+     * @return
+     */
+    public static Class<?> getGenericType(Type[] typeArray) {
+        Class<?> clazz = null;
+        for (Type type : typeArray) {
+            if (type instanceof ParameterizedType) {
+                Class<?> trueTypeClass = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
+                try {
+                    clazz = SqlBeanUtil.class.getClassLoader().loadClass(trueTypeClass.getName());
+                    break;
+                } catch (ClassNotFoundException e) {
+                }
+            }
+        }
+        return clazz;
+    }
+
+    /**
+     * 获取获取实体类字段类型
+     *
+     * @param field
+     * @return
+     */
+    public static Class<?> getEntityClassFieldType(Field field) {
+        Class<?> clazz = field.getType();
+        if (clazz.isEnum() && SqlEnum.class.isAssignableFrom(clazz)) {
+            Type[] typeArray = clazz.getGenericInterfaces();
+            clazz = SqlBeanUtil.getGenericType(typeArray);
+            if (clazz == null) {
+                throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类中的枚举类字段：" + field.getType().getSimpleName() + "在实现SqlEnum接口时必须指定泛型类型");
+            }
+            if (!SqlBeanUtil.isBaseType(clazz)) {
+                throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类中的枚举类字段：" + field.getType().getSimpleName() + "在实现SqlEnum接口时指定的泛型类型不支持");
+            }
+        }
+        return clazz;
     }
 
 }

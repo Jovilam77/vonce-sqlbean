@@ -7,7 +7,7 @@ import java.io.Serializable;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2020年3月1日上午10:00:00
  */
 public class Column implements Serializable {

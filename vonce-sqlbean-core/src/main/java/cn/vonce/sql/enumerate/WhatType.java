@@ -6,7 +6,7 @@ package cn.vonce.sql.enumerate;
  *
  * @author jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2017年6月2日下午5:24:16
  */
 public enum WhatType {

@@ -49,12 +49,12 @@ public class ConnectionContextHolder {
      *
      * @param isOk
      */
-    public static void commit(boolean isOk) {
+    public static void commitOrRollback(boolean isOk) {
         String ds = DataSourceContextHolder.getDataSource();
         if (StringUtil.isBlank(ds)) {
             ds = "default";
         }
-        commit(ds, isOk);
+        commitOrRollback(ds, isOk);
     }
 
     /**
@@ -63,7 +63,7 @@ public class ConnectionContextHolder {
      * @param ds
      * @param isOk
      */
-    public static void commit(String ds, boolean isOk) {
+    public static void commitOrRollback(String ds, boolean isOk) {
         try {
             ConcurrentHashMap<String, ConnectionProxy> map = contextHolder.get();
             if (map != null) {

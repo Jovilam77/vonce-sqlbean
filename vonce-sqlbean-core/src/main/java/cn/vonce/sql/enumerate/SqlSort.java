@@ -8,7 +8,7 @@ import cn.vonce.sql.uitls.StringUtil;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2018年4月16日下午7:14:23
  */
 public enum SqlSort {

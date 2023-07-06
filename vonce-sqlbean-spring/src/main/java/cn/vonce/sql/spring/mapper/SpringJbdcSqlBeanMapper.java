@@ -11,7 +11,7 @@ import java.sql.ResultSet;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  */
 public class SpringJbdcSqlBeanMapper<T> extends SqlBeanMapper implements RowMapper<T> {
 
@@ -28,8 +28,8 @@ public class SpringJbdcSqlBeanMapper<T> extends SqlBeanMapper implements RowMapp
         Object value;
         if (SqlBeanUtil.isMap(returnType.getName())) {
             value = super.mapHandleResultSet(resultSet);
-        } else if (!SqlBeanUtil.isBaseType(returnType.getName())) {
-            value = super.beanHandleResultSet(clazz, resultSet, super.getColumnNameList(resultSet));
+        } else if (!SqlBeanUtil.isBaseType(returnType)) {
+            value = super.beanHandleResultSet(returnType, resultSet, super.getColumnNameList(resultSet));
         } else {
             value = super.baseHandleResultSet(resultSet);
             if (value != null && !value.getClass().getName().equals(returnType.getName())) {

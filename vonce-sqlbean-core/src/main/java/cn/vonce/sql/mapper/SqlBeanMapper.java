@@ -1,33 +1,47 @@
 package cn.vonce.sql.mapper;
 
 
-import cn.vonce.sql.annotation.SqlJoin;
-import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.uitls.DateUtil;
-import cn.vonce.sql.uitls.ReflectUtil;
-import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.*;
 
 /**
  * SqlBean 结果映射
  */
-public class SqlBeanMapper {
+public class SqlBeanMapper extends BaseMapper {
 
     /**
-     * 基础对象映射
+     * 获取所有列名
      *
-     * @param resultSet
+     * @param autoCloseable
      * @return
+     * @throws SQLException
      */
-    public Object baseHandleResultSet(ResultSet resultSet) {
+    @Override
+    public List<String> getColumnNameList(AutoCloseable autoCloseable) {
+        ResultSet resultSet = (ResultSet) autoCloseable;
+        List<String> columnNameList = new ArrayList<>();
+        try {
+            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+            int columns = resultSetMetaData.getColumnCount();
+            if (columnNameList.size() == 0) {
+                for (int i = 1; i <= columns; i++) {
+                    columnNameList.add(resultSetMetaData.getColumnLabel(i));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return columnNameList;
+    }
+
+    @Override
+    public Object baseHandleResultSet(AutoCloseable autoCloseable) {
+        ResultSet resultSet = (ResultSet) autoCloseable;
         Object value = null;
         try {
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
@@ -41,13 +55,9 @@ public class SqlBeanMapper {
         return value;
     }
 
-    /**
-     * map对象映射
-     *
-     * @param resultSet
-     * @return
-     */
-    public Object mapHandleResultSet(ResultSet resultSet) {
+    @Override
+    public Object mapHandleResultSet(AutoCloseable autoCloseable) {
+        ResultSet resultSet = (ResultSet) autoCloseable;
         Map<String, Object> map = null;
         try {
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
@@ -66,133 +76,9 @@ public class SqlBeanMapper {
         return map;
     }
 
-    /**
-     * bean对象映射处理
-     *
-     * @param resultSet
-     * @param clazz
-     * @return
-     */
-    public Object beanHandleResultSet(Class<?> clazz, ResultSet resultSet, List<String> columnNameList) {
-        Object bean = ReflectUtil.instance().newObject(clazz);
-        String tableAlias = SqlBeanUtil.getTable(clazz).getAlias();
-        List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
-        for (Field field : fieldList) {
-            if (Modifier.isStatic(field.getModifiers())) {
-                continue;
-            }
-            SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
-            String fieldName = field.getName();
-            if (sqlJoin != null) {
-                if (sqlJoin.isBean()) {
-                    Class<?> subClazz = field.getType();
-                    Object subBean = ReflectUtil.instance().newObject(subClazz);
-                    //获取表的别名，先是获取别名，获取不到就会获取表名
-                    String subTableAlias = SqlBeanUtil.getTable(subClazz).getAlias();
-                    //如果在SqlBeanJoin中设置了表名，那么优先使用该表名，如果有多个联表查询的对象需要连接同一张表的，那么需要保证表名一致
-                    if (StringUtil.isNotEmpty(sqlJoin.table())) {
-                        subTableAlias = sqlJoin.table();
-                    }
-                    //如果在SqlBeanJoin中设置了别名，那么优先使用该别名，如果有多个联表查询的对象需要连接同一张表的，那么需要保证别名一致
-                    if (StringUtil.isNotEmpty(sqlJoin.tableAlias())) {
-                        subTableAlias = sqlJoin.tableAlias();
-                    }
-                    List<Field> subFields = SqlBeanUtil.getBeanAllField(subClazz);
-                    for (Field subField : subFields) {
-                        if (Modifier.isStatic(subField.getModifiers())) {
-                            continue;
-                        }
-                        String subFieldName = subField.getName();
-                        subFieldName = subTableAlias + SqlConstant.UNDERLINE + subFieldName;
-                        setFieldValue(subBean, subField, subFieldName, resultSet);
-                    }
-                    ReflectUtil.instance().set(bean.getClass(), bean, fieldName, subBean);
-                    continue;
-                } else {
-                    if (!columnNameList.contains(fieldName)) {
-                        String subTableAlias = sqlJoin.table();
-                        if (StringUtil.isNotEmpty(sqlJoin.tableAlias())) {
-                            subTableAlias = sqlJoin.tableAlias();
-                        }
-                        fieldName = subTableAlias + SqlConstant.UNDERLINE + fieldName;
-                    }
-                    if (columnNameList.contains(fieldName)) {
-                        setFieldValue(bean, field, fieldName, resultSet);
-                    }
-                }
-            } else {
-                //优先使用 表别名+字段名才方式匹配
-                String newFieldName = tableAlias + SqlConstant.UNDERLINE + fieldName;
-                if (!columnNameList.contains(newFieldName)) {
-                    //其次通过驼峰转下划线方式匹配
-                    newFieldName = StringUtil.humpToUnderline(fieldName);
-                    if (!columnNameList.contains(newFieldName)) {
-                        newFieldName = newFieldName.toUpperCase();
-                        if (!columnNameList.contains(newFieldName)) {
-                            //再其次通过字段名匹配
-                            newFieldName = fieldName;
-                            if (!columnNameList.contains(newFieldName)) {
-                                newFieldName = fieldName.toUpperCase();
-                            }
-                        }
-                    }
-                }
-                if (columnNameList.contains(newFieldName)) {
-                    setFieldValue(bean, field, newFieldName, resultSet);
-                }
-            }
-        }
-        return bean;
-    }
-
-    /**
-     * 获取所有列名
-     *
-     * @param resultSet
-     * @return
-     * @throws SQLException
-     */
-    public List<String> getColumnNameList(ResultSet resultSet) {
-        List<String> columnNameList = new ArrayList<>();
-        try {
-            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-            int columns = resultSetMetaData.getColumnCount();
-            if (columnNameList.size() == 0) {
-                for (int i = 1; i <= columns; i++) {
-                    columnNameList.add(resultSetMetaData.getColumnLabel(i));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return columnNameList;
-    }
-
-    /**
-     * 字段赋值
-     *
-     * @param obj
-     * @param field
-     * @param fieldName
-     * @param resultSet
-     */
-    public void setFieldValue(Object obj, Field field, String fieldName, ResultSet resultSet) {
-        Object value = getValue(field.getType().getName(), fieldName, resultSet);
-        if (value == null || value.equals("null")) {
-            value = getDefaultValue(field.getType().getName());
-        }
-        ReflectUtil.instance().set(obj.getClass(), obj, field.getName(), value);
-    }
-
-    /**
-     * 获取该字段对应的值
-     *
-     * @param fieldType
-     * @param fieldName
-     * @param resultSet
-     * @return
-     */
-    public Object getValue(String fieldType, String fieldName, ResultSet resultSet) {
+    @Override
+    public Object getValue(String fieldType, String fieldName, AutoCloseable autoCloseable) {
+        ResultSet resultSet = (ResultSet) autoCloseable;
         Object value = null;
         try {
             switch (fieldType) {
@@ -298,18 +184,11 @@ public class SqlBeanMapper {
         } catch (SQLException e) {
         }
         return value;
-
     }
 
-    /**
-     * 获取该字段对应的值
-     *
-     * @param jdbcType
-     * @param index
-     * @param resultSet
-     * @return
-     */
-    public Object getValue(String jdbcType, int index, ResultSet resultSet) {
+    @Override
+    public Object getValue(String jdbcType, int index, AutoCloseable autoCloseable) {
+        ResultSet resultSet = (ResultSet) autoCloseable;
         Object value = null;
         try {
             switch (jdbcType) {
@@ -352,131 +231,6 @@ public class SqlBeanMapper {
         } catch (SQLException e) {
         }
         return value;
-
     }
-
-    /**
-     * 获取基本类型默认值
-     *
-     * @param typeName
-     * @return
-     */
-    public static Object getDefaultValue(String typeName) {
-        Object value = null;
-        switch (typeName) {
-            case "byte":
-                value = new Byte("0");
-                break;
-            case "short":
-                value = new Short("0");
-                break;
-            case "int":
-                value = 0;
-                break;
-            case "long":
-                value = 0L;
-                break;
-            case "float":
-                value = 0F;
-                break;
-            case "double":
-                value = 0D;
-                break;
-            case "char":
-                value = '\u0000';
-                break;
-            case "boolean":
-                value = false;
-                break;
-        }
-        return value;
-    }
-
-    /**
-     * 获取基本类型默认值
-     *
-     * @param typeName
-     * @return
-     */
-    public static Object getDefaultValueByColumnType(String typeName) {
-        Object value = null;
-        switch (typeName) {
-            case "BIGINT":
-            case "INTEGER":
-            case "TINYINT":
-            case "SMALLINT":
-                value = 0;
-                break;
-            case "FLOAT":
-                value = 0f;
-                break;
-            case "DOUBLE":
-            case "NUMERIC":
-                value = 0d;
-                break;
-            case "BIT":
-                value = false;
-                break;
-            case "CHAR":
-            case "VARCHAR":
-            case "LONGVARCHAR":
-                value = null;
-                break;
-            default:
-                value = null;
-                break;
-        }
-        return value;
-    }
-
-    /**
-     * 获取转换后的值
-     *
-     * @param typeName
-     * @param value
-     * @return
-     */
-    public static Object getValueConvert(String typeName, Object value) {
-        Object newValue = value;
-        switch (typeName) {
-            case "byte":
-            case "java.lang.Byte":
-                newValue = new Byte(value.toString());
-                break;
-            case "short":
-            case "java.lang.Short":
-                newValue = new Short(value.toString());
-                break;
-            case "int":
-            case "java.lang.Integer":
-                newValue = new Integer(value.toString());
-                break;
-            case "long":
-            case "java.lang.Long":
-                newValue = new Long(value.toString());
-                break;
-            case "float":
-            case "java.lang.Float":
-                newValue = new Float(value.toString());
-                break;
-            case "double":
-            case "java.lang.Double":
-                newValue = new Double(value.toString());
-                break;
-            case "boolean":
-            case "java.lang.Boolean":
-                newValue = new Boolean(value.toString());
-                break;
-            case "char":
-            case "java.lang.Character":
-                newValue = value.toString().charAt(0);
-                break;
-            case "java.lang.String":
-                newValue = value.toString();
-                break;
-        }
-        return newValue;
-    }
-
 
 }

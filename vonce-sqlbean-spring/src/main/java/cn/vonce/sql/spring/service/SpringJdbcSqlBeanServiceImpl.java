@@ -11,6 +11,7 @@ import cn.vonce.sql.page.PageHelper;
 import cn.vonce.sql.page.ResultData;
 import cn.vonce.sql.service.TableService;
 import cn.vonce.sql.spring.annotation.DbSwitch;
+import cn.vonce.sql.spring.annotation.DbTransactional;
 import cn.vonce.sql.spring.config.UseSpringJdbc;
 import cn.vonce.sql.spring.enumerate.DbRole;
 import cn.vonce.sql.spring.mapper.SpringJbdcSqlBeanMapper;
@@ -23,9 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -37,7 +37,7 @@ import java.util.*;
  * @param <T>
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2019年5月22日下午16:20:12
  */
 @UseSpringJdbc
@@ -57,30 +57,16 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     private Class<?> clazz;
 
     public SpringJdbcSqlBeanServiceImpl() {
-        Type[] typeArray = new Type[]{getClass().getGenericSuperclass()};
-        if (typeArray == null || typeArray.length == 0) {
-            typeArray = getClass().getGenericInterfaces();
-        }
-        for (Type type : typeArray) {
-            if (type instanceof ParameterizedType) {
-                Class<?> trueTypeClass = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
-                try {
-                    clazz = this.getClass().getClassLoader().loadClass(trueTypeClass.getName());
-                    return;
-                } catch (ClassNotFoundException e) {
-                    logger.error(e.getMessage());
-                }
-            }
-        }
+        clazz = SqlBeanUtil.getGenericType(this.getClass());
     }
 
     @Override
-    public SqlBeanConfig getSqlBeanConfig() {
+    SqlBeanConfig getSqlBeanConfig() {
         return sqlBeanConfig;
     }
 
     @Override
-    public SqlBeanDB initDBInfo() {
+    SqlBeanDB initDBInfo() {
         SqlBeanDB sqlBeanDB = new SqlBeanDB();
         if (!initDBInfo) {
             try {
@@ -94,6 +80,11 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             }
         }
         return sqlBeanDB;
+    }
+
+    @Override
+    Long getAutoIncrId() {
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.lastInsertIdSql(), new SpringJbdcSqlBeanMapper<Long>(clazz, Long.class)));
     }
 
     @Override
@@ -542,28 +533,40 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return jdbcTemplate.update(SqlBeanProvider.updateByBeanSql(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, where, SqlBeanUtil.funToColumn(filterColumns)));
     }
 
+    @Transactional
+    @DbTransactional
     @DbSwitch(DbRole.MASTER)
     @Override
     public int insert(T... bean) {
         if (bean == null || bean.length == 0) {
             throw new SqlBeanException("insert方法bean参数必须拥有一个值");
         }
-        return jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), clazz, bean));
+        int count = jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), clazz, bean));
+        super.setAutoIncrId(clazz, Arrays.asList(bean));
+        return count;
     }
 
+    @Transactional
+    @DbTransactional
     @DbSwitch(DbRole.MASTER)
     @Override
     public int insert(Collection<T> beanList) {
         if (beanList == null || beanList.size() == 0) {
             throw new SqlBeanException("insert方法beanList参数至少拥有一个值");
         }
-        return jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), clazz, beanList));
+        int count = jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), clazz, beanList));
+        super.setAutoIncrId(clazz, beanList);
+        return count;
     }
 
+    @Transactional
+    @DbTransactional
     @DbSwitch(DbRole.MASTER)
     @Override
     public int insert(Insert insert) {
-        return jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), clazz, insert));
+        int count = jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), clazz, insert));
+        super.setAutoIncrId(clazz, insert.getInsertBean());
+        return count;
     }
 
     @DbSwitch(DbRole.MASTER)

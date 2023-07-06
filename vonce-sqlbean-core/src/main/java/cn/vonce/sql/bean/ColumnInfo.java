@@ -5,7 +5,7 @@ package cn.vonce.sql.bean;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  */
 public class ColumnInfo {
 
@@ -37,6 +37,10 @@ public class ColumnInfo {
      * 是否为外键
      */
     private Boolean fk;
+    /**
+     * 是否自增字段
+     */
+    private Boolean autoIncr;
     /**
      * 字段长度
      */
@@ -104,6 +108,14 @@ public class ColumnInfo {
 
     public void setFk(Boolean fk) {
         this.fk = fk;
+    }
+
+    public Boolean getAutoIncr() {
+        return autoIncr;
+    }
+
+    public void setAutoIncr(Boolean autoIncr) {
+        this.autoIncr = autoIncr;
     }
 
     public Long getLength() {

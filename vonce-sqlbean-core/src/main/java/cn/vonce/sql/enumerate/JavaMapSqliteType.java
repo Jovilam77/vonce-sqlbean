@@ -4,6 +4,7 @@ import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
+import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.uitls.DateUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
@@ -18,7 +19,7 @@ import java.util.*;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  */
 public enum JavaMapSqliteType {
 
@@ -34,7 +35,8 @@ public enum JavaMapSqliteType {
 
     private Class<?>[] classes;
 
-    public static JavaMapSqliteType getType(Class<?> clazz) {
+    public static JavaMapSqliteType getType(Field field) {
+        Class<?> clazz = SqlBeanUtil.getEntityClassFieldType(field);
         for (JavaMapSqliteType javaType : values()) {
             for (Class<?> thisClazz : javaType.classes) {
                 if (thisClazz == clazz) {
@@ -42,11 +44,7 @@ public enum JavaMapSqliteType {
                 }
             }
         }
-        return null;
-    }
-
-    public static String getTypeName(Class<?> clazz) {
-        return getType(clazz).name();
+        throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类不支持此字段类型：" + clazz.getSimpleName());
     }
 
     /**

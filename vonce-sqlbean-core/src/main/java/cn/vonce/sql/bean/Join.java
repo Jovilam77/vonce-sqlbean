@@ -9,7 +9,7 @@ import java.io.Serializable;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2019年6月10日上午12:00:00
  */
 public class Join implements Serializable {

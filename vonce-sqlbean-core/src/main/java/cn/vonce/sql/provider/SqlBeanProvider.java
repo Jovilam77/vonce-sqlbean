@@ -23,7 +23,7 @@ import java.util.Map;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2018年5月15日下午2:23:47
  */
 public class SqlBeanProvider {
@@ -658,7 +658,6 @@ public class SqlBeanProvider {
      * @param wrapper
      * @param targetTableName
      * @param columns
-
      * @return
      */
     public static String copySql(SqlBeanDB sqlBeanDB, Class<?> clazz, Wrapper wrapper, String targetSchema, String targetTableName, Column[] columns) {
@@ -670,6 +669,15 @@ public class SqlBeanProvider {
         copy.setTargetTableName(targetTableName);
         copy.where(wrapper);
         return SqlHelper.buildCopy(copy);
+    }
+
+    /**
+     * 获取最后插入的自增id
+     *
+     * @return
+     */
+    public static String lastInsertIdSql() {
+        return "select last_insert_id()";
     }
 
     /**
@@ -695,7 +703,7 @@ public class SqlBeanProvider {
             alter.setSqlBeanDB(sqlBeanDB);
             alter.setTable(clazz);
             String oldName = sqlColumn == null ? "" : (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) ? sqlColumn.oldName().toUpperCase() : sqlColumn.oldName();
-            ColumnInfo columnInfo = SqlBeanUtil.getColumnInfo(alter.getSqlBeanDB(), field, sqlTable, sqlColumn);
+            ColumnInfo columnInfo = SqlBeanUtil.buildColumnInfo(alter.getSqlBeanDB(), field, sqlTable, sqlColumn);
             boolean exist = false;
             boolean fit = true;
             //优先比较字段改名的
@@ -848,17 +856,6 @@ public class SqlBeanProvider {
             e.printStackTrace();
             return null;
         }
-//        if (!select.getOrderBy().isEmpty()) {
-//            for (Order order : select.getOrderBy()) {
-//                if (StringUtil.isEmpty(order.getTableAlias())) {
-//                    List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
-//                    Field field = SqlBeanUtil.getFieldByTableFieldName(fieldList, order.getName());
-//                    if (field != null) {
-//                        order.setTableAlias(select.getTable().getAlias());
-//                    }
-//                }
-//            }
-//        }
         return SqlHelper.buildSelectSql(select);
     }
 

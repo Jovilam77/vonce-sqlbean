@@ -6,7 +6,7 @@ import java.io.Serializable;
  * 实现分页必须实现此接口
  * 
  * @author jovi
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @version 1.0
  * @date 2017年3月14日上午11:51:49
  */

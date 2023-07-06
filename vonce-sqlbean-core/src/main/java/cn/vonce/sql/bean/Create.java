@@ -5,7 +5,7 @@ package cn.vonce.sql.bean;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2020年7月30日下午4:40:00
  */
 public class Create extends Common {

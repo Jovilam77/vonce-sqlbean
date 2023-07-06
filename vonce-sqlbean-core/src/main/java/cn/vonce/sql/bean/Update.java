@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2017年8月18日上午9:00:19
  */
 public class Update<T> extends CommonCondition<Update<T>> implements Serializable {

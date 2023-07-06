@@ -4,9 +4,11 @@ import cn.vonce.sql.bean.Alter;
 import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
+import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +45,8 @@ public enum JavaMapSqlServerType {
 
     private Class<?>[] classes;
 
-    public static JavaMapSqlServerType getType(Class<?> clazz) {
+    public static JavaMapSqlServerType getType(Field field) {
+        Class<?> clazz = SqlBeanUtil.getEntityClassFieldType(field);
         for (JavaMapSqlServerType javaType : values()) {
             for (Class<?> thisClazz : javaType.classes) {
                 if (thisClazz == clazz) {
@@ -51,11 +54,7 @@ public enum JavaMapSqlServerType {
                 }
             }
         }
-        return null;
-    }
-
-    public static String getTypeName(Class<?> clazz) {
-        return getType(clazz).name();
+        throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类不支持此字段类型：" + clazz.getSimpleName());
     }
 
     /**

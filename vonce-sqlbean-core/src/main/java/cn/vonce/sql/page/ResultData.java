@@ -8,7 +8,7 @@ import java.util.List;
  *
  * @author jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2017年5月24日上午11:32:38
  */
 public class ResultData<T> implements Serializable {

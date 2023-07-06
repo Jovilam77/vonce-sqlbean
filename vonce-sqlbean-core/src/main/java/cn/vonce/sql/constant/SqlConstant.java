@@ -1,5 +1,12 @@
 package cn.vonce.sql.constant;
 
+/**
+ * 关键字常量
+ *
+ * @author Jovi
+ * @version 1.0
+ * @email imjovi@qq.com
+ */
 public class SqlConstant {
 
     // sql
@@ -59,6 +66,7 @@ public class SqlConstant {
 
     public static final String CREATE_TABLE = "CREATE TABLE ";
     public static final String PRIMARY_KEY = "PRIMARY KEY";
+    public static final String AUTO_INCREMENT = "AUTO_INCREMENT";
     public static final String NULL = "NULL";
     public static final String NOT_NULL = "NOT NULL";
     public static final String DEFAULT = "DEFAULT";

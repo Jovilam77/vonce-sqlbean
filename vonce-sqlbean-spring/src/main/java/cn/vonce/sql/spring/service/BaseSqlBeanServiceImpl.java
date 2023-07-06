@@ -1,14 +1,20 @@
 package cn.vonce.sql.spring.service;
 
+import cn.vonce.sql.annotation.SqlId;
 import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.enumerate.DbType;
+import cn.vonce.sql.enumerate.IdType;
 import cn.vonce.sql.enumerate.JdbcType;
+import cn.vonce.sql.uitls.ReflectUtil;
+import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
+import java.lang.reflect.Field;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,15 +24,15 @@ import java.util.Objects;
  * @param
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  */
 public abstract class BaseSqlBeanServiceImpl {
 
     private SqlBeanDB sqlBeanDB;
 
-    public abstract SqlBeanConfig getSqlBeanConfig();
+    abstract SqlBeanConfig getSqlBeanConfig();
 
-    public abstract SqlBeanDB initDBInfo();
+    abstract SqlBeanDB initDBInfo();
 
     public SqlBeanDB getSqlBeanDB() {
         if (sqlBeanDB == null) {
@@ -114,6 +120,40 @@ public abstract class BaseSqlBeanServiceImpl {
         sqlBeanDB.setDriverVersion(metaData.getDriverVersion());
         sqlBeanDB.setDriverName(metaData.getDriverName());
         sqlBeanDB.setDbType(DbType.getDbType(sqlBeanDB.getProductName()));
+    }
+
+    /**
+     * 获取自增id
+     *
+     * @return
+     */
+    abstract Long getAutoIncrId();
+
+    /**
+     * 设置自增id
+     *
+     * @param clazz
+     * @param beanList
+     * @param <T>
+     */
+    public <T> void setAutoIncrId(Class<?> clazz, Collection<T> beanList) {
+        if (beanList == null || beanList.size() == 0) {
+            return;
+        }
+        Field idField = SqlBeanUtil.getIdField(clazz);
+        Long idBeginValue = getAutoIncrId();
+        if (idBeginValue != null && idField != null && idField.getAnnotation(SqlId.class).type() == IdType.AUTO) {
+            int i = 0;
+            for (T t : beanList) {
+                Field field = SqlBeanUtil.getIdField(t.getClass());
+                if (Number.class.isAssignableFrom(field.getType())) {
+                    Long value = idBeginValue + i;
+                    Object newValue = ReflectUtil.instance().invoke(field.getType(), null, "valueOf", new Class<?>[]{String.class}, new Object[]{value.toString()});
+                    ReflectUtil.instance().set(t.getClass(), t, field.getName(), newValue);
+                }
+                i++;
+            }
+        }
     }
 
 }

@@ -24,7 +24,7 @@ import java.util.*;
  *
  * @author Jovi
  * @version 1.0
- * @email 766255988@qq.com
+ * @email imjovi@qq.com
  * @date 2018年5月15日上午9:21:48
  */
 @Intercepts(@Signature(method = "handleResultSets", type = ResultSetHandler.class, args = {Statement.class}))
@@ -75,7 +75,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             if (resultType.getName().equals(ColumnInfo.class.getName()) || resultType.getName().equals(TableInfo.class.getName())) {
                 return beanHandleResultSet(resultType, resultSet, super.getColumnNameList(resultSet));
             }
-            if (SqlBeanUtil.isBaseType(resultType.getName())) {
+            if (SqlBeanUtil.isBaseType(resultType)) {
                 return baseHandleResultSet(resultSet, resultType);
             }
             if (SqlBeanUtil.isMap(resultType.getName())) {
@@ -88,7 +88,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             } else {
                 returnType = (Class<?>) mapParam.get("clazz");
             }
-            if (SqlBeanUtil.isBaseType(returnType.getName())) {
+            if (SqlBeanUtil.isBaseType(returnType)) {
                 return baseHandleResultSet(resultSet, returnType);
             }
             if (SqlBeanUtil.isMap(returnType.getName())) {
