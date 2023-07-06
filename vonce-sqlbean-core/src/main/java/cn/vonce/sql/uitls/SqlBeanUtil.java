@@ -324,8 +324,8 @@ public class SqlBeanUtil {
      * @param field
      * @return
      */
-    public static ColumnInfo getColumnInfo(SqlBeanDB sqlBeanDB, Field field) {
-        return getColumnInfo(sqlBeanDB, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class));
+    public static ColumnInfo buildColumnInfo(SqlBeanDB sqlBeanDB, Field field) {
+        return buildColumnInfo(sqlBeanDB, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class));
     }
 
     /**
@@ -337,11 +337,14 @@ public class SqlBeanUtil {
      * @param sqlColumn
      * @return
      */
-    public static ColumnInfo getColumnInfo(SqlBeanDB sqlBeanDB, Field field, SqlTable sqlTable, SqlColumn sqlColumn) {
+    public static ColumnInfo buildColumnInfo(SqlBeanDB sqlBeanDB, Field field, SqlTable sqlTable, SqlColumn sqlColumn) {
         String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
         ColumnInfo columnInfo = new ColumnInfo();
         columnInfo.setName(SqlBeanUtil.isToUpperCase(sqlBeanDB) ? columnName.toUpperCase() : columnName);
-        columnInfo.setPk(field.isAnnotationPresent(SqlId.class));
+        //是否主键 是否自增
+        SqlId sqlId = field.getAnnotation(SqlId.class);
+        columnInfo.setPk(sqlId != null);
+        columnInfo.setAutoIncr(sqlId == null ? false : sqlId.type() == IdType.AUTO);
         JdbcType jdbcType;
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
             jdbcType = sqlColumn.type();
@@ -410,6 +413,11 @@ public class SqlBeanUtil {
         }
         if (sqlBeanDB.getDbType() != DbType.SQLite && sqlBeanDB.getDbType() != DbType.Derby) {
             if (StringUtil.isNotBlank(columnInfo.getRemarks()) && !columnInfo.getRemarks().equals(toColumnInfo.getRemarks())) {
+                return false;
+            }
+        }
+        if (sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) {
+            if (!columnInfo.getAutoIncr().equals(toColumnInfo.getAutoIncr())) {
                 return false;
             }
         }
@@ -1285,6 +1293,13 @@ public class SqlBeanUtil {
             if (alter.getType() == AlterType.MODIFY && columnInfo.getNotnull() != null && !columnInfo.getNotnull()) {
                 sql.append(SqlConstant.SPACES);
                 sql.append(SqlConstant.NULL);
+            }
+        }
+        //是否自增
+        if (columnInfo.getAutoIncr() != null && columnInfo.getAutoIncr()) {
+            if (common.getSqlBeanDB().getDbType() == DbType.MySQL || common.getSqlBeanDB().getDbType() == DbType.MariaDB) {
+                sql.append(SqlConstant.SPACES);
+                sql.append(SqlConstant.AUTO_INCREMENT);
             }
         }
         //默认值

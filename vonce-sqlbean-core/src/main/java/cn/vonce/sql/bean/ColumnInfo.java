@@ -38,6 +38,10 @@ public class ColumnInfo {
      */
     private Boolean fk;
     /**
+     * 是否自增字段
+     */
+    private Boolean autoIncr;
+    /**
      * 字段长度
      */
     private Long length;
@@ -104,6 +108,14 @@ public class ColumnInfo {
 
     public void setFk(Boolean fk) {
         this.fk = fk;
+    }
+
+    public Boolean getAutoIncr() {
+        return autoIncr;
+    }
+
+    public void setAutoIncr(Boolean autoIncr) {
+        this.autoIncr = autoIncr;
     }
 
     public Long getLength() {

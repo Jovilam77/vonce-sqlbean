@@ -181,7 +181,6 @@ public class SqlHelper {
         sqlSb.append(SqlConstant.CREATE_TABLE);
         sqlSb.append(getTableName(create.getTable(), create));
         sqlSb.append(SqlConstant.BEGIN_BRACKET);
-        Field idField = null;
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(create.getBeanClass());
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(create.getBeanClass());
         DbType dbType = create.getSqlBeanDB().getDbType();
@@ -189,16 +188,11 @@ public class SqlHelper {
             if (SqlBeanUtil.isIgnore(fieldList.get(i))) {
                 continue;
             }
-            if (idField == null) {
-                if (fieldList.get(i).getAnnotation(SqlId.class) != null) {
-                    idField = fieldList.get(i);
-                }
-            }
             SqlColumn sqlColumn = fieldList.get(i).getAnnotation(SqlColumn.class);
-            sqlSb.append(SqlBeanUtil.addColumn(create, SqlBeanUtil.getColumnInfo(create.getSqlBeanDB(), fieldList.get(i), sqlTable, sqlColumn), null));
+            sqlSb.append(SqlBeanUtil.addColumn(create, SqlBeanUtil.buildColumnInfo(create.getSqlBeanDB(), fieldList.get(i), sqlTable, sqlColumn), null));
             sqlSb.append(SqlConstant.COMMA);
         }
-
+        Field idField = SqlBeanUtil.getIdField(create.getBeanClass());
         //主键
         if (idField != null) {
             String idFieldName = SqlBeanUtil.getTableFieldName(create, idField, sqlTable);
