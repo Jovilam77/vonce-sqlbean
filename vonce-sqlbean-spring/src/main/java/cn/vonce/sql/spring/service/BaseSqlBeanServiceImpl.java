@@ -141,8 +141,11 @@ public abstract class BaseSqlBeanServiceImpl {
             return;
         }
         Field idField = SqlBeanUtil.getIdField(clazz);
-        Long idBeginValue = getAutoIncrId();
-        if (idBeginValue != null && idField != null && idField.getAnnotation(SqlId.class).type() == IdType.AUTO) {
+        if (idField != null && idField.getAnnotation(SqlId.class).type() == IdType.AUTO) {
+            Long idBeginValue = getAutoIncrId();
+            if (idBeginValue == null) {
+                return;
+            }
             int i = 0;
             for (T t : beanList) {
                 Field field = SqlBeanUtil.getIdField(t.getClass());
