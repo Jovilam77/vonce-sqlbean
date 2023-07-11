@@ -693,7 +693,8 @@ public class SqlBeanProvider {
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
         List<Alter> alterList = new ArrayList<>();
         Map<String, String> renameMap = (sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) ? new HashMap<>() : null;
-        for (Field field : fieldList) {
+        for (int i = 0; i < fieldList.size(); i++) {
+            Field field = fieldList.get(i);
             if (SqlBeanUtil.isIgnore(field)) {
                 continue;
             }
@@ -707,12 +708,12 @@ public class SqlBeanProvider {
             boolean exist = false;
             boolean fit = true;
             //优先比较字段改名的
-            for (int i = 0; i < columnInfoList.size(); i++) {
-                if (sqlColumn != null && oldName.equalsIgnoreCase(columnInfoList.get(i).getName())) {
+            for (int j = 0; j < columnInfoList.size(); j++) {
+                if (sqlColumn != null && oldName.equalsIgnoreCase(columnInfoList.get(j).getName())) {
                     //存在此字段
                     exist = true;
                     //使用实体类中的字段信息与数据库中的字段信息做比较
-                    fit = SqlBeanUtil.columnInfoCompare(sqlBeanDB, columnInfo, columnInfoList.get(i));
+                    fit = SqlBeanUtil.columnInfoCompare(sqlBeanDB, columnInfo, columnInfoList.get(j));
                     if (!fit) {
                         alter.setType(AlterType.CHANGE);
                         alter.setColumnInfo(columnInfo);
@@ -720,9 +721,9 @@ public class SqlBeanProvider {
                         //只有MySQL、MariaDB需要处理
                         if (sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) {
                             renameMap.put(oldName, columnInfo.getName());
-                            if (i > 0) {
-                                String afterName = renameMap.get(columnInfoList.get(i - 1).getName());
-                                alter.setAfterColumnName(StringUtil.isNotBlank(afterName) ? afterName : columnInfoList.get(i - 1).getName());
+                            if (j > 0) {
+                                String afterName = renameMap.get(columnInfoList.get(j - 1).getName());
+                                alter.setAfterColumnName(StringUtil.isNotBlank(afterName) ? afterName : columnInfoList.get(j - 1).getName());
                             }
                         }
                         alterList.add(alter);
@@ -735,19 +736,19 @@ public class SqlBeanProvider {
                 continue;
             }
             //其次比较变更内容
-            for (int i = 0; i < columnInfoList.size(); i++) {
-                if (columnInfo.getName().equalsIgnoreCase(columnInfoList.get(i).getName())) {
+            for (int j = 0; j < columnInfoList.size(); j++) {
+                if (columnInfo.getName().equalsIgnoreCase(columnInfoList.get(j).getName())) {
                     //存在此字段
                     exist = true;
                     //使用实体类中的字段信息与数据库中的字段信息做比较
-                    fit = SqlBeanUtil.columnInfoCompare(sqlBeanDB, columnInfo, columnInfoList.get(i));
+                    fit = SqlBeanUtil.columnInfoCompare(sqlBeanDB, columnInfo, columnInfoList.get(j));
                     if (!fit) {
                         alter.setType(AlterType.MODIFY);
                         alter.setColumnInfo(columnInfo);
                         //只有MySQL、MariaDB需要处理
-                        if ((sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) && i > 0) {
-                            String afterName = renameMap.get(columnInfoList.get(i - 1).getName());
-                            alter.setAfterColumnName(StringUtil.isNotBlank(afterName) ? afterName : columnInfoList.get(i - 1).getName());
+                        if ((sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) && j > 0) {
+                            String afterName = renameMap.get(columnInfoList.get(j - 1).getName());
+                            alter.setAfterColumnName(StringUtil.isNotBlank(afterName) ? afterName : columnInfoList.get(j - 1).getName());
                         }
                         alterList.add(alter);
                     }
@@ -761,6 +762,9 @@ public class SqlBeanProvider {
             if (!exist) {
                 alter.setType(AlterType.ADD);
                 alter.setColumnInfo(columnInfo);
+                if ((sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) && i > 0) {
+                    alter.setAfterColumnName(SqlBeanUtil.getTableFieldName(fieldList.get(i - 1), sqlTable));
+                }
                 alterList.add(alter);
             }
         }
