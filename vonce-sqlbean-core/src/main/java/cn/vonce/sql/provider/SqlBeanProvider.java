@@ -692,7 +692,6 @@ public class SqlBeanProvider {
         SqlTable sqlTable = clazz.getAnnotation(SqlTable.class);
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
         List<Alter> alterList = new ArrayList<>();
-        Map<String, String> renameMap = (sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) ? new HashMap<>() : null;
         for (int i = 0; i < fieldList.size(); i++) {
             Field field = fieldList.get(i);
             if (SqlBeanUtil.isIgnore(field)) {
@@ -720,10 +719,8 @@ public class SqlBeanProvider {
                         alter.setOldColumnName(oldName);
                         //只有MySQL、MariaDB需要处理
                         if (sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) {
-                            renameMap.put(oldName, columnInfo.getName());
                             if (j > 0) {
-                                String afterName = renameMap.get(columnInfoList.get(j - 1).getName());
-                                alter.setAfterColumnName(StringUtil.isNotBlank(afterName) ? afterName : columnInfoList.get(j - 1).getName());
+                                alter.setAfterColumnName(SqlBeanUtil.getTableFieldName(fieldList.get(i - 1), sqlTable));
                             }
                         }
                         alterList.add(alter);
@@ -747,8 +744,7 @@ public class SqlBeanProvider {
                         alter.setColumnInfo(columnInfo);
                         //只有MySQL、MariaDB需要处理
                         if ((sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) && j > 0) {
-                            String afterName = renameMap.get(columnInfoList.get(j - 1).getName());
-                            alter.setAfterColumnName(StringUtil.isNotBlank(afterName) ? afterName : columnInfoList.get(j - 1).getName());
+                            alter.setAfterColumnName(SqlBeanUtil.getTableFieldName(fieldList.get(i - 1), sqlTable));
                         }
                         alterList.add(alter);
                     }
