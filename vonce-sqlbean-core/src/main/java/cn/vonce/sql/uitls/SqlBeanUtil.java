@@ -839,7 +839,7 @@ public class SqlBeanUtil {
         fun.append(SqlConstant.BEGIN_BRACKET);
         if (sqlFun.getValues() != null && sqlFun.getValues().length > 0) {
             for (Object value : sqlFun.getValues()) {
-                fun.append(value instanceof SqlFun ? getSqlFunction(common, (SqlFun) value) : SqlBeanUtil.getOriginal(common, value));
+                fun.append(SqlBeanUtil.getOriginal(common, value));
                 fun.append(SqlConstant.COMMA);
             }
             fun.deleteCharAt(fun.length() - SqlConstant.COMMA.length());
