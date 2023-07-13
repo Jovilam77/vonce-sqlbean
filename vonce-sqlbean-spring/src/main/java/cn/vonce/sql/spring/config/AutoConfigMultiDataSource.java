@@ -3,6 +3,7 @@ package cn.vonce.sql.spring.config;
 import cn.vonce.sql.spring.annotation.EnableAutoConfigMultiDataSource;
 import cn.vonce.sql.spring.datasource.DynamicDataSource;
 import cn.vonce.sql.spring.datasource.TransactionalInterceptor;
+import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
@@ -110,7 +111,7 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
                             try {
                                 Method method = methodMap.get("set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1));
                                 if (method != null) {
-                                    method.invoke(dataSource, getValueConvert(method.getParameterTypes()[0].getName(), propertyValue));
+                                    method.invoke(dataSource, SqlBeanUtil.getValueConvert(method.getParameterTypes()[0], propertyValue));
                                 }
                             } catch (IllegalAccessException e) {
                                 e.printStackTrace();
@@ -203,55 +204,6 @@ public class AutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar,
             classMethodMap.put(typeClass, methodMap);
         }
         return methodMap;
-    }
-
-    /**
-     * 获取转换后的值
-     *
-     * @param fieldType
-     * @param originalValue
-     * @return
-     */
-    private Object getValueConvert(String fieldType, String originalValue) {
-        Object value;
-        switch (fieldType) {
-            case "byte":
-            case "java.lang.Byte":
-                value = Byte.parseByte(originalValue);
-                break;
-            case "short":
-            case "java.lang.Short":
-                value = Short.parseShort(originalValue);
-                break;
-            case "int":
-            case "java.lang.Integer":
-                value = Integer.parseInt(originalValue);
-                break;
-            case "float":
-            case "java.lang.Float":
-                value = Float.parseFloat(originalValue);
-                break;
-            case "double":
-            case "java.lang.Double":
-                value = Double.parseDouble(originalValue);
-                break;
-            case "long":
-            case "java.lang.Long":
-                value = Long.parseLong(originalValue);
-                break;
-            case "boolean":
-            case "java.lang.Boolean":
-                value = Boolean.parseBoolean(originalValue);
-                break;
-            case "char":
-            case "java.lang.Character":
-                value = originalValue.charAt(0);
-                break;
-            default:
-                value = originalValue;
-                break;
-        }
-        return value;
     }
 
     private BeanDefinition transactionalDefinition() {

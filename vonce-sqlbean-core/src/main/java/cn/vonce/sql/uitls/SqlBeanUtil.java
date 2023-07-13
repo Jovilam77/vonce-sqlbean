@@ -883,49 +883,25 @@ public class SqlBeanUtil {
     /**
      * 获取字段类型
      *
-     * @param typeName
+     * @param type
      * @return
      */
-    public static WhatType whatType(String typeName) {
-        WhatType whatType;
-        switch (typeName) {
-            case "java.lang.String":
-            case "char":
-            case "java.lang.Character":
-                whatType = WhatType.STRING_TYPE;
-                break;
-            case "boolean":
-            case "java.lang.Boolean":
-                whatType = WhatType.BOOL_TYPE;
-                break;
-            case "byte":
-            case "java.lang.Byte":
-            case "short":
-            case "java.lang.Short":
-            case "int":
-            case "java.lang.Integer":
-            case "long":
-            case "java.lang.Long":
-            case "float":
-            case "java.lang.Float":
-            case "double":
-            case "java.lang.Double":
-                whatType = WhatType.VALUE_TYPE;
-                break;
-            case "java.util.Date":
-            case "java.sql.Date":
-            case "java.sql.Timestamp":
-            case "java.sql.Time":
-            case "java.time.LocalDate":
-            case "java.time.LocalTime":
-            case "java.time.LocalDateTime":
-                whatType = WhatType.DATE_TYPE;
-                break;
-            default:
-                whatType = WhatType.OBJECT_TYPE;
-                break;
+    public static WhatType whatType(Class<?> type) {
+        if (type == String.class || type == char.class || type == Character.class) {
+            return WhatType.STRING_TYPE;
+        } else if (type == boolean.class || type == Boolean.class) {
+            return WhatType.BOOL_TYPE;
+        } else if (type == byte.class || type == Byte.class || type == short.class || type == Short.class
+                || type == int.class || type == Integer.class || type == long.class
+                || type == Long.class || type == float.class || type == Float.class
+                || type == double.class || type == Double.class) {
+            return WhatType.VALUE_TYPE;
+        } else if (type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class
+                || type == java.sql.Timestamp.class || type == java.sql.Time.class
+                || type == LocalDate.class || type == LocalTime.class || type == LocalDateTime.class) {
+            return WhatType.DATE_TYPE;
         }
-        return whatType;
+        return WhatType.OBJECT_TYPE;
     }
 
     /**
@@ -983,40 +959,36 @@ public class SqlBeanUtil {
     /**
      * 该类型是否为基本类型
      *
-     * @param clazz
+     * @param type
      * @return
      */
-    public static boolean isBaseType(Class<?> clazz) {
-        if (clazz == String.class || clazz == char.class || clazz == Character.class
-                || clazz == boolean.class || clazz == Boolean.class || clazz == byte.class
-                || clazz == Byte.class || clazz == short.class || clazz == Short.class
-                || clazz == int.class || clazz == Integer.class || clazz == long.class
-                || clazz == Long.class || clazz == float.class || clazz == Float.class
-                || clazz == double.class || clazz == Double.class || clazz == Date.class
-                || clazz == BigDecimal.class) {
+    public static boolean isBaseType(Class<?> type) {
+        if (type == String.class || type == char.class || type == Character.class
+                || type == boolean.class || type == Boolean.class || type == byte.class
+                || type == Byte.class || type == short.class || type == Short.class
+                || type == int.class || type == Integer.class || type == long.class
+                || type == Long.class || type == float.class || type == Float.class
+                || type == double.class || type == Double.class || type == Date.class
+                || type == java.sql.Date.class || type == java.sql.Timestamp.class
+                || type == java.sql.Timestamp.class || type == java.sql.Time.class
+                || type == LocalDate.class || type == LocalTime.class || type == LocalDateTime.class
+                || type == BigDecimal.class) {
             return true;
         }
         return false;
     }
 
     /**
-     * 该类型是否为
+     * 该类型是否为map
      *
-     * @param typeName
+     * @param type
      * @return
      */
-    public static boolean isMap(String typeName) {
-        boolean isTrue;
-        switch (typeName) {
-            case "java.util.Map":
-            case "java.util.HashMap":
-                isTrue = true;
-                break;
-            default:
-                isTrue = false;
-                break;
+    public static boolean isMap(Class<?> type) {
+        if (type == Map.class || type == HashMap.class) {
+            return true;
         }
-        return isTrue;
+        return false;
     }
 
     /**
@@ -1043,7 +1015,7 @@ public class SqlBeanUtil {
         String sqlValue;
         WhatType whatType;
         if (jdbcType == null) {
-            whatType = whatType(value.getClass().getName());
+            whatType = whatType(value.getClass());
         } else {
             whatType = whatType(jdbcType);
         }
@@ -1159,45 +1131,41 @@ public class SqlBeanUtil {
     /**
      * 更新乐观锁版本
      *
-     * @param typeName
+     * @param type
      * @param value
      * @return
      */
-    public static Object updateVersion(String typeName, Object value) {
-        switch (typeName) {
-            case "int":
-            case "java.lang.Integer":
-            case "long":
-            case "java.lang.Long":
-                long val = 0;
-                if (value != null) {
-                    val = Long.parseLong(value.toString());
-                }
-                value = val + 1;
-                break;
-            case "java.util.Date":
-            case "java.sql.Timestamp":
-                value = new Date();
-                break;
+    public static Object updateVersion(Class<?> type, Object value) {
+        if (type == int.class || type == Integer.class || type == long.class || type == Long.class) {
+            long val = 0;
+            if (value != null) {
+                val = Long.parseLong(value.toString());
+            }
+            val += 1;
+            if (type == int.class || type == Integer.class) {
+                return (int) val;
+            }
+            return val;
         }
-        return value;
+        if (type == Date.class || type == java.sql.Timestamp.class) {
+            return new Date();
+        }
+        if (type == LocalDateTime.class) {
+            return LocalDateTime.now();
+        }
+        return null;
     }
 
     /**
      * 乐观锁字段是否有效
      *
-     * @param typeName
+     * @param type
      * @return
      */
-    public static boolean versionEffectiveness(String typeName) {
-        switch (typeName) {
-            case "int":
-            case "java.lang.Integer":
-            case "long":
-            case "java.lang.Long":
-            case "java.util.Date":
-            case "java.sql.Timestamp":
-                return true;
+    public static boolean versionEffectiveness(Class<?> type) {
+        if (type == int.class || type == Integer.class || type == long.class || type == Long.class
+                || type == Date.class || type == java.sql.Timestamp.class || type == LocalDateTime.class) {
+            return true;
         }
         return false;
     }
@@ -1224,39 +1192,109 @@ public class SqlBeanUtil {
     /**
      * 获取类型的默认值（仅支持基本类型、String、Date、Timestamp、BigDecimal）
      *
-     * @param typeName
+     * @param type
      * @return
      */
-    public static Object getDefaultValue(String typeName) {
-        switch (typeName) {
-            case "java.lang.Byte":
-            case "java.lang.Short":
-            case "java.lang.Integer":
-                return 0;
-            case "java.lang.Long":
-                return 0l;
-            case "java.lang.Float":
-                return 0f;
-            case "java.lang.Double":
-                return 0d;
-            case "java.lang.Character":
-                return '\u0000';
-            case "java.lang.Boolean":
-                return false;
-            case "java.lang.String":
-                return "";
-            case "java.util.Date":
-                return new Date();
-            case "java.sql.Timestamp":
-                return new Timestamp(System.currentTimeMillis());
-            case "java.math.BigDecimal":
-                return new BigDecimal(0);
-            case "java.time.LocalDate":
-                return LocalDate.now();
-            case "java.time.LocalTime":
-                return LocalTime.now();
-            case "java.time.LocalDateTime":
-                return LocalDateTime.now();
+    public static Object getDefaultValue(Class<?> type) {
+        if (type == Byte.class || type == byte.class) {
+            return new Byte("0");
+        }
+        if (type == Short.class || type == short.class) {
+            return new Short("0");
+        }
+        if (type == Integer.class || type == int.class) {
+            return 0;
+        }
+        if (type == Long.class || type == long.class) {
+            return 0L;
+        }
+        if (type == Float.class || type == float.class) {
+            return 0F;
+        }
+        if (type == Double.class || type == double.class) {
+            return 0D;
+        }
+        if (type == Character.class || type == char.class) {
+            return '\u0000';
+        }
+        if (type == Boolean.class || type == boolean.class) {
+            return false;
+        }
+        if (type == String.class) {
+            return "";
+        }
+        if (type == Date.class) {
+            return new Date();
+        }
+        if (type == Timestamp.class) {
+            return new Timestamp(System.currentTimeMillis());
+        }
+        if (type == BigDecimal.class) {
+            return new BigDecimal(0);
+        }
+        if (type == LocalDate.class) {
+            return LocalDate.now();
+        }
+        if (type == LocalTime.class) {
+            return LocalTime.now();
+        }
+        if (type == LocalDateTime.class) {
+            return LocalDateTime.now();
+        }
+        return null;
+    }
+
+    /**
+     * 获取转换后的值
+     *
+     * @param type
+     * @param value
+     * @return
+     */
+    public static Object getValueConvert(Class<?> type, Object value) {
+        if (type == Byte.class || type == byte.class) {
+            return Byte.parseByte(value.toString());
+        }
+        if (type == Short.class || type == short.class) {
+            return Short.parseShort(value.toString());
+        }
+        if (type == Integer.class || type == int.class) {
+            return Integer.parseInt(value.toString());
+        }
+        if (type == Long.class || type == long.class) {
+            return Integer.parseInt(value.toString());
+        }
+        if (type == Float.class || type == float.class) {
+            return Float.parseFloat(value.toString());
+        }
+        if (type == Double.class || type == double.class) {
+            return Double.parseDouble(value.toString());
+        }
+        if (type == Character.class || type == char.class) {
+            return value.toString().charAt(0);
+        }
+        if (type == Boolean.class || type == boolean.class) {
+            return Boolean.parseBoolean(value.toString());
+        }
+        if (type == String.class) {
+            return value.toString();
+        }
+        if (type == Date.class || type == Timestamp.class) {
+            return DateUtil.stringToDate(value.toString());
+        }
+        if (type == BigDecimal.class) {
+            return new BigDecimal(value.toString());
+        }
+        if (type == LocalDate.class) {
+            LocalDateTime localDateTime = DateUtil.strTimeToLocalDateTime(value.toString());
+            return localDateTime == null ? null : localDateTime.toLocalDate();
+        }
+        if (type == LocalTime.class) {
+            LocalDateTime localDateTime = DateUtil.strTimeToLocalDateTime(value.toString());
+            return localDateTime == null ? null : localDateTime.toLocalTime();
+        }
+        if (type == LocalDateTime.class) {
+            return DateUtil.strTimeToLocalDateTime(value.toString());
         }
         return null;
     }

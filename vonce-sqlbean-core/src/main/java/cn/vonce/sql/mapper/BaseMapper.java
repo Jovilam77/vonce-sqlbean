@@ -136,7 +136,7 @@ public abstract class BaseMapper {
     public void setFieldValue(Object obj, Field field, String fieldName, AutoCloseable baseResult) {
         Object value = getValue(field.getType().getName(), fieldName, baseResult);
         if (value == null || value.equals("null")) {
-            value = getDefaultValue(field.getType().getName());
+            value = SqlBeanUtil.getDefaultValue(field.getType());
         }
         if (SqlEnum.class.isAssignableFrom(field.getType())) {
             SqlEnum[] sqlEnums = (SqlEnum[]) field.getType().getEnumConstants();
@@ -179,43 +179,6 @@ public abstract class BaseMapper {
      * @param typeName
      * @return
      */
-    public Object getDefaultValue(String typeName) {
-        Object value = null;
-        switch (typeName) {
-            case "byte":
-                value = new Byte("0");
-                break;
-            case "short":
-                value = new Short("0");
-                break;
-            case "int":
-                value = 0;
-                break;
-            case "long":
-                value = 0L;
-                break;
-            case "float":
-                value = 0F;
-                break;
-            case "double":
-                value = 0D;
-                break;
-            case "char":
-                value = '\u0000';
-                break;
-            case "boolean":
-                value = false;
-                break;
-        }
-        return value;
-    }
-
-    /**
-     * 获取基本类型默认值
-     *
-     * @param typeName
-     * @return
-     */
     public Object getDefaultValueByColumnType(String typeName) {
         Object value;
         switch (typeName) {
@@ -245,55 +208,6 @@ public abstract class BaseMapper {
                 break;
         }
         return value;
-    }
-
-    /**
-     * 获取转换后的值
-     *
-     * @param typeName
-     * @param value
-     * @return
-     */
-    public Object getValueConvert(String typeName, Object value) {
-        Object newValue = value;
-        switch (typeName) {
-            case "byte":
-            case "java.lang.Byte":
-                newValue = new Byte(value.toString());
-                break;
-            case "short":
-            case "java.lang.Short":
-                newValue = new Short(value.toString());
-                break;
-            case "int":
-            case "java.lang.Integer":
-                newValue = new Integer(value.toString());
-                break;
-            case "long":
-            case "java.lang.Long":
-                newValue = new Long(value.toString());
-                break;
-            case "float":
-            case "java.lang.Float":
-                newValue = new Float(value.toString());
-                break;
-            case "double":
-            case "java.lang.Double":
-                newValue = new Double(value.toString());
-                break;
-            case "boolean":
-            case "java.lang.Boolean":
-                newValue = new Boolean(value.toString());
-                break;
-            case "char":
-            case "java.lang.Character":
-                newValue = value.toString().charAt(0);
-                break;
-            case "java.lang.String":
-                newValue = value.toString();
-                break;
-        }
-        return newValue;
     }
 
 }
