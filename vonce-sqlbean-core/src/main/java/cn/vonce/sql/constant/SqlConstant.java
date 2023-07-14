@@ -114,4 +114,11 @@ public class SqlConstant {
     public static final String TEXT = "TEXT";
     public static final String BLOB = "BLOB";
 
+    // Postgresql
+    public static final String TYPE = "TYPE ";
+    public static final String COLLATE = "COLLATE ";
+    public static final String PG_CATALOG = "PG_CATALOG";
+    public static final String USING = " USING ";
+    public static final String DOUBLE_COLON = "::";
+
 }

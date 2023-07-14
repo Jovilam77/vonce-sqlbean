@@ -97,7 +97,7 @@ public enum JavaMapMySqlType {
         sql.append("(CASE column_key WHEN 'MUL' THEN 1 ELSE 0 END) AS fk, ");
         sql.append("(CASE extra WHEN 'auto_increment' THEN 1 ELSE 0 END) AS auto_incr, ");
         sql.append("(CASE WHEN data_type = 'bit' OR data_type = 'tinyint' OR data_type = 'smallint' OR data_type = 'mediumint' OR data_type = 'int' OR data_type = 'bigint' ");
-        sql.append("THEN REPLACE ( substring( column_type, INSTR( column_type, '(' )+ 1 ), ')', '' ) ");
+        sql.append("THEN REPLACE ( SUBSTRING( column_type, INSTR( column_type, '(' )+ 1 ), ')', '' ) ");
         sql.append("WHEN data_type = 'float' OR data_type = 'double' OR data_type = 'decimal' ");
         sql.append("THEN numeric_precision ELSE character_maximum_length END ) AS length, ");
         sql.append("numeric_scale AS scale, ");
