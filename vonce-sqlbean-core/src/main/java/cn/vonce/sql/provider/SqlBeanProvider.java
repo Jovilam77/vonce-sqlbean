@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 通用的数据库操作sql语句生成
@@ -691,6 +692,7 @@ public class SqlBeanProvider {
     public static List<String> buildAlterSql(SqlBeanDB sqlBeanDB, Class<?> clazz, List<ColumnInfo> columnInfoList) {
         SqlTable sqlTable = clazz.getAnnotation(SqlTable.class);
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
+        fieldList = fieldList.stream().filter(item -> !SqlBeanUtil.isIgnore(item)).collect(Collectors.toList());
         List<Alter> alterList = new ArrayList<>();
         for (int i = 0; i < fieldList.size(); i++) {
             Field field = fieldList.get(i);

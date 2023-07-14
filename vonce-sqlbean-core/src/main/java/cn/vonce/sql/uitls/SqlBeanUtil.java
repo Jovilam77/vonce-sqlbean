@@ -1190,12 +1190,12 @@ public class SqlBeanUtil {
     }
 
     /**
-     * 获取类型的默认值（仅支持基本类型、String、Date、Timestamp、BigDecimal）
+     * 赋予初始值
      *
      * @param type
      * @return
      */
-    public static Object getDefaultValue(Class<?> type) {
+    public static Object assignInitialValue(Class<?> type) {
         if (type == Byte.class || type == byte.class) {
             return new Byte("0");
         }
@@ -1240,6 +1240,40 @@ public class SqlBeanUtil {
         }
         if (type == LocalDateTime.class) {
             return LocalDateTime.now();
+        }
+        return null;
+    }
+
+    /**
+     * 获取类型的默认值
+     *
+     * @param type
+     * @return
+     */
+    public static Object getDefaultValue(Class<?> type) {
+        if (type == byte.class) {
+            return new Byte("0");
+        }
+        if (type == short.class) {
+            return new Short("0");
+        }
+        if (type == int.class) {
+            return 0;
+        }
+        if (type == long.class) {
+            return 0L;
+        }
+        if (type == float.class) {
+            return 0F;
+        }
+        if (type == double.class) {
+            return 0D;
+        }
+        if (type == char.class) {
+            return '\u0000';
+        }
+        if (type == boolean.class) {
+            return false;
         }
         return null;
     }
