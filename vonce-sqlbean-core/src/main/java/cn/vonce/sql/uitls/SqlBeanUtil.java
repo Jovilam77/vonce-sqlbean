@@ -1084,7 +1084,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static String filterSQLInject(String str) {
-        return str.replaceAll("([';])+|(--)+", "");
+        return str.replace("\'","\\'");
     }
 
     /**
