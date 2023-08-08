@@ -100,7 +100,7 @@ public abstract class BaseSqlBeanServiceImpl {
                     info.setType(JdbcType.TIME.getName(toUpperCase));
                 }
                 String deftValue = info.getDfltValue();
-                if (deftValue != null && StringUtil.isNotBlank(deftValue) && deftValue.indexOf("::character varying") > -1) {
+                if (deftValue != null && StringUtil.isNotBlank(deftValue) && deftValue.indexOf("'::") > -1) {
                     info.setDfltValue(info.getDfltValue().substring(1, info.getDfltValue().indexOf("'::")));
                 }
             }
