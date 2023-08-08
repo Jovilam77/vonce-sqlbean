@@ -128,7 +128,7 @@ public enum JavaMapDB2Type {
                 sql.append(SqlConstant.ADD);
                 sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
                 sqlList.add(sql.toString());
-                sqlList.add(addRemarks(alter, transferred));
+                sqlList.add(addRemarks(false, alter, transferred));
             } else if (alter.getType() == AlterType.CHANGE) {
                 StringBuffer sql = new StringBuffer();
                 sql.append(changeColumn(alter));
@@ -140,10 +140,10 @@ public enum JavaMapDB2Type {
                     sql.append(modifySql);
                 }
                 sqlList.add(sql.toString());
-                sqlList.add(addRemarks(alter, transferred));
+                sqlList.add(addRemarks(false, alter, transferred));
             } else if (alter.getType() == AlterType.MODIFY) {
                 sqlList.add(SqlConstant.ALTER_TABLE + modifyColumn(alter));
-                sqlList.add(addRemarks(alter, transferred));
+                sqlList.add(addRemarks(false, alter, transferred));
             } else if (alter.getType() == AlterType.DROP) {
                 StringBuffer sql = new StringBuffer();
                 sql.append(SqlConstant.ALTER_TABLE);
@@ -239,21 +239,24 @@ public enum JavaMapDB2Type {
     /**
      * 增加列备注
      *
+     * @param isTable
      * @param item
      * @param transferred
      * @return
      */
-    private static String addRemarks(Alter item, String transferred) {
+    public static String addRemarks(boolean isTable, Alter item, String transferred) {
         StringBuffer remarksSql = new StringBuffer();
         if (StringUtil.isNotBlank(item.getColumnInfo().getRemarks())) {
             remarksSql.append(SqlConstant.COMMENT);
             remarksSql.append(SqlConstant.ON);
-            remarksSql.append(SqlConstant.COLUMN);
+            remarksSql.append(isTable ? SqlConstant.TABLE : SqlConstant.COLUMN);
             remarksSql.append(getFullName(item, item.getTable()));
-            remarksSql.append(SqlConstant.POINT);
-            remarksSql.append(transferred);
-            remarksSql.append(item.getColumnInfo().getName());
-            remarksSql.append(transferred);
+            if (!isTable) {
+                remarksSql.append(SqlConstant.POINT);
+                remarksSql.append(transferred);
+                remarksSql.append(item.getColumnInfo().getName());
+                remarksSql.append(transferred);
+            }
             remarksSql.append(SqlConstant.IS);
             remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
             remarksSql.append(item.getColumnInfo().getRemarks());

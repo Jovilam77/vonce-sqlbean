@@ -678,6 +678,15 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return count;
     }
 
+    @Override
+    public int alterRemarks(String remarks) {
+        if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Derby) {
+            return 0;
+        }
+        String sql = SqlBeanProvider.alterRemarksSql(getSqlBeanDB(), clazz, remarks);
+        return jdbcTemplate.update(sql);
+    }
+
     @DbSwitch(DbRole.MASTER)
     @Override
     public void dropTable() {

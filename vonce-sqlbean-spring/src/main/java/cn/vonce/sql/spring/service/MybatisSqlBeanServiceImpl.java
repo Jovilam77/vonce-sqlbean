@@ -686,6 +686,15 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return count;
     }
 
+    @Override
+    public int alterRemarks(String remarks) {
+        if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Derby) {
+            return 0;
+        }
+        String sql = SqlBeanProvider.alterRemarksSql(getSqlBeanDB(), clazz, remarks);
+        return mybatisSqlBeanDao.executeSql(sql);
+    }
+
     @DbSwitch(DbRole.MASTER)
     @Override
     public void dropTable() {

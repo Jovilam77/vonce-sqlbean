@@ -806,6 +806,43 @@ public class SqlBeanProvider {
     }
 
     /**
+     * 更改表结构sql
+     *
+     * @param sqlBeanDB
+     * @param clazz
+     * @param remarks
+     * @return
+     */
+    public static String alterRemarksSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String remarks) {
+        Alter alter = new Alter();
+        alter.setSqlBeanDB(sqlBeanDB);
+        alter.setTable(clazz);
+        ColumnInfo columnInfo = new ColumnInfo();
+        columnInfo.setRemarks(remarks);
+        alter.setColumnInfo(columnInfo);
+        String transferred = SqlBeanUtil.getTransferred(alter);
+        switch (sqlBeanDB.getDbType()) {
+            case MySQL:
+            case MariaDB:
+                return JavaMapMySqlType.addRemarks(alter, transferred);
+            case SQLServer:
+                return JavaMapSqlServerType.addRemarks(true, alter);
+            case Oracle:
+                return JavaMapOracleType.addRemarks(true, alter, transferred);
+            case Postgresql:
+                return JavaMapPostgresqlType.addRemarks(true, alter, transferred);
+            case DB2:
+                return JavaMapDB2Type.addRemarks(true, alter, transferred);
+            case H2:
+                return JavaMapH2Type.addRemarks(true, alter, transferred);
+            case Hsql:
+                return JavaMapHsqlType.addRemarks(true, alter, transferred);
+            default:
+                throw new SqlBeanException("请配置正确的数据库");
+        }
+    }
+
+    /**
      * 实例化Select
      *
      * @param clazz

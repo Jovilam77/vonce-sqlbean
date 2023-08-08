@@ -210,4 +210,12 @@ public interface TableService<T> {
      */
     int alter(List<Alter> alterList);
 
+    /**
+     * 更改表注释
+     *
+     * @param remarks 注释
+     * @return
+     */
+    int alterRemarks(String remarks);
+
 }

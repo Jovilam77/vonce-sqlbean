@@ -166,4 +166,33 @@ public enum JavaMapMySqlType {
         return sqlList;
     }
 
+    /**
+     * 增加列备注
+     *
+     * @param item
+     * @param transferred
+     * @return
+     */
+    public static String addRemarks(Alter item, String transferred) {
+        StringBuffer remarksSql = new StringBuffer();
+        if (StringUtil.isNotBlank(item.getColumnInfo().getRemarks())) {
+            remarksSql.append(SqlConstant.ALTER_TABLE);
+            if (StringUtil.isNotBlank(item.getTable().getSchema())) {
+                remarksSql.append(transferred);
+                remarksSql.append(item.getTable().getSchema());
+                remarksSql.append(transferred);
+                remarksSql.append(SqlConstant.POINT);
+            }
+            remarksSql.append(transferred);
+            remarksSql.append(item.getTable().getName());
+            remarksSql.append(transferred);
+            remarksSql.append(SqlConstant.COMMENT);
+            remarksSql.append(SqlConstant.EQUAL_TO);
+            remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+            remarksSql.append(item.getColumnInfo().getRemarks());
+            remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        }
+        return remarksSql.toString();
+    }
+
 }

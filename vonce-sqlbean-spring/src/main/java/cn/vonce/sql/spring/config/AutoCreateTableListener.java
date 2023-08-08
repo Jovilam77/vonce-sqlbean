@@ -58,6 +58,10 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                                 for (TableInfo tableInfo : tableList) {
                                     if (tableInfo.getName().equalsIgnoreCase(table.getName())) {
                                         isExist = true;
+                                        //表注释不一致
+                                        if (!sqlTable.remarks().equals(tableInfo.getRemarks())) {
+                                            tableService.alterRemarks(sqlTable.remarks());
+                                        }
                                         break;
                                     }
                                 }
