@@ -129,18 +129,24 @@ public enum JavaMapPostgresqlType {
         List<String> sqlList = new ArrayList<>();
         String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
         Table table = alterList.get(0).getTable();
+        StringBuffer alertSql = new StringBuffer();
+        alertSql.append(SqlConstant.ALTER_TABLE);
+        alertSql.append(getFullName(alterList.get(0), table));
         StringBuffer addOrModifySql = new StringBuffer();
-        addOrModifySql.append(SqlConstant.ALTER_TABLE);
-        addOrModifySql.append(getFullName(alterList.get(0), table));
         for (int i = 0; i < alterList.size(); i++) {
             Alter alter = alterList.get(i);
             if (alter.getType() == AlterType.ADD) {
+                if (addOrModifySql.length() > 0) {
+                    addOrModifySql.append(SqlConstant.COMMA);
+                }
                 addOrModifySql.append(SqlConstant.ADD);
                 addOrModifySql.append(SqlConstant.COLUMN);
                 addOrModifySql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), null));
-                addOrModifySql.append(SqlConstant.COMMA);
                 sqlList.add(addRemarks(alter, transferred));
             } else if (alter.getType() == AlterType.MODIFY) {
+                if (addOrModifySql.length() > 0) {
+                    addOrModifySql.append(SqlConstant.COMMA);
+                }
                 addOrModifySql.append(modifyColumn(alter));
                 sqlList.add(addRemarks(alter, transferred));
             } else if (alter.getType() == AlterType.DROP) {
@@ -158,12 +164,16 @@ public enum JavaMapPostgresqlType {
                 sqlList.add(changeColumn(alter));
                 sqlList.add(addRemarks(alter, transferred));
                 //更改名称的同时可能也更改其他信息
+                if (addOrModifySql.length() > 0) {
+                    addOrModifySql.append(SqlConstant.COMMA);
+                }
                 alter.getColumnInfo().setName(alter.getOldColumnName());
                 addOrModifySql.append(modifyColumn(alter));
             }
         }
         //新增更改类型信息的语句需要先执行
-        sqlList.add(0, addOrModifySql.toString());
+        alertSql.append(addOrModifySql);
+        sqlList.add(0, alertSql.toString());
         return sqlList;
     }
 
@@ -220,16 +230,6 @@ public enum JavaMapPostgresqlType {
             typeSql.append(SqlConstant.END_BRACKET);
         }
         modifySql.append(typeSql);
-        if (jdbcType == JdbcType.VARCHAR || jdbcType == JdbcType.TEXT) {
-            modifySql.append(SqlConstant.COLLATE);
-            modifySql.append(SqlConstant.DOUBLE_ESCAPE_CHARACTER);
-            modifySql.append(SqlConstant.PG_CATALOG);
-            modifySql.append(SqlConstant.DOUBLE_ESCAPE_CHARACTER);
-            modifySql.append(SqlConstant.POINT);
-            modifySql.append(SqlConstant.DOUBLE_ESCAPE_CHARACTER);
-            modifySql.append(SqlConstant.DEFAULT);
-            modifySql.append(SqlConstant.DOUBLE_ESCAPE_CHARACTER);
-        }
         modifySql.append(SqlConstant.USING);
         modifySql.append(columnName);
         modifySql.append(SqlConstant.DOUBLE_COLON);
@@ -237,6 +237,16 @@ public enum JavaMapPostgresqlType {
         //是否存在主键
         if (columnInfo.getPk()) {
             modifySql.append(SqlConstant.COMMA);
+            //先删除主键
+            modifySql.append(SqlConstant.DROP);
+            modifySql.append(SqlConstant.CONSTRAINT);
+            modifySql.append(SqlConstant.DOUBLE_ESCAPE_CHARACTER);
+            modifySql.append(alter.getTable().getName());
+            modifySql.append(SqlConstant.UNDERLINE);
+            modifySql.append(SqlConstant.PKEY);
+            modifySql.append(SqlConstant.DOUBLE_ESCAPE_CHARACTER);
+            modifySql.append(SqlConstant.COMMA);
+            //添加主键
             modifySql.append(SqlConstant.ADD);
             modifySql.append(SqlConstant.PRIMARY_KEY);
             modifySql.append(SqlConstant.BEGIN_BRACKET);
@@ -261,7 +271,7 @@ public enum JavaMapPostgresqlType {
             if (StringUtil.isNotEmpty(columnInfo.getDfltValue())) {
                 modifySql.append(SqlConstant.SET);
                 modifySql.append(SqlConstant.DEFAULT);
-                modifySql.append(columnInfo.getDfltValue());
+                modifySql.append(SqlBeanUtil.getSqlValue(alter, columnInfo.getDfltValue(), jdbcType));
             } else {
                 modifySql.append(SqlConstant.SPACES + SqlConstant.DROP);
                 modifySql.append(SqlConstant.DEFAULT);

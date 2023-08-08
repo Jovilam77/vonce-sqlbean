@@ -788,8 +788,8 @@ public class SqlBeanProvider {
                 return JavaMapSqlServerType.alterTable(alterList);
             case Oracle:
                 return JavaMapOracleType.alterTable(alterList);
-//                case Postgresql:
-//                    return JavaMapPostgresqlType.alterTable(alterList);
+            case Postgresql:
+                return JavaMapPostgresqlType.alterTable(alterList);
             case DB2:
                 return JavaMapDB2Type.alterTable(alterList);
             case H2:

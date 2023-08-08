@@ -96,6 +96,12 @@ public abstract class BaseSqlBeanServiceImpl {
                     info.setType(JdbcType.LONGBLOB.getName(toUpperCase));
                 } else if ("TIMESTAMP WITHOUT TIME ZONE".equalsIgnoreCase(info.getType())) {
                     info.setType(JdbcType.TIMESTAMP.getName(toUpperCase));
+                } else if ("TIME WITHOUT TIME ZONE".equalsIgnoreCase(info.getType())) {
+                    info.setType(JdbcType.TIME.getName(toUpperCase));
+                }
+                String deftValue = info.getDfltValue();
+                if (deftValue != null && StringUtil.isNotBlank(deftValue) && deftValue.indexOf("::character varying") > -1) {
+                    info.setDfltValue(info.getDfltValue().substring(1, info.getDfltValue().indexOf("'::")));
                 }
             }
         }

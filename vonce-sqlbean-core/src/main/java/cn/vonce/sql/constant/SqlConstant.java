@@ -120,5 +120,7 @@ public class SqlConstant {
     public static final String PG_CATALOG = "PG_CATALOG";
     public static final String USING = " USING ";
     public static final String DOUBLE_COLON = "::";
+    public static final String CONSTRAINT = "CONSTRAINT ";
+    public static final String PKEY = "pkey";
 
 }

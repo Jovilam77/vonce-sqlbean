@@ -42,9 +42,6 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                 beanNameList.addAll(Arrays.asList(evt.getApplicationContext().getBeanNamesForType(TableService.class)));
                 if (!beanNameList.isEmpty()) {
                     List<TableInfo> tableList = evt.getApplicationContext().getBean(beanNameList.get(0), TableService.class).getTableList(null);
-                    if (tableList == null || tableList.size() == 0) {
-                        return;
-                    }
                     for (String name : beanNameList) {
                         TableService tableService = evt.getApplicationContext().getBean(name, TableService.class);
                         Class<?> clazz = tableService.getBeanClass();
