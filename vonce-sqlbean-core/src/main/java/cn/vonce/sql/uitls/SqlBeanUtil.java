@@ -402,8 +402,10 @@ public class SqlBeanUtil {
         if (columnInfo.getNotnull() != null && !columnInfo.getNotnull().equals(toColumnInfo.getNotnull())) {
             return false;
         }
-        if ((columnInfo.getDfltValue() == null && columnInfo.getDfltValue() != toColumnInfo.getDfltValue()) || (columnInfo.getDfltValue() != null /*&& toColumnInfo.getDfltValue() != null*/ && !columnInfo.getDfltValue().equals(toColumnInfo.getDfltValue()))) {
-            return false;
+        if (sqlBeanDB.getDbType() != DbType.SQLServer) {
+            if ((columnInfo.getDfltValue() == null && columnInfo.getDfltValue() != toColumnInfo.getDfltValue()) || (columnInfo.getDfltValue() != null /*&& toColumnInfo.getDfltValue() != null*/ && !columnInfo.getDfltValue().equals(toColumnInfo.getDfltValue()))) {
+                return false;
+            }
         }
         if (columnInfo.getLength() != null && !columnInfo.getLength().equals(toColumnInfo.getLength())) {
             return false;
@@ -1084,7 +1086,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static String filterSQLInject(String str) {
-        return str.replace("\'","\\'");
+        return str.replace("\'", "\\'");
     }
 
     /**

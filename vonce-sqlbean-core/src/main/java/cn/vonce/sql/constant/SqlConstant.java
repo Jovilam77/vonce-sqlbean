@@ -84,6 +84,7 @@ public class SqlConstant {
     public static final String MODIFY = "MODIFY ";
     public static final String DROP = "DROP ";
     public static final String AFTER = "AFTER ";
+    public static final String FOR = "FOR ";
 
     // mssql
     public static final String TOP = " TOP ";
