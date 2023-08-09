@@ -1,6 +1,9 @@
 package cn.vonce.sql.bean;
 
+import cn.vonce.sql.enumerate.AlterDifference;
 import cn.vonce.sql.enumerate.AlterType;
+
+import java.util.List;
 
 /**
  * 改变表结构
@@ -27,6 +30,11 @@ public class Alter extends Common {
      * 排序再哪个后面
      */
     private String afterColumnName;
+
+    /**
+     * 修改的差异
+     */
+    private List<AlterDifference> differences;
 
     public AlterType getType() {
         return type;
@@ -58,6 +66,14 @@ public class Alter extends Common {
 
     public void setAfterColumnName(String afterColumnName) {
         this.afterColumnName = afterColumnName;
+    }
+
+    public List<AlterDifference> getDifferences() {
+        return differences;
+    }
+
+    public void setDifferences(List<AlterDifference> differences) {
+        this.differences = differences;
     }
 
 }

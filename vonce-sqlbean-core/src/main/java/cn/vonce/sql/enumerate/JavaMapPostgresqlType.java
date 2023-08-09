@@ -271,7 +271,9 @@ public enum JavaMapPostgresqlType {
             if (StringUtil.isNotEmpty(columnInfo.getDfltValue())) {
                 modifySql.append(SqlConstant.SET);
                 modifySql.append(SqlConstant.DEFAULT);
+                modifySql.append(SqlConstant.SINGLE_QUOTATION_MARK);
                 modifySql.append(SqlBeanUtil.getSqlValue(alter, columnInfo.getDfltValue(), jdbcType));
+                modifySql.append(SqlConstant.SINGLE_QUOTATION_MARK);
             } else {
                 modifySql.append(SqlConstant.SPACES + SqlConstant.DROP);
                 modifySql.append(SqlConstant.DEFAULT);

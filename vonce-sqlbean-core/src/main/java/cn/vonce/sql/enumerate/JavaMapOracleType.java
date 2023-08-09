@@ -1,6 +1,7 @@
 package cn.vonce.sql.enumerate;
 
 import cn.vonce.sql.bean.Alter;
+import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.bean.Common;
 import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanDB;
@@ -182,7 +183,40 @@ public enum JavaMapOracleType {
         StringBuffer modifySql = new StringBuffer();
         modifySql.append(SqlConstant.MODIFY);
         modifySql.append(SqlConstant.BEGIN_BRACKET);
-        modifySql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), null));
+        ColumnInfo columnInfo = alter.getColumnInfo();
+        JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
+        modifySql.append(SqlBeanUtil.getTableFieldName(alter, columnInfo.getName()));
+        modifySql.append(SqlConstant.SPACES);
+        modifySql.append(jdbcType.name());
+        if (columnInfo.getLength() != null && columnInfo.getLength() > 0) {
+            modifySql.append(SqlConstant.BEGIN_BRACKET);
+            //字段长度
+            modifySql.append(columnInfo.getLength());
+            if (jdbcType.isFloat()) {
+                modifySql.append(SqlConstant.COMMA);
+                modifySql.append(columnInfo.getScale() == null ? 0 : columnInfo.getScale());
+            }
+            modifySql.append(SqlConstant.END_BRACKET);
+        }
+        if (alter.getDifferences().contains(AlterDifference.NOT_NULL)) {
+            //是否为null
+            if ((columnInfo.getNotnull() != null && columnInfo.getNotnull()) || columnInfo.getPk()) {
+                modifySql.append(SqlConstant.SPACES);
+                modifySql.append(SqlConstant.NOT_NULL);
+            } else {
+                if (alter.getType() == AlterType.MODIFY && columnInfo.getNotnull() != null && !columnInfo.getNotnull()) {
+                    modifySql.append(SqlConstant.SPACES);
+                    modifySql.append(SqlConstant.NULL);
+                }
+            }
+        }
+        //默认值
+        if (StringUtil.isNotBlank(columnInfo.getDfltValue())) {
+            modifySql.append(SqlConstant.SPACES);
+            modifySql.append(SqlConstant.DEFAULT);
+            modifySql.append(SqlConstant.SPACES);
+            modifySql.append(SqlBeanUtil.getSqlValue(alter, columnInfo.getDfltValue(), jdbcType));
+        }
         modifySql.append(SqlConstant.END_BRACKET);
         modifySql.append(SqlConstant.SPACES);
         return modifySql.toString();

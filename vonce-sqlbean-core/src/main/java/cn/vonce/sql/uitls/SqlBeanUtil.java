@@ -389,41 +389,42 @@ public class SqlBeanUtil {
      * @param toColumnInfo
      * @return
      */
-    public static boolean columnInfoCompare(SqlBeanDB sqlBeanDB, ColumnInfo columnInfo, ColumnInfo toColumnInfo) {
+    public static List<AlterDifference> columnInfoCompare(SqlBeanDB sqlBeanDB, ColumnInfo columnInfo, ColumnInfo toColumnInfo) {
+        List<AlterDifference> alterDifferenceList = new ArrayList<>();
         if (!columnInfo.getPk().equals(toColumnInfo.getPk())) {
-            return false;
+            alterDifferenceList.add(AlterDifference.PK);
         }
         if (!columnInfo.getName().equals(toColumnInfo.getName())) {
-            return false;
+            alterDifferenceList.add(AlterDifference.NAME);
         }
         if (!columnInfo.getType().equalsIgnoreCase(toColumnInfo.getType())) {
-            return false;
+            alterDifferenceList.add(AlterDifference.TYPE);
         }
         if (columnInfo.getNotnull() != null && !columnInfo.getNotnull().equals(toColumnInfo.getNotnull())) {
-            return false;
+            alterDifferenceList.add(AlterDifference.NOT_NULL);
         }
         if (sqlBeanDB.getDbType() != DbType.SQLServer) {
             if ((columnInfo.getDfltValue() == null && columnInfo.getDfltValue() != toColumnInfo.getDfltValue()) || (columnInfo.getDfltValue() != null /*&& toColumnInfo.getDfltValue() != null*/ && !columnInfo.getDfltValue().equals(toColumnInfo.getDfltValue()))) {
-                return false;
+                alterDifferenceList.add(AlterDifference.DFLT_VALUE);
             }
         }
         if (columnInfo.getLength() != null && !columnInfo.getLength().equals(toColumnInfo.getLength())) {
-            return false;
+            alterDifferenceList.add(AlterDifference.LENGTH);
         }
         if (columnInfo.getScale() != null && !columnInfo.getScale().equals(toColumnInfo.getScale())) {
-            return false;
+            alterDifferenceList.add(AlterDifference.SCALE);
         }
         if (sqlBeanDB.getDbType() != DbType.SQLite && sqlBeanDB.getDbType() != DbType.Derby) {
             if (StringUtil.isNotBlank(columnInfo.getRemarks()) && !columnInfo.getRemarks().equals(toColumnInfo.getRemarks())) {
-                return false;
+                alterDifferenceList.add(AlterDifference.REMARKS);
             }
         }
         if (sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) {
             if (!columnInfo.getAutoIncr().equals(toColumnInfo.getAutoIncr())) {
-                return false;
+                alterDifferenceList.add(AlterDifference.AUTO_INCR);
             }
         }
-        return true;
+        return alterDifferenceList;
     }
 
     /**
@@ -926,6 +927,11 @@ public class SqlBeanUtil {
             case LONGTEXT:
             case CLOB:
             case NCLOB:
+            case DATE:
+            case TIME:
+            case DATETIME:
+            case DATETIME2:
+            case TIMESTAMP:
                 whatType = WhatType.STRING_TYPE;
                 break;
             case BIT:
@@ -943,13 +949,6 @@ public class SqlBeanUtil {
             case MONEY:
             case SMALLMONEY:
                 whatType = WhatType.VALUE_TYPE;
-                break;
-            case DATE:
-            case TIME:
-            case DATETIME:
-            case DATETIME2:
-            case TIMESTAMP:
-                whatType = WhatType.DATE_TYPE;
                 break;
             default:
                 whatType = WhatType.OBJECT_TYPE;
@@ -1358,6 +1357,20 @@ public class SqlBeanUtil {
             }
             sql.append(SqlConstant.END_BRACKET);
         }
+        //是否自增
+        if (columnInfo.getAutoIncr() != null && columnInfo.getAutoIncr()) {
+            if (common.getSqlBeanDB().getDbType() == DbType.MySQL || common.getSqlBeanDB().getDbType() == DbType.MariaDB) {
+                sql.append(SqlConstant.SPACES);
+                sql.append(SqlConstant.AUTO_INCREMENT);
+            }
+        }
+        //默认值
+        if (StringUtil.isNotBlank(columnInfo.getDfltValue())) {
+            sql.append(SqlConstant.SPACES);
+            sql.append(SqlConstant.DEFAULT);
+            sql.append(SqlConstant.SPACES);
+            sql.append(SqlBeanUtil.getSqlValue(common, columnInfo.getDfltValue(), jdbcType));
+        }
         //是否为null
         if ((columnInfo.getNotnull() != null && columnInfo.getNotnull()) || columnInfo.getPk()) {
             sql.append(SqlConstant.SPACES);
@@ -1368,20 +1381,6 @@ public class SqlBeanUtil {
                 sql.append(SqlConstant.SPACES);
                 sql.append(SqlConstant.NULL);
             }
-        }
-        //是否自增
-        if (columnInfo.getAutoIncr() != null && columnInfo.getAutoIncr()) {
-            if (common.getSqlBeanDB().getDbType() == DbType.MySQL || common.getSqlBeanDB().getDbType() == DbType.MariaDB) {
-                sql.append(SqlConstant.SPACES);
-                sql.append(SqlConstant.AUTO_INCREMENT);
-            }
-        }
-        //默认值
-        if (StringUtil.isNotEmpty(columnInfo.getDfltValue())) {
-            sql.append(SqlConstant.SPACES);
-            sql.append(SqlConstant.DEFAULT);
-            sql.append(SqlConstant.SPACES);
-            sql.append(SqlBeanUtil.getSqlValue(common, columnInfo.getDfltValue(), jdbcType));
         }
         //如果是Mysql或MariaDB
         if (common.getSqlBeanDB().getDbType() == DbType.MySQL || common.getSqlBeanDB().getDbType() == DbType.MariaDB) {

@@ -101,7 +101,19 @@ public abstract class BaseSqlBeanServiceImpl {
                 }
                 String deftValue = info.getDfltValue();
                 if (deftValue != null && StringUtil.isNotBlank(deftValue) && deftValue.indexOf("'::") > -1) {
-                    info.setDfltValue(info.getDfltValue().substring(1, info.getDfltValue().indexOf("'::")));
+                    info.setDfltValue(deftValue.substring(1, deftValue.indexOf("'::")));
+                }
+            }
+        } else if (dbType == DbType.Oracle) {
+            for (ColumnInfo info : columnInfoList) {
+                String deftValue = info.getDfltValue();
+                if (deftValue != null) {
+                    deftValue = deftValue.trim();
+                    if (deftValue.charAt(0) == '\'' && deftValue.charAt(deftValue.length() - 1) == '\'') {
+                        info.setDfltValue(deftValue.substring(1, deftValue.length() - 1));
+                    } else {
+                        info.setDfltValue(deftValue);
+                    }
                 }
             }
         }

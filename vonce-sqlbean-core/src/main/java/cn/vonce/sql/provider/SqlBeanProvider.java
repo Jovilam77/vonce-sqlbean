@@ -707,18 +707,19 @@ public class SqlBeanProvider {
             String oldName = sqlColumn == null ? "" : (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) ? sqlColumn.oldName().toUpperCase() : sqlColumn.oldName();
             ColumnInfo columnInfo = SqlBeanUtil.buildColumnInfo(alter.getSqlBeanDB(), field, sqlTable, sqlColumn);
             boolean exist = false;
-            boolean fit = true;
+
             //优先比较字段改名的
             for (int j = 0; j < columnInfoList.size(); j++) {
                 if (sqlColumn != null && oldName.equalsIgnoreCase(columnInfoList.get(j).getName())) {
                     //存在此字段
                     exist = true;
                     //使用实体类中的字段信息与数据库中的字段信息做比较
-                    fit = SqlBeanUtil.columnInfoCompare(sqlBeanDB, columnInfo, columnInfoList.get(j));
-                    if (!fit) {
+                    List<AlterDifference> alterDifferenceList = SqlBeanUtil.columnInfoCompare(sqlBeanDB, columnInfo, columnInfoList.get(j));
+                    if (alterDifferenceList.size() > 0) {
                         alter.setType(AlterType.CHANGE);
                         alter.setColumnInfo(columnInfo);
                         alter.setOldColumnName(oldName);
+                        alter.setDifferences(alterDifferenceList);
                         //只有MySQL、MariaDB需要处理
                         if (sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) {
                             if (j > 0) {
@@ -731,7 +732,7 @@ public class SqlBeanProvider {
                 }
             }
             //如果改名的字段已存在则跳过外层循环
-            if (!fit) {
+            if (alter.getDifferences() != null) {
                 continue;
             }
             //其次比较变更内容
@@ -740,10 +741,11 @@ public class SqlBeanProvider {
                     //存在此字段
                     exist = true;
                     //使用实体类中的字段信息与数据库中的字段信息做比较
-                    fit = SqlBeanUtil.columnInfoCompare(sqlBeanDB, columnInfo, columnInfoList.get(j));
-                    if (!fit) {
+                    List<AlterDifference> alterDifferenceList = SqlBeanUtil.columnInfoCompare(sqlBeanDB, columnInfo, columnInfoList.get(j));
+                    if (alterDifferenceList.size() > 0) {
                         alter.setType(AlterType.MODIFY);
                         alter.setColumnInfo(columnInfo);
+                        alter.setDifferences(alterDifferenceList);
                         //只有MySQL、MariaDB需要处理
                         if ((sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) && j > 0) {
                             alter.setAfterColumnName(SqlBeanUtil.getTableFieldName(fieldList.get(i - 1), sqlTable));
@@ -753,7 +755,7 @@ public class SqlBeanProvider {
                     break;
                 }
             }
-            if (!fit) {
+            if (alter.getDifferences() != null) {
                 continue;
             }
             //如果比较之后数据库中的表字段仍不存在实体类中的字段时，说明是新增
