@@ -3,7 +3,7 @@ package cn.vonce.sql.mapper;
 
 import cn.vonce.sql.annotation.SqlJoin;
 import cn.vonce.sql.constant.SqlConstant;
-import cn.vonce.sql.enumerate.SqlEnum;
+import cn.vonce.sql.define.SqlEnum;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;

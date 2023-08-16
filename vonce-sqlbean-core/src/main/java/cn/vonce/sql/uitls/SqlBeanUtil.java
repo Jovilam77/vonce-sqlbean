@@ -6,6 +6,7 @@ import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.define.JoinOn;
+import cn.vonce.sql.define.SqlEnum;
 import cn.vonce.sql.define.SqlFun;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;

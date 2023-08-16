@@ -106,17 +106,36 @@ public abstract class BaseSqlBeanServiceImpl {
             }
         } else if (dbType == DbType.Oracle) {
             for (ColumnInfo info : columnInfoList) {
-                String deftValue = info.getDfltValue();
-                if (deftValue != null) {
-                    deftValue = deftValue.trim();
-                    if (deftValue.charAt(0) == '\'' && deftValue.charAt(deftValue.length() - 1) == '\'') {
-                        info.setDfltValue(deftValue.substring(1, deftValue.length() - 1));
+                info.setDfltValue(processDefaultValue(info.getDfltValue()));
+            }
+        } else if (dbType == DbType.SQLite) {
+            for (ColumnInfo info : columnInfoList) {
+                if (info.getType().indexOf("(") > -1 && info.getType().indexOf(")") > -1) {
+                    String range = info.getType().substring(info.getType().indexOf("(") + 1, info.getType().indexOf(")"));
+                    if (range.indexOf(",") > -1) {
+                        String ranges[] = range.split(",");
+                        info.setLength(Long.parseLong(ranges[0]));
+                        info.setScale(Integer.parseInt(ranges[1]));
                     } else {
-                        info.setDfltValue(deftValue);
+                        info.setLength(Long.parseLong(range));
                     }
+                    info.setType(info.getType().substring(0, info.getType().indexOf("(")));
                 }
+                info.setDfltValue(processDefaultValue(info.getDfltValue()));
             }
         }
+    }
+
+    private String processDefaultValue(String dfltValue) {
+        if (dfltValue != null) {
+            dfltValue = dfltValue.trim();
+            if (dfltValue.charAt(0) == '\'' && dfltValue.charAt(dfltValue.length() - 1) == '\'') {
+                return dfltValue.substring(1, dfltValue.length() - 1);
+            } else {
+                return dfltValue;
+            }
+        }
+        return null;
     }
 
     /**
