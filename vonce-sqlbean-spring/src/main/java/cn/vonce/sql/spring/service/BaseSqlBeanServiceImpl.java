@@ -82,6 +82,7 @@ public abstract class BaseSqlBeanServiceImpl {
                 String range[] = StringUtil.getBracketContent(values[0]).split(",");
                 info.setLength("".equals(range[0]) ? 0 : Long.parseLong(range[0]));
                 info.setScale(range.length == 1 ? 0 : Integer.parseInt(range[1]));
+                info.setDfltValue(processDefaultValue(info.getDfltValue()));
             }
         } else if (dbType == DbType.H2 || dbType == DbType.Postgresql) {
             Boolean toUpperCase = getSqlBeanDB().getSqlBeanConfig().getToUpperCase();
