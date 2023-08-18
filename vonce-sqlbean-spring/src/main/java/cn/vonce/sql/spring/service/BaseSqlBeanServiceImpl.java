@@ -105,7 +105,7 @@ public abstract class BaseSqlBeanServiceImpl {
                     info.setDfltValue(deftValue.substring(1, deftValue.indexOf("'::")));
                 }
             }
-        } else if (dbType == DbType.Oracle) {
+        } else if (dbType == DbType.Oracle || dbType == DbType.DB2) {
             for (ColumnInfo info : columnInfoList) {
                 info.setDfltValue(processDefaultValue(info.getDfltValue()));
             }
