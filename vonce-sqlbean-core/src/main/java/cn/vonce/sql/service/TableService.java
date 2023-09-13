@@ -51,12 +51,30 @@ public interface TableService<T> {
     List<TableInfo> getTableList(String tableName);
 
     /**
+     * 获取表名列表
+     *
+     * @param schema
+     * @param tableName
+     * @return
+     */
+    List<TableInfo> getTableList(String schema, String tableName);
+
+    /**
      * 获取列信息列表
      *
      * @param tableName
      * @return
      */
     List<ColumnInfo> getColumnInfoList(String tableName);
+
+    /**
+     * 获取列信息列表
+     *
+     * @param schema
+     * @param tableName
+     * @return
+     */
+    List<ColumnInfo> getColumnInfoList(String schema, String tableName);
 
     /**
      * 备份表和数据到一张新表(表名_+时间)

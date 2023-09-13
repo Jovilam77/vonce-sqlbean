@@ -563,6 +563,8 @@ public class SqlBeanProvider {
      * 获取表名列表
      *
      * @param sqlBeanDB
+     * @param schema
+     * @param name
      * @return
      */
     public static String selectTableListSql(SqlBeanDB sqlBeanDB, String schema, String name) {
@@ -598,32 +600,34 @@ public class SqlBeanProvider {
      * 获取列信息列表
      *
      * @param sqlBeanDB
+     * @param schema
+     * @param name
      * @return
      */
-    public static String selectColumnListSql(SqlBeanDB sqlBeanDB, String name) {
+    public static String selectColumnListSql(SqlBeanDB sqlBeanDB, String schema, String name) {
         if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase() && StringUtil.isNotEmpty(name)) {
             name = name.toUpperCase();
         }
         switch (sqlBeanDB.getDbType()) {
             case MySQL:
             case MariaDB:
-                return JavaMapMySqlType.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapMySqlType.getColumnListSql(sqlBeanDB, schema, name);
             case SQLServer:
-                return JavaMapSqlServerType.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapSqlServerType.getColumnListSql(sqlBeanDB, schema, name);
             case Oracle:
-                return JavaMapOracleType.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapOracleType.getColumnListSql(sqlBeanDB, schema, name);
             case Postgresql:
-                return JavaMapPostgresqlType.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapPostgresqlType.getColumnListSql(sqlBeanDB, schema, name);
             case DB2:
-                return JavaMapDB2Type.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapDB2Type.getColumnListSql(sqlBeanDB, schema, name);
             case H2:
-                return JavaMapH2Type.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapH2Type.getColumnListSql(sqlBeanDB, schema, name);
             case Hsql:
-                return JavaMapHsqlType.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapHsqlType.getColumnListSql(sqlBeanDB, schema, name);
             case Derby:
-                return JavaMapDerbyType.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapDerbyType.getColumnListSql(sqlBeanDB, schema, name);
             case SQLite:
-                return JavaMapSqliteType.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapSqliteType.getColumnListSql(sqlBeanDB, schema, name);
             default:
                 throw new SqlBeanException("请配置正确的数据库");
         }
@@ -808,7 +812,7 @@ public class SqlBeanProvider {
     }
 
     /**
-     * 更改表结构sql
+     * 更改表备注sql
      *
      * @param sqlBeanDB
      * @param clazz
@@ -975,13 +979,21 @@ public class SqlBeanProvider {
     private static void setSchema(Common common, Class<?> clazz) {
         //自主设置优先级高
         if (StringUtil.isEmpty(common.getTable().getSchema())) {
-            String schema = DynSchemaContextHolder.getSchema();
-            if (StringUtil.isNotEmpty(schema)) {
-                common.getTable().setSchema(schema);
-            } else {
-                common.getTable().setSchema(SqlBeanUtil.getTable(clazz).getSchema());
-            }
+            common.getTable().setSchema(getSchema(clazz));
         }
+    }
+
+    /**
+     * 获取Schema
+     *
+     * @param clazz
+     */
+    public static String getSchema(Class<?> clazz) {
+        String schema = DynSchemaContextHolder.getSchema();
+        if (StringUtil.isEmpty(schema)) {
+            return SqlBeanUtil.getTable(clazz).getSchema();
+        }
+        return schema;
     }
 
 }

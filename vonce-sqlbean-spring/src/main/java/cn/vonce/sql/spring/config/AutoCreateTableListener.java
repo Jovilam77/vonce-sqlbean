@@ -12,9 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
+import java.util.*;
 
 /**
  * 自动创建表监听类
@@ -40,7 +39,7 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                 List<String> beanNameList = new ArrayList<>();
                 beanNameList.addAll(Arrays.asList(evt.getApplicationContext().getBeanNamesForType(TableService.class)));
                 if (!beanNameList.isEmpty()) {
-                    List<TableInfo> tableList = evt.getApplicationContext().getBean(beanNameList.get(0), TableService.class).getTableList(null);
+                    Map<String, TableService> schemaMap = new HashMap<>();
                     for (String name : beanNameList) {
                         TableService tableService = evt.getApplicationContext().getBean(name, TableService.class);
                         Class<?> clazz = tableService.getBeanClass();
@@ -48,34 +47,46 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                             continue;
                         }
                         SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-                        Table table = SqlBeanUtil.getTable(clazz);
-                        //存在@SqlTable注解才会自动创建表和更新表结构
-                        if (sqlTable != null && !sqlTable.isView()) {
-                            boolean isExist = false;
-                            //创建表
-                            if (sqlTable.autoCreate()) {
+                        schemaMap.put(sqlTable.schema(), tableService);
+                    }
+                    for (Map.Entry<String, TableService> entry : schemaMap.entrySet()) {
+                        List<TableInfo> tableList = entry.getValue().getTableList(null);
+                        for (String name : beanNameList) {
+                            TableService tableService = evt.getApplicationContext().getBean(name, TableService.class);
+                            Class<?> clazz = tableService.getBeanClass();
+                            if (clazz == null) {
+                                continue;
+                            }
+                            SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
+                            Table table = SqlBeanUtil.getTable(clazz);
+                            //存在@SqlTable注解且不是视图且schema一致的才会自动创建表和更新表结构
+                            if (sqlTable != null && !sqlTable.isView() && sqlTable.schema().equals(entry.getKey())) {
+                                boolean isExist = false;
+                                //检查表是否存在
                                 for (TableInfo tableInfo : tableList) {
                                     if (tableInfo.getName().equalsIgnoreCase(table.getName())) {
                                         isExist = true;
                                         //表注释不一致
-                                        if (!sqlTable.remarks().equals(tableInfo.getRemarks())) {
+                                        if (sqlTable.autoAlter() && !sqlTable.remarks().equals(tableInfo.getRemarks())) {
                                             tableService.alterRemarks(sqlTable.remarks());
                                         }
                                         break;
                                     }
                                 }
-                                if (!isExist) {
+                                //创建表
+                                if (!isExist && sqlTable.autoCreate()) {
                                     tableService.createTable();
                                     logger.info("-----'{}'表不存在，已为你自动创建-----", table.getName());
                                     continue;
                                 }
-                            }
-                            //更新表结构
-                            if (sqlTable.autoAlter()) {
-                                tableService.alter(table, tableService.getColumnInfoList(table.getName()));
+                                //更新表结构
+                                if (isExist && sqlTable.autoAlter()) {
+                                    tableService.alter(table, tableService.getColumnInfoList(table.getName()));
+                                }
                             }
                         }
                     }
+                    schemaMap.clear();
                 }
             }).start();
         }

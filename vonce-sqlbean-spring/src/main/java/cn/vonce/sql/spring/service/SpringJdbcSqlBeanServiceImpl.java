@@ -692,7 +692,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public void dropTable() {
         SqlBeanDB sqlBeanDB = getSqlBeanDB();
         if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.Postgresql && sqlBeanDB.getDbType() != DbType.SQLServer && sqlBeanDB.getDbType() != DbType.H2) {
-            List<TableInfo> nameList = jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(sqlBeanDB, null, SqlBeanUtil.getTable(clazz).getName()), TableInfo.class);
+            List<TableInfo> nameList = jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(sqlBeanDB, SqlBeanProvider.getSchema(clazz), SqlBeanUtil.getTable(clazz).getName()), TableInfo.class);
             if (nameList == null || nameList.isEmpty()) {
                 return;
             }
@@ -716,13 +716,24 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<TableInfo> getTableList(String tableName) {
-        return jdbcTemplate.query(SqlBeanProvider.selectTableListSql(getSqlBeanDB(), null, tableName), new SpringJbdcSqlBeanMapper<TableInfo>(TableInfo.class, TableInfo.class));
+        return this.getTableList(SqlBeanProvider.getSchema(clazz), tableName);
+    }
+
+    @Override
+    public List<TableInfo> getTableList(String schema, String tableName) {
+        return jdbcTemplate.query(SqlBeanProvider.selectTableListSql(getSqlBeanDB(), schema, tableName), new SpringJbdcSqlBeanMapper<TableInfo>(TableInfo.class, TableInfo.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<ColumnInfo> getColumnInfoList(String tableName) {
-        List<ColumnInfo> columnInfoList = jdbcTemplate.query(SqlBeanProvider.selectColumnListSql(getSqlBeanDB(), tableName), new SpringJbdcSqlBeanMapper<ColumnInfo>(ColumnInfo.class, ColumnInfo.class));
+        return this.getColumnInfoList(SqlBeanProvider.getSchema(clazz), tableName);
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public List<ColumnInfo> getColumnInfoList(String schema, String tableName) {
+        List<ColumnInfo> columnInfoList = jdbcTemplate.query(SqlBeanProvider.selectColumnListSql(getSqlBeanDB(), schema, tableName), new SpringJbdcSqlBeanMapper<ColumnInfo>(ColumnInfo.class, ColumnInfo.class));
         super.handleColumnInfo(columnInfoList);
         return columnInfoList;
     }
