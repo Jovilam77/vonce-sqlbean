@@ -692,7 +692,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public void dropTable() {
         SqlBeanDB sqlBeanDB = getSqlBeanDB();
         if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.Postgresql && sqlBeanDB.getDbType() != DbType.SQLServer && sqlBeanDB.getDbType() != DbType.H2) {
-            List<TableInfo> nameList = jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(sqlBeanDB, SqlBeanProvider.getSchema(clazz), SqlBeanUtil.getTable(clazz).getName()), TableInfo.class);
+            List<TableInfo> nameList = jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(sqlBeanDB, SqlBeanUtil.getTable(clazz).getSchema(), SqlBeanUtil.getTable(clazz).getName()), TableInfo.class);
             if (nameList == null || nameList.isEmpty()) {
                 return;
             }
@@ -716,7 +716,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<TableInfo> getTableList(String tableName) {
-        return this.getTableList(SqlBeanProvider.getSchema(clazz), tableName);
+        return this.getTableList(SqlBeanUtil.getTable(clazz).getSchema(), tableName);
     }
 
     @Override
@@ -727,7 +727,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<ColumnInfo> getColumnInfoList(String tableName) {
-        return this.getColumnInfoList(SqlBeanProvider.getSchema(clazz), tableName);
+        return this.getColumnInfoList(SqlBeanUtil.getTable(clazz).getSchema(), tableName);
     }
 
     @DbSwitch(DbRole.SLAVE)

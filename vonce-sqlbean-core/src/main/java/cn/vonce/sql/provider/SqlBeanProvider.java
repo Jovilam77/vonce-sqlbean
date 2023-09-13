@@ -988,7 +988,7 @@ public class SqlBeanProvider {
      *
      * @param clazz
      */
-    public static String getSchema(Class<?> clazz) {
+    private static String getSchema(Class<?> clazz) {
         String schema = DynSchemaContextHolder.getSchema();
         if (StringUtil.isEmpty(schema)) {
             return SqlBeanUtil.getTable(clazz).getSchema();
