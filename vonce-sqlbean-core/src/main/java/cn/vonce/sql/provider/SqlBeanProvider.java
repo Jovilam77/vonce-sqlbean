@@ -751,7 +751,7 @@ public class SqlBeanProvider {
                         alter.setColumnInfo(columnInfo);
                         alter.setDifferences(alterDifferenceList);
                         //只有MySQL、MariaDB需要处理
-                        if ((sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) && j > 0) {
+                        if ((sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) && i > 0) {
                             alter.setAfterColumnName(SqlBeanUtil.getTableFieldName(fieldList.get(i - 1), sqlTable));
                         }
                         alterList.add(alter);
