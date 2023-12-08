@@ -81,7 +81,11 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                                 }
                                 //更新表结构
                                 if (isExist && sqlTable.autoAlter()) {
-                                    tableService.alter(table, tableService.getColumnInfoList(table.getName()));
+                                    try {
+                                        tableService.alter(table, tableService.getColumnInfoList(table.getName()));
+                                    } catch (Exception e) {
+                                        logger.error("更新表结构出错：" + e.getMessage(), e);
+                                    }
                                 }
                             }
                         }
