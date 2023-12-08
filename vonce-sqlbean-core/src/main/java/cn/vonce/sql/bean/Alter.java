@@ -27,7 +27,7 @@ public class Alter extends Common {
      */
     private String oldColumnName;
     /**
-     * 排序再哪个后面
+     * 排序在哪个后面
      */
     private String afterColumnName;
 

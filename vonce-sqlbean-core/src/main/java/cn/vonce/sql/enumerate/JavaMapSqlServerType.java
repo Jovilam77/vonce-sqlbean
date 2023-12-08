@@ -274,18 +274,17 @@ public enum JavaMapSqlServerType {
      * @return
      */
     public static String addRemarks(boolean isTable, Alter item) {
+        String remarks = StringUtil.isNotBlank(item.getColumnInfo().getRemarks()) ? item.getColumnInfo().getRemarks() : "''";
         StringBuffer remarksSql = new StringBuffer();
-        if (StringUtil.isNotBlank(item.getColumnInfo().getRemarks())) {
-            remarksSql.append("IF ((SELECT COUNT(*) FROM ::fn_listextendedproperty(");
-            remarksSql.append("'MS_Description', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + (!isTable ? "', 'COLUMN', N'" + item.getColumnInfo().getName() + "'" : "', NULL, NULL"));
-            remarksSql.append(")) > 0)");
-            remarksSql.append("\n  EXEC sp_updateextendedproperty ");
-            remarksSql.append("'MS_Description', N'" + item.getColumnInfo().getRemarks() + "', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + "'" + (!isTable ? (", 'COLUMN', N'" + item.getColumnInfo().getName() + "'") : ""));
-            remarksSql.append("\nELSE");
-            remarksSql.append("\n  EXEC sp_addextendedproperty ");
-            remarksSql.append("'MS_Description', N'" + item.getColumnInfo().getRemarks() + "', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + "'" + (!isTable ? (", 'COLUMN', N'" + item.getColumnInfo().getName() + "'") : ""));
-            remarksSql.append(SqlConstant.SEMICOLON);
-        }
+        remarksSql.append("IF ((SELECT COUNT(*) FROM ::fn_listextendedproperty(");
+        remarksSql.append("'MS_Description', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + (!isTable ? "', 'COLUMN', N'" + item.getColumnInfo().getName() + "'" : "', NULL, NULL"));
+        remarksSql.append(")) > 0)");
+        remarksSql.append("\n  EXEC sp_updateextendedproperty ");
+        remarksSql.append("'MS_Description', N'" + remarks + "', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + "'" + (!isTable ? (", 'COLUMN', N'" + item.getColumnInfo().getName() + "'") : ""));
+        remarksSql.append("\nELSE");
+        remarksSql.append("\n  EXEC sp_addextendedproperty ");
+        remarksSql.append("'MS_Description', N'" + remarks + "', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + "'" + (!isTable ? (", 'COLUMN', N'" + item.getColumnInfo().getName() + "'") : ""));
+        remarksSql.append(SqlConstant.SEMICOLON);
         return remarksSql.toString();
     }
 

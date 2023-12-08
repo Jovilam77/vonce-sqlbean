@@ -236,22 +236,20 @@ public enum JavaMapHsqlType {
      */
     public static String addRemarks(boolean isTable, Alter item, String transferred) {
         StringBuffer remarksSql = new StringBuffer();
-        if (StringUtil.isNotBlank(item.getColumnInfo().getRemarks())) {
-            remarksSql.append(SqlConstant.COMMENT);
-            remarksSql.append(SqlConstant.ON);
-            remarksSql.append(isTable ? SqlConstant.TABLE : SqlConstant.COLUMN);
-            remarksSql.append(getFullName(item, item.getTable()));
-            if (!isTable) {
-                remarksSql.append(SqlConstant.POINT);
-                remarksSql.append(transferred);
-                remarksSql.append(item.getColumnInfo().getName());
-                remarksSql.append(transferred);
-            }
-            remarksSql.append(SqlConstant.IS);
-            remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
-            remarksSql.append(item.getColumnInfo().getRemarks());
-            remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        remarksSql.append(SqlConstant.COMMENT);
+        remarksSql.append(SqlConstant.ON);
+        remarksSql.append(isTable ? SqlConstant.TABLE : SqlConstant.COLUMN);
+        remarksSql.append(getFullName(item, item.getTable()));
+        if (!isTable) {
+            remarksSql.append(SqlConstant.POINT);
+            remarksSql.append(transferred);
+            remarksSql.append(item.getColumnInfo().getName());
+            remarksSql.append(transferred);
         }
+        remarksSql.append(SqlConstant.IS);
+        remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        remarksSql.append(StringUtil.isNotBlank(item.getColumnInfo().getRemarks()) ? item.getColumnInfo().getRemarks() : "''");
+        remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
         return remarksSql.toString();
     }
 

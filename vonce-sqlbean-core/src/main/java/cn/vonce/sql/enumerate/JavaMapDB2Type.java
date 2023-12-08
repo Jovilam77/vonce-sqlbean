@@ -129,7 +129,7 @@ public enum JavaMapDB2Type {
                 sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
                 sqlList.add(sql.toString());
                 String remarks = addRemarks(false, alter, transferred);
-                if (StringUtil.isNotBlank(remarks)){
+                if (StringUtil.isNotBlank(remarks)) {
                     sqlList.add(remarks);
                 }
             } else if (alter.getType() == AlterType.CHANGE) {
@@ -143,7 +143,7 @@ public enum JavaMapDB2Type {
                 }
                 sqlList.add(sql.toString());
                 String remarks = addRemarks(false, alter, transferred);
-                if (StringUtil.isNotBlank(remarks)){
+                if (StringUtil.isNotBlank(remarks)) {
                     sqlList.add(remarks);
                 }
             } else if (alter.getType() == AlterType.MODIFY) {
@@ -152,7 +152,7 @@ public enum JavaMapDB2Type {
                     sqlList.add(modifySql.toString());
                 }
                 String remarks = addRemarks(false, alter, transferred);
-                if (StringUtil.isNotBlank(remarks)){
+                if (StringUtil.isNotBlank(remarks)) {
                     sqlList.add(remarks);
                 }
             } else if (alter.getType() == AlterType.DROP) {
@@ -204,7 +204,7 @@ public enum JavaMapDB2Type {
         List<AlterDifference> alterDifferenceList = alter.getDifferences();
         for (AlterDifference alterDifference : alterDifferenceList) {
             ColumnInfo columnInfo = alter.getColumnInfo();
-            if (alterDifference == AlterDifference.NOT_NULL || alterDifference == AlterDifference.TYPE){
+            if (alterDifference == AlterDifference.NOT_NULL || alterDifference == AlterDifference.TYPE) {
                 if (modifySql.length() > 0) {
                     modifySql.append(SqlConstant.SEMICOLON);
                 }
@@ -271,22 +271,20 @@ public enum JavaMapDB2Type {
      */
     public static String addRemarks(boolean isTable, Alter item, String transferred) {
         StringBuffer remarksSql = new StringBuffer();
-        if (StringUtil.isNotBlank(item.getColumnInfo().getRemarks())) {
-            remarksSql.append(SqlConstant.COMMENT);
-            remarksSql.append(SqlConstant.ON);
-            remarksSql.append(isTable ? SqlConstant.TABLE : SqlConstant.COLUMN);
-            remarksSql.append(getFullName(item, item.getTable()));
-            if (!isTable) {
-                remarksSql.append(SqlConstant.POINT);
-                remarksSql.append(transferred);
-                remarksSql.append(item.getColumnInfo().getName());
-                remarksSql.append(transferred);
-            }
-            remarksSql.append(SqlConstant.IS);
-            remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
-            remarksSql.append(item.getColumnInfo().getRemarks());
-            remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        remarksSql.append(SqlConstant.COMMENT);
+        remarksSql.append(SqlConstant.ON);
+        remarksSql.append(isTable ? SqlConstant.TABLE : SqlConstant.COLUMN);
+        remarksSql.append(getFullName(item, item.getTable()));
+        if (!isTable) {
+            remarksSql.append(SqlConstant.POINT);
+            remarksSql.append(transferred);
+            remarksSql.append(item.getColumnInfo().getName());
+            remarksSql.append(transferred);
         }
+        remarksSql.append(SqlConstant.IS);
+        remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        remarksSql.append(StringUtil.isNotBlank(item.getColumnInfo().getRemarks()) ? item.getColumnInfo().getRemarks() : "''");
+        remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
         return remarksSql.toString();
     }
 
