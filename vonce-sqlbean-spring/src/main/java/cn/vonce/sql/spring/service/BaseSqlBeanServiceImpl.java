@@ -82,6 +82,7 @@ public abstract class BaseSqlBeanServiceImpl {
                 String range[] = StringUtil.getBracketContent(values[0]).split(",");
                 info.setLength("".equals(range[0]) ? 0 : Long.parseLong(range[0]));
                 info.setScale(range.length == 1 ? 0 : Integer.parseInt(range[1]));
+                info.setDfltValue(processDefaultValue(info.getDfltValue()));
             }
         } else if (dbType == DbType.H2 || dbType == DbType.Postgresql) {
             Boolean toUpperCase = getSqlBeanDB().getSqlBeanConfig().getToUpperCase();
@@ -96,9 +97,46 @@ public abstract class BaseSqlBeanServiceImpl {
                     info.setType(JdbcType.LONGBLOB.getName(toUpperCase));
                 } else if ("TIMESTAMP WITHOUT TIME ZONE".equalsIgnoreCase(info.getType())) {
                     info.setType(JdbcType.TIMESTAMP.getName(toUpperCase));
+                } else if ("TIME WITHOUT TIME ZONE".equalsIgnoreCase(info.getType())) {
+                    info.setType(JdbcType.TIME.getName(toUpperCase));
+                }
+                String deftValue = info.getDfltValue();
+                if (deftValue != null && StringUtil.isNotBlank(deftValue) && deftValue.indexOf("'::") > -1) {
+                    info.setDfltValue(deftValue.substring(1, deftValue.indexOf("'::")));
                 }
             }
+        } else if (dbType == DbType.Oracle || dbType == DbType.DB2) {
+            for (ColumnInfo info : columnInfoList) {
+                info.setDfltValue(processDefaultValue(info.getDfltValue()));
+            }
+        } else if (dbType == DbType.SQLite) {
+            for (ColumnInfo info : columnInfoList) {
+                if (info.getType().indexOf("(") > -1 && info.getType().indexOf(")") > -1) {
+                    String range = info.getType().substring(info.getType().indexOf("(") + 1, info.getType().indexOf(")"));
+                    if (range.indexOf(",") > -1) {
+                        String ranges[] = range.split(",");
+                        info.setLength(Long.parseLong(ranges[0]));
+                        info.setScale(Integer.parseInt(ranges[1]));
+                    } else {
+                        info.setLength(Long.parseLong(range));
+                    }
+                    info.setType(info.getType().substring(0, info.getType().indexOf("(")));
+                }
+                info.setDfltValue(processDefaultValue(info.getDfltValue()));
+            }
         }
+    }
+
+    private String processDefaultValue(String dfltValue) {
+        if (dfltValue != null) {
+            dfltValue = dfltValue.trim();
+            if (dfltValue.charAt(0) == '\'' && dfltValue.charAt(dfltValue.length() - 1) == '\'') {
+                return dfltValue.substring(1, dfltValue.length() - 1);
+            } else {
+                return dfltValue;
+            }
+        }
+        return null;
     }
 
     /**
@@ -141,8 +179,11 @@ public abstract class BaseSqlBeanServiceImpl {
             return;
         }
         Field idField = SqlBeanUtil.getIdField(clazz);
-        Long idBeginValue = getAutoIncrId();
-        if (idBeginValue != null && idField != null && idField.getAnnotation(SqlId.class).type() == IdType.AUTO) {
+        if (idField != null && idField.getAnnotation(SqlId.class).type() == IdType.AUTO) {
+            Long idBeginValue = getAutoIncrId();
+            if (idBeginValue == null) {
+                return;
+            }
             int i = 0;
             for (T t : beanList) {
                 Field field = SqlBeanUtil.getIdField(t.getClass());

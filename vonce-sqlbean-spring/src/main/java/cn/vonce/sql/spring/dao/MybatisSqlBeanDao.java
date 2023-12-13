@@ -432,19 +432,23 @@ public interface MybatisSqlBeanDao<T> {
      * 获取表名列表
      *
      * @param sqlBeanDB
+     * @param schema
+     * @param name
      * @return
      */
     @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectTableList")
-    List<TableInfo> selectTableList(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
+    List<TableInfo> selectTableList(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("schema") String schema, @Param("name") String name);
 
     /**
      * 获取表名列表
      *
      * @param sqlBeanDB
+     * @param schema
+     * @param name
      * @return
      */
     @SelectProvider(type = MybatisSqlBeanProvider.class, method = "selectColumnInfoList")
-    List<ColumnInfo> selectColumnInfoList(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
+    List<ColumnInfo> selectColumnInfoList(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("schema") String schema, @Param("name") String name);
 
     /**
      * 备份表和数据

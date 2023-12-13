@@ -1,6 +1,7 @@
 package cn.vonce.sql.enumerate;
 
 import cn.vonce.sql.bean.Alter;
+import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
@@ -122,7 +123,7 @@ public enum JavaMapSqlServerType {
                 sql.append(getFullName(alter, alter.getTable(), null));
                 sql.append(SqlConstant.ADD);
                 sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
-                remarksSql.append(addRemarks(alter));
+                remarksSql.append(addRemarks(false, alter));
             } else if (alter.getType() == AlterType.CHANGE) {
                 //改名
                 sql.append(SqlConstant.EXEC_SP_RENAME);
@@ -143,11 +144,11 @@ public enum JavaMapSqlServerType {
                     sql.append(SqlConstant.ALTER_TABLE);
                     sql.append(modifySql);
                 }
-                remarksSql.append(addRemarks(alter));
+                remarksSql.append(addRemarks(false, alter));
             } else if (alter.getType() == AlterType.MODIFY) {
                 sql.append(SqlConstant.ALTER_TABLE);
                 sql.append(modifyColumn(alter));
-                remarksSql.append(addRemarks(alter));
+                remarksSql.append(addRemarks(false, alter));
             } else if (alter.getType() == AlterType.DROP) {
                 sql.append(SqlConstant.ALTER_TABLE);
                 sql.append(getFullName(alter, alter.getTable(), null));
@@ -210,33 +211,80 @@ public enum JavaMapSqlServerType {
      * @return
      */
     private static StringBuffer modifyColumn(Alter alter) {
+        ColumnInfo columnInfo = alter.getColumnInfo();
         StringBuffer modifySql = new StringBuffer();
-        modifySql.append(getFullName(alter, alter.getTable(), null));
+        String fullName = getFullName(alter, alter.getTable(), null);
+        modifySql.append(fullName);
         modifySql.append(SqlConstant.ALTER);
         modifySql.append(SqlConstant.COLUMN);
-        modifySql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
+        JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
+        modifySql.append(SqlBeanUtil.getTableFieldName(alter, columnInfo.getName()));
+        modifySql.append(SqlConstant.SPACES);
+        modifySql.append(jdbcType.name());
+        if (columnInfo.getLength() != null && columnInfo.getLength() > 0) {
+            modifySql.append(SqlConstant.BEGIN_BRACKET);
+            //字段长度
+            modifySql.append(columnInfo.getLength());
+            if (jdbcType.isFloat()) {
+                modifySql.append(SqlConstant.COMMA);
+                modifySql.append(columnInfo.getScale() == null ? 0 : columnInfo.getScale());
+            }
+            modifySql.append(SqlConstant.END_BRACKET);
+        }
+        //是否为null
+        if ((columnInfo.getNotnull() != null && columnInfo.getNotnull()) || columnInfo.getPk()) {
+            modifySql.append(SqlConstant.SPACES);
+            modifySql.append(SqlConstant.NOT_NULL);
+        } else {
+            if (columnInfo.getNotnull() != null && !columnInfo.getNotnull()) {
+                modifySql.append(SqlConstant.SPACES);
+                modifySql.append(SqlConstant.NULL);
+            }
+        }
+        //是否自增
+        if (columnInfo.getAutoIncr() != null && columnInfo.getAutoIncr()) {
+            if (alter.getSqlBeanDB().getDbType() == DbType.MySQL || alter.getSqlBeanDB().getDbType() == DbType.MariaDB) {
+                modifySql.append(SqlConstant.SPACES);
+                modifySql.append(SqlConstant.AUTO_INCREMENT);
+            }
+        }
+//        //默认值
+//        if (StringUtil.isNotEmpty(columnInfo.getDfltValue())) {
+//            modifySql.append(SqlConstant.SEMICOLON);
+//            modifySql.append(SqlConstant.ALTER_TABLE);
+//            modifySql.append(fullName);
+//            modifySql.append(SqlConstant.ADD);
+//            modifySql.append(SqlConstant.DEFAULT);
+//            modifySql.append(SqlConstant.SPACES);
+//            modifySql.append(columnInfo.getDfltValue());
+//            modifySql.append(SqlConstant.SPACES);
+//            modifySql.append(SqlConstant.FOR);
+//            modifySql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
+//            modifySql.append(SqlBeanUtil.isToUpperCase(alter) ? columnInfo.getName().toUpperCase() : columnInfo.getName());
+//            modifySql.append(SqlConstant.END_SQUARE_BRACKETS);
+//        }
         return modifySql;
     }
 
     /**
      * 增加列备注
      *
+     * @param isTable
      * @param item
      * @return
      */
-    private static String addRemarks(Alter item) {
+    public static String addRemarks(boolean isTable, Alter item) {
+        String remarks = StringUtil.isNotBlank(item.getColumnInfo().getRemarks()) ? item.getColumnInfo().getRemarks() : "''";
         StringBuffer remarksSql = new StringBuffer();
-        if (StringUtil.isNotBlank(item.getColumnInfo().getRemarks())) {
-            remarksSql.append("IF ((SELECT COUNT(*) FROM ::fn_listextendedproperty(");
-            remarksSql.append("'MS_Description', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + "', 'COLUMN', N'" + item.getColumnInfo().getName() + "'");
-            remarksSql.append(")) > 0)");
-            remarksSql.append("\n  EXEC sp_updateextendedproperty ");
-            remarksSql.append("'MS_Description', N'" + item.getColumnInfo().getRemarks() + "', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + "', 'COLUMN', N'" + item.getColumnInfo().getName() + "'");
-            remarksSql.append("\nELSE");
-            remarksSql.append("\n  EXEC sp_addextendedproperty ");
-            remarksSql.append("'MS_Description', N'" + item.getColumnInfo().getRemarks() + "', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + "', 'COLUMN', N'" + item.getColumnInfo().getName() + "'");
-            remarksSql.append(SqlConstant.SEMICOLON);
-        }
+        remarksSql.append("IF ((SELECT COUNT(*) FROM ::fn_listextendedproperty(");
+        remarksSql.append("'MS_Description', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + (!isTable ? "', 'COLUMN', N'" + item.getColumnInfo().getName() + "'" : "', NULL, NULL"));
+        remarksSql.append(")) > 0)");
+        remarksSql.append("\n  EXEC sp_updateextendedproperty ");
+        remarksSql.append("'MS_Description', N'" + remarks + "', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + "'" + (!isTable ? (", 'COLUMN', N'" + item.getColumnInfo().getName() + "'") : ""));
+        remarksSql.append("\nELSE");
+        remarksSql.append("\n  EXEC sp_addextendedproperty ");
+        remarksSql.append("'MS_Description', N'" + remarks + "', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + "'" + (!isTable ? (", 'COLUMN', N'" + item.getColumnInfo().getName() + "'") : ""));
+        remarksSql.append(SqlConstant.SEMICOLON);
         return remarksSql.toString();
     }
 

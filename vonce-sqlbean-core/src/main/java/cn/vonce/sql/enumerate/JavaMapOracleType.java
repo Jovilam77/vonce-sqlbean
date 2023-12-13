@@ -1,6 +1,7 @@
 package cn.vonce.sql.enumerate;
 
 import cn.vonce.sql.bean.Alter;
+import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.bean.Common;
 import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanDB;
@@ -120,10 +121,10 @@ public enum JavaMapOracleType {
                 addOrModifySql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), null));
                 addOrModifySql.append(SqlConstant.END_BRACKET);
                 addOrModifySql.append(SqlConstant.SPACES);
-                sqlList.add(addRemarks(alter, transferred));
+                sqlList.add(addRemarks(false, alter, transferred));
             } else if (alter.getType() == AlterType.MODIFY) {
                 addOrModifySql.append(modifyColumn(alter));
-                sqlList.add(addRemarks(alter, transferred));
+                sqlList.add(addRemarks(false, alter, transferred));
             } else if (alter.getType() == AlterType.DROP) {
                 StringBuffer dropSql = new StringBuffer();
                 dropSql.append(SqlConstant.ALTER_TABLE);
@@ -137,7 +138,7 @@ public enum JavaMapOracleType {
                 sqlList.add(dropSql.toString());
             } else if (alter.getType() == AlterType.CHANGE) {
                 sqlList.add(changeColumn(alter));
-                sqlList.add(addRemarks(alter, transferred));
+                sqlList.add(addRemarks(false, alter, transferred));
                 //更改名称的同时可能也更改其他信息
                 alter.getColumnInfo().setName(alter.getOldColumnName());
                 addOrModifySql.append(modifyColumn(alter));
@@ -182,7 +183,40 @@ public enum JavaMapOracleType {
         StringBuffer modifySql = new StringBuffer();
         modifySql.append(SqlConstant.MODIFY);
         modifySql.append(SqlConstant.BEGIN_BRACKET);
-        modifySql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), null));
+        ColumnInfo columnInfo = alter.getColumnInfo();
+        JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
+        modifySql.append(SqlBeanUtil.getTableFieldName(alter, columnInfo.getName()));
+        modifySql.append(SqlConstant.SPACES);
+        modifySql.append(jdbcType.name());
+        if (columnInfo.getLength() != null && columnInfo.getLength() > 0) {
+            modifySql.append(SqlConstant.BEGIN_BRACKET);
+            //字段长度
+            modifySql.append(columnInfo.getLength());
+            if (jdbcType.isFloat()) {
+                modifySql.append(SqlConstant.COMMA);
+                modifySql.append(columnInfo.getScale() == null ? 0 : columnInfo.getScale());
+            }
+            modifySql.append(SqlConstant.END_BRACKET);
+        }
+        if (alter.getDifferences().contains(AlterDifference.NOT_NULL)) {
+            //是否为null
+            if ((columnInfo.getNotnull() != null && columnInfo.getNotnull()) || columnInfo.getPk()) {
+                modifySql.append(SqlConstant.SPACES);
+                modifySql.append(SqlConstant.NOT_NULL);
+            } else {
+                if (alter.getType() == AlterType.MODIFY && columnInfo.getNotnull() != null && !columnInfo.getNotnull()) {
+                    modifySql.append(SqlConstant.SPACES);
+                    modifySql.append(SqlConstant.NULL);
+                }
+            }
+        }
+        //默认值
+        if (StringUtil.isNotBlank(columnInfo.getDfltValue())) {
+            modifySql.append(SqlConstant.SPACES);
+            modifySql.append(SqlConstant.DEFAULT);
+            modifySql.append(SqlConstant.SPACES);
+            modifySql.append(SqlBeanUtil.getSqlValue(alter, columnInfo.getDfltValue(), jdbcType));
+        }
         modifySql.append(SqlConstant.END_BRACKET);
         modifySql.append(SqlConstant.SPACES);
         return modifySql.toString();
@@ -209,26 +243,27 @@ public enum JavaMapOracleType {
     /**
      * 增加列备注
      *
+     * @param isTable
      * @param item
      * @param transferred
      * @return
      */
-    private static String addRemarks(Alter item, String transferred) {
+    public static String addRemarks(boolean isTable, Alter item, String transferred) {
         StringBuffer remarksSql = new StringBuffer();
-        if (StringUtil.isNotBlank(item.getColumnInfo().getRemarks())) {
-            remarksSql.append(SqlConstant.COMMENT);
-            remarksSql.append(SqlConstant.ON);
-            remarksSql.append(SqlConstant.COLUMN);
-            remarksSql.append(getFullName(item, item.getTable()));
+        remarksSql.append(SqlConstant.COMMENT);
+        remarksSql.append(SqlConstant.ON);
+        remarksSql.append(isTable ? SqlConstant.TABLE : SqlConstant.COLUMN);
+        remarksSql.append(getFullName(item, item.getTable()));
+        if (!isTable) {
             remarksSql.append(SqlConstant.POINT);
             remarksSql.append(transferred);
             remarksSql.append(item.getColumnInfo().getName());
             remarksSql.append(transferred);
-            remarksSql.append(SqlConstant.IS);
-            remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
-            remarksSql.append(item.getColumnInfo().getRemarks());
-            remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
         }
+        remarksSql.append(SqlConstant.IS);
+        remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        remarksSql.append(StringUtil.isNotBlank(item.getColumnInfo().getRemarks()) ? item.getColumnInfo().getRemarks() : "''");
+        remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
         return remarksSql.toString();
     }
 

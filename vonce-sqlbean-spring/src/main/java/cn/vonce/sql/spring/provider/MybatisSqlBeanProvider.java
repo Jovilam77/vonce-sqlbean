@@ -296,7 +296,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String selectTableList(Map<String, Object> map) {
-        return SqlBeanProvider.selectTableListSql((SqlBeanDB) map.get("sqlBeanDB"), null, (String) map.get("name"));
+        return SqlBeanProvider.selectTableListSql((SqlBeanDB) map.get("sqlBeanDB"), (String) map.get("schema"), (String) map.get("name"));
     }
 
     /**
@@ -306,7 +306,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String selectColumnInfoList(Map<String, Object> map) {
-        return SqlBeanProvider.selectColumnListSql((SqlBeanDB) map.get("sqlBeanDB"), (String) map.get("name"));
+        return SqlBeanProvider.selectColumnListSql((SqlBeanDB) map.get("sqlBeanDB"), (String) map.get("schema"), (String) map.get("name"));
     }
 
     /**

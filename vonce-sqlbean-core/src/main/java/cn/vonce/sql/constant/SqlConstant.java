@@ -27,6 +27,7 @@ public class SqlConstant {
     public static final String OR = " OR ";
     public static final String UPDATE = "UPDATE ";
     public static final String SET = " SET ";
+    public static final String DATA_TYPE = "DATA TYPE ";
     public static final String VALUES = "VALUES";
     public static final String NULL_VALUE = "NULL";
     public static final String INSERT_INTO = "INSERT INTO ";
@@ -73,6 +74,7 @@ public class SqlConstant {
     public static final String COMMENT = "COMMENT";
 
     public static final String ALTER_TABLE = "ALTER TABLE ";
+    public static final String TABLE = "TABLE ";
     public static final String ALTER = "ALTER ";
     public static final String COLUMN = "COLUMN ";
     public static final String TO = " TO ";
@@ -83,6 +85,7 @@ public class SqlConstant {
     public static final String MODIFY = "MODIFY ";
     public static final String DROP = "DROP ";
     public static final String AFTER = "AFTER ";
+    public static final String FOR = "FOR ";
 
     // mssql
     public static final String TOP = " TOP ";
@@ -113,5 +116,14 @@ public class SqlConstant {
     public static final String REAL = "REAL";
     public static final String TEXT = "TEXT";
     public static final String BLOB = "BLOB";
+
+    // Postgresql
+    public static final String TYPE = "TYPE ";
+    public static final String COLLATE = "COLLATE ";
+    public static final String PG_CATALOG = "PG_CATALOG";
+    public static final String USING = " USING ";
+    public static final String DOUBLE_COLON = "::";
+    public static final String CONSTRAINT = "CONSTRAINT ";
+    public static final String PKEY = "pkey";
 
 }

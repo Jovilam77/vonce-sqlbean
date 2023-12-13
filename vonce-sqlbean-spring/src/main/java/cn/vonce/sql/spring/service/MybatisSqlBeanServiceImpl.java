@@ -686,12 +686,21 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return count;
     }
 
+    @Override
+    public int alterRemarks(String remarks) {
+        if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Derby) {
+            return 0;
+        }
+        String sql = SqlBeanProvider.alterRemarksSql(getSqlBeanDB(), clazz, remarks);
+        return mybatisSqlBeanDao.executeSql(sql);
+    }
+
     @DbSwitch(DbRole.MASTER)
     @Override
     public void dropTable() {
         SqlBeanDB sqlBeanDB = getSqlBeanDB();
         if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.Postgresql && sqlBeanDB.getDbType() != DbType.SQLServer && sqlBeanDB.getDbType() != DbType.H2) {
-            List<TableInfo> nameList = mybatisSqlBeanDao.selectTableList(getSqlBeanDB(), SqlBeanUtil.getTable(clazz).getName());
+            List<TableInfo> nameList = mybatisSqlBeanDao.selectTableList(getSqlBeanDB(), SqlBeanUtil.getTable(clazz).getSchema(), SqlBeanUtil.getTable(clazz).getName());
             if (nameList == null || nameList.isEmpty()) {
                 return;
             }
@@ -715,13 +724,25 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<TableInfo> getTableList(String tableName) {
-        return mybatisSqlBeanDao.selectTableList(getSqlBeanDB(), tableName);
+        return this.getTableList(SqlBeanUtil.getTable(clazz).getSchema(), tableName);
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public List<TableInfo> getTableList(String schema, String tableName) {
+        return mybatisSqlBeanDao.selectTableList(getSqlBeanDB(), schema, tableName);
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<ColumnInfo> getColumnInfoList(String tableName) {
-        List<ColumnInfo> columnInfoList = mybatisSqlBeanDao.selectColumnInfoList(getSqlBeanDB(), tableName);
+        return this.getColumnInfoList(SqlBeanUtil.getTable(clazz).getSchema(), tableName);
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public List<ColumnInfo> getColumnInfoList(String schema, String tableName) {
+        List<ColumnInfo> columnInfoList = mybatisSqlBeanDao.selectColumnInfoList(getSqlBeanDB(), schema, tableName);
         super.handleColumnInfo(columnInfoList);
         return columnInfoList;
     }

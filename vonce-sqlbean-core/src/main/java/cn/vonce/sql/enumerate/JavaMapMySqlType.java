@@ -96,8 +96,10 @@ public enum JavaMapMySqlType {
         sql.append("(CASE column_key WHEN 'PRI' THEN 1 ELSE 0 END) AS pk, ");
         sql.append("(CASE column_key WHEN 'MUL' THEN 1 ELSE 0 END) AS fk, ");
         sql.append("(CASE extra WHEN 'auto_increment' THEN 1 ELSE 0 END) AS auto_incr, ");
-        sql.append("(CASE WHEN data_type = 'bit' OR data_type = 'tinyint' OR data_type = 'mediumint' OR data_type = 'int' OR data_type = 'bigint' OR ");
-        sql.append("data_type = 'float' OR data_type = 'double' OR data_type = 'decimal' THEN numeric_precision ELSE character_maximum_length END) AS length, ");
+        sql.append("(CASE WHEN data_type = 'bit' OR data_type = 'tinyint' OR data_type = 'smallint' OR data_type = 'mediumint' OR data_type = 'int' OR data_type = 'bigint' ");
+        sql.append("THEN REPLACE ( SUBSTRING( column_type, INSTR( column_type, '(' )+ 1 ), ')', '' ) ");
+        sql.append("WHEN data_type = 'float' OR data_type = 'double' OR data_type = 'decimal' ");
+        sql.append("THEN numeric_precision ELSE character_maximum_length END ) AS length, ");
         sql.append("numeric_scale AS scale, ");
         sql.append("column_comment AS remarks ");
         sql.append("FROM information_schema.columns ");
@@ -162,6 +164,33 @@ public enum JavaMapMySqlType {
         List<String> sqlList = new ArrayList<>();
         sqlList.add(sql.toString());
         return sqlList;
+    }
+
+    /**
+     * 增加列备注
+     *
+     * @param item
+     * @param transferred
+     * @return
+     */
+    public static String addRemarks(Alter item, String transferred) {
+        StringBuffer remarksSql = new StringBuffer();
+        remarksSql.append(SqlConstant.ALTER_TABLE);
+        if (StringUtil.isNotBlank(item.getTable().getSchema())) {
+            remarksSql.append(transferred);
+            remarksSql.append(item.getTable().getSchema());
+            remarksSql.append(transferred);
+            remarksSql.append(SqlConstant.POINT);
+        }
+        remarksSql.append(transferred);
+        remarksSql.append(item.getTable().getName());
+        remarksSql.append(transferred);
+        remarksSql.append(SqlConstant.COMMENT);
+        remarksSql.append(SqlConstant.EQUAL_TO);
+        remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        remarksSql.append(StringUtil.isNotBlank(item.getColumnInfo().getRemarks()) ? item.getColumnInfo().getRemarks() : "''");
+        remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        return remarksSql.toString();
     }
 
 }

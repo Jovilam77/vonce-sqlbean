@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 通用的数据库操作sql语句生成
@@ -562,6 +563,8 @@ public class SqlBeanProvider {
      * 获取表名列表
      *
      * @param sqlBeanDB
+     * @param schema
+     * @param name
      * @return
      */
     public static String selectTableListSql(SqlBeanDB sqlBeanDB, String schema, String name) {
@@ -597,32 +600,34 @@ public class SqlBeanProvider {
      * 获取列信息列表
      *
      * @param sqlBeanDB
+     * @param schema
+     * @param name
      * @return
      */
-    public static String selectColumnListSql(SqlBeanDB sqlBeanDB, String name) {
+    public static String selectColumnListSql(SqlBeanDB sqlBeanDB, String schema, String name) {
         if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase() && StringUtil.isNotEmpty(name)) {
             name = name.toUpperCase();
         }
         switch (sqlBeanDB.getDbType()) {
             case MySQL:
             case MariaDB:
-                return JavaMapMySqlType.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapMySqlType.getColumnListSql(sqlBeanDB, schema, name);
             case SQLServer:
-                return JavaMapSqlServerType.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapSqlServerType.getColumnListSql(sqlBeanDB, schema, name);
             case Oracle:
-                return JavaMapOracleType.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapOracleType.getColumnListSql(sqlBeanDB, schema, name);
             case Postgresql:
-                return JavaMapPostgresqlType.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapPostgresqlType.getColumnListSql(sqlBeanDB, schema, name);
             case DB2:
-                return JavaMapDB2Type.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapDB2Type.getColumnListSql(sqlBeanDB, schema, name);
             case H2:
-                return JavaMapH2Type.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapH2Type.getColumnListSql(sqlBeanDB, schema, name);
             case Hsql:
-                return JavaMapHsqlType.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapHsqlType.getColumnListSql(sqlBeanDB, schema, name);
             case Derby:
-                return JavaMapDerbyType.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapDerbyType.getColumnListSql(sqlBeanDB, schema, name);
             case SQLite:
-                return JavaMapSqliteType.getColumnListSql(sqlBeanDB, null, name);
+                return JavaMapSqliteType.getColumnListSql(sqlBeanDB, schema, name);
             default:
                 throw new SqlBeanException("请配置正确的数据库");
         }
@@ -691,9 +696,10 @@ public class SqlBeanProvider {
     public static List<String> buildAlterSql(SqlBeanDB sqlBeanDB, Class<?> clazz, List<ColumnInfo> columnInfoList) {
         SqlTable sqlTable = clazz.getAnnotation(SqlTable.class);
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
+        fieldList = fieldList.stream().filter(item -> !SqlBeanUtil.isIgnore(item)).collect(Collectors.toList());
         List<Alter> alterList = new ArrayList<>();
-        Map<String, String> renameMap = (sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) ? new HashMap<>() : null;
-        for (Field field : fieldList) {
+        for (int i = 0; i < fieldList.size(); i++) {
+            Field field = fieldList.get(i);
             if (SqlBeanUtil.isIgnore(field)) {
                 continue;
             }
@@ -705,24 +711,23 @@ public class SqlBeanProvider {
             String oldName = sqlColumn == null ? "" : (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) ? sqlColumn.oldName().toUpperCase() : sqlColumn.oldName();
             ColumnInfo columnInfo = SqlBeanUtil.buildColumnInfo(alter.getSqlBeanDB(), field, sqlTable, sqlColumn);
             boolean exist = false;
-            boolean fit = true;
+
             //优先比较字段改名的
-            for (int i = 0; i < columnInfoList.size(); i++) {
-                if (sqlColumn != null && oldName.equalsIgnoreCase(columnInfoList.get(i).getName())) {
+            for (int j = 0; j < columnInfoList.size(); j++) {
+                if (sqlColumn != null && oldName.equalsIgnoreCase(columnInfoList.get(j).getName())) {
                     //存在此字段
                     exist = true;
                     //使用实体类中的字段信息与数据库中的字段信息做比较
-                    fit = SqlBeanUtil.columnInfoCompare(sqlBeanDB, columnInfo, columnInfoList.get(i));
-                    if (!fit) {
+                    List<AlterDifference> alterDifferenceList = SqlBeanUtil.columnInfoCompare(sqlBeanDB, columnInfo, columnInfoList.get(j));
+                    if (alterDifferenceList.size() > 0) {
                         alter.setType(AlterType.CHANGE);
                         alter.setColumnInfo(columnInfo);
                         alter.setOldColumnName(oldName);
+                        alter.setDifferences(alterDifferenceList);
                         //只有MySQL、MariaDB需要处理
                         if (sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) {
-                            renameMap.put(oldName, columnInfo.getName());
-                            if (i > 0) {
-                                String afterName = renameMap.get(columnInfoList.get(i - 1).getName());
-                                alter.setAfterColumnName(StringUtil.isNotBlank(afterName) ? afterName : columnInfoList.get(i - 1).getName());
+                            if (j > 0) {
+                                alter.setAfterColumnName(SqlBeanUtil.getTableFieldName(fieldList.get(i - 1), sqlTable));
                             }
                         }
                         alterList.add(alter);
@@ -731,36 +736,39 @@ public class SqlBeanProvider {
                 }
             }
             //如果改名的字段已存在则跳过外层循环
-            if (!fit) {
+            if (alter.getDifferences() != null) {
                 continue;
             }
             //其次比较变更内容
-            for (int i = 0; i < columnInfoList.size(); i++) {
-                if (columnInfo.getName().equalsIgnoreCase(columnInfoList.get(i).getName())) {
+            for (int j = 0; j < columnInfoList.size(); j++) {
+                if (columnInfo.getName().equalsIgnoreCase(columnInfoList.get(j).getName())) {
                     //存在此字段
                     exist = true;
                     //使用实体类中的字段信息与数据库中的字段信息做比较
-                    fit = SqlBeanUtil.columnInfoCompare(sqlBeanDB, columnInfo, columnInfoList.get(i));
-                    if (!fit) {
+                    List<AlterDifference> alterDifferenceList = SqlBeanUtil.columnInfoCompare(sqlBeanDB, columnInfo, columnInfoList.get(j));
+                    if (alterDifferenceList.size() > 0) {
                         alter.setType(AlterType.MODIFY);
                         alter.setColumnInfo(columnInfo);
+                        alter.setDifferences(alterDifferenceList);
                         //只有MySQL、MariaDB需要处理
                         if ((sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) && i > 0) {
-                            String afterName = renameMap.get(columnInfoList.get(i - 1).getName());
-                            alter.setAfterColumnName(StringUtil.isNotBlank(afterName) ? afterName : columnInfoList.get(i - 1).getName());
+                            alter.setAfterColumnName(SqlBeanUtil.getTableFieldName(fieldList.get(i - 1), sqlTable));
                         }
                         alterList.add(alter);
                     }
                     break;
                 }
             }
-            if (!fit) {
+            if (alter.getDifferences() != null) {
                 continue;
             }
             //如果比较之后数据库中的表字段仍不存在实体类中的字段时，说明是新增
             if (!exist) {
                 alter.setType(AlterType.ADD);
                 alter.setColumnInfo(columnInfo);
+                if ((sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) && i > 0) {
+                    alter.setAfterColumnName(SqlBeanUtil.getTableFieldName(fieldList.get(i - 1), sqlTable));
+                }
                 alterList.add(alter);
             }
         }
@@ -786,8 +794,8 @@ public class SqlBeanProvider {
                 return JavaMapSqlServerType.alterTable(alterList);
             case Oracle:
                 return JavaMapOracleType.alterTable(alterList);
-//                case Postgresql:
-//                    return JavaMapPostgresqlType.alterTable(alterList);
+            case Postgresql:
+                return JavaMapPostgresqlType.alterTable(alterList);
             case DB2:
                 return JavaMapDB2Type.alterTable(alterList);
             case H2:
@@ -798,6 +806,43 @@ public class SqlBeanProvider {
                 return JavaMapDerbyType.alterTable(alterList);
             case SQLite:
                 return JavaMapSqliteType.alterTable(alterList);
+            default:
+                throw new SqlBeanException("请配置正确的数据库");
+        }
+    }
+
+    /**
+     * 更改表备注sql
+     *
+     * @param sqlBeanDB
+     * @param clazz
+     * @param remarks
+     * @return
+     */
+    public static String alterRemarksSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String remarks) {
+        Alter alter = new Alter();
+        alter.setSqlBeanDB(sqlBeanDB);
+        alter.setTable(clazz);
+        ColumnInfo columnInfo = new ColumnInfo();
+        columnInfo.setRemarks(remarks);
+        alter.setColumnInfo(columnInfo);
+        String transferred = SqlBeanUtil.getTransferred(alter);
+        switch (sqlBeanDB.getDbType()) {
+            case MySQL:
+            case MariaDB:
+                return JavaMapMySqlType.addRemarks(alter, transferred);
+            case SQLServer:
+                return JavaMapSqlServerType.addRemarks(true, alter);
+            case Oracle:
+                return JavaMapOracleType.addRemarks(true, alter, transferred);
+            case Postgresql:
+                return JavaMapPostgresqlType.addRemarks(true, alter, transferred);
+            case DB2:
+                return JavaMapDB2Type.addRemarks(true, alter, transferred);
+            case H2:
+                return JavaMapH2Type.addRemarks(true, alter, transferred);
+            case Hsql:
+                return JavaMapHsqlType.addRemarks(true, alter, transferred);
             default:
                 throw new SqlBeanException("请配置正确的数据库");
         }
@@ -934,13 +979,21 @@ public class SqlBeanProvider {
     private static void setSchema(Common common, Class<?> clazz) {
         //自主设置优先级高
         if (StringUtil.isEmpty(common.getTable().getSchema())) {
-            String schema = DynSchemaContextHolder.getSchema();
-            if (StringUtil.isNotEmpty(schema)) {
-                common.getTable().setSchema(schema);
-            } else {
-                common.getTable().setSchema(SqlBeanUtil.getTable(clazz).getSchema());
-            }
+            common.getTable().setSchema(getSchema(clazz));
         }
+    }
+
+    /**
+     * 获取Schema
+     *
+     * @param clazz
+     */
+    private static String getSchema(Class<?> clazz) {
+        String schema = DynSchemaContextHolder.getSchema();
+        if (StringUtil.isEmpty(schema)) {
+            return SqlBeanUtil.getTable(clazz).getSchema();
+        }
+        return schema;
     }
 
 }

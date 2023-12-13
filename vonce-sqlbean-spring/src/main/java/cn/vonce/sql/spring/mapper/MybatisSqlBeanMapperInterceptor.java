@@ -78,7 +78,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             if (SqlBeanUtil.isBaseType(resultType)) {
                 return baseHandleResultSet(resultSet, resultType);
             }
-            if (SqlBeanUtil.isMap(resultType.getName())) {
+            if (SqlBeanUtil.isMap(resultType)) {
                 return mapHandleResultSet(resultSet);
             }
             // 获取实际需要返回的类型
@@ -91,7 +91,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             if (SqlBeanUtil.isBaseType(returnType)) {
                 return baseHandleResultSet(resultSet, returnType);
             }
-            if (SqlBeanUtil.isMap(returnType.getName())) {
+            if (SqlBeanUtil.isMap(returnType)) {
                 return mapHandleResultSet(resultSet);
             }
             return beanHandleResultSet(returnType, resultSet, super.getColumnNameList(resultSet));
@@ -156,7 +156,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
                 while (resultSet.next()) {
                     Object value = super.baseHandleResultSet(resultSet);
                     if (value != null && !value.getClass().getName().equals(returnType.getName())) {
-                        value = getValueConvert(returnType.getName(), value);
+                        value = SqlBeanUtil.getValueConvert(returnType, value);
                     }
                     resultList.add(value);
                 }
@@ -168,7 +168,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             }
         }
         if (resultList.isEmpty()) {
-            resultList.add(getDefaultValue(returnType.getName()));
+            resultList.add(SqlBeanUtil.getDefaultValue(returnType));
         }
         return resultList;
     }

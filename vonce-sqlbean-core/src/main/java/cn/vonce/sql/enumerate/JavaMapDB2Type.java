@@ -128,7 +128,10 @@ public enum JavaMapDB2Type {
                 sql.append(SqlConstant.ADD);
                 sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
                 sqlList.add(sql.toString());
-                sqlList.add(addRemarks(alter, transferred));
+                String remarks = addRemarks(false, alter, transferred);
+                if (StringUtil.isNotBlank(remarks)) {
+                    sqlList.add(remarks);
+                }
             } else if (alter.getType() == AlterType.CHANGE) {
                 StringBuffer sql = new StringBuffer();
                 sql.append(changeColumn(alter));
@@ -136,14 +139,22 @@ public enum JavaMapDB2Type {
                 //先改名后修改信息
                 StringBuffer modifySql = modifyColumn(alter);
                 if (modifySql.length() > 0) {
-                    sql.append(SqlConstant.ALTER_TABLE);
                     sql.append(modifySql);
                 }
                 sqlList.add(sql.toString());
-                sqlList.add(addRemarks(alter, transferred));
+                String remarks = addRemarks(false, alter, transferred);
+                if (StringUtil.isNotBlank(remarks)) {
+                    sqlList.add(remarks);
+                }
             } else if (alter.getType() == AlterType.MODIFY) {
-                sqlList.add(SqlConstant.ALTER_TABLE + modifyColumn(alter));
-                sqlList.add(addRemarks(alter, transferred));
+                StringBuffer modifySql = modifyColumn(alter);
+                if (modifySql.length() > 0) {
+                    sqlList.add(modifySql.toString());
+                }
+                String remarks = addRemarks(false, alter, transferred);
+                if (StringUtil.isNotBlank(remarks)) {
+                    sqlList.add(remarks);
+                }
             } else if (alter.getType() == AlterType.DROP) {
                 StringBuffer sql = new StringBuffer();
                 sql.append(SqlConstant.ALTER_TABLE);
@@ -153,8 +164,8 @@ public enum JavaMapDB2Type {
                 sql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
                 sqlList.add(sql.toString());
             }
+            sqlList.add(recast(alterList.get(i)));
         }
-        sqlList.add(recast(alterList.get(0)));
         return sqlList;
     }
 
@@ -190,30 +201,44 @@ public enum JavaMapDB2Type {
      */
     private static StringBuffer modifyColumn(Alter alter) {
         StringBuffer modifySql = new StringBuffer();
-        modifySql.append(getFullName(alter, alter.getTable()));
-        modifySql.append(SqlConstant.ALTER);
-        modifySql.append(SqlConstant.COLUMN);
-        ColumnInfo columnInfo = alter.getColumnInfo();
-        modifySql.append(SqlBeanUtil.isToUpperCase(alter) ? columnInfo.getName().toUpperCase() : columnInfo.getName());
-        if ((columnInfo.getNotnull() != null && columnInfo.getNotnull()) || columnInfo.getPk()) {
-            modifySql.append(" SET ");
-            modifySql.append(SqlConstant.NOT_NULL);
-        }/* else if (columnInfo.getNotnull() != null && !columnInfo.getNotnull()) {
-            modifySql.append(" DROP ");
-            modifySql.append(SqlConstant.NOT_NULL);
-        }*/
-        JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
-        modifySql.append(" SET DATA TYPE ");
-        modifySql.append(jdbcType.name());
-        if (columnInfo.getLength() != null && columnInfo.getLength() > 0) {
-            modifySql.append(SqlConstant.BEGIN_BRACKET);
-            //字段长度
-            modifySql.append(columnInfo.getLength());
-            if (jdbcType.isFloat()) {
-                modifySql.append(SqlConstant.COMMA);
-                modifySql.append(columnInfo.getScale() == null ? 0 : columnInfo.getScale());
+        List<AlterDifference> alterDifferenceList = alter.getDifferences();
+        for (AlterDifference alterDifference : alterDifferenceList) {
+            ColumnInfo columnInfo = alter.getColumnInfo();
+            if (alterDifference == AlterDifference.NOT_NULL || alterDifference == AlterDifference.TYPE) {
+                if (modifySql.length() > 0) {
+                    modifySql.append(SqlConstant.SEMICOLON);
+                }
+                modifySql.append(SqlConstant.ALTER_TABLE);
+                modifySql.append(getFullName(alter, alter.getTable()));
+                modifySql.append(SqlConstant.ALTER);
+                modifySql.append(SqlConstant.COLUMN);
+                modifySql.append(SqlBeanUtil.isToUpperCase(alter) ? columnInfo.getName().toUpperCase() : columnInfo.getName());
             }
-            modifySql.append(SqlConstant.END_BRACKET);
+            if (alterDifference == AlterDifference.NOT_NULL) {
+                if ((columnInfo.getNotnull() != null && columnInfo.getNotnull()) || columnInfo.getPk()) {
+                    modifySql.append(SqlConstant.SET);
+                    modifySql.append(SqlConstant.NOT_NULL);
+                } else if (columnInfo.getNotnull() != null && !columnInfo.getNotnull()) {
+                    modifySql.append(SqlConstant.SPACES);
+                    modifySql.append(SqlConstant.DROP);
+                    modifySql.append(SqlConstant.NOT_NULL);
+                }
+            } else if (alterDifference == AlterDifference.TYPE) {
+                JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
+                modifySql.append(SqlConstant.SET);
+                modifySql.append(SqlConstant.DATA_TYPE);
+                modifySql.append(jdbcType.name());
+                if (columnInfo.getLength() != null && columnInfo.getLength() > 0) {
+                    modifySql.append(SqlConstant.BEGIN_BRACKET);
+                    //字段长度
+                    modifySql.append(columnInfo.getLength());
+                    if (jdbcType.isFloat()) {
+                        modifySql.append(SqlConstant.COMMA);
+                        modifySql.append(columnInfo.getScale() == null ? 0 : columnInfo.getScale());
+                    }
+                    modifySql.append(SqlConstant.END_BRACKET);
+                }
+            }
         }
         return modifySql;
     }
@@ -239,26 +264,27 @@ public enum JavaMapDB2Type {
     /**
      * 增加列备注
      *
+     * @param isTable
      * @param item
      * @param transferred
      * @return
      */
-    private static String addRemarks(Alter item, String transferred) {
+    public static String addRemarks(boolean isTable, Alter item, String transferred) {
         StringBuffer remarksSql = new StringBuffer();
-        if (StringUtil.isNotBlank(item.getColumnInfo().getRemarks())) {
-            remarksSql.append(SqlConstant.COMMENT);
-            remarksSql.append(SqlConstant.ON);
-            remarksSql.append(SqlConstant.COLUMN);
-            remarksSql.append(getFullName(item, item.getTable()));
+        remarksSql.append(SqlConstant.COMMENT);
+        remarksSql.append(SqlConstant.ON);
+        remarksSql.append(isTable ? SqlConstant.TABLE : SqlConstant.COLUMN);
+        remarksSql.append(getFullName(item, item.getTable()));
+        if (!isTable) {
             remarksSql.append(SqlConstant.POINT);
             remarksSql.append(transferred);
             remarksSql.append(item.getColumnInfo().getName());
             remarksSql.append(transferred);
-            remarksSql.append(SqlConstant.IS);
-            remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
-            remarksSql.append(item.getColumnInfo().getRemarks());
-            remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
         }
+        remarksSql.append(SqlConstant.IS);
+        remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        remarksSql.append(StringUtil.isNotBlank(item.getColumnInfo().getRemarks()) ? item.getColumnInfo().getRemarks() : "''");
+        remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
         return remarksSql.toString();
     }
 

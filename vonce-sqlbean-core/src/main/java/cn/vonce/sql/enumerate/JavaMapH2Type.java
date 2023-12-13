@@ -141,7 +141,7 @@ public enum JavaMapH2Type {
                 sql.append(getFullName(alter, alter.getTable()));
                 sql.append(SqlConstant.ADD);
                 sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
-                remarksSql.append(addRemarks(alter, transferred));
+                remarksSql.append(addRemarks(false, alter, transferred));
             } else if (alter.getType() == AlterType.CHANGE) {
                 sql.append(changeColumn(alter));
                 sql.append(SqlConstant.SEMICOLON);
@@ -151,11 +151,11 @@ public enum JavaMapH2Type {
                     sql.append(SqlConstant.ALTER_TABLE);
                     sql.append(modifySql);
                 }
-                remarksSql.append(addRemarks(alter, transferred));
+                remarksSql.append(addRemarks(false, alter, transferred));
             } else if (alter.getType() == AlterType.MODIFY) {
                 sql.append(SqlConstant.ALTER_TABLE);
                 sql.append(modifyColumn(alter));
-                remarksSql.append(addRemarks(alter, transferred));
+                remarksSql.append(addRemarks(false, alter, transferred));
             } else if (alter.getType() == AlterType.DROP) {
                 sql.append(SqlConstant.ALTER_TABLE);
                 sql.append(getFullName(alter, alter.getTable()));
@@ -231,26 +231,27 @@ public enum JavaMapH2Type {
     /**
      * 增加列备注
      *
+     * @param isTable
      * @param item
      * @param transferred
      * @return
      */
-    private static String addRemarks(Alter item, String transferred) {
+    public static String addRemarks(boolean isTable, Alter item, String transferred) {
         StringBuffer remarksSql = new StringBuffer();
-        if (StringUtil.isNotBlank(item.getColumnInfo().getRemarks())) {
-            remarksSql.append(SqlConstant.COMMENT);
-            remarksSql.append(SqlConstant.ON);
-            remarksSql.append(SqlConstant.COLUMN);
-            remarksSql.append(getFullName(item, item.getTable()));
+        remarksSql.append(SqlConstant.COMMENT);
+        remarksSql.append(SqlConstant.ON);
+        remarksSql.append(isTable ? SqlConstant.TABLE : SqlConstant.COLUMN);
+        remarksSql.append(getFullName(item, item.getTable()));
+        if (!isTable) {
             remarksSql.append(SqlConstant.POINT);
             remarksSql.append(transferred);
             remarksSql.append(item.getColumnInfo().getName());
             remarksSql.append(transferred);
-            remarksSql.append(SqlConstant.IS);
-            remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
-            remarksSql.append(item.getColumnInfo().getRemarks());
-            remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
         }
+        remarksSql.append(SqlConstant.IS);
+        remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        remarksSql.append(StringUtil.isNotBlank(item.getColumnInfo().getRemarks()) ? item.getColumnInfo().getRemarks() : "''");
+        remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
         return remarksSql.toString();
     }
 

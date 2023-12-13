@@ -1,4 +1,4 @@
-package cn.vonce.sql.enumerate;
+package cn.vonce.sql.define;
 
 import java.io.Serializable;
 

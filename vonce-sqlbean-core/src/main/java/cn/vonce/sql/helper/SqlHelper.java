@@ -528,7 +528,7 @@ public class SqlHelper {
                     valueSql.append(0);
                     ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), field.getType() == Boolean.class || field.getType() == boolean.class ? false : 0);
                 } else if (value == null && sqlDefaultValue != null && (sqlDefaultValue.with() == FillWith.INSERT || sqlDefaultValue.with() == FillWith.TOGETHER)) {
-                    Object defaultValue = SqlBeanUtil.getDefaultValue(field.getType().getName());
+                    Object defaultValue = SqlBeanUtil.assignInitialValue(SqlBeanUtil.getEntityClassFieldType(field));
                     valueSql.append(SqlBeanUtil.getSqlValue(common, defaultValue));
                     ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), defaultValue);
                 } else {
@@ -619,10 +619,10 @@ public class SqlHelper {
                 setSql.append(transferred);
                 setSql.append(SqlConstant.EQUAL_TO);
                 if (update.isOptimisticLock() && sqlVersion != null) {
-                    Object o = SqlBeanUtil.updateVersion(field.getType().getName(), objectValue);
+                    Object o = SqlBeanUtil.updateVersion(field.getType(), objectValue);
                     setSql.append(SqlBeanUtil.getSqlValue(update, o));
                 } else if (objectValue == null && sqlDefaultValue != null && (sqlDefaultValue.with() == FillWith.UPDATE || sqlDefaultValue.with() == FillWith.TOGETHER)) {
-                    Object defaultValue = SqlBeanUtil.getDefaultValue(field.getType().getName());
+                    Object defaultValue = SqlBeanUtil.assignInitialValue(SqlBeanUtil.getEntityClassFieldType(field));
                     setSql.append(SqlBeanUtil.getSqlValue(update, defaultValue));
                     ReflectUtil.instance().set(bean.getClass(), bean, field.getName(), defaultValue);
                 } else {
@@ -875,7 +875,7 @@ public class SqlHelper {
             versionField = SqlBeanUtil.getVersionField(bean.getClass());
         }
         if (versionField != null) {
-            boolean versionEffectiveness = SqlBeanUtil.versionEffectiveness(versionField.getType().getName());
+            boolean versionEffectiveness = SqlBeanUtil.versionEffectiveness(versionField.getType());
             if (versionEffectiveness) {
                 versionConditionSql.append(SqlConstant.BEGIN_BRACKET);
                 versionConditionSql.append(SqlBeanUtil.getTableFieldName(versionField, sqlTable));
