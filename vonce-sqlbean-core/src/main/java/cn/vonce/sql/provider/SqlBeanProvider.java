@@ -13,6 +13,7 @@ import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -871,6 +872,10 @@ public class SqlBeanProvider {
         } catch (SqlBeanException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
             return null;
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
         }
         return select;
     }
@@ -897,7 +902,7 @@ public class SqlBeanProvider {
         setSchema(select, clazz);
         try {
             SqlBeanUtil.setJoin(select, clazz);
-        } catch (SqlBeanException | InstantiationException | IllegalAccessException e) {
+        } catch (SqlBeanException | InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             e.printStackTrace();
             return null;
         }

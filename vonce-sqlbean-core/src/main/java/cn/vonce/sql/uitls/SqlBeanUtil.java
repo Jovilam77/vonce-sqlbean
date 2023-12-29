@@ -14,10 +14,7 @@ import cn.vonce.sql.exception.SqlBeanException;
 import java.beans.Introspector;
 import java.io.*;
 import java.lang.invoke.SerializedLambda;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -655,7 +652,7 @@ public class SqlBeanUtil {
      * @param clazz
      * @return
      */
-    public static Map<String, Join> setJoin(Select select, Class<?> clazz) throws SqlBeanException, InstantiationException, IllegalAccessException {
+    public static Map<String, Join> setJoin(Select select, Class<?> clazz) throws SqlBeanException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         SqlTable sqlTable = getSqlTable(clazz);
         List<Field> fieldList = getBeanAllField(clazz);
         Map<String, Join> joinFieldMap = new HashMap<>();
@@ -689,11 +686,18 @@ public class SqlBeanUtil {
             if (sqlJoin.on() != null && sqlJoin.on() != void.class) {
                 key = Md5Util.encode(sqlJoin.on() + sqlJoin.on().getClassLoader().toString());
                 if (joinFieldMap.containsKey(key)) {
-                    join = null;
                     continue;
                 }
                 select.addJoin(join);
-                JoinOn joinOn = (JoinOn) sqlJoin.on().newInstance();
+                JoinOn joinOn;
+                //如果是非静态内部类
+                if (sqlJoin.on().getEnclosingClass() != null && !Modifier.isStatic(sqlJoin.on().getModifiers())) {
+                    Object enclosingInstance = sqlJoin.on().getEnclosingClass().newInstance();
+                    Constructor<?> constructor = sqlJoin.on().getDeclaredConstructor(sqlJoin.on().getEnclosingClass());
+                    joinOn = (JoinOn) constructor.newInstance(enclosingInstance);
+                } else {
+                    joinOn = (JoinOn) sqlJoin.on().newInstance();
+                }
                 Condition condition = new Condition();
                 joinOn.on(condition);
                 join.on().setDataList(condition.getDataList());
@@ -701,7 +705,6 @@ public class SqlBeanUtil {
                 if (sqlJoin != null && !sqlJoin.isBean()) {
                     key = Md5Util.encode(sqlJoin.table().toLowerCase() + sqlJoin.tableKeyword().toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
                     if (joinFieldMap.containsKey(key)) {
-                        join = null;
                         continue;
                     }
                     select.addJoin(join);
@@ -710,7 +713,6 @@ public class SqlBeanUtil {
                     String tableKeyword = getTableFieldName(getIdField(subClazz), sqlTable);
                     key = Md5Util.encode(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
                     if (joinFieldMap.containsKey(key)) {
-                        join = null;
                         continue;
                     }
                     select.addJoin(join);
