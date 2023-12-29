@@ -143,7 +143,7 @@ public class SqlBeanUtil {
 
 
     /**
-     * 获取Bean字段中实际对于的表字段
+     * 获取Bean字段中实际对于的表字段(加数据库转义符)
      *
      * @param common
      * @param field
@@ -155,7 +155,7 @@ public class SqlBeanUtil {
     }
 
     /**
-     * 获取Bean字段中实际对于的表字段
+     * 获取Bean字段中实际对于的表字段(加数据库转义符)
      *
      * @param common
      * @param name
@@ -1428,6 +1428,17 @@ public class SqlBeanUtil {
     public static void check(Common common) {
         isNull(common.getSqlBeanDB(), "请设置sqlBeanConfig");
         isNull(common.getSqlBeanDB().getDbType(), "请设置sqlBeanConfig -> dbType");
+    }
+
+    /**
+     * 获取列字段对象
+     *
+     * @param field
+     * @return Column
+     */
+    public static Column getColumnByField(Field field) {
+        SqlTable sqlTable = SqlBeanUtil.getSqlTable(field.getDeclaringClass());
+        return new Column(sqlTable.alias(), SqlBeanUtil.getTableFieldName(field, sqlTable), "");
     }
 
     /**
