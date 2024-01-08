@@ -556,24 +556,30 @@ public class SqlHelper {
             if (valuesList == null || valuesList.size() == 0) {
                 throw new SqlBeanException("请指定Insert的字段对应的值");
             }
+            fieldSql.append(SqlConstant.BEGIN_BRACKET);
             for (int i = 0; i < columnList.size(); i++) {
                 fieldSql.append(SqlBeanUtil.getTableFieldName(insert, columnList.get(i).getName()));
                 if (i < columnList.size() - 1) {
                     fieldSql.append(SqlConstant.COMMA);
                 }
             }
-            for (List<Object> valueList : valuesList) {
+            fieldSql.append(SqlConstant.END_BRACKET);
+            for (int i = 0; i < valuesList.size(); i++) {
+                //每次必须清空
+                valueSql.delete(0, valueSql.length());
+                List<Object> valueList = valuesList.get(i);
                 if (valueList.size() != columnList.size()) {
                     throw new SqlBeanException("指定Insert的value数量与column数量不一致");
                 }
                 valueSql.append(SqlConstant.BEGIN_BRACKET);
-                for (int i = 0; i < valueList.size(); i++) {
-                    valueSql.append(SqlBeanUtil.getSqlValue(insert, valueList.get(i)));
-                    if (i < columnList.size() - 1) {
-                        fieldSql.append(SqlConstant.COMMA);
+                for (int j = 0; j < valueList.size(); j++) {
+                    valueSql.append(SqlBeanUtil.getSqlValue(insert, valueList.get(j)));
+                    if (j < columnList.size() - 1) {
+                        valueSql.append(SqlConstant.COMMA);
                     }
                 }
                 valueSql.append(SqlConstant.END_BRACKET);
+                valueSqlList.add(valueSql.toString());
             }
         }
         if (insert.getSqlBeanDB().getDbType() == DbType.Oracle) {
