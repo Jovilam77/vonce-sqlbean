@@ -9,8 +9,9 @@
  mapUsToCc  | 是否开启Java字段驼峰命名转Sql字段下划线命名 | true | 否
  isView  | 是否为视图 | false | 否
  value  | 表名 |  | 是
- alias  | 别名 | "" | 否
+ alias  | 表别名 | "" | 否
  schema  | schema | "" | 否
+ remarks  | 表注释 | "" | 否
 
 ```java
 2.@SqlId     //标识id，目前仅支持UUID, SNOWFLAKE_ID_16, SNOWFLAKE_ID_18，请查看IdType枚举类
@@ -32,7 +33,9 @@
  length  | 长度(创建表使用) | 0 | 否
  decimal  | 小数点(创建表使用) | 0 | 否
  def  | 默认值(创建表使用) | "" | 否
+ remarks  | 字段注释 | "" | 否
  ignore  | 是否忽略该字段 | false | 否
+ oldName  | 旧字段名称 | "" | 否
 
 ```java
 4.@SqlUnion     //标识表连接并继承于某个实体类（主表）
@@ -52,18 +55,22 @@
  tableAlias | 连接表的别名 | "" |否
  tableKeyword | 连接的表字段 | "" |否
  mainKeyword | 主表的字段 | "" |否
-
+ from | 连接的表（通常情况下可代替schema、table、tableAlias，优先级高） | void.class |否
+ on | 连接条件（优先级高） | void.class |否
 
 ```java
-6.@SqlVersion   //标识乐观锁版本，仅支持int、long、Date、Timestamp类型
+6.@SqlDefaultValue //标识该注解的字段如果为null自动注入默认值（仅支持基本类型、String、Date、Timestamp、BigDecimal）
+```
+属性  | 解释  | 默认 | 必须
+ :----: | :-----: | :-----: | :------: 
+with  | 填充类型（insert=新增、update=更新，together=新增更新同时） |  | 是
+
+```java
+7.@SqlVersion   //标识乐观锁版本，仅支持int、long、Date、Timestamp类型
 ```
 
 ```java
-7.@SqlLogically //标识逻辑删除，请配合logicallyDeleteById、logicallyDeleteBy这两个方法使用，请查看内置Delete文档
-```
-
-```java
-8.@SqlDefaultValue //标识该注解的字段如果为null自动注入默认值（仅支持基本类型、String、Date、Timestamp、BigDecimal）
+8.@SqlLogically //标识逻辑删除，请配合logicallyDeleteById、logicallyDeleteBy这两个方法使用，请查看内置Delete文档
 ```
 
 #### 二. 示例.单表用法（该例子已包含表生成、常量生成、id生成、乐观锁、插入时间、更新时间）
@@ -91,12 +98,12 @@ public class Essay {
 	@SqlVersion //乐观锁
 	//@SqlColumn("version" )
 	private Long version;
-	
-	@SqlInsertTime
+
+    @SqlDefaultValue(with = FillWith.INSERT)
 	//@SqlColumn("creation_time" )
 	private Date creationTime;
-	
-	@SqlUpdateTime
+
+    @SqlDefaultValue(with = FillWith.UPDATE)
 	//@SqlColumn("update_time" )
 	private Date updateTime;
 	

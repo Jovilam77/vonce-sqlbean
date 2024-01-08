@@ -1,21 +1,11 @@
-#### 一. Delete对象使用示例（常规情况下不使用该方式，查看下方文档使用更简便方式）
+#### 一. Delete对象使用示例（通常情况下不使用该方式，查看下方文档使用更简便方式）
 ```java
     Delete delete = new Delete();
-	
-    //delete.setTable("t_essay");
-    delete.setTable(Essay.class);
-	
-    //id 大于 1  这里的id建议用SqlEssay.id 常量替代 这里演示多种写法特意不写
-    delete.where("id", 1, SqlOperator.GREATER_THAN);
-	
-    //并且 内容等于222 这里的content建议用SqlEssay.content 常量替代 这里演示多种写法特意不写
-    delete.wAND("content", "222");
-	
+    delete.where().gt(Essay::getId, 1).and().eq(Essay::getContent, "222");
     //条件也可用包装器 复杂条件推荐使用
-    //delete.setWhere(Wrapper.where(Cond.gt(SqlEssay.id, 1)).and(Cond.eq(SqlEssay.content, "222")));
+    //delete.where(Wrapper.where(Cond.gt(Essay::getId, 1)).and(Cond.eq(Essay::getContent, "222")));
     //也可使用表达式 如果这三种条件同时出现 那么此方式优先级最高 上面包装器次之
-    //delete.setWhere("& = ? AND & = ?", SqlEssay.id, 1, SqlEssay.content, "222");
-	
+    //delete.where("& = ? AND & = ?", SqlEssay.id, 1, SqlEssay.content, "222");
     essayService.delete(delete);
 ```
 #### 二. DeleteService接口文档

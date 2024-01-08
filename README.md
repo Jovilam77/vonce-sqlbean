@@ -19,7 +19,7 @@
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
-		<version>1.6.0-beta22</version>
+		<version>1.6.0-beta23</version>
 	</dependency>
 
 ###### 2.标注实体类
@@ -176,6 +176,6 @@ public class UserController {
 
 ###### [8️⃣. SqlBean和SqlHelper](doc/SqlHelper.md "SqlBean和SqlHelper")
 
-###### [9️⃣. Where条件和包装器](doc/Where.md "Where条件和包装器")
+###### [9️⃣. Where条件和Sql函数](doc/Where.md "Where条件和Sql函数")
 
 ###### [🔟. 多数据源动态Schema读写分离相关配置](doc/DataSourceConfig.md "多数据源动态Schema读写分离相关配置")

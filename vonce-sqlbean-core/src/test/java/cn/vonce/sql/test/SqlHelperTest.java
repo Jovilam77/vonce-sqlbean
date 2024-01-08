@@ -12,6 +12,8 @@ import cn.vonce.sql.model.Essay;
 import cn.vonce.sql.model.User;
 import cn.vonce.sql.model.sql.SqlEssay;
 import cn.vonce.sql.model.sql.SqlUser;
+import cn.vonce.sql.page.PageHelper;
+import cn.vonce.sql.page.ResultData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,6 +112,8 @@ public class SqlHelperTest {
         System.out.println(SqlHelper.buildSelectSql(select2));
     }
 
+
+
     /**
      * 查询3
      *
@@ -119,10 +123,10 @@ public class SqlHelperTest {
         Select select3 = new Select();
         select3.setSqlBeanDB(sqlBeanDB);
         select3.setBeanClass(Essay.class);
-        select3.column(SqlEssay._all, "count")
-                .column(SqlEssay.categoryId);
-        select3.setTable(SqlEssay._tableName);
-        select3.groupBy(SqlEssay.categoryId);
+        select3.column(SqlFun.count(Essay::getId), "count")
+                .column(Essay::getCategoryId);
+        select3.setTable(Essay.class);
+        select3.groupBy(Essay::getCategoryId);
         select3.having().eq("count", 5);
         System.out.println("---select3---");
         System.out.println(SqlHelper.buildSelectSql(select3));
@@ -170,6 +174,7 @@ public class SqlHelperTest {
      */
     private static void insert1(SqlBeanDB sqlBeanDB) {
         Insert insert = new Insert();
+        insert.setBeanClass(User.class);
         insert.setSqlBeanDB(sqlBeanDB);
         User user = new User();
         user.setId("10000");
@@ -190,6 +195,7 @@ public class SqlHelperTest {
     private static void insert2(SqlBeanDB sqlBeanDB) {
         Insert insert = new Insert();
         insert.setSqlBeanDB(sqlBeanDB);
+        insert.setBeanClass(User.class);
         List<User> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             User user = new User();
@@ -206,7 +212,21 @@ public class SqlHelperTest {
     }
 
     /**
-     * 更新
+     * 插入3
+     *
+     * @param sqlBeanDB
+     */
+    private static void insert3(SqlBeanDB sqlBeanDB) {
+        Insert<User> insert = new Insert<>();
+        insert.setSqlBeanDB(sqlBeanDB);
+        insert.setBeanClass(User.class);
+        insert.column(User::getId, User::getGender, User::getNickname).values(1, 2, "Jovi").values(2, 1, "Vicky");
+        System.out.println("---insert3---");
+        System.out.println(SqlHelper.buildInsertSql(insert));
+    }
+
+    /**
+     * 更新1
      *
      * @param sqlBeanDB
      */
@@ -224,10 +244,12 @@ public class SqlHelperTest {
         update.where().gt(SqlUser.id, 0).and().lt(SqlUser.id, 10);
         System.out.println("---update---");
         System.out.println(SqlHelper.buildUpdateSql(update));
+
+
     }
 
     /**
-     * 更新
+     * 更新2
      *
      * @param sqlBeanDB
      */
