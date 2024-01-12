@@ -389,5 +389,33 @@ public class DateUtil {
         return LocalDateTime.now().plusDays(offSet).format(DateTimeFormatter.ofPattern(timeFormat));
     }
 
+    /**
+     * 获取当前时间的这个周的周一
+     *
+     * @return
+     */
+    public static Date getMonday() {
+        return getMonday(null);
+    }
+
+    /**
+     * 获取指定时间的这个周的周一
+     *
+     * @param date
+     * @return
+     */
+    public static Date getMonday(Date date) {
+        // 创建 Calendar 对象并设置为当前时间
+        Calendar calendar = Calendar.getInstance();
+        if (date != null) {
+            calendar.setTime(date);
+        }
+        // 将日期调整到本周第一天（周一）
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        if (dayOfWeek != Calendar.MONDAY) {
+            calendar.add(Calendar.DATE, -1 * (dayOfWeek - Calendar.MONDAY));
+        }
+        return calendar.getTime();
+    }
 
 }
