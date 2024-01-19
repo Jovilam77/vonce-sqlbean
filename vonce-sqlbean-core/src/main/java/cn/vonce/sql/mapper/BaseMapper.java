@@ -139,15 +139,7 @@ public abstract class BaseMapper {
             value = SqlBeanUtil.getDefaultValue(field.getType());
         }
         if (SqlEnum.class.isAssignableFrom(field.getType())) {
-            SqlEnum[] sqlEnums = (SqlEnum[]) field.getType().getEnumConstants();
-            SqlEnum sqlEnum = null;
-            for (SqlEnum item : sqlEnums) {
-                if (item.getCode().equals(value)) {
-                    sqlEnum = item;
-                    break;
-                }
-            }
-            ReflectUtil.instance().set(obj.getClass(), obj, field.getName(), sqlEnum);
+            ReflectUtil.instance().set(obj.getClass(), obj, field.getName(), SqlBeanUtil.matchEnum(field, value));
         } else {
             ReflectUtil.instance().set(obj.getClass(), obj, field.getName(), value);
         }

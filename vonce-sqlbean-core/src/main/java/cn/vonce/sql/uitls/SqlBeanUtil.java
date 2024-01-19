@@ -1558,4 +1558,21 @@ public class SqlBeanUtil {
         return clazz;
     }
 
+    /**
+     * 匹配枚举
+     *
+     * @param field
+     * @param value
+     * @return
+     */
+    public static SqlEnum matchEnum(Field field, Object value) {
+        SqlEnum[] sqlEnums = (SqlEnum[]) field.getType().getEnumConstants();
+        for (SqlEnum item : sqlEnums) {
+            if (item.getCode().equals(value)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
 }

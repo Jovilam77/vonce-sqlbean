@@ -1,6 +1,7 @@
 package cn.vonce.sql.helper;
 
 import cn.vonce.sql.annotation.*;
+import cn.vonce.sql.define.SqlEnum;
 import cn.vonce.sql.define.SqlFun;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.StringUtil;
@@ -532,7 +533,11 @@ public class SqlHelper {
                     } else if (value == null && sqlDefaultValue != null && (sqlDefaultValue.with() == FillWith.INSERT || sqlDefaultValue.with() == FillWith.TOGETHER)) {
                         Object defaultValue = SqlBeanUtil.assignInitialValue(SqlBeanUtil.getEntityClassFieldType(field));
                         valueSql.append(SqlBeanUtil.getSqlValue(insert, defaultValue));
-                        ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), defaultValue);
+                        if (SqlEnum.class.isAssignableFrom(field.getType())) {
+                            ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), SqlBeanUtil.matchEnum(field, defaultValue));
+                        } else {
+                            ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), defaultValue);
+                        }
                     } else {
                         valueSql.append(SqlBeanUtil.getSqlValue(insert, ReflectUtil.instance().get(objectList.get(i).getClass(), objectList.get(i), field.getName())));
                     }
@@ -661,7 +666,12 @@ public class SqlHelper {
                 } else if (objectValue == null && sqlDefaultValue != null && (sqlDefaultValue.with() == FillWith.UPDATE || sqlDefaultValue.with() == FillWith.TOGETHER)) {
                     Object defaultValue = SqlBeanUtil.assignInitialValue(SqlBeanUtil.getEntityClassFieldType(field));
                     setSql.append(SqlBeanUtil.getSqlValue(update, defaultValue));
-                    ReflectUtil.instance().set(bean.getClass(), bean, field.getName(), defaultValue);
+                    if (SqlEnum.class.isAssignableFrom(field.getType())) {
+                        ReflectUtil.instance().set(bean.getClass(), bean, field.getName(), SqlBeanUtil.matchEnum(field, defaultValue));
+                    } else {
+                        ReflectUtil.instance().set(bean.getClass(), bean, field.getName(), defaultValue);
+                    }
+
                 } else {
                     setSql.append(SqlBeanUtil.getSqlValue(update, objectValue));
                 }
