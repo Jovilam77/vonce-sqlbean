@@ -10,7 +10,6 @@ import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.uitls.SqlBeanUtil;
-
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -761,28 +760,27 @@ public class SqlHelper {
      */
     private static String groupByAndOrderBySql(String type, Select select) {
         StringBuffer groupByAndOrderBySql = new StringBuffer();
-        Column[] columns;
-        if (SqlConstant.ORDER_BY.equals(type)) {
-            columns = select.getOrderBy().toArray(new Column[]{});
-        } else {
-            columns = select.getGroupBy().toArray(new Column[]{});
-        }
+        int length = SqlConstant.ORDER_BY.equals(type) ? select.getOrderBy().size() : select.getGroupBy().size();
         String transferred = SqlBeanUtil.getTransferred(select);
         boolean isToUpperCase = SqlBeanUtil.isToUpperCase(select);
-        if (columns != null && columns.length != 0) {
+        if (length != 0) {
             groupByAndOrderBySql.append(type);
-            for (int i = 0; i < columns.length; i++) {
-                Column column = columns[i];
+            for (int i = 0; i < length; i++) {
+                Column column = SqlConstant.ORDER_BY.equals(type) ? select.getOrderBy().get(i).getColumn() : select.getGroupBy().get(i).getColumn();
                 if (StringUtil.isNotEmpty(column.getTableAlias())) {
                     groupByAndOrderBySql.append(transferred);
                     groupByAndOrderBySql.append(column.getTableAlias());
                     groupByAndOrderBySql.append(transferred);
                     groupByAndOrderBySql.append(SqlConstant.POINT);
                     groupByAndOrderBySql.append(transferred);
-                    groupByAndOrderBySql.append(isToUpperCase ? column.getName().toUpperCase() : column.getName());
-                    groupByAndOrderBySql.append(transferred);
+                }
+                if (column instanceof SqlFun) {
+                    groupByAndOrderBySql.append(SqlBeanUtil.getSqlFunction(select, (SqlFun) column));
                 } else {
                     groupByAndOrderBySql.append(isToUpperCase ? column.getName().toUpperCase() : column.getName());
+                }
+                if (StringUtil.isNotEmpty(column.getTableAlias())) {
+                    groupByAndOrderBySql.append(transferred);
                 }
                 if (SqlConstant.ORDER_BY.equals(type)) {
                     groupByAndOrderBySql.append(SqlConstant.SPACES);

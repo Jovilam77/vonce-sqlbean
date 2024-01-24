@@ -138,12 +138,12 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 设置column
      *
-     * @param columnNames
+     * @param columNames
      */
-    public Select column(String[] columnNames) {
-        if (columnNames != null && columnNames.length > 0) {
-            for (String columnName : columnNames) {
-                this.columnList.add(new Column(columnName));
+    public Select column(String[] columNames) {
+        if (columNames != null && columNames.length > 0) {
+            for (String columName : columNames) {
+                this.columnList.add(new Column(columName));
             }
         }
         return this;
@@ -201,22 +201,22 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加column列字段
      *
-     * @param columnName
+     * @param columName
      * @return
      */
-    public Select column(String columnName) {
-        return column("", columnName, "");
+    public Select column(String columName) {
+        return column("", columName, "");
     }
 
     /**
      * 添加column列字段
      *
-     * @param columnName  列列字段名
+     * @param columName   列列字段名
      * @param columnAlias 别名
      * @return
      */
-    public Select column(String columnName, String columnAlias) {
-        return column("", columnName, columnAlias);
+    public Select column(String columName, String columnAlias) {
+        return column("", columName, columnAlias);
     }
 
     /**
@@ -267,12 +267,12 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * 添加column列字段
      *
      * @param tableAlias  表别名
-     * @param columnName  列列字段名
+     * @param columName   列列字段名
      * @param columnAlias 别名
      * @return
      */
-    public Select column(String tableAlias, String columnName, String columnAlias) {
-        columnList.add(new Column(tableAlias, columnName, columnAlias));
+    public Select column(String tableAlias, String columName, String columnAlias) {
+        columnList.add(new Column(tableAlias, columName, columnAlias));
         return this;
     }
 
@@ -460,11 +460,11 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加groupBy分组
      *
-     * @param columNname 列字段名
+     * @param columName 列字段名
      * @return
      */
-    public Select groupBy(String columNname) {
-        return groupBy("", columNname);
+    public Select groupBy(String columName) {
+        return groupBy("", columName);
     }
 
     /**
@@ -474,7 +474,8 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @return
      */
     public Select groupBy(Column column) {
-        return groupBy(column.getTableAlias(), column.getName());
+        groupByList.add(new Group(column));
+        return this;
     }
 
     /**
@@ -484,19 +485,19 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @return
      */
     public <T, R> Select groupBy(ColumnFun<T, R> columnFun) {
-        Column column = LambdaUtil.getColumn(columnFun);
-        return groupBy(column.getTableAlias(), column.getName());
+        groupByList.add(new Group(LambdaUtil.getColumn(columnFun)));
+        return this;
     }
 
     /**
      * 添加groupBy分组
      *
      * @param tableAlias 表别名
-     * @param columNname 列字段名
+     * @param columName  列字段名
      * @return
      */
-    public Select groupBy(String tableAlias, String columNname) {
-        groupByList.add(new Group(tableAlias, columNname));
+    public Select groupBy(String tableAlias, String columName) {
+        groupByList.add(new Group(tableAlias, columName));
         return this;
     }
 
@@ -513,19 +514,19 @@ public class Select extends CommonCondition<Select> implements Serializable {
     /**
      * 添加列字段排序
      *
-     * @param columNname 列字段名
+     * @param columName 列字段名
      */
-    public Select orderByAsc(String columNname) {
-        return orderBy("", columNname, SqlSort.ASC);
+    public Select orderByAsc(String columName) {
+        return orderBy("", columName, SqlSort.ASC);
     }
 
     /**
      * 添加列字段排序
      *
-     * @param columNname 列字段名
+     * @param columName 列字段名
      */
-    public Select orderByDesc(String columNname) {
-        return orderBy("", columNname, SqlSort.DESC);
+    public Select orderByDesc(String columName) {
+        return orderBy("", columName, SqlSort.DESC);
     }
 
     /**
@@ -534,7 +535,8 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param column 列字段名
      */
     public Select orderByAsc(Column column) {
-        return orderBy(column.getTableAlias(), column.getName(), SqlSort.ASC);
+        orderByList.add(new Order(column, SqlSort.ASC));
+        return this;
     }
 
     /**
@@ -543,8 +545,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param columnFun 列字段名
      */
     public <T, R> Select orderByAsc(ColumnFun<T, R> columnFun) {
-        Column column = LambdaUtil.getColumn(columnFun);
-        return orderBy(column.getTableAlias(), column.getName(), SqlSort.ASC);
+        return orderByAsc(LambdaUtil.getColumn(columnFun));
     }
 
     /**
@@ -553,7 +554,8 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param column 列字段名
      */
     public Select orderByDesc(Column column) {
-        return orderBy(column.getTableAlias(), column.getName(), SqlSort.DESC);
+        orderByList.add(new Order(column, SqlSort.DESC));
+        return this;
     }
 
     /**
@@ -562,8 +564,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param columnFun 列字段名
      */
     public <T, R> Select orderByDesc(ColumnFun<T, R> columnFun) {
-        Column column = LambdaUtil.getColumn(columnFun);
-        return orderBy(column.getTableAlias(), column.getName(), SqlSort.DESC);
+        return orderByDesc(LambdaUtil.getColumn(columnFun));
     }
 
     /**
@@ -574,8 +575,7 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @return
      */
     public Select orderBy(String columName, SqlSort sqlSort) {
-        orderByList.add(new Order("", columName, sqlSort));
-        return this;
+        return orderBy("", columName, sqlSort);
     }
 
     /**
@@ -599,20 +599,19 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @return
      */
     public Select orderBy(Column column, SqlSort sqlSort) {
-        return orderBy(column.getTableAlias(), column.getName(), sqlSort);
+        orderByList.add(new Order(column, sqlSort));
+        return this;
     }
 
     /**
      * 添加列字段排序
      *
      * @param columnFun 列字段名
-     * @param sqlSort        排序方式
+     * @param sqlSort   排序方式
      * @return
      */
     public <T, R> Select orderBy(ColumnFun<T, R> columnFun, SqlSort sqlSort) {
-        Column column = LambdaUtil.getColumn(columnFun);
-        orderByList.add(new Order(column.getTableAlias(), column.getName(), sqlSort));
-        return this;
+        return orderBy(LambdaUtil.getColumn(columnFun), sqlSort);
     }
 
     /**
