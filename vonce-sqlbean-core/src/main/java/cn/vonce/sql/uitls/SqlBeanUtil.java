@@ -14,10 +14,7 @@ import cn.vonce.sql.exception.SqlBeanException;
 import java.beans.Introspector;
 import java.io.*;
 import java.lang.invoke.SerializedLambda;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -52,17 +49,17 @@ public class SqlBeanUtil {
                 return null;
             }
             do {
-                if (!superClass.getName().equals("java.lang.Object")) {
+                if (superClass != java.lang.Object.class) {
                     sqlTable = superClass.getAnnotation(SqlTable.class);
                     if (sqlTable != null) {
                         break;
                     }
                     superClass = superClass.getSuperclass();
                 }
-                if (superClass.getName().equals("java.lang.Object")) {
+                if (superClass == java.lang.Object.class) {
                     break;
                 }
-            } while (!superClass.getName().equals("java.lang.Object"));
+            } while (superClass != java.lang.Object.class);
         }
         sqlTableMap.put(clazz, sqlTable);
         return sqlTable;
@@ -146,7 +143,7 @@ public class SqlBeanUtil {
 
 
     /**
-     * 获取Bean字段中实际对于的表字段
+     * 获取Bean字段中实际对于的表字段(加数据库转义符)
      *
      * @param common
      * @param field
@@ -158,7 +155,7 @@ public class SqlBeanUtil {
     }
 
     /**
-     * 获取Bean字段中实际对于的表字段
+     * 获取Bean字段中实际对于的表字段(加数据库转义符)
      *
      * @param common
      * @param name
@@ -535,14 +532,14 @@ public class SqlBeanUtil {
         List<Field> fieldList = new ArrayList<>();
         Class<?> superClass = clazz.getSuperclass();
         do {
-            if (superClass != null && !superClass.getName().equals("java.lang.Object")) {
+            if (superClass != null && superClass != java.lang.Object.class) {
                 fieldList.addAll(Arrays.asList(superClass.getDeclaredFields()));
                 superClass = superClass.getSuperclass();
             }
-            if (superClass != null && superClass.getName().equals("java.lang.Object")) {
+            if (superClass != null && superClass == java.lang.Object.class) {
                 break;
             }
-        } while (superClass != null && !superClass.getName().equals("java.lang.Object"));
+        } while (superClass != null && superClass != java.lang.Object.class);
         fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
         return fieldList;
     }
@@ -655,7 +652,7 @@ public class SqlBeanUtil {
      * @param clazz
      * @return
      */
-    public static Map<String, Join> setJoin(Select select, Class<?> clazz) throws SqlBeanException, InstantiationException, IllegalAccessException {
+    public static Map<String, Join> setJoin(Select select, Class<?> clazz) throws SqlBeanException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         SqlTable sqlTable = getSqlTable(clazz);
         List<Field> fieldList = getBeanAllField(clazz);
         Map<String, Join> joinFieldMap = new HashMap<>();
@@ -689,11 +686,18 @@ public class SqlBeanUtil {
             if (sqlJoin.on() != null && sqlJoin.on() != void.class) {
                 key = Md5Util.encode(sqlJoin.on() + sqlJoin.on().getClassLoader().toString());
                 if (joinFieldMap.containsKey(key)) {
-                    join = null;
                     continue;
                 }
                 select.addJoin(join);
-                JoinOn joinOn = (JoinOn) sqlJoin.on().newInstance();
+                JoinOn joinOn;
+                //如果是非静态内部类
+                if (sqlJoin.on().getEnclosingClass() != null && !Modifier.isStatic(sqlJoin.on().getModifiers())) {
+                    Object enclosingInstance = sqlJoin.on().getEnclosingClass().newInstance();
+                    Constructor<?> constructor = sqlJoin.on().getDeclaredConstructor(sqlJoin.on().getEnclosingClass());
+                    joinOn = (JoinOn) constructor.newInstance(enclosingInstance);
+                } else {
+                    joinOn = (JoinOn) sqlJoin.on().newInstance();
+                }
                 Condition condition = new Condition();
                 joinOn.on(condition);
                 join.on().setDataList(condition.getDataList());
@@ -701,7 +705,6 @@ public class SqlBeanUtil {
                 if (sqlJoin != null && !sqlJoin.isBean()) {
                     key = Md5Util.encode(sqlJoin.table().toLowerCase() + sqlJoin.tableKeyword().toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
                     if (joinFieldMap.containsKey(key)) {
-                        join = null;
                         continue;
                     }
                     select.addJoin(join);
@@ -710,7 +713,6 @@ public class SqlBeanUtil {
                     String tableKeyword = getTableFieldName(getIdField(subClazz), sqlTable);
                     key = Md5Util.encode(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
                     if (joinFieldMap.containsKey(key)) {
-                        join = null;
                         continue;
                     }
                     select.addJoin(join);
@@ -1431,6 +1433,17 @@ public class SqlBeanUtil {
     /**
      * 获取列字段对象
      *
+     * @param field
+     * @return Column
+     */
+    public static Column getColumnByField(Field field) {
+        SqlTable sqlTable = SqlBeanUtil.getSqlTable(field.getDeclaringClass());
+        return new Column(sqlTable.alias(), SqlBeanUtil.getTableFieldName(field, sqlTable), "");
+    }
+
+    /**
+     * 获取列字段对象
+     *
      * @param lambda
      * @return Column
      */
@@ -1525,7 +1538,7 @@ public class SqlBeanUtil {
     }
 
     /**
-     * 获取获取实体类字段类型
+     * 获取实体类字段类型
      *
      * @param field
      * @return
@@ -1543,6 +1556,23 @@ public class SqlBeanUtil {
             }
         }
         return clazz;
+    }
+
+    /**
+     * 匹配枚举
+     *
+     * @param field
+     * @param value
+     * @return
+     */
+    public static SqlEnum matchEnum(Field field, Object value) {
+        SqlEnum[] sqlEnums = (SqlEnum[]) field.getType().getEnumConstants();
+        for (SqlEnum item : sqlEnums) {
+            if (item.getCode().equals(value)) {
+                return item;
+            }
+        }
+        return null;
     }
 
 }

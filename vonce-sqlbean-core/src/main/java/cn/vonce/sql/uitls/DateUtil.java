@@ -6,10 +6,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 时间工具类 Created by jovi on 2017/7/10.
@@ -389,5 +386,31 @@ public class DateUtil {
         return LocalDateTime.now().plusDays(offSet).format(DateTimeFormatter.ofPattern(timeFormat));
     }
 
+    /**
+     * 获取当前时间的这个周的周一
+     *
+     * @return
+     */
+    public static Date getMonday() {
+        return getMonday(null);
+    }
+
+    /**
+     * 获取指定时间的这个周的周一
+     *
+     * @param date
+     * @return
+     */
+    public static Date getMonday(Date date) {
+        Calendar calendar = Calendar.getInstance(Locale.CHINA);
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);//以周一为首日
+        if (date != null) {
+            calendar.setTimeInMillis(date.getTime());
+        }else {
+            calendar.setTimeInMillis(System.currentTimeMillis());//当前时间
+        }
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);//周一
+        return calendar.getTime();
+    }
 
 }

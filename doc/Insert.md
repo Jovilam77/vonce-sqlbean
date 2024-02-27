@@ -1,4 +1,4 @@
-#### 一. Insert对象使用示例（常规情况下不使用该方式，查看下方文档使用更简便方式）
+#### 一. Insert对象使用示例（通常情况下不使用该方式，查看下方文档使用更简便方式）
 ```java
     Date date = new Date();
     //单条插入
@@ -52,7 +52,7 @@
      * @return
      */
      @SuppressWarnings("unchecked")
-     int insert(List<T> beanList);
+     int insert(Collection<T> beanList);
 ```
 ###### 3：插入数据
 ```java

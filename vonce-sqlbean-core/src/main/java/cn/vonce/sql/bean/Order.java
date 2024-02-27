@@ -1,7 +1,6 @@
 package cn.vonce.sql.bean;
 
 import cn.vonce.sql.enumerate.SqlSort;
-
 import java.io.Serializable;
 
 /**
@@ -11,6 +10,7 @@ public class Order extends Column implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Column column;
     private SqlSort sqlSort = SqlSort.ASC;
 
     public Order() {
@@ -22,12 +22,21 @@ public class Order extends Column implements Serializable {
     }
 
     public Order(Column column, SqlSort sqlSort) {
-        this(column.getTableAlias(), column.getName(), sqlSort);
+        this.column = column;
+        this.sqlSort = sqlSort;
     }
 
     public Order(String tableAlias, String name, SqlSort sqlSort) {
-        super(tableAlias, name, "");
+        column = new Column(tableAlias, name, "");
         this.sqlSort = sqlSort;
+    }
+
+    public Column getColumn() {
+        return column;
+    }
+
+    public void setColumn(Column column) {
+        this.column = column;
     }
 
     public SqlSort getSqlSort() {

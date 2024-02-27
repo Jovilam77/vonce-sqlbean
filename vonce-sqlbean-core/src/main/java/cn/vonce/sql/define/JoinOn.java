@@ -1,6 +1,7 @@
 package cn.vonce.sql.define;
 
 import cn.vonce.sql.bean.Condition;
+import cn.vonce.sql.bean.Select;
 
 /**
  * 表连接条件
@@ -9,8 +10,8 @@ import cn.vonce.sql.bean.Condition;
  * @email imjovi@qq.com
  * @date 2022/11/30 11:44
  */
-public interface JoinOn {
+public interface JoinOn<T extends Select> {
 
-    void on(Condition condition);
+    void on(Condition<T> condition);
 
 }

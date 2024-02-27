@@ -298,19 +298,21 @@ public class PageHelper<T> implements Serializable {
             //设置分页
             select.page(pagenum, pagesize, startByZero);
             select.orderBy(orders);
-            // 先统计数量
-            int count;
-            Object obj;
+            //参数class类型
+            Class[] paramClasses = {Select.class};
+            //查询统计参数
+            Object[] countParams = {countSelect};
+            //查询列表参数
+            Object[] listParams = {select};
             if (returnType != null) {
-                count = (int) ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getCount(), new Class[]{Class.class, Select.class}, new Object[]{returnType, countSelect});
-                obj = ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getSelect(), new Class[]{Class.class, Select.class}, new Object[]{returnType, select});
-            } else {
-                count = (int) ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getCount(), new Class[]{Select.class}, new Object[]{countSelect});
-                obj = ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getSelect(), new Class[]{Select.class}, new Object[]{select});
+                paramClasses = new Class[]{Class.class, Select.class};
+                countParams = new Object[]{returnType, countSelect};
+                listParams = new Object[]{returnType, select};
             }
             // 计算共有几页
-            this.dispose(count);
-            this.setDataList((List<T>) obj);
+            this.dispose((int) ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getCount(), paramClasses, countParams));
+            // 分页数据列表
+            this.setDataList((List<T>) ReflectUtil.instance().invoke(clazz, pageService, this.getPagingMethod().getSelect(), paramClasses, listParams));
         } catch (Exception e) {
             e.printStackTrace();
         }

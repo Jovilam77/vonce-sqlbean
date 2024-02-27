@@ -50,6 +50,14 @@ public class Essay {
         this.id = id;
     }
 
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
+
     public String getUserId() {
         return userId;
     }

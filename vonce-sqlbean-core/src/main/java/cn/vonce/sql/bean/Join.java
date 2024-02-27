@@ -2,6 +2,7 @@ package cn.vonce.sql.bean;
 
 import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.enumerate.JoinType;
+
 import java.io.Serializable;
 
 /**
@@ -44,17 +45,17 @@ public class Join implements Serializable {
     private String mainKeyword;
     @Deprecated
     private String on;
-    /**
-     * 链式返回对象
-     */
-    private Select returnObj;
+//    /**
+//     * 链式返回对象
+//     */
+//    private Select returnObj;
     /**
      * Join 条件
      */
     private Condition<Select> joinCondition;
 
     protected void setReturnObj(Select returnObj) {
-        this.returnObj = returnObj;
+//        this.returnObj = returnObj;
         joinCondition = new Condition<>(returnObj);
     }
 
@@ -121,24 +122,24 @@ public class Join implements Serializable {
         this.on = on;
     }
 
-    public Condition<Select> on(String field, Object value) {
-        joinCondition.eq(field, value);
-        return joinCondition;
+    public Logic<Select> on(String field, Object value) {
+        return joinCondition.eq(field, value);
     }
 
-    public Condition<Select> on(String tableAlias, String field, Object value) {
-        joinCondition.eq(tableAlias, field, value);
-        return joinCondition;
+    public Logic<Select> on(String tableAlias, String field, Object value) {
+        return joinCondition.eq(tableAlias, field, value);
     }
 
-    public Condition<Select> on(Column column, Object value) {
-        joinCondition.eq(column, value);
-        return joinCondition;
+    public Logic<Select> on(Column column, Object value) {
+        return joinCondition.eq(column, value);
     }
 
-    public <T, R> Condition<Select> on(ColumnFun<T, R> columnFun, Object value) {
-        joinCondition.eq(columnFun, value);
-        return joinCondition;
+    public <T, R> Logic<Select> on(ColumnFun<T, R> columnFun, Object value) {
+        return joinCondition.eq(columnFun, value);
+    }
+
+    public <T, K, R> Logic<Select> on(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
+        return joinCondition.eq(columnFun, value);
     }
 
     public Condition<Select> on() {
