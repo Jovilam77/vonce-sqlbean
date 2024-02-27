@@ -72,7 +72,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
      */
     private Object handleResultSet(ResultSet resultSet, Map<String, Object> mapParam, Class<?> resultType) {
         if (null != resultSet) {
-            if (resultType.getName().equals(ColumnInfo.class.getName()) || resultType.getName().equals(TableInfo.class.getName())) {
+            if (resultType == ColumnInfo.class || resultType == TableInfo.class) {
                 return beanHandleResultSet(resultType, resultSet, super.getColumnNameList(resultSet));
             }
             if (SqlBeanUtil.isBaseType(resultType)) {
@@ -107,17 +107,19 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
      * @return
      */
     public List<Object> beanHandleResultSet(Class<?> clazz, ResultSet resultSet, List<String> columnNameList) {
-        List<Object> list = new ArrayList<>();
-        try {
-            while (resultSet.next()) {
-                list.add(super.beanHandleResultSet(clazz, resultSet, columnNameList));
+        List<Object> resultList = new ArrayList<>();
+        if (null != resultSet) {
+            try {
+                while (resultSet.next()) {
+                    resultList.add(super.beanHandleResultSet(clazz, resultSet, columnNameList));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                closeResultSet(resultSet);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            closeResultSet(resultSet);
         }
-        return list;
+        return resultList;
     }
 
     /**
@@ -155,7 +157,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             try {
                 while (resultSet.next()) {
                     Object value = super.baseHandleResultSet(resultSet);
-                    if (value != null && !value.getClass().getName().equals(returnType.getName())) {
+                    if (value != null && value.getClass() != returnType) {
                         value = SqlBeanUtil.getValueConvert(returnType, value);
                     }
                     resultList.add(value);

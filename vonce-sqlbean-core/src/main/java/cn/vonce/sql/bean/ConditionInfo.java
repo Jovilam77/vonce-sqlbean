@@ -13,7 +13,7 @@ import java.io.Serializable;
  * @email imjovi@qq.com
  * @date 2018年4月16日下午7:15:10
  */
-public class ConditionInfo/* extends Column*/ implements Serializable {
+public class ConditionInfo implements Serializable {
 
     /**
      *
@@ -24,20 +24,7 @@ public class ConditionInfo/* extends Column*/ implements Serializable {
         super();
     }
 
-//    public ConditionInfo(String columnName, Object value) {
-//        this(null, "", columnName, value, null);
-//    }
-//
-//    public ConditionInfo(String tableAlias, String columnName, Object value) {
-//        this(null, tableAlias, columnName, value, null);
-//    }
-//
-//    public ConditionInfo(String tableAlias, String columnName, Object value, SqlOperator sqlOperator) {
-//        this(null, tableAlias, columnName, value, sqlOperator);
-//    }
-
     public ConditionInfo(SqlLogic sqlLogic, String tableAlias, String columnName, Object value, SqlOperator sqlOperator) {
-//        super(tableAlias, columnName, "");
         this.sqlLogic = sqlLogic;
         this.column = new Column(tableAlias, columnName, null);
         this.value = value;
