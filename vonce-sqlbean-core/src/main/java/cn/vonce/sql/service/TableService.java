@@ -101,6 +101,16 @@ public interface TableService<T> {
     void backup(String targetSchema, String targetTableName);
 
     /**
+     * 备份表和数据到一张指定名称的新表
+     *
+     * @param wrapper         条件包装器
+     * @param targetSchema    目标schema
+     * @param targetTableName 目标表名
+     * @return
+     */
+    void backup(Wrapper wrapper, String targetSchema, String targetTableName);
+
+    /**
      * 根据条件备份表和数据到一张指定名称的新表
      *
      * @param wrapper         条件包装器

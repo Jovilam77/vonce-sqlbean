@@ -580,20 +580,25 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Override
     public String backup() {
         String targetTableName = SqlBeanUtil.getTable(clazz).getName() + "_" + DateUtil.dateToString(new Date(), "yyyyMMddHHmmssSSS");
-        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, null, targetTableName, null, null);
+        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, null, null, targetTableName, null);
         return targetTableName;
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(String targetTableName) {
-        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, null, targetTableName, null, null);
+        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, null, null, targetTableName, null);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(String targetSchema, String targetTableName) {
         mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, null, targetSchema, targetTableName, null);
+    }
+
+    @Override
+    public void backup(Wrapper wrapper, String targetSchema, String targetTableName) {
+        mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, null);
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -745,6 +750,11 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         List<ColumnInfo> columnInfoList = mybatisSqlBeanDao.selectColumnInfoList(getSqlBeanDB(), schema, tableName);
         super.handleColumnInfo(columnInfoList);
         return columnInfoList;
+    }
+
+    @Override
+    public TableService<T> operation() {
+        return this;
     }
 
 }

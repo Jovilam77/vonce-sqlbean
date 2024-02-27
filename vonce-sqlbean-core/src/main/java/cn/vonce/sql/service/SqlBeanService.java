@@ -15,8 +15,16 @@ public interface SqlBeanService<T, ID> extends SelectService<T, ID>, InsertServi
 
     /**
      * 获得数据库相关信息
+     *
      * @return
      */
     SqlBeanDB getSqlBeanDB();
+
+    /**
+     * 表操作
+     *
+     * @return
+     */
+    TableService<T> operation();
 
 }

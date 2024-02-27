@@ -589,6 +589,11 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, null, targetSchema, targetTableName, null));
     }
 
+    @Override
+    public void backup(Wrapper wrapper, String targetSchema, String targetTableName) {
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, null));
+    }
+
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(Wrapper wrapper, String targetTableName, Column... columns) {
@@ -749,5 +754,9 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         }
     }
 
+    @Override
+    public TableService<T> operation() {
+        return this;
+    }
 
 }
