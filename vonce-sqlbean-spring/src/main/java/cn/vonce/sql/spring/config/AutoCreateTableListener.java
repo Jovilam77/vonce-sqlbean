@@ -50,7 +50,7 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                         schemaMap.put(sqlTable.schema(), tableService);
                     }
                     for (Map.Entry<String, TableService> entry : schemaMap.entrySet()) {
-                        List<TableInfo> tableList = entry.getValue().getTableList(null);
+                        List<TableInfo> tableList = entry.getValue().getTableList();
                         for (String name : beanNameList) {
                             TableService tableService = evt.getApplicationContext().getBean(name, TableService.class);
                             Class<?> clazz = tableService.getBeanClass();

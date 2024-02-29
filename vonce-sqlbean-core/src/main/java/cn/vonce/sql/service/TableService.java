@@ -45,6 +45,13 @@ public interface TableService<T> {
     /**
      * 获取表名列表
      *
+     * @return
+     */
+    List<TableInfo> getTableList();
+
+    /**
+     * 获取表名列表
+     *
      * @param tableName 可以为null
      * @return
      */
@@ -58,6 +65,13 @@ public interface TableService<T> {
      * @return
      */
     List<TableInfo> getTableList(String schema, String tableName);
+
+    /**
+     * 获取列信息列表
+     *
+     * @return
+     */
+    List<ColumnInfo> getColumnInfoList();
 
     /**
      * 获取列信息列表

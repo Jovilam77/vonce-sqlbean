@@ -431,6 +431,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, filterColumns));
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns) {
         return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns)));
@@ -454,6 +455,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return jdbcTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, filterColumns));
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns) {
         return jdbcTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns)));
@@ -505,6 +507,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), clazz, update, false));
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper, ColumnFun<T, R>... filterColumns) {
         return this.updateBy(bean, updateNotNull, optimisticLock, wrapper, SqlBeanUtil.funToColumn(filterColumns));
@@ -528,6 +531,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return jdbcTemplate.update(SqlBeanProvider.updateByBeanSql(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, where, filterColumns));
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String where, ColumnFun<T, R>... filterColumns) {
         return jdbcTemplate.update(SqlBeanProvider.updateByBeanSql(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, where, SqlBeanUtil.funToColumn(filterColumns)));
@@ -589,6 +593,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, null, targetSchema, targetTableName, null));
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(Wrapper wrapper, String targetSchema, String targetTableName) {
         jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, null));
@@ -600,6 +605,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, wrapper, null, targetTableName, columns));
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> void backup(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns) {
         jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, wrapper, null, targetTableName, SqlBeanUtil.funToColumn(columns)));
@@ -611,6 +617,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, columns));
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> void backup(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
         jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, SqlBeanUtil.funToColumn(columns)));
@@ -634,6 +641,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, wrapper, null, targetTableName, columns));
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int copy(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns) {
         return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, wrapper, null, targetTableName, SqlBeanUtil.funToColumn(columns)));
@@ -645,11 +653,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, columns));
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int copy(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
         return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, SqlBeanUtil.funToColumn(columns)));
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public int alter(Table table, List<ColumnInfo> columnInfoList) {
         List<String> sqlList = SqlBeanProvider.buildAlterSql(getSqlBeanDB(), clazz, columnInfoList);
@@ -683,6 +693,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return count;
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public int alterRemarks(String remarks) {
         if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Derby) {
@@ -720,13 +731,27 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @DbSwitch(DbRole.SLAVE)
     @Override
+    public List<TableInfo> getTableList() {
+        return this.getTableList(SqlBeanUtil.getTable(clazz).getSchema(), null);
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
     public List<TableInfo> getTableList(String tableName) {
         return this.getTableList(SqlBeanUtil.getTable(clazz).getSchema(), tableName);
     }
 
+    @DbSwitch(DbRole.SLAVE)
     @Override
     public List<TableInfo> getTableList(String schema, String tableName) {
         return jdbcTemplate.query(SqlBeanProvider.selectTableListSql(getSqlBeanDB(), schema, tableName), new SpringJbdcSqlBeanMapper<TableInfo>(TableInfo.class, TableInfo.class));
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public List<ColumnInfo> getColumnInfoList() {
+        Table table = SqlBeanUtil.getTable(clazz);
+        return this.getColumnInfoList(table.getSchema(), table.getName());
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -743,6 +768,11 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         return columnInfoList;
     }
 
+    @Override
+    public TableService<T> operation() {
+        return this;
+    }
+
     private static <T> T singleResult(Collection<T> results) {
         int size = results != null ? results.size() : 0;
         if (size == 0) {
@@ -752,11 +782,6 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         } else {
             return results.iterator().next();
         }
-    }
-
-    @Override
-    public TableService<T> operation() {
-        return this;
     }
 
 }

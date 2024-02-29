@@ -437,6 +437,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return mybatisSqlBeanDao.updateById(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, filterColumns);
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns) {
         return mybatisSqlBeanDao.updateById(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns));
@@ -460,6 +461,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return mybatisSqlBeanDao.updateByBeanId(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, filterColumns);
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns) {
         return mybatisSqlBeanDao.updateByBeanId(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns));
@@ -511,6 +513,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return mybatisSqlBeanDao.update(getSqlBeanDB(), clazz, update, false);
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper, ColumnFun<T, R>... filterColumns) {
         return this.updateBy(bean, updateNotNull, optimisticLock, wrapper, SqlBeanUtil.funToColumn(filterColumns));
@@ -534,6 +537,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, where, filterColumns);
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String where, ColumnFun<T, R>... filterColumns) {
         return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, where, SqlBeanUtil.funToColumn(filterColumns));
@@ -596,6 +600,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, null, targetSchema, targetTableName, null);
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(Wrapper wrapper, String targetSchema, String targetTableName) {
         mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, null);
@@ -607,6 +612,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, wrapper, null, targetTableName, columns);
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> void backup(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns) {
         mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, wrapper, null, targetTableName, SqlBeanUtil.funToColumn(columns));
@@ -618,6 +624,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, columns);
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> void backup(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
         mybatisSqlBeanDao.backup(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, SqlBeanUtil.funToColumn(columns));
@@ -641,6 +648,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, wrapper, null, targetTableName, columns);
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int copy(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns) {
         return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, wrapper, null, targetTableName, SqlBeanUtil.funToColumn(columns));
@@ -652,6 +660,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, columns);
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int copy(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
         return mybatisSqlBeanDao.copy(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, SqlBeanUtil.funToColumn(columns));
@@ -691,6 +700,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         return count;
     }
 
+    @DbSwitch(DbRole.MASTER)
     @Override
     public int alterRemarks(String remarks) {
         if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Derby) {
@@ -728,6 +738,12 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.SLAVE)
     @Override
+    public List<TableInfo> getTableList() {
+        return this.getTableList(SqlBeanUtil.getTable(clazz).getSchema(), null);
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
     public List<TableInfo> getTableList(String tableName) {
         return this.getTableList(SqlBeanUtil.getTable(clazz).getSchema(), tableName);
     }
@@ -736,6 +752,13 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Override
     public List<TableInfo> getTableList(String schema, String tableName) {
         return mybatisSqlBeanDao.selectTableList(getSqlBeanDB(), schema, tableName);
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public List<ColumnInfo> getColumnInfoList() {
+        Table table = SqlBeanUtil.getTable(clazz);
+        return this.getColumnInfoList(table.getSchema(), table.getName());
     }
 
     @DbSwitch(DbRole.SLAVE)
