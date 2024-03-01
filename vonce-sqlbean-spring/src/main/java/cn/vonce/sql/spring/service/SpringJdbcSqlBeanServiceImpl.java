@@ -577,14 +577,14 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @Override
     public String backup() {
         String targetTableName = SqlBeanUtil.getTable(clazz).getName() + "_" + DateUtil.dateToString(new Date(), "yyyyMMddHHmmssSSS");
-        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, null, targetTableName, null, null));
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, null, null, targetTableName, null));
         return targetTableName;
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(String targetTableName) {
-        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, null, targetTableName, null, null));
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, null, null, targetTableName, null));
     }
 
     @DbSwitch(DbRole.MASTER)
