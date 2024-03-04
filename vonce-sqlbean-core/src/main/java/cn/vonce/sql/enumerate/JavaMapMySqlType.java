@@ -34,8 +34,7 @@ public enum JavaMapMySqlType {
     BIT(new Class[]{boolean.class, Boolean.class}),
     DATE(new Class[]{java.sql.Date.class, java.time.LocalDate.class}),
     TIME(new Class[]{java.sql.Time.class, java.time.LocalTime.class}),
-    TIMESTAMP(new Class[]{java.sql.Timestamp.class}),
-    DATETIME(new Class[]{java.util.Date.class, java.time.LocalDateTime.class}),
+    TIMESTAMP(new Class[]{java.sql.Timestamp.class, java.util.Date.class, java.time.LocalDateTime.class}),
     CLOB(new Class[]{java.sql.Clob.class}),
     BLOB(new Class[]{java.sql.Blob.class, Object.class});
 
