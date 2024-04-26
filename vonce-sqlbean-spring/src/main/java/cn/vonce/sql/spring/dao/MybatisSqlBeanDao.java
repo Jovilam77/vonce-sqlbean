@@ -485,4 +485,34 @@ public interface MybatisSqlBeanDao<T> {
     @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "executeSql")
     int executeSql(String sql);
 
+    /**
+     * 数据库列表
+     *
+     * @param sqlBeanDB
+     * @param name
+     * @return
+     */
+    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "databases")
+    int databases(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
+
+    /**
+     * 创建数据库
+     *
+     * @param sqlBeanDB
+     * @param name
+     * @return
+     */
+    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "createDatabase")
+    int createDatabase(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
+
+    /**
+     * 删除数据库
+     *
+     * @param sqlBeanDB
+     * @param name
+     * @return
+     */
+    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "dropDatabase")
+    int dropDatabase(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
+
 }

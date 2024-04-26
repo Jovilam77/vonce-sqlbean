@@ -9,7 +9,7 @@ import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.page.PageHelper;
 import cn.vonce.sql.page.ResultData;
-import cn.vonce.sql.service.TableService;
+import cn.vonce.sql.service.DbManageService;
 import cn.vonce.sql.spring.annotation.DbSwitch;
 import cn.vonce.sql.spring.annotation.DbTransactional;
 import cn.vonce.sql.spring.config.UseSpringJdbc;
@@ -42,7 +42,7 @@ import java.util.*;
  */
 @UseSpringJdbc
 @Service
-public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl implements SqlBeanService<T, ID>, TableService<T> {
+public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl implements SqlBeanService<T, ID>, DbManageService<T> {
 
     private Logger logger = LoggerFactory.getLogger(SpringJdbcSqlBeanServiceImpl.class);
 
@@ -705,6 +705,33 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public int databases(String name) {
+        String sql = SqlBeanProvider.databaseSql(getSqlBeanDB(), name);
+        return jdbcTemplate.update(sql);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int createDatabase(String name) {
+        if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Oracle) {
+            return 0;
+        }
+        String sql = SqlBeanProvider.createDatabaseSql(getSqlBeanDB(), name);
+        return jdbcTemplate.update(sql);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int dropDatabase(String name) {
+        if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Oracle) {
+            return 0;
+        }
+        String sql = SqlBeanProvider.dropDatabaseSql(getSqlBeanDB(), name);
+        return jdbcTemplate.update(sql);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public void dropTable() {
         SqlBeanDB sqlBeanDB = getSqlBeanDB();
         if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.Postgresql && sqlBeanDB.getDbType() != DbType.SQLServer && sqlBeanDB.getDbType() != DbType.H2) {
@@ -769,7 +796,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     }
 
     @Override
-    public TableService<T> operation() {
+    public DbManageService<T> operation() {
         return this;
     }
 

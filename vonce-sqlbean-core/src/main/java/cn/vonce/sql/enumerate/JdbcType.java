@@ -1,9 +1,5 @@
 package cn.vonce.sql.enumerate;
 
-import cn.vonce.sql.exception.SqlBeanException;
-
-import java.lang.reflect.Field;
-
 /**
  * JdbcType枚举类
  *
@@ -73,43 +69,6 @@ public enum JdbcType {
             }
         }
         return null;
-    }
-
-    public static JdbcType getType(DbType dbType, Field field) {
-        JdbcType jdbcType;
-        switch (dbType) {
-            case MySQL:
-            case MariaDB:
-                jdbcType = JdbcType.getType(JavaMapMySqlType.getType(field).name());
-                break;
-            case SQLServer:
-                jdbcType = JdbcType.getType(JavaMapSqlServerType.getType(field).name());
-                break;
-            case Oracle:
-                jdbcType = JdbcType.getType(JavaMapOracleType.getType(field).name());
-                break;
-            case Postgresql:
-                jdbcType = JdbcType.getType(JavaMapPostgresqlType.getType(field).name());
-                break;
-            case DB2:
-                jdbcType = JdbcType.getType(JavaMapDB2Type.getType(field).name());
-                break;
-            case H2:
-                jdbcType = JdbcType.getType(JavaMapH2Type.getType(field).name());
-                break;
-            case Hsql:
-                jdbcType = JdbcType.getType(JavaMapHsqlType.getType(field).name());
-                break;
-            case Derby:
-                jdbcType = JdbcType.getType(JavaMapDerbyType.getType(field).name());
-                break;
-            case SQLite:
-                jdbcType = JdbcType.getType(JavaMapSqliteType.getType(field).name());
-                break;
-            default:
-                throw new SqlBeanException("请配置正确的数据库");
-        }
-        return jdbcType;
     }
 
     public boolean isFloat() {

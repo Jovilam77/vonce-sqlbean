@@ -1,5 +1,6 @@
 package cn.vonce.sql.enumerate;
 
+import cn.vonce.sql.dialect.*;
 import cn.vonce.sql.uitls.StringUtil;
 
 /**
@@ -12,7 +13,26 @@ import cn.vonce.sql.uitls.StringUtil;
  */
 public enum DbType {
 
-    MySQL, MariaDB, SQLServer, Oracle, Postgresql, DB2, H2, Hsql, Derby, SQLite;
+    MySQL(new MysqlDialect()),
+    MariaDB(new MysqlDialect()),
+    SQLServer(new SqlServerDialect()),
+    Oracle(new OracleDialect()),
+    Postgresql(new PostgresqlDialect()),
+    DB2(new DB2Dialect()),
+    H2(new H2Dialect()),
+    Hsql(new HsqlDialect()),
+    Derby(new DerbyDialect()),
+    SQLite(new SqliteDialect());
+
+    private SqlDialect sqlDialect;
+
+    DbType(SqlDialect sqlDialect) {
+        this.sqlDialect = sqlDialect;
+    }
+
+    public SqlDialect getSqlDialect() {
+        return sqlDialect;
+    }
 
     public static DbType getDbType(String productName) {
         if (StringUtil.isNotEmpty(productName)) {

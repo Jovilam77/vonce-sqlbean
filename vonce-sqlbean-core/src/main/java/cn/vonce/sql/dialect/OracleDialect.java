@@ -1,0 +1,295 @@
+package cn.vonce.sql.dialect;
+
+import cn.vonce.sql.bean.Alter;
+import cn.vonce.sql.bean.ColumnInfo;
+import cn.vonce.sql.bean.Common;
+import cn.vonce.sql.bean.Table;
+import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.constant.SqlConstant;
+import cn.vonce.sql.enumerate.AlterDifference;
+import cn.vonce.sql.enumerate.AlterType;
+import cn.vonce.sql.enumerate.JavaMapOracleType;
+import cn.vonce.sql.enumerate.JdbcType;
+import cn.vonce.sql.exception.SqlBeanException;
+import cn.vonce.sql.uitls.SqlBeanUtil;
+import cn.vonce.sql.uitls.StringUtil;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Oracle方言
+ *
+ * @author Jovi
+ * @email imjovi@qq.com
+ * @date 2024/4/16 10:13
+ */
+public class OracleDialect implements SqlDialect<JavaMapOracleType> {
+
+    public JavaMapOracleType getType(Field field) {
+        Class<?> clazz = SqlBeanUtil.getEntityClassFieldType(field);
+        for (JavaMapOracleType javaType : JavaMapOracleType.values()) {
+            for (Class<?> thisClazz : javaType.getClasses()) {
+                if (thisClazz == clazz) {
+                    return javaType;
+                }
+            }
+        }
+        throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类不支持此字段类型：" + clazz.getSimpleName());
+    }
+
+    @Override
+    public JdbcType getJdbcType(Field field) {
+        return JdbcType.getType(getType(field).name());
+    }
+
+    /**
+     * 获取表数据列表的SQL
+     *
+     * @param sqlBeanDB
+     * @param schema
+     * @param tableName
+     * @return
+     */
+    public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT t.table_name AS \"name\", c.comments AS \"remarks\" ");
+        sql.append("FROM user_tables t ");
+        sql.append("LEFT JOIN user_tab_comments c ");
+        sql.append("ON c.table_name = t.table_name");
+        if (StringUtil.isNotEmpty(tableName)) {
+            sql.append(" AND t.table_name = '");
+            sql.append((sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) ? tableName.toUpperCase() : tableName);
+            sql.append("'");
+        }
+        return sql.toString();
+    }
+
+    /**
+     * 获取列数据列表的SQL
+     *
+     * @param sqlBeanDB
+     * @param tableName
+     * @return
+     */
+    public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT col.column_id AS cid, col.column_name AS name, col.data_type AS type, ");
+        sql.append("(CASE col.nullable WHEN 'N' THEN '1' ELSE '0' END) AS notnull, col.data_default AS dflt_value, ");
+        sql.append("(CASE uc1.constraint_type WHEN 'P' THEN '1' ELSE '0' END) AS pk, ");
+        sql.append("(CASE uc2.constraint_type WHEN 'R' THEN '1' ELSE '0' END) AS fk, ");
+        sql.append("(CASE WHEN col.data_type = 'FLOAT' OR col.data_type = 'DOUBLE' OR col.data_type = 'DECIMAL' OR col.data_type = 'NUMBER' THEN col.data_precision ELSE col.char_length END) AS length, ");
+        sql.append("col.data_scale AS scale, ");
+        sql.append("user_col_comments.comments AS remarks ");
+        sql.append("FROM user_tab_columns col ");
+        sql.append("LEFT JOIN user_cons_columns ucc ON ucc.table_name = col.table_name AND ucc.column_name = col.column_name AND ucc.position IS NOT NULL ");
+        sql.append("LEFT JOIN user_constraints uc1 ON uc1.constraint_name = ucc.constraint_name AND uc1.constraint_type = 'P' ");
+        sql.append("LEFT JOIN user_constraints uc2 ON uc2.constraint_name = ucc.constraint_name AND uc2.constraint_type = 'R' ");
+        sql.append("INNER JOIN user_col_comments ON user_col_comments.table_name = col.table_name AND user_col_comments.column_name = col.column_name ");
+        sql.append("WHERE col.table_name = '");
+        sql.append(tableName);
+        sql.append("'");
+        return sql.toString();
+    }
+
+    /**
+     * 更改表结构
+     *
+     * @param alterList
+     * @return
+     */
+    public List<String> alterTable(List<Alter> alterList) {
+        List<String> sqlList = new ArrayList<>();
+        String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
+        Table table = alterList.get(0).getTable();
+        StringBuffer addOrModifySql = new StringBuffer();
+        addOrModifySql.append(SqlConstant.ALTER_TABLE);
+        addOrModifySql.append(getFullName(alterList.get(0), table));
+        for (int i = 0; i < alterList.size(); i++) {
+            Alter alter = alterList.get(i);
+            if (alter.getType() == AlterType.ADD) {
+                addOrModifySql.append(SqlConstant.ADD);
+                addOrModifySql.append(SqlConstant.BEGIN_BRACKET);
+                addOrModifySql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), null));
+                addOrModifySql.append(SqlConstant.END_BRACKET);
+                addOrModifySql.append(SqlConstant.SPACES);
+                sqlList.add(addRemarks(false, alter, transferred));
+            } else if (alter.getType() == AlterType.MODIFY) {
+                addOrModifySql.append(modifyColumn(alter));
+                sqlList.add(addRemarks(false, alter, transferred));
+            } else if (alter.getType() == AlterType.DROP) {
+                StringBuffer dropSql = new StringBuffer();
+                dropSql.append(SqlConstant.ALTER_TABLE);
+                dropSql.append(getFullName(alter, table));
+                dropSql.append(SqlConstant.DROP);
+                dropSql.append(SqlConstant.BEGIN_BRACKET);
+                dropSql.append(transferred);
+                dropSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
+                dropSql.append(transferred);
+                dropSql.append(SqlConstant.END_BRACKET);
+                sqlList.add(dropSql.toString());
+            } else if (alter.getType() == AlterType.CHANGE) {
+                sqlList.add(changeColumn(alter));
+                sqlList.add(addRemarks(false, alter, transferred));
+                //更改名称的同时可能也更改其他信息
+                alter.getColumnInfo().setName(alter.getOldColumnName());
+                addOrModifySql.append(modifyColumn(alter));
+            }
+        }
+        //新增更改类型信息的语句需要先执行
+        sqlList.add(0, addOrModifySql.toString());
+        return sqlList;
+    }
+
+    /**
+     * 获取全名
+     *
+     * @param common
+     * @param table
+     * @return
+     */
+    private String getFullName(Common common, Table table) {
+        String transferred = SqlBeanUtil.getTransferred(common);
+        boolean toUpperCase = SqlBeanUtil.isToUpperCase(common);
+        StringBuffer sql = new StringBuffer();
+        if (StringUtil.isNotBlank(table.getSchema())) {
+            sql.append(transferred);
+            sql.append(toUpperCase ? table.getSchema().toUpperCase() : table.getSchema());
+            sql.append(transferred);
+            sql.append(SqlConstant.POINT);
+        }
+        sql.append(transferred);
+        sql.append(toUpperCase ? table.getName().toUpperCase() : table.getName());
+        sql.append(transferred);
+        sql.append(SqlConstant.SPACES);
+        return sql.toString();
+    }
+
+    /**
+     * 更改列信息
+     *
+     * @param alter
+     * @return
+     */
+    private String modifyColumn(Alter alter) {
+        StringBuffer modifySql = new StringBuffer();
+        modifySql.append(SqlConstant.MODIFY);
+        modifySql.append(SqlConstant.BEGIN_BRACKET);
+        ColumnInfo columnInfo = alter.getColumnInfo();
+        JdbcType jdbcType = JdbcType.getType(columnInfo.getType());
+        modifySql.append(SqlBeanUtil.getTableFieldName(alter, columnInfo.getName()));
+        modifySql.append(SqlConstant.SPACES);
+        modifySql.append(jdbcType.name());
+        if (columnInfo.getLength() != null && columnInfo.getLength() > 0) {
+            modifySql.append(SqlConstant.BEGIN_BRACKET);
+            //字段长度
+            modifySql.append(columnInfo.getLength());
+            if (jdbcType.isFloat()) {
+                modifySql.append(SqlConstant.COMMA);
+                modifySql.append(columnInfo.getScale() == null ? 0 : columnInfo.getScale());
+            }
+            modifySql.append(SqlConstant.END_BRACKET);
+        }
+        if (alter.getDifferences().contains(AlterDifference.NOT_NULL)) {
+            //是否为null
+            if ((columnInfo.getNotnull() != null && columnInfo.getNotnull()) || columnInfo.getPk()) {
+                modifySql.append(SqlConstant.SPACES);
+                modifySql.append(SqlConstant.NOT_NULL);
+            } else {
+                if (alter.getType() == AlterType.MODIFY && columnInfo.getNotnull() != null && !columnInfo.getNotnull()) {
+                    modifySql.append(SqlConstant.SPACES);
+                    modifySql.append(SqlConstant.NULL);
+                }
+            }
+        }
+        //默认值
+        if (StringUtil.isNotBlank(columnInfo.getDfltValue())) {
+            modifySql.append(SqlConstant.SPACES);
+            modifySql.append(SqlConstant.DEFAULT);
+            modifySql.append(SqlConstant.SPACES);
+            modifySql.append(SqlBeanUtil.getSqlValue(alter, columnInfo.getDfltValue(), jdbcType));
+        }
+        modifySql.append(SqlConstant.END_BRACKET);
+        modifySql.append(SqlConstant.SPACES);
+        return modifySql.toString();
+    }
+
+    /**
+     * 更改字段名
+     *
+     * @param alter
+     * @return
+     */
+    private String changeColumn(Alter alter) {
+        StringBuffer changeSql = new StringBuffer();
+        changeSql.append(SqlConstant.ALTER_TABLE);
+        changeSql.append(getFullName(alter, alter.getTable()));
+        changeSql.append(SqlConstant.RENAME);
+        changeSql.append(SqlConstant.COLUMN);
+        changeSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getOldColumnName().toUpperCase() : alter.getOldColumnName());
+        changeSql.append(SqlConstant.TO);
+        changeSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
+        return changeSql.toString();
+    }
+
+    /**
+     * 增加列备注
+     *
+     * @param isTable
+     * @param item
+     * @param transferred
+     * @return
+     */
+    public String addRemarks(boolean isTable, Alter item, String transferred) {
+        StringBuffer remarksSql = new StringBuffer();
+        remarksSql.append(SqlConstant.COMMENT);
+        remarksSql.append(SqlConstant.ON);
+        remarksSql.append(isTable ? SqlConstant.TABLE : SqlConstant.COLUMN);
+        remarksSql.append(getFullName(item, item.getTable()));
+        if (!isTable) {
+            remarksSql.append(SqlConstant.POINT);
+            remarksSql.append(transferred);
+            remarksSql.append(item.getColumnInfo().getName());
+            remarksSql.append(transferred);
+        }
+        remarksSql.append(SqlConstant.IS);
+        remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        remarksSql.append(StringUtil.isNotBlank(item.getColumnInfo().getRemarks()) ? item.getColumnInfo().getRemarks() : "''");
+        remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
+        return remarksSql.toString();
+    }
+
+    /**
+     * 获取schema的SQL
+     *
+     * @param name
+     * @return
+     */
+    public String getDatabaseSql(String name) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT DISTINCT OWNER AS as \"name\" FROM ALL_OBJECTS ");
+        if (StringUtil.isNotEmpty(name)) {
+            sql.append("WHERE OWNER = ");
+            sql.append("'" + name + "'");
+        }
+        return sql.toString();
+    }
+
+    @Override
+    public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+        return null;
+    }
+
+    /**
+     * 获取创建数据库的SQL
+     *
+     * @param name
+     * @return
+     */
+    @Override
+    public String getDropDatabaseSql(String name) {
+        return null;
+    }
+
+}

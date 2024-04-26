@@ -128,7 +128,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
      * @param resultSet
      * @return
      */
-    public Object mapHandleResultSet(ResultSet resultSet) {
+    public List<Object> mapHandleResultSet(ResultSet resultSet) {
         List<Object> resultList = new ArrayList<>();
         if (null != resultSet) {
             try {

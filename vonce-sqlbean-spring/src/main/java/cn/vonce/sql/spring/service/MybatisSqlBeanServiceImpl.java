@@ -10,7 +10,7 @@ import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.page.PageHelper;
 import cn.vonce.sql.page.ResultData;
 import cn.vonce.sql.provider.SqlBeanProvider;
-import cn.vonce.sql.service.TableService;
+import cn.vonce.sql.service.DbManageService;
 import cn.vonce.sql.spring.annotation.DbSwitch;
 import cn.vonce.sql.spring.annotation.DbTransactional;
 import cn.vonce.sql.spring.config.UseMybatis;
@@ -42,7 +42,7 @@ import java.util.*;
  */
 @UseMybatis
 @Service
-public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl implements SqlBeanService<T, ID>, TableService<T> {
+public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl implements SqlBeanService<T, ID>, DbManageService<T> {
 
     private Logger logger = LoggerFactory.getLogger(MybatisSqlBeanServiceImpl.class);
 
@@ -712,6 +712,30 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public int databases(String name) {
+        return mybatisSqlBeanDao.databases(getSqlBeanDB(), name);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int createDatabase(String name) {
+        if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Oracle) {
+            return 0;
+        }
+        return mybatisSqlBeanDao.createDatabase(getSqlBeanDB(), name);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int dropDatabase(String name) {
+        if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Oracle) {
+            return 0;
+        }
+        return mybatisSqlBeanDao.dropDatabase(getSqlBeanDB(), name);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public void dropTable() {
         SqlBeanDB sqlBeanDB = getSqlBeanDB();
         if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.Postgresql && sqlBeanDB.getDbType() != DbType.SQLServer && sqlBeanDB.getDbType() != DbType.H2) {
@@ -776,7 +800,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     }
 
     @Override
-    public TableService<T> operation() {
+    public DbManageService<T> operation() {
         return this;
     }
 

@@ -15,9 +15,7 @@ import cn.vonce.sql.uitls.StringUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -572,29 +570,7 @@ public class SqlBeanProvider {
         if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase() && StringUtil.isNotEmpty(name)) {
             name = name.toUpperCase();
         }
-        switch (sqlBeanDB.getDbType()) {
-            case MySQL:
-            case MariaDB:
-                return JavaMapMySqlType.getTableListSql(sqlBeanDB, schema, name);
-            case SQLServer:
-                return JavaMapSqlServerType.getTableListSql(sqlBeanDB, schema, name);
-            case Oracle:
-                return JavaMapOracleType.getTableListSql(sqlBeanDB, schema, name);
-            case Postgresql:
-                return JavaMapPostgresqlType.getTableListSql(sqlBeanDB, schema, name);
-            case DB2:
-                return JavaMapDB2Type.getTableListSql(sqlBeanDB, schema, name);
-            case H2:
-                return JavaMapH2Type.getTableListSql(sqlBeanDB, schema, name);
-            case Hsql:
-                return JavaMapHsqlType.getTableListSql(sqlBeanDB, schema, name);
-            case Derby:
-                return JavaMapDerbyType.getTableListSql(sqlBeanDB, schema, name);
-            case SQLite:
-                return JavaMapSqliteType.getTableListSql(sqlBeanDB, schema, name);
-            default:
-                throw new SqlBeanException("请配置正确的数据库");
-        }
+        return sqlBeanDB.getDbType().getSqlDialect().getTableListSql(sqlBeanDB, schema, name);
     }
 
     /**
@@ -609,29 +585,7 @@ public class SqlBeanProvider {
         if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase() && StringUtil.isNotEmpty(name)) {
             name = name.toUpperCase();
         }
-        switch (sqlBeanDB.getDbType()) {
-            case MySQL:
-            case MariaDB:
-                return JavaMapMySqlType.getColumnListSql(sqlBeanDB, schema, name);
-            case SQLServer:
-                return JavaMapSqlServerType.getColumnListSql(sqlBeanDB, schema, name);
-            case Oracle:
-                return JavaMapOracleType.getColumnListSql(sqlBeanDB, schema, name);
-            case Postgresql:
-                return JavaMapPostgresqlType.getColumnListSql(sqlBeanDB, schema, name);
-            case DB2:
-                return JavaMapDB2Type.getColumnListSql(sqlBeanDB, schema, name);
-            case H2:
-                return JavaMapH2Type.getColumnListSql(sqlBeanDB, schema, name);
-            case Hsql:
-                return JavaMapHsqlType.getColumnListSql(sqlBeanDB, schema, name);
-            case Derby:
-                return JavaMapDerbyType.getColumnListSql(sqlBeanDB, schema, name);
-            case SQLite:
-                return JavaMapSqliteType.getColumnListSql(sqlBeanDB, schema, name);
-            default:
-                throw new SqlBeanException("请配置正确的数据库");
-        }
+        return sqlBeanDB.getDbType().getSqlDialect().getColumnListSql(sqlBeanDB, schema, name);
     }
 
     /**
@@ -787,29 +741,7 @@ public class SqlBeanProvider {
      * @return
      */
     public static List<String> alterSql(DbType dbType, List<Alter> alterList) {
-        switch (dbType) {
-            case MySQL:
-            case MariaDB:
-                return JavaMapMySqlType.alterTable(alterList);
-            case SQLServer:
-                return JavaMapSqlServerType.alterTable(alterList);
-            case Oracle:
-                return JavaMapOracleType.alterTable(alterList);
-            case Postgresql:
-                return JavaMapPostgresqlType.alterTable(alterList);
-            case DB2:
-                return JavaMapDB2Type.alterTable(alterList);
-            case H2:
-                return JavaMapH2Type.alterTable(alterList);
-            case Hsql:
-                return JavaMapHsqlType.alterTable(alterList);
-            case Derby:
-                return JavaMapDerbyType.alterTable(alterList);
-            case SQLite:
-                return JavaMapSqliteType.alterTable(alterList);
-            default:
-                throw new SqlBeanException("请配置正确的数据库");
-        }
+        return dbType.getSqlDialect().alterTable(alterList);
     }
 
     /**
@@ -828,25 +760,40 @@ public class SqlBeanProvider {
         columnInfo.setRemarks(remarks);
         alter.setColumnInfo(columnInfo);
         String transferred = SqlBeanUtil.getTransferred(alter);
-        switch (sqlBeanDB.getDbType()) {
-            case MySQL:
-            case MariaDB:
-                return JavaMapMySqlType.addRemarks(alter, transferred);
-            case SQLServer:
-                return JavaMapSqlServerType.addRemarks(true, alter);
-            case Oracle:
-                return JavaMapOracleType.addRemarks(true, alter, transferred);
-            case Postgresql:
-                return JavaMapPostgresqlType.addRemarks(true, alter, transferred);
-            case DB2:
-                return JavaMapDB2Type.addRemarks(true, alter, transferred);
-            case H2:
-                return JavaMapH2Type.addRemarks(true, alter, transferred);
-            case Hsql:
-                return JavaMapHsqlType.addRemarks(true, alter, transferred);
-            default:
-                throw new SqlBeanException("请配置正确的数据库");
-        }
+        return sqlBeanDB.getDbType().getSqlDialect().addRemarks(true, alter, transferred);
+    }
+
+    /**
+     * 获取数据库列表sql
+     *
+     * @param sqlBeanDB
+     * @param name
+     * @return
+     */
+    public static String databaseSql(SqlBeanDB sqlBeanDB, String name) {
+        return sqlBeanDB.getDbType().getSqlDialect().getDatabaseSql(name);
+    }
+
+    /**
+     * 创建数据库sql
+     *
+     * @param sqlBeanDB
+     * @param name
+     * @return
+     */
+    public static String createDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+        return sqlBeanDB.getDbType().getSqlDialect().getCreateDatabaseSql(sqlBeanDB, name);
+    }
+
+    /**
+     * 删除数据库sql
+     *
+     * @param sqlBeanDB
+     * @param name
+     * @return
+     */
+    public static String dropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+        return sqlBeanDB.getDbType().getSqlDialect().getDropDatabaseSql(name);
     }
 
     /**

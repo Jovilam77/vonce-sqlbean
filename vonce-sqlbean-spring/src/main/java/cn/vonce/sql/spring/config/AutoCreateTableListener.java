@@ -4,7 +4,7 @@ import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.bean.TableInfo;
 import cn.vonce.sql.config.SqlBeanConfig;
-import cn.vonce.sql.service.TableService;
+import cn.vonce.sql.service.DbManageService;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,23 +37,25 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
         if ((evt.getApplicationContext().getParent() == null || evt.getApplicationContext().getParent().getParent() == null) && (sqlBeanConfig == null || sqlBeanConfig.getAutoCreate())) {
             new Thread(() -> {
                 List<String> beanNameList = new ArrayList<>();
-                beanNameList.addAll(Arrays.asList(evt.getApplicationContext().getBeanNamesForType(TableService.class)));
+                beanNameList.addAll(Arrays.asList(evt.getApplicationContext().getBeanNamesForType(DbManageService.class)));
                 if (!beanNameList.isEmpty()) {
-                    Map<String, TableService> schemaMap = new HashMap<>();
+                    Map<String, DbManageService> schemaMap = new HashMap<>();
                     for (String name : beanNameList) {
-                        TableService tableService = evt.getApplicationContext().getBean(name, TableService.class);
-                        Class<?> clazz = tableService.getBeanClass();
+                        DbManageService dbManageService = evt.getApplicationContext().getBean(name, DbManageService.class);
+                        Class<?> clazz = dbManageService.getBeanClass();
                         if (clazz == null) {
                             continue;
                         }
                         SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-                        schemaMap.put(sqlTable.schema(), tableService);
+                        schemaMap.put(sqlTable.schema(), dbManageService);
                     }
-                    for (Map.Entry<String, TableService> entry : schemaMap.entrySet()) {
+                    for (Map.Entry<String, DbManageService> entry : schemaMap.entrySet()) {
+                        //检查schema是否存在
+
                         List<TableInfo> tableList = entry.getValue().getTableList();
                         for (String name : beanNameList) {
-                            TableService tableService = evt.getApplicationContext().getBean(name, TableService.class);
-                            Class<?> clazz = tableService.getBeanClass();
+                            DbManageService dbManageService = evt.getApplicationContext().getBean(name, DbManageService.class);
+                            Class<?> clazz = dbManageService.getBeanClass();
                             if (clazz == null) {
                                 continue;
                             }
@@ -68,21 +70,21 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                                         isExist = true;
                                         //表注释不一致
                                         if (sqlTable.autoAlter() && !sqlTable.remarks().equals(tableInfo.getRemarks())) {
-                                            tableService.alterRemarks(sqlTable.remarks());
+                                            dbManageService.alterRemarks(sqlTable.remarks());
                                         }
                                         break;
                                     }
                                 }
                                 //创建表
                                 if (!isExist && sqlTable.autoCreate()) {
-                                    tableService.createTable();
+                                    dbManageService.createTable();
                                     logger.info("-----'{}'表不存在，已为你自动创建-----", table.getName());
                                     continue;
                                 }
                                 //更新表结构
                                 if (isExist && sqlTable.autoAlter()) {
                                     try {
-                                        tableService.alter(table, tableService.getColumnInfoList(table.getName()));
+                                        dbManageService.alter(table, dbManageService.getColumnInfoList(table.getName()));
                                     } catch (Exception e) {
                                         logger.error("更新表结构出错：" + e.getMessage(), e);
                                     }

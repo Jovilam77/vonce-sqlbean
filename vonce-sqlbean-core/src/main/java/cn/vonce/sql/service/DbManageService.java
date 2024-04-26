@@ -7,14 +7,14 @@ import cn.vonce.sql.helper.Wrapper;
 import java.util.List;
 
 /**
- * 表结构业务接口
+ * 数据库操作业务接口
  *
  * @author Jovi
  * @version 1.0
  * @email imjovi@qq.com
  * @date 2020/6/30 15:40
  */
-public interface TableService<T> {
+public interface DbManageService<T> {
 
     /**
      * 获取Bean类型
@@ -259,5 +259,29 @@ public interface TableService<T> {
      * @return
      */
     int alterRemarks(String remarks);
+
+    /**
+     * 数据库列表
+     *
+     * @param name
+     * @return
+     */
+    int databases(String name);
+
+    /**
+     * 创建数据库
+     *
+     * @param name
+     * @return
+     */
+    int createDatabase(String name);
+
+    /**
+     * 删除数据库
+     *
+     * @param name
+     * @return
+     */
+    int dropDatabase(String name);
 
 }

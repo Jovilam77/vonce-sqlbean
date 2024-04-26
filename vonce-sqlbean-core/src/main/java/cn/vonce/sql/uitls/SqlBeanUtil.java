@@ -280,11 +280,11 @@ public class SqlBeanUtil {
                 existId++;
             }
             if (existId > 1) {
-                throw new SqlBeanException("请正确标识@SqlId注解，id字段只能标识一个，但我们在'" + field.getDeclaringClass().getName() + "'此实体类或其父类找到了不止一处");
+                throw new SqlBeanException("请正确标识@SqlId注解，id字段只能标识一个，但我们在《" + field.getDeclaringClass().getName() + "》此实体类或其父类找到了不止一处");
             }
         }
         if (existId == 0) {
-            throw new SqlBeanException("请检查实体类的id字段是否正确标识@SqlId注解");
+            throw new SqlBeanException("请检查实体类《" + clazz.getName() + "》的id字段是否正确标识@SqlId注解");
         }
         return idField;
     }
@@ -347,7 +347,7 @@ public class SqlBeanUtil {
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
             jdbcType = sqlColumn.type();
         } else {
-            jdbcType = JdbcType.getType(sqlBeanDB.getDbType(), field);
+            jdbcType = sqlBeanDB.getDbType().getSqlDialect().getJdbcType(field);
         }
         columnInfo.setType(jdbcType.name());
         if (sqlColumn != null) {

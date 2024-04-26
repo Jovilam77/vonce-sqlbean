@@ -348,4 +348,34 @@ public class MybatisSqlBeanProvider {
         return SqlBeanProvider.lastInsertIdSql();
     }
 
+    /**
+     * 复制数据到指定表
+     *
+     * @param map
+     * @return
+     */
+    public String databases(Map<String, Object> map) {
+        return SqlBeanProvider.databaseSql((SqlBeanDB) map.get("sqlBeanDB"), (String) map.get("name"));
+    }
+
+    /**
+     * 复制数据到指定表
+     *
+     * @param map
+     * @return
+     */
+    public String createDatabase(Map<String, Object> map) {
+        return SqlBeanProvider.createDatabaseSql((SqlBeanDB) map.get("sqlBeanDB"), (String) map.get("name"));
+    }
+
+    /**
+     * 复制数据到指定表
+     *
+     * @param map
+     * @return
+     */
+    public String dropDatabase(Map<String, Object> map) {
+        return SqlBeanProvider.dropDatabaseSql((SqlBeanDB) map.get("sqlBeanDB"), (String) map.get("name"));
+    }
+
 }
