@@ -214,7 +214,7 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
      */
     public String getDatabaseSql(String name) {
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT TABLENAME as \"name\" FROM SYSCS_DIAG.SYSTABLES ");
+        sql.append("SELECT SCHEMANAME as \"name\" FROM SYS.SYSSCHEMAS ");
         if (StringUtil.isNotEmpty(name)) {
             sql.append("WHERE SCHEMANAME = ");
             sql.append("'" + name + "'");
