@@ -229,7 +229,7 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
 
     @Override
     public String getDropDatabaseSql(String name) {
-        return "DROP SCHEMA " + name + " RESTRICT;";
+        return "DROP SCHEMA " + name + " RESTRICT";
     }
 
 }
