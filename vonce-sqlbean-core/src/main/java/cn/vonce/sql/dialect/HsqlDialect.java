@@ -260,7 +260,7 @@ public class HsqlDialect implements SqlDialect<JavaMapHsqlType> {
 
     @Override
     public String getDropDatabaseSql(String name) {
-        return "DROP DATABASE IF EXISTS " + name;
+        return "DROP SCHEMA IF EXISTS " + name;
     }
 
 }

@@ -214,9 +214,9 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
      */
     public String getDatabaseSql(String name) {
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT datname as \"name\" FROM pg_database ");
+        sql.append("SELECT TABLENAME as \"name\" FROM SYSCS_DIAG.SYSTABLES ");
         if (StringUtil.isNotEmpty(name)) {
-            sql.append("WHERE datname = ");
+            sql.append("WHERE SCHEMANAME = ");
             sql.append("'" + name + "'");
         }
         return sql.toString();
@@ -224,7 +224,7 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
 
     @Override
     public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return "CREATE SCHEMA " + name + " AUTHORIZATION id";
+        return "CREATE SCHEMA AUTHORIZATION " + name;
     }
 
     @Override

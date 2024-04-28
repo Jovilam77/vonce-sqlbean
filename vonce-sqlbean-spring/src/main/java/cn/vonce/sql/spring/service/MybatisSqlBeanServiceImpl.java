@@ -800,7 +800,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     }
 
     @Override
-    public DbManageService<T> operation() {
+    public DbManageService<T> manage() {
         return this;
     }
 

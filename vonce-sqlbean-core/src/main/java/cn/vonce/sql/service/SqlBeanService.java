@@ -25,6 +25,6 @@ public interface SqlBeanService<T, ID> extends SelectService<T, ID>, InsertServi
      *
      * @return
      */
-    DbManageService<T> operation();
+    DbManageService<T> manage();
 
 }

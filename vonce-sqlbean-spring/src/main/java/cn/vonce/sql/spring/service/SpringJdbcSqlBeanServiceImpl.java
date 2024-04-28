@@ -796,7 +796,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     }
 
     @Override
-    public DbManageService<T> operation() {
+    public DbManageService<T> manage() {
         return this;
     }
 
