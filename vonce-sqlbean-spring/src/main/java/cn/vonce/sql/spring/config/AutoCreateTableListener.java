@@ -6,6 +6,7 @@ import cn.vonce.sql.bean.TableInfo;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.service.DbManageService;
 import cn.vonce.sql.uitls.SqlBeanUtil;
+import cn.vonce.sql.uitls.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +51,14 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                         schemaMap.put(sqlTable.schema(), dbManageService);
                     }
                     for (Map.Entry<String, DbManageService> entry : schemaMap.entrySet()) {
-                        //检查schema是否存在
-
+                        //检查schema是否存在,不存在则创建（不支持sqlite和oracle）
+                        if (StringUtil.isNotBlank(entry.getKey())) {
+                            List<String> databases = entry.getValue().getDatabases(entry.getKey());
+                            if (databases == null || databases.isEmpty()) {
+                                entry.getValue().createDatabase(entry.getKey());
+                                logger.info("-----'{}'schema不存在，已为你自动创建-----", entry.getKey());
+                            }
+                        }
                         List<TableInfo> tableList = entry.getValue().getTableList();
                         for (String name : beanNameList) {
                             DbManageService dbManageService = evt.getApplicationContext().getBean(name, DbManageService.class);

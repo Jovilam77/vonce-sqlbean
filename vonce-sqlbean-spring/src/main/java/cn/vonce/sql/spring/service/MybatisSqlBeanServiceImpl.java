@@ -712,7 +712,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int databases(String name) {
+    public List<String> getDatabases(String name) {
         return mybatisSqlBeanDao.databases(getSqlBeanDB(), name);
     }
 
@@ -797,11 +797,6 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         List<ColumnInfo> columnInfoList = mybatisSqlBeanDao.selectColumnInfoList(getSqlBeanDB(), schema, tableName);
         super.handleColumnInfo(columnInfoList);
         return columnInfoList;
-    }
-
-    @Override
-    public DbManageService<T> manage() {
-        return this;
     }
 
 }

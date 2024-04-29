@@ -266,7 +266,7 @@ public interface DbManageService<T> {
      * @param name
      * @return
      */
-    int databases(String name);
+    List<String> getDatabases(String name);
 
     /**
      * 创建数据库

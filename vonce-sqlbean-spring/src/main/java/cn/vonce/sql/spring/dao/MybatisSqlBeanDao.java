@@ -492,8 +492,8 @@ public interface MybatisSqlBeanDao<T> {
      * @param name
      * @return
      */
-    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "databases")
-    int databases(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
+    @SelectProvider(type = MybatisSqlBeanProvider.class, method = "databases")
+    List<String> databases(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
 
     /**
      * 创建数据库

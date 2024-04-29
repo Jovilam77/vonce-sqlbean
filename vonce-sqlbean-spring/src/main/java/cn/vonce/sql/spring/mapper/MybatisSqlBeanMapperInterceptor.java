@@ -169,9 +169,6 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
                 closeResultSet(resultSet);
             }
         }
-        if (resultList.isEmpty()) {
-            resultList.add(SqlBeanUtil.getDefaultValue(returnType));
-        }
         return resultList;
     }
 
