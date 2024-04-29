@@ -25,6 +25,7 @@ import java.util.List;
  */
 public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
 
+    @Override
     public JavaMapDerbyType getType(Field field) {
         Class<?> clazz = SqlBeanUtil.getEntityClassFieldType(field);
         for (JavaMapDerbyType javaType : JavaMapDerbyType.values()) {
@@ -50,6 +51,7 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
      * @param tableName
      * @return
      */
+    @Override
     public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT tb.TABLENAME AS \"name\", sc.SCHEMANAME AS \"schema\" ");
@@ -75,6 +77,7 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
      * @param tableName
      * @return
      */
+    @Override
     public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT cl.COLUMNNUMBER AS cid, cl.COLUMNNAME AS name, cl.COLUMNDATATYPE AS type, cl.COLUMNDEFAULT AS dflt_value, ");
@@ -103,6 +106,7 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
      * @param alterList
      * @return
      */
+    @Override
     public List<String> alterTable(List<Alter> alterList) {
         List<String> sqlList = new ArrayList<>();
         for (int i = 0; i < alterList.size(); i++) {
@@ -212,24 +216,25 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
      * @param name
      * @return
      */
-    public String getDatabaseSql(String name) {
+    @Override
+    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT SCHEMANAME as \"name\" FROM SYS.SYSSCHEMAS ");
         if (StringUtil.isNotEmpty(name)) {
             sql.append("WHERE SCHEMANAME = ");
-            sql.append("'" + name + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
         }
         return sql.toString();
     }
 
     @Override
     public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return "CREATE SCHEMA AUTHORIZATION " + name;
+        return "CREATE SCHEMA AUTHORIZATION " + this.getSchemaName(sqlBeanDB, name);
     }
 
     @Override
-    public String getDropDatabaseSql(String name) {
-        return "DROP SCHEMA " + name + " RESTRICT";
+    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+        return "DROP SCHEMA " + this.getSchemaName(sqlBeanDB, name) + " RESTRICT";
     }
 
 }

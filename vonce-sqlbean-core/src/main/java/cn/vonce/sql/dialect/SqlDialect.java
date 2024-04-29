@@ -3,6 +3,7 @@ package cn.vonce.sql.dialect;
 import cn.vonce.sql.bean.Alter;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.enumerate.JdbcType;
+import cn.vonce.sql.uitls.SqlBeanUtil;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -73,10 +74,11 @@ public interface SqlDialect<T> {
     /**
      * 获取数据库列表sql
      *
+     * @param sqlBeanDB
      * @param name
      * @return
      */
-    String getDatabaseSql(String name);
+    String getDatabaseSql(SqlBeanDB sqlBeanDB, String name);
 
     /**
      * 创建数据库sql
@@ -90,9 +92,21 @@ public interface SqlDialect<T> {
     /**
      * 删除数据库sql
      *
+     * @param sqlBeanDB
      * @param name
      * @return
      */
-    String getDropDatabaseSql(String name);
+    String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name);
+
+    /**
+     * 获取schema名称
+     *
+     * @param sqlBeanDB
+     * @param name
+     * @return
+     */
+    default String getSchemaName(SqlBeanDB sqlBeanDB, String name) {
+        return (SqlBeanUtil.isToUpperCase(sqlBeanDB) ? name.toUpperCase() : name);
+    }
 
 }

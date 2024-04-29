@@ -126,19 +126,30 @@ public class SqlBeanUtil {
     }
 
     /**
-     * 返回带转义表名,优先级 tableName第一，注解第二，类名第三
+     * 返回带转义表名
      *
      * @param table
      * @param common
      * @return
      */
     public static String getTableName(Table table, Common common) {
-        String schema = table.getSchema();
-        String tableName = table.getName();
-        if (StringUtil.isNotEmpty(schema)) {
-            tableName = schema + SqlConstant.POINT + tableName;
-        }
+        String tableName = getTableName(common, table.getSchema(), table.getName());
         return SqlBeanUtil.isToUpperCase(common) ? tableName.toUpperCase() : tableName;
+    }
+
+    /**
+     * 返回带schema表名
+     *
+     * @param schema
+     * @param tableName
+     * @return
+     */
+    public static String getTableName(Common common, String schema, String tableName) {
+        String transferred = getTransferred(common);
+        if (StringUtil.isNotEmpty(schema)) {
+            tableName = transferred + schema + transferred + SqlConstant.POINT + transferred + tableName + transferred;
+        }
+        return tableName;
     }
 
 

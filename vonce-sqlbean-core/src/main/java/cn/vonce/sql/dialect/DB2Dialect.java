@@ -45,15 +45,6 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
         return JdbcType.getType(getType(field).name());
     }
 
-    /**
-     * 获取表数据列表的SQL
-     * select tabname AS \"name\" from syscat.tables where tabschema = current schema and tabname = 'TEST'
-     *
-     * @param sqlBeanDB
-     * @param schema
-     * @param tableName
-     * @return
-     */
     @Override
     public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
@@ -72,13 +63,6 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
         return sql.toString();
     }
 
-    /**
-     * 获取列数据列表的SQL
-     *
-     * @param sqlBeanDB
-     * @param tableName
-     * @return
-     */
     @Override
     public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
@@ -100,12 +84,6 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
         return sql.toString();
     }
 
-    /**
-     * 更改表结构
-     *
-     * @param alterList
-     * @return
-     */
     @Override
     public List<String> alterTable(List<Alter> alterList) {
         List<String> sqlList = new ArrayList<>();
@@ -252,14 +230,6 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
         return changeSql.toString();
     }
 
-    /**
-     * 增加列备注
-     *
-     * @param isTable
-     * @param item
-     * @param transferred
-     * @return
-     */
     @Override
     public String addRemarks(boolean isTable, Alter item, String transferred) {
         StringBuffer remarksSql = new StringBuffer();
@@ -297,31 +267,25 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
         return recastSql.toString();
     }
 
-    /**
-     * 获取schema的SQL
-     *
-     * @param name
-     * @return
-     */
     @Override
-    public String getDatabaseSql(String name) {
+    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT DATABASENAME as \"name\" FROM SYSIBM.SYSDATABASES ");
         if (StringUtil.isNotEmpty(name)) {
             sql.append("WHERE DATABASENAME = ");
-            sql.append("'" + name + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
         }
         return sql.toString();
     }
 
     @Override
     public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return "CREATE DATABASE " + name;
+        return "CREATE DATABASE " + this.getSchemaName(sqlBeanDB, name);
     }
 
     @Override
-    public String getDropDatabaseSql(String name) {
-        return "DROP DATABASE " + name;
+    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+        return "DROP DATABASE " + this.getSchemaName(sqlBeanDB, name);
     }
 
 }

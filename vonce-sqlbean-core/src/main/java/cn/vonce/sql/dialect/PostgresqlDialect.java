@@ -26,6 +26,7 @@ import java.util.List;
  */
 public class PostgresqlDialect implements SqlDialect<JavaMapPostgresqlType> {
 
+    @Override
     public JavaMapPostgresqlType getType(Field field) {
         Class<?> clazz = SqlBeanUtil.getEntityClassFieldType(field);
         for (JavaMapPostgresqlType javaType : JavaMapPostgresqlType.values()) {
@@ -43,14 +44,7 @@ public class PostgresqlDialect implements SqlDialect<JavaMapPostgresqlType> {
         return JdbcType.getType(getType(field).name());
     }
 
-    /**
-     * 获取表数据列表的SQL
-     *
-     * @param sqlBeanDB
-     * @param schema
-     * @param tableName
-     * @return
-     */
+    @Override
     public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT pt.tablename AS \"name\", pd.description AS remarks ");
@@ -70,13 +64,7 @@ public class PostgresqlDialect implements SqlDialect<JavaMapPostgresqlType> {
         return sql.toString();
     }
 
-    /**
-     * 获取列数据列表的SQL
-     *
-     * @param sqlBeanDB
-     * @param tableName
-     * @return
-     */
+    @Override
     public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT cl.ordinal_position as cid, cl.column_name as name, cl.data_type as type, ");
@@ -104,12 +92,7 @@ public class PostgresqlDialect implements SqlDialect<JavaMapPostgresqlType> {
         return sql.toString();
     }
 
-    /**
-     * 更改表结构
-     *
-     * @param alterList
-     * @return
-     */
+    @Override
     public List<String> alterTable(List<Alter> alterList) {
         List<String> sqlList = new ArrayList<>();
         String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
@@ -284,13 +267,7 @@ public class PostgresqlDialect implements SqlDialect<JavaMapPostgresqlType> {
         return changeSql.toString();
     }
 
-    /**
-     * 增加列备注
-     *
-     * @param item
-     * @param transferred
-     * @return
-     */
+    @Override
     public String addRemarks(boolean isTable, Alter item, String transferred) {
         StringBuffer remarksSql = new StringBuffer();
         remarksSql.append(SqlConstant.COMMENT);
@@ -310,30 +287,25 @@ public class PostgresqlDialect implements SqlDialect<JavaMapPostgresqlType> {
         return remarksSql.toString();
     }
 
-    /**
-     * 获取schema的SQL
-     *
-     * @param name
-     * @return
-     */
-    public String getDatabaseSql(String name) {
+    @Override
+    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT datname as \"name\" FROM pg_database ");
         if (StringUtil.isNotEmpty(name)) {
             sql.append("WHERE datname = ");
-            sql.append("'" + name + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
         }
         return sql.toString();
     }
 
     @Override
     public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return "CREATE DATABASE " + name;
+        return "CREATE DATABASE " + this.getSchemaName(sqlBeanDB, name);
     }
 
     @Override
-    public String getDropDatabaseSql(String name) {
-        return "DROP DATABASE IF EXISTS " + name;
+    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+        return "DROP DATABASE IF EXISTS " + this.getSchemaName(sqlBeanDB, name);
     }
 
 }

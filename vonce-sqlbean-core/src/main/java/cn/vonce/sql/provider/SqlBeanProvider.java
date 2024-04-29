@@ -771,7 +771,7 @@ public class SqlBeanProvider {
      * @return
      */
     public static String databaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return sqlBeanDB.getDbType().getSqlDialect().getDatabaseSql(name);
+        return sqlBeanDB.getDbType().getSqlDialect().getDatabaseSql(sqlBeanDB, name);
     }
 
     /**
@@ -793,7 +793,7 @@ public class SqlBeanProvider {
      * @return
      */
     public static String dropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return sqlBeanDB.getDbType().getSqlDialect().getDropDatabaseSql(name);
+        return sqlBeanDB.getDbType().getSqlDialect().getDropDatabaseSql(sqlBeanDB, name);
     }
 
     /**

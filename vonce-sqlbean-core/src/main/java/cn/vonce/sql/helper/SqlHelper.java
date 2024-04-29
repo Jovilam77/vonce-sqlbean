@@ -10,6 +10,7 @@ import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.uitls.SqlBeanUtil;
+
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -124,7 +125,7 @@ public class SqlHelper {
         if (update.getSqlBeanDB().getDbType() == DbType.H2 || update.getSqlBeanDB().getDbType() == DbType.Oracle) {
             sqlSb.append(SqlBeanUtil.fromFullName(update.getTable().getSchema(), update.getTable().getName(), update.getTable().getAlias(), update));
         } else {
-            sqlSb.append(getTableName(update.getTable(), update));
+            sqlSb.append(SqlBeanUtil.getTableName(update.getTable(), update));
         }
         sqlSb.append(SqlConstant.SET);
         sqlSb.append(setSql(update));
@@ -163,7 +164,7 @@ public class SqlHelper {
         if (delete.getSqlBeanDB().getDbType() == DbType.H2 || delete.getSqlBeanDB().getDbType() == DbType.Oracle) {
             sqlSb.append(SqlBeanUtil.fromFullName(delete.getTable().getSchema(), delete.getTable().getName(), delete.getTable().getAlias(), delete));
         } else {
-            sqlSb.append(getTableName(delete.getTable(), delete));
+            sqlSb.append(SqlBeanUtil.getTableName(delete.getTable(), delete));
         }
         sqlSb.append(whereSql(delete, null));
         return sqlSb.toString();
@@ -179,7 +180,7 @@ public class SqlHelper {
         SqlBeanUtil.check(create);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlConstant.CREATE_TABLE);
-        sqlSb.append(getTableName(create.getTable(), create));
+        sqlSb.append(SqlBeanUtil.getTableName(create.getTable(), create));
         sqlSb.append(SqlConstant.BEGIN_BRACKET);
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(create.getBeanClass());
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(create.getBeanClass());
@@ -232,7 +233,7 @@ public class SqlHelper {
         //非SQLServer、Postgresql数据库则使用：create table A as select * from B
         if (DbType.SQLServer != backup.getSqlBeanDB().getDbType() && DbType.Postgresql != backup.getSqlBeanDB().getDbType()) {
             backupSql.append(SqlConstant.CREATE_TABLE);
-            backupSql.append(getTableName(targetSchema, backup.getTargetTableName()));
+            backupSql.append(SqlBeanUtil.getTableName(backup, targetSchema, backup.getTargetTableName()));
             backupSql.append(SqlConstant.SPACES);
             backupSql.append(SqlConstant.AS);
         }
@@ -249,10 +250,10 @@ public class SqlHelper {
         //如果是SQLServer、Postgresql数据库则需要拼接INTO：select * into A from B
         if (DbType.SQLServer == backup.getSqlBeanDB().getDbType() || DbType.Postgresql == backup.getSqlBeanDB().getDbType()) {
             backupSql.append(SqlConstant.INTO);
-            backupSql.append(getTableName(targetSchema, backup.getTargetTableName()));
+            backupSql.append(SqlBeanUtil.getTableName(backup, targetSchema, backup.getTargetTableName()));
         }
         backupSql.append(SqlConstant.FROM);
-        backupSql.append(getTableName(backup.getTable(), backup));
+        backupSql.append(SqlBeanUtil.getTableName(backup.getTable(), backup));
         //如果是Derby数据库，仅支持创建表结构，其他数据库则可通过条件备份数据和是否需要数据
         if (DbType.Derby == backup.getSqlBeanDB().getDbType()) {
             backupSql.append(" WITH NO DATA");
@@ -277,7 +278,7 @@ public class SqlHelper {
         StringBuffer copySql = new StringBuffer();
         StringBuffer columnSql = new StringBuffer();
         copySql.append(SqlConstant.INSERT_INTO);
-        copySql.append(getTableName(copy.getTable(), copy));
+        copySql.append(SqlBeanUtil.getTableName(copy.getTable(), copy));
         if (copy.getColumns() != null && copy.getColumns().length > 0) {
             for (Column column : copy.getColumns()) {
                 columnSql.append(column.getName());
@@ -305,7 +306,7 @@ public class SqlHelper {
             copySql.append(SqlConstant.ALL);
         }
         copySql.append(SqlConstant.FROM);
-        copySql.append(getTableName(targetSchema, copy.getTargetTableName()));
+        copySql.append(SqlBeanUtil.getTableName(copy, targetSchema, copy.getTargetTableName()));
         copySql.append(whereSql(copy, null));
         return copySql.toString();
     }
@@ -318,7 +319,7 @@ public class SqlHelper {
      */
     public static String buildDrop(Drop drop) {
         StringBuffer dropSql = new StringBuffer();
-        String tableName = getTableName(drop.getTable(), drop);
+        String tableName = SqlBeanUtil.getTableName(drop.getTable(), drop);
         if (drop.getSqlBeanDB().getDbType() == DbType.MySQL || drop.getSqlBeanDB().getDbType() == DbType.MariaDB || drop.getSqlBeanDB().getDbType() == DbType.Postgresql || drop.getSqlBeanDB().getDbType() == DbType.H2) {
             dropSql.append("DROP TABLE IF EXISTS ");
             dropSql.append(tableName);
@@ -330,32 +331,6 @@ public class SqlHelper {
             dropSql.append(tableName);
         }
         return dropSql.toString();
-    }
-
-    /**
-     * 返回带转义表名,优先级 tableName第一，注解第二，类名第三
-     *
-     * @param table
-     * @param common
-     * @return
-     */
-    private static String getTableName(Table table, Common common) {
-        String tableName = getTableName(table.getSchema(), table.getName());
-        return SqlBeanUtil.isToUpperCase(common) ? tableName.toUpperCase() : tableName;
-    }
-
-    /**
-     * 返回带schema表名
-     *
-     * @param schema
-     * @param tableName
-     * @return
-     */
-    private static String getTableName(String schema, String tableName) {
-        if (StringUtil.isNotEmpty(schema)) {
-            tableName = schema + SqlConstant.POINT + tableName;
-        }
-        return tableName;
     }
 
     /**
@@ -464,7 +439,7 @@ public class SqlHelper {
      * @throws IllegalArgumentException
      */
     private static String fieldAndValuesSql(Insert insert) throws IllegalArgumentException {
-        String tableName = getTableName(insert.getTable(), insert);
+        String tableName = SqlBeanUtil.getTableName(insert.getTable(), insert);
         StringBuffer fieldSql = new StringBuffer();
         StringBuffer valueSql = new StringBuffer();
         StringBuffer fieldAndValuesSql = new StringBuffer();

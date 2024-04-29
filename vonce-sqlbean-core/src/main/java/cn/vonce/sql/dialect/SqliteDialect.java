@@ -25,6 +25,7 @@ import java.util.*;
  */
 public class SqliteDialect implements SqlDialect<JavaMapSqliteType> {
 
+    @Override
     public JavaMapSqliteType getType(Field field) {
         Class<?> clazz = SqlBeanUtil.getEntityClassFieldType(field);
         for (JavaMapSqliteType javaType : JavaMapSqliteType.values()) {
@@ -42,14 +43,7 @@ public class SqliteDialect implements SqlDialect<JavaMapSqliteType> {
         return JdbcType.getType(getType(field).name());
     }
 
-    /**
-     * 获取表数据列表的SQL
-     *
-     * @param sqlBeanDB
-     * @param schema
-     * @param tableName
-     * @return
-     */
+    @Override
     public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT name ");
@@ -61,13 +55,7 @@ public class SqliteDialect implements SqlDialect<JavaMapSqliteType> {
         return sql.toString();
     }
 
-    /**
-     * 获取列数据列表的SQL
-     *
-     * @param sqlBeanDB
-     * @param tableName
-     * @return
-     */
+    @Override
     public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("pragma table_info('");
@@ -76,12 +64,7 @@ public class SqliteDialect implements SqlDialect<JavaMapSqliteType> {
         return sql.toString();
     }
 
-    /**
-     * 更改表结构
-     *
-     * @param alterList
-     * @return
-     */
+    @Override
     public List<String> alterTable(List<Alter> alterList) {
         List<String> sqlList = new ArrayList<>();
         SqlBeanDB sqlBeanDB = alterList.get(0).getSqlBeanDB();
@@ -161,7 +144,7 @@ public class SqliteDialect implements SqlDialect<JavaMapSqliteType> {
     }
 
     @Override
-    public String getDatabaseSql(String name) {
+    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
         return null;
     }
 
@@ -171,7 +154,7 @@ public class SqliteDialect implements SqlDialect<JavaMapSqliteType> {
     }
 
     @Override
-    public String getDropDatabaseSql(String name) {
+    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
         return null;
     }
 

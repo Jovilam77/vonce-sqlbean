@@ -189,12 +189,12 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
      * @return
      */
     @Override
-    public String getDatabaseSql(String name) {
+    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT schema_name as `name` FROM information_schema.schemata ");
         if (StringUtil.isNotEmpty(name)) {
             sql.append("WHERE schema_name = ");
-            sql.append("'" + name + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
         }
         return sql.toString();
     }
@@ -209,7 +209,7 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
     public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
         StringBuffer sql = new StringBuffer();
         sql.append("CREATE DATABASE IF NOT EXISTS ");
-        sql.append(name);
+        sql.append(this.getSchemaName(sqlBeanDB, name));
         sql.append(" CHARACTER SET ");
         if (sqlBeanDB.getDatabaseMajorVersion() > 5 || (sqlBeanDB.getDatabaseMajorVersion() == 5 && sqlBeanDB.getDatabaseMinorVersion() > 3)) {
             sql.append("utf8mb4 COLLATE utf8mb4_general_ci");
@@ -220,8 +220,8 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
     }
 
     @Override
-    public String getDropDatabaseSql(String name) {
-        return "DROP DATABASE IF EXISTS " + name;
+    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+        return "DROP DATABASE IF EXISTS " + this.getSchemaName(sqlBeanDB, name);
     }
 
 }

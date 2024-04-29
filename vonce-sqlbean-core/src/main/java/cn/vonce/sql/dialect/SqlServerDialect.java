@@ -44,14 +44,6 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
         return JdbcType.getType(getType(field).name());
     }
 
-    /**
-     * 获取表数据列表的SQL
-     *
-     * @param sqlBeanDB
-     * @param schema
-     * @param tableName
-     * @return
-     */
     @Override
     public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
@@ -66,13 +58,6 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
         return sql.toString();
     }
 
-    /**
-     * 获取列数据列表的SQL
-     *
-     * @param sqlBeanDB
-     * @param tableName
-     * @return
-     */
     @Override
     public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
@@ -94,12 +79,6 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
         return sql.toString();
     }
 
-    /**
-     * 更改表结构
-     *
-     * @param alterList
-     * @return
-     */
     @Override
     public List<String> alterTable(List<Alter> alterList) {
         List<String> sqlList = new ArrayList<>();
@@ -237,32 +216,9 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
                 modifySql.append(SqlConstant.AUTO_INCREMENT);
             }
         }
-//        //默认值
-//        if (StringUtil.isNotEmpty(columnInfo.getDfltValue())) {
-//            modifySql.append(SqlConstant.SEMICOLON);
-//            modifySql.append(SqlConstant.ALTER_TABLE);
-//            modifySql.append(fullName);
-//            modifySql.append(SqlConstant.ADD);
-//            modifySql.append(SqlConstant.DEFAULT);
-//            modifySql.append(SqlConstant.SPACES);
-//            modifySql.append(columnInfo.getDfltValue());
-//            modifySql.append(SqlConstant.SPACES);
-//            modifySql.append(SqlConstant.FOR);
-//            modifySql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
-//            modifySql.append(SqlBeanUtil.isToUpperCase(alter) ? columnInfo.getName().toUpperCase() : columnInfo.getName());
-//            modifySql.append(SqlConstant.END_SQUARE_BRACKETS);
-//        }
         return modifySql;
     }
 
-    /**
-     * 增加列备注
-     *
-     * @param isTable
-     * @param item
-     * @param transferred
-     * @return
-     */
     @Override
     public String addRemarks(boolean isTable, Alter item, String transferred) {
         String remarks = StringUtil.isNotBlank(item.getColumnInfo().getRemarks()) ? item.getColumnInfo().getRemarks() : "''";
@@ -279,19 +235,13 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
         return remarksSql.toString();
     }
 
-    /**
-     * 获取schema的SQL
-     *
-     * @param name
-     * @return
-     */
     @Override
-    public String getDatabaseSql(String name) {
+    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT name FROM master.sys.databases ");
         if (StringUtil.isNotEmpty(name)) {
             sql.append("WHERE name = ");
-            sql.append("'" + name + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
         }
         return sql.toString();
     }
@@ -300,20 +250,20 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
     public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
         StringBuffer sql = new StringBuffer();
         sql.append("IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'");
-        sql.append(name);
+        sql.append(this.getSchemaName(sqlBeanDB, name));
         sql.append("') BEGIN CREATE DATABASE [");
-        sql.append(name);
+        sql.append(this.getSchemaName(sqlBeanDB, name));
         sql.append("]; END");
         return sql.toString();
     }
 
     @Override
-    public String getDropDatabaseSql(String name) {
+    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
         StringBuffer sql = new StringBuffer();
         sql.append("IF EXISTS (SELECT name FROM sys.databases WHERE name = N'");
-        sql.append(name);
+        sql.append(this.getSchemaName(sqlBeanDB, name));
         sql.append("') BEGIN DROP DATABASE [");
-        sql.append(name);
+        sql.append(this.getSchemaName(sqlBeanDB, name));
         sql.append("]; END");
         return sql.toString();
     }

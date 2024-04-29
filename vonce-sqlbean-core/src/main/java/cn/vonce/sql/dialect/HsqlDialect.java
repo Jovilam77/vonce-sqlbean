@@ -25,6 +25,7 @@ import java.util.List;
  */
 public class HsqlDialect implements SqlDialect<JavaMapHsqlType> {
 
+    @Override
     public JavaMapHsqlType getType(Field field) {
         Class<?> clazz = SqlBeanUtil.getEntityClassFieldType(field);
         for (JavaMapHsqlType javaType : JavaMapHsqlType.values()) {
@@ -42,14 +43,7 @@ public class HsqlDialect implements SqlDialect<JavaMapHsqlType> {
         return JdbcType.getType(getType(field).name());
     }
 
-    /**
-     * 获取表数据列表的SQL
-     *
-     * @param sqlBeanDB
-     * @param schema
-     * @param tableName
-     * @return
-     */
+    @Override
     public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT t.TABLE_SCHEMA AS schema, t.TABLE_NAME AS name, sc.COMMENT AS remarks ");
@@ -69,13 +63,7 @@ public class HsqlDialect implements SqlDialect<JavaMapHsqlType> {
         return sql.toString();
     }
 
-    /**
-     * 获取列数据列表的SQL
-     *
-     * @param sqlBeanDB
-     * @param tableName
-     * @return
-     */
+    @Override
     public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT cl.ORDINAL_POSITION AS cid, ");
@@ -105,12 +93,7 @@ public class HsqlDialect implements SqlDialect<JavaMapHsqlType> {
         return sql.toString();
     }
 
-    /**
-     * 更改表结构
-     *
-     * @param alterList
-     * @return
-     */
+    @Override
     public List<String> alterTable(List<Alter> alterList) {
         List<String> sqlList = new ArrayList<>();
         String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
@@ -210,14 +193,7 @@ public class HsqlDialect implements SqlDialect<JavaMapHsqlType> {
         return changeSql.toString();
     }
 
-    /**
-     * 增加列备注
-     *
-     * @param isTable
-     * @param item
-     * @param transferred
-     * @return
-     */
+    @Override
     public String addRemarks(boolean isTable, Alter item, String transferred) {
         StringBuffer remarksSql = new StringBuffer();
         remarksSql.append(SqlConstant.COMMENT);
@@ -237,30 +213,25 @@ public class HsqlDialect implements SqlDialect<JavaMapHsqlType> {
         return remarksSql.toString();
     }
 
-    /**
-     * 获取schema的SQL
-     *
-     * @param name
-     * @return
-     */
-    public String getDatabaseSql(String name) {
+    @Override
+    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT SCHEMA_NAME as \"name\" FROM INFORMATION_SCHEMA.SCHEMATA ");
         if (StringUtil.isNotEmpty(name)) {
             sql.append("WHERE SCHEMA_NAME = ");
-            sql.append("'" + name + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
         }
         return sql.toString();
     }
 
     @Override
     public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return "CREATE SCHEMA IF NOT EXISTS " + name;
+        return "CREATE SCHEMA IF NOT EXISTS " + this.getSchemaName(sqlBeanDB, name);
     }
 
     @Override
-    public String getDropDatabaseSql(String name) {
-        return "DROP SCHEMA IF EXISTS " + name;
+    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+        return "DROP SCHEMA IF EXISTS " + this.getSchemaName(sqlBeanDB, name);
     }
 
 }

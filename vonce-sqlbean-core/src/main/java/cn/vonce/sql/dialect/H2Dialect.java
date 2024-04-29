@@ -25,6 +25,7 @@ import java.util.List;
  */
 public class H2Dialect implements SqlDialect<JavaMapH2Type> {
 
+    @Override
     public JavaMapH2Type getType(Field field) {
         Class<?> clazz = SqlBeanUtil.getEntityClassFieldType(field);
         for (JavaMapH2Type javaType : JavaMapH2Type.values()) {
@@ -50,6 +51,7 @@ public class H2Dialect implements SqlDialect<JavaMapH2Type> {
      * @param tableName
      * @return
      */
+    @Override
     public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT TABLE_SCHEMA AS schema,TABLE_NAME AS name,REMARKS AS remarks ");
@@ -74,6 +76,7 @@ public class H2Dialect implements SqlDialect<JavaMapH2Type> {
      * @param tableName
      * @return
      */
+    @Override
     public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT cl.ORDINAL_POSITION AS cid, ");
@@ -113,6 +116,7 @@ public class H2Dialect implements SqlDialect<JavaMapH2Type> {
      * @param alterList
      * @return
      */
+    @Override
     public List<String> alterTable(List<Alter> alterList) {
         List<String> sqlList = new ArrayList<>();
         String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
@@ -220,6 +224,7 @@ public class H2Dialect implements SqlDialect<JavaMapH2Type> {
      * @param transferred
      * @return
      */
+    @Override
     public String addRemarks(boolean isTable, Alter item, String transferred) {
         StringBuffer remarksSql = new StringBuffer();
         remarksSql.append(SqlConstant.COMMENT);
@@ -245,24 +250,25 @@ public class H2Dialect implements SqlDialect<JavaMapH2Type> {
      * @param name
      * @return
      */
-    public String getDatabaseSql(String name) {
+    @Override
+    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT SCHEMA_NAME as \"name\" FROM INFORMATION_SCHEMA.SCHEMATA ");
         if (StringUtil.isNotEmpty(name)) {
             sql.append("WHERE SCHEMA_NAME = ");
-            sql.append("'" + name + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
         }
         return sql.toString();
     }
 
     @Override
     public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return "CREATE SCHEMA IF NOT EXISTS " + name;
+        return "CREATE SCHEMA IF NOT EXISTS " + this.getSchemaName(sqlBeanDB, name);
     }
 
     @Override
-    public String getDropDatabaseSql(String name) {
-        return "DROP SCHEMA IF EXISTS " + name;
+    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+        return "DROP SCHEMA IF EXISTS " + this.getSchemaName(sqlBeanDB, name);
     }
 
 }

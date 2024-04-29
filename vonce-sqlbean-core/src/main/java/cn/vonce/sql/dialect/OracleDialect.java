@@ -27,6 +27,7 @@ import java.util.List;
  */
 public class OracleDialect implements SqlDialect<JavaMapOracleType> {
 
+    @Override
     public JavaMapOracleType getType(Field field) {
         Class<?> clazz = SqlBeanUtil.getEntityClassFieldType(field);
         for (JavaMapOracleType javaType : JavaMapOracleType.values()) {
@@ -44,14 +45,7 @@ public class OracleDialect implements SqlDialect<JavaMapOracleType> {
         return JdbcType.getType(getType(field).name());
     }
 
-    /**
-     * 获取表数据列表的SQL
-     *
-     * @param sqlBeanDB
-     * @param schema
-     * @param tableName
-     * @return
-     */
+    @Override
     public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT t.table_name AS \"name\", c.comments AS \"remarks\" ");
@@ -66,13 +60,7 @@ public class OracleDialect implements SqlDialect<JavaMapOracleType> {
         return sql.toString();
     }
 
-    /**
-     * 获取列数据列表的SQL
-     *
-     * @param sqlBeanDB
-     * @param tableName
-     * @return
-     */
+    @Override
     public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT col.column_id AS cid, col.column_name AS name, col.data_type AS type, ");
@@ -93,12 +81,7 @@ public class OracleDialect implements SqlDialect<JavaMapOracleType> {
         return sql.toString();
     }
 
-    /**
-     * 更改表结构
-     *
-     * @param alterList
-     * @return
-     */
+    @Override
     public List<String> alterTable(List<Alter> alterList) {
         List<String> sqlList = new ArrayList<>();
         String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
@@ -233,14 +216,7 @@ public class OracleDialect implements SqlDialect<JavaMapOracleType> {
         return changeSql.toString();
     }
 
-    /**
-     * 增加列备注
-     *
-     * @param isTable
-     * @param item
-     * @param transferred
-     * @return
-     */
+    @Override
     public String addRemarks(boolean isTable, Alter item, String transferred) {
         StringBuffer remarksSql = new StringBuffer();
         remarksSql.append(SqlConstant.COMMENT);
@@ -260,18 +236,13 @@ public class OracleDialect implements SqlDialect<JavaMapOracleType> {
         return remarksSql.toString();
     }
 
-    /**
-     * 获取schema的SQL
-     *
-     * @param name
-     * @return
-     */
-    public String getDatabaseSql(String name) {
+    @Override
+    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT DISTINCT OWNER AS as \"name\" FROM ALL_OBJECTS ");
         if (StringUtil.isNotEmpty(name)) {
             sql.append("WHERE OWNER = ");
-            sql.append("'" + name + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
         }
         return sql.toString();
     }
@@ -281,14 +252,8 @@ public class OracleDialect implements SqlDialect<JavaMapOracleType> {
         return null;
     }
 
-    /**
-     * 获取创建数据库的SQL
-     *
-     * @param name
-     * @return
-     */
     @Override
-    public String getDropDatabaseSql(String name) {
+    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
         return null;
     }
 
