@@ -47,22 +47,22 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
     @Override
     public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT o.name, p.value AS remarks ");
-        sql.append("FROM sysobjects o ");
+        sql.append("SELECT t.name, p.value AS remarks ");
+        sql.append("FROM sys.tables t ");
+        sql.append("INNER JOIN sys.schemas s ON s.schema_id = t.schema_id ");
         sql.append("LEFT JOIN sys.extended_properties p ");
-        sql.append("ON p.major_id = o.id AND p.minor_id = 0 ");
-        sql.append("WHERE o.xtype='U'");
-        sql.append(" AND o.id = object_id('");
-        sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
-        sql.append(StringUtil.isNotBlank(schema) ? schema : SqlConstant.DBO);
-        sql.append(SqlConstant.END_SQUARE_BRACKETS);
-        sql.append(SqlConstant.POINT);
-        sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
-        sql.append(tableName);
-        sql.append(SqlConstant.END_SQUARE_BRACKETS);
-        sql.append("')");
+        sql.append("ON p.major_id = t.object_id AND p.minor_id = 0 ");
+        sql.append("WHERE t.type= 'U'");
+        sql.append(" AND s.name = ");
+        if (StringUtil.isNotEmpty(schema)) {
+            sql.append("'");
+            sql.append(schema);
+            sql.append("'");
+        } else {
+            sql.append("USER_NAME()");
+        }
         if (StringUtil.isNotEmpty(tableName)) {
-            sql.append(" AND o.name = '" + tableName + "'");
+            sql.append(" AND t.name = '" + tableName + "'");
         }
         return sql.toString();
     }
@@ -75,20 +75,17 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
         sql.append("(CASE LEFT(constraint_name, 2) WHEN 'FK' THEN 1 ELSE 0 END) AS fk, ");
         sql.append("a.length, a.scale, c.value AS remarks ");
         sql.append("FROM (");
-        sql.append("SELECT syscolumns.id, syscolumns.colid AS cid, syscolumns.name AS name, syscolumns.prec AS length, syscolumns.scale, systypes.name AS type, syscolumns.isnullable AS notnull, '");
+        sql.append("SELECT syscolumns.id, syscolumns.colid AS cid, syscolumns.name AS name, syscolumns.prec AS length, syscolumns.scale, systypes.name AS type, syscolumns.isnullable AS notnull, t.name AS table_name,s.name AS schemaName ");
+        sql.append("FROM syscolumns ");
+        sql.append("INNER JOIN systypes ON syscolumns.xusertype = systypes.xusertype ");
+        sql.append("INNER JOIN sys.tables t ON t.object_id = syscolumns.id ");
+        sql.append("INNER JOIN sys.schemas s ON s.schema_id = t.schema_id ");
+        sql.append("WHERE s.name = ");
+        sql.append(StringUtil.isNotBlank(schema) ? "'" + schema + "'" : "USER_NAME()");
+        sql.append("AND t.name = '");
         sql.append(tableName);
-        sql.append("' AS table_name ");
-        sql.append("FROM syscolumns, systypes ");
-        sql.append("WHERE syscolumns.xusertype = systypes.xusertype AND syscolumns.id = object_id('");
-        sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
-        sql.append(StringUtil.isNotBlank(schema) ? schema : SqlConstant.DBO);
-        sql.append(SqlConstant.END_SQUARE_BRACKETS);
-        sql.append(SqlConstant.POINT);
-        sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
-        sql.append(tableName);
-        sql.append(SqlConstant.END_SQUARE_BRACKETS);
-        sql.append("')) a ");
-        sql.append("LEFT JOIN information_schema.key_column_usage b ON a.name = b.column_name AND a.table_name = b.table_name ");
+        sql.append("') a ");
+        sql.append("LEFT JOIN information_schema.key_column_usage b ON a.name = b.column_name AND a.table_name = b.table_name AND b.table_schema = a.schemaName ");
         sql.append("LEFT JOIN sys.extended_properties c ON c.major_id = a.id AND c.minor_id = a.cid ");
         sql.append("ORDER BY a.cid");
         return sql.toString();
@@ -238,7 +235,7 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
     public String addRemarks(boolean isTable, Alter item, String transferred) {
         String remarks = StringUtil.isNotBlank(item.getColumnInfo().getRemarks()) ? item.getColumnInfo().getRemarks() : "''";
         StringBuffer remarksSql = new StringBuffer();
-        String schema =  SqlConstant.DBO;
+        String schema = SqlConstant.DBO;
         if (StringUtil.isNotBlank(item.getTable().getSchema())) {
             schema = item.getTable().getSchema();
         }
@@ -281,7 +278,7 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
         StringBuffer sql = new StringBuffer();
         sql.append("IF EXISTS (SELECT name FROM sys.schemas WHERE name = N'");
         sql.append(this.getSchemaName(sqlBeanDB, schemaName));
-        sql.append("') BEGIN EXEC ('DROP DATABASE [");
+        sql.append("') BEGIN EXEC ('DROP SCHEMA [");
         sql.append(this.getSchemaName(sqlBeanDB, schemaName));
         sql.append("]'); END");
         return sql.toString();
