@@ -52,6 +52,15 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
         sql.append("LEFT JOIN sys.extended_properties p ");
         sql.append("ON p.major_id = o.id AND p.minor_id = 0 ");
         sql.append("WHERE o.xtype='U'");
+        sql.append(" AND o.id = object_id('");
+        sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
+        sql.append(StringUtil.isNotBlank(schema) ? schema : SqlConstant.DBO);
+        sql.append(SqlConstant.END_SQUARE_BRACKETS);
+        sql.append(SqlConstant.POINT);
+        sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
+        sql.append(tableName);
+        sql.append(SqlConstant.END_SQUARE_BRACKETS);
+        sql.append("')");
         if (StringUtil.isNotEmpty(tableName)) {
             sql.append(" AND o.name = '" + tableName + "'");
         }
@@ -71,7 +80,13 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
         sql.append("' AS table_name ");
         sql.append("FROM syscolumns, systypes ");
         sql.append("WHERE syscolumns.xusertype = systypes.xusertype AND syscolumns.id = object_id('");
+        sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
+        sql.append(StringUtil.isNotBlank(schema) ? schema : SqlConstant.DBO);
+        sql.append(SqlConstant.END_SQUARE_BRACKETS);
+        sql.append(SqlConstant.POINT);
+        sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
         sql.append(tableName);
+        sql.append(SqlConstant.END_SQUARE_BRACKETS);
         sql.append("')) a ");
         sql.append("LEFT JOIN information_schema.key_column_usage b ON a.name = b.column_name AND a.table_name = b.table_name ");
         sql.append("LEFT JOIN sys.extended_properties c ON c.major_id = a.id AND c.minor_id = a.cid ");
@@ -154,10 +169,10 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
             sql.append(SqlConstant.END_SQUARE_BRACKETS);
             sql.append(SqlConstant.POINT);
         }
-        sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
-        sql.append(SqlConstant.DBO);
-        sql.append(SqlConstant.END_SQUARE_BRACKETS);
-        sql.append(SqlConstant.POINT);
+//        sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
+//        sql.append(SqlConstant.DBO);
+//        sql.append(SqlConstant.END_SQUARE_BRACKETS);
+//        sql.append(SqlConstant.POINT);
         sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
         sql.append(SqlBeanUtil.isToUpperCase(alter) ? table.getName().toUpperCase() : table.getName());
         sql.append(SqlConstant.END_SQUARE_BRACKETS);
@@ -223,14 +238,18 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
     public String addRemarks(boolean isTable, Alter item, String transferred) {
         String remarks = StringUtil.isNotBlank(item.getColumnInfo().getRemarks()) ? item.getColumnInfo().getRemarks() : "''";
         StringBuffer remarksSql = new StringBuffer();
+        String schema =  SqlConstant.DBO;
+        if (StringUtil.isNotBlank(item.getTable().getSchema())) {
+            schema = item.getTable().getSchema();
+        }
         remarksSql.append("IF ((SELECT COUNT(*) FROM ::fn_listextendedproperty(");
-        remarksSql.append("'MS_Description', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + (!isTable ? "', 'COLUMN', N'" + item.getColumnInfo().getName() + "'" : "', NULL, NULL"));
+        remarksSql.append("'MS_Description', 'SCHEMA', N'" + schema + "', 'TABLE', N'" + item.getTable().getName() + (!isTable ? "', 'COLUMN', N'" + item.getColumnInfo().getName() + "'" : "', NULL, NULL"));
         remarksSql.append(")) > 0)");
         remarksSql.append("\n  EXEC sp_updateextendedproperty ");
-        remarksSql.append("'MS_Description', N'" + remarks + "', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + "'" + (!isTable ? (", 'COLUMN', N'" + item.getColumnInfo().getName() + "'") : ""));
+        remarksSql.append("'MS_Description', N'" + remarks + "', 'SCHEMA', N'" + schema + "', 'TABLE', N'" + item.getTable().getName() + "'" + (!isTable ? (", 'COLUMN', N'" + item.getColumnInfo().getName() + "'") : ""));
         remarksSql.append("\nELSE");
         remarksSql.append("\n  EXEC sp_addextendedproperty ");
-        remarksSql.append("'MS_Description', N'" + remarks + "', 'SCHEMA', N'dbo', 'TABLE', N'" + item.getTable().getName() + "'" + (!isTable ? (", 'COLUMN', N'" + item.getColumnInfo().getName() + "'") : ""));
+        remarksSql.append("'MS_Description', N'" + remarks + "', 'SCHEMA', N'" + schema + "', 'TABLE', N'" + item.getTable().getName() + "'" + (!isTable ? (", 'COLUMN', N'" + item.getColumnInfo().getName() + "'") : ""));
         remarksSql.append(SqlConstant.SEMICOLON);
         return remarksSql.toString();
     }
@@ -238,7 +257,7 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
     @Override
     public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT name FROM master.sys.databases ");
+        sql.append("SELECT name FROM sys.schemas ");
         if (StringUtil.isNotEmpty(schemaName)) {
             sql.append("WHERE name = ");
             sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
@@ -249,22 +268,22 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
     @Override
     public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
         StringBuffer sql = new StringBuffer();
-        sql.append("IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'");
+        sql.append("IF NOT EXISTS (SELECT name FROM sys.schemas WHERE name = N'");
         sql.append(this.getSchemaName(sqlBeanDB, schemaName));
-        sql.append("') BEGIN CREATE DATABASE [");
+        sql.append("') BEGIN EXEC ('CREATE SCHEMA [");
         sql.append(this.getSchemaName(sqlBeanDB, schemaName));
-        sql.append("]; END");
+        sql.append("]'); END");
         return sql.toString();
     }
 
     @Override
     public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
         StringBuffer sql = new StringBuffer();
-        sql.append("IF EXISTS (SELECT name FROM sys.databases WHERE name = N'");
+        sql.append("IF EXISTS (SELECT name FROM sys.schemas WHERE name = N'");
         sql.append(this.getSchemaName(sqlBeanDB, schemaName));
-        sql.append("') BEGIN DROP DATABASE [");
+        sql.append("') BEGIN EXEC ('DROP DATABASE [");
         sql.append(this.getSchemaName(sqlBeanDB, schemaName));
-        sql.append("]; END");
+        sql.append("]'); END");
         return sql.toString();
     }
 

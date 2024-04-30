@@ -98,7 +98,7 @@ public class SqlConstant {
     public static final String SEMICOLON = ";";
     public static final String BEGIN_SQUARE_BRACKETS = "[";
     public static final String END_SQUARE_BRACKETS = "]";
-    public static final String DBO = "DBO";
+    public static final String DBO = "dbo";
 
     // oracle
     public static final String RN = "RN";
