@@ -713,6 +713,9 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.MASTER)
     @Override
     public List<String> getDatabases(String name) {
+        if (getSqlBeanDB().getDbType() == DbType.SQLite) {
+            return null;
+        }
         return mybatisSqlBeanDao.databases(getSqlBeanDB(), name);
     }
 

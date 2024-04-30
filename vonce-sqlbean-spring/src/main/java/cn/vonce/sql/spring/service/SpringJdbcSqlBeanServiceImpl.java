@@ -706,6 +706,9 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.MASTER)
     @Override
     public List<String> getDatabases(String name) {
+        if (getSqlBeanDB().getDbType() == DbType.SQLite) {
+            return null;
+        }
         String sql = SqlBeanProvider.databaseSql(getSqlBeanDB(), name);
         return jdbcTemplate.query(sql, new SpringJbdcSqlBeanMapper<>(clazz, String.class));
     }
