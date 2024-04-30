@@ -214,24 +214,24 @@ public class HsqlDialect implements SqlDialect<JavaMapHsqlType> {
     }
 
     @Override
-    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+    public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT SCHEMA_NAME as \"name\" FROM INFORMATION_SCHEMA.SCHEMATA ");
-        if (StringUtil.isNotEmpty(name)) {
+        if (StringUtil.isNotEmpty(schemaName)) {
             sql.append("WHERE SCHEMA_NAME = ");
-            sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
         }
         return sql.toString();
     }
 
     @Override
-    public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return "CREATE SCHEMA IF NOT EXISTS " + this.getSchemaName(sqlBeanDB, name);
+    public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+        return "CREATE SCHEMA IF NOT EXISTS " + this.getSchemaName(sqlBeanDB, schemaName);
     }
 
     @Override
-    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return "DROP SCHEMA IF EXISTS " + this.getSchemaName(sqlBeanDB, name);
+    public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+        return "DROP SCHEMA IF EXISTS " + this.getSchemaName(sqlBeanDB, schemaName);
     }
 
 }

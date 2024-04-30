@@ -268,24 +268,24 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
     }
 
     @Override
-    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+    public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT DATABASENAME as \"name\" FROM SYSIBM.SYSDATABASES ");
-        if (StringUtil.isNotEmpty(name)) {
+        if (StringUtil.isNotEmpty(schemaName)) {
             sql.append("WHERE DATABASENAME = ");
-            sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
         }
         return sql.toString();
     }
 
     @Override
-    public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return "CREATE DATABASE " + this.getSchemaName(sqlBeanDB, name);
+    public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+        return "CREATE DATABASE " + this.getSchemaName(sqlBeanDB, schemaName);
     }
 
     @Override
-    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return "DROP DATABASE " + this.getSchemaName(sqlBeanDB, name);
+    public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+        return "DROP DATABASE " + this.getSchemaName(sqlBeanDB, schemaName);
     }
 
 }

@@ -486,7 +486,7 @@ public interface MybatisSqlBeanDao<T> {
     int executeSql(String sql);
 
     /**
-     * 数据库列表
+     * 模式列表
      *
      * @param sqlBeanDB
      * @param name
@@ -496,23 +496,23 @@ public interface MybatisSqlBeanDao<T> {
     List<String> databases(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
 
     /**
-     * 创建数据库
+     * 创建模式
      *
      * @param sqlBeanDB
      * @param name
      * @return
      */
-    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "createDatabase")
-    int createDatabase(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
+    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "createSchema")
+    int createSchema(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
 
     /**
-     * 删除数据库
+     * 删除模式
      *
      * @param sqlBeanDB
      * @param name
      * @return
      */
-    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "dropDatabase")
-    int dropDatabase(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
+    @UpdateProvider(type = MybatisSqlBeanProvider.class, method = "dropSchema")
+    int dropSchema(@Param("sqlBeanDB") SqlBeanDB sqlBeanDB, @Param("name") String name);
 
 }

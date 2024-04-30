@@ -764,36 +764,36 @@ public class SqlBeanProvider {
     }
 
     /**
-     * 获取数据库列表sql
+     * 获取模式列表sql
      *
      * @param sqlBeanDB
-     * @param name
+     * @param schemaName
      * @return
      */
-    public static String databaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return sqlBeanDB.getDbType().getSqlDialect().getDatabaseSql(sqlBeanDB, name);
+    public static String databaseSql(SqlBeanDB sqlBeanDB, String schemaName) {
+        return sqlBeanDB.getDbType().getSqlDialect().getSchemaSql(sqlBeanDB, schemaName);
     }
 
     /**
-     * 创建数据库sql
+     * 创建模式sql
      *
      * @param sqlBeanDB
-     * @param name
+     * @param schemaName
      * @return
      */
-    public static String createDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return sqlBeanDB.getDbType().getSqlDialect().getCreateDatabaseSql(sqlBeanDB, name);
+    public static String createSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+        return sqlBeanDB.getDbType().getSqlDialect().getCreateSchemaSql(sqlBeanDB, schemaName);
     }
 
     /**
-     * 删除数据库sql
+     * 删除模式sql
      *
      * @param sqlBeanDB
-     * @param name
+     * @param schemaName
      * @return
      */
-    public static String dropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return sqlBeanDB.getDbType().getSqlDialect().getDropDatabaseSql(sqlBeanDB, name);
+    public static String dropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+        return sqlBeanDB.getDbType().getSqlDialect().getDropSchemaSql(sqlBeanDB, schemaName);
     }
 
     /**

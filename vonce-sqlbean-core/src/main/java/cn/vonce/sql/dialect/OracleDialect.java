@@ -237,23 +237,23 @@ public class OracleDialect implements SqlDialect<JavaMapOracleType> {
     }
 
     @Override
-    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+    public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT USERNAME AS \"name\" FROM ALL_USERS ");
-        if (StringUtil.isNotEmpty(name)) {
+        if (StringUtil.isNotEmpty(schemaName)) {
             sql.append("WHERE USERNAME = ");
-            sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
         }
         return sql.toString();
     }
 
     @Override
-    public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+    public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
         return null;
     }
 
     @Override
-    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+    public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
         return null;
     }
 

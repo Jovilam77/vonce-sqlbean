@@ -58,9 +58,9 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                             if (entry.getValue().getSqlBeanDB().getDbType() == DbType.SQLite || entry.getValue().getSqlBeanDB().getDbType() == DbType.Oracle) {
                                 continue;
                             }
-                            List<String> databases = ((DbManageService) entry.getValue()).getDatabases(entry.getKey());
+                            List<String> databases = ((DbManageService) entry.getValue()).getSchemas(entry.getKey());
                             if (databases == null || databases.isEmpty()) {
-                                ((DbManageService) entry.getValue()).createDatabase(entry.getKey());
+                                ((DbManageService) entry.getValue()).createSchema(entry.getKey());
                                 logger.info("-----'{}'schema不存在，已为你自动创建-----", entry.getKey());
                             }
                         }

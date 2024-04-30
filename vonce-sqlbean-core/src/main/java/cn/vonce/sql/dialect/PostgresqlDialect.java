@@ -288,24 +288,24 @@ public class PostgresqlDialect implements SqlDialect<JavaMapPostgresqlType> {
     }
 
     @Override
-    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+    public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT datname as \"name\" FROM pg_database ");
-        if (StringUtil.isNotEmpty(name)) {
-            sql.append("WHERE datname = ");
-            sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
+        sql.append("SELECT schema_name as \"name\" FROM information_schema.schemata ");
+        if (StringUtil.isNotEmpty(schemaName)) {
+            sql.append("WHERE schema_name = ");
+            sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
         }
         return sql.toString();
     }
 
     @Override
-    public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return "CREATE DATABASE " + this.getSchemaName(sqlBeanDB, name);
+    public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+        return "CREATE SCHEMA IF NOT EXISTS " + this.getSchemaName(sqlBeanDB, schemaName);
     }
 
     @Override
-    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return "DROP DATABASE IF EXISTS " + this.getSchemaName(sqlBeanDB, name);
+    public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+        return "DROP DATABASE IF EXISTS " + this.getSchemaName(sqlBeanDB, schemaName);
     }
 
 }

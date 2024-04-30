@@ -705,7 +705,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public List<String> getDatabases(String name) {
+    public List<String> getSchemas(String name) {
         if (getSqlBeanDB().getDbType() == DbType.SQLite) {
             return null;
         }
@@ -715,21 +715,21 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int createDatabase(String name) {
+    public int createSchema(String name) {
         if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Oracle) {
             return 0;
         }
-        String sql = SqlBeanProvider.createDatabaseSql(getSqlBeanDB(), name);
+        String sql = SqlBeanProvider.createSchemaSql(getSqlBeanDB(), name);
         return jdbcTemplate.update(sql);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int dropDatabase(String name) {
+    public int dropSchema(String name) {
         if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Oracle) {
             return 0;
         }
-        String sql = SqlBeanProvider.dropDatabaseSql(getSqlBeanDB(), name);
+        String sql = SqlBeanProvider.dropSchemaSql(getSqlBeanDB(), name);
         return jdbcTemplate.update(sql);
     }
 

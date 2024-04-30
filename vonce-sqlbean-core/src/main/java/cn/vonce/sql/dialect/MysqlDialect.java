@@ -42,14 +42,6 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
         return JdbcType.getType(getType(field).name());
     }
 
-    /**
-     * 获取表数据列表的SQL
-     *
-     * @param sqlBeanDB
-     * @param schema
-     * @param tableName
-     * @return
-     */
     @Override
     public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
@@ -67,13 +59,6 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
         return sql.toString();
     }
 
-    /**
-     * 获取列数据列表的SQL
-     *
-     * @param sqlBeanDB
-     * @param tableName
-     * @return
-     */
     @Override
     public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
@@ -101,12 +86,6 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
         return sql.toString();
     }
 
-    /**
-     * 更改表结构
-     *
-     * @param alterList
-     * @return
-     */
     @Override
     public List<String> alterTable(List<Alter> alterList) {
         String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
@@ -153,14 +132,6 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
         return sqlList;
     }
 
-    /**
-     * 增加列备注
-     *
-     * @param isTable
-     * @param item
-     * @param transferred
-     * @return
-     */
     @Override
     public String addRemarks(boolean isTable, Alter item, String transferred) {
         StringBuffer remarksSql = new StringBuffer();
@@ -182,34 +153,22 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
         return remarksSql.toString();
     }
 
-    /**
-     * 获取schema的SQL
-     *
-     * @param name
-     * @return
-     */
     @Override
-    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+    public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT schema_name as `name` FROM information_schema.schemata ");
-        if (StringUtil.isNotEmpty(name)) {
+        if (StringUtil.isNotEmpty(schemaName)) {
             sql.append("WHERE schema_name = ");
-            sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
         }
         return sql.toString();
     }
 
-    /**
-     * 获取创建数据库的SQL
-     *
-     * @param name
-     * @return
-     */
     @Override
-    public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+    public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("CREATE DATABASE IF NOT EXISTS ");
-        sql.append(this.getSchemaName(sqlBeanDB, name));
+        sql.append(this.getSchemaName(sqlBeanDB, schemaName));
         sql.append(" CHARACTER SET ");
         if (sqlBeanDB.getDatabaseMajorVersion() > 5 || (sqlBeanDB.getDatabaseMajorVersion() == 5 && sqlBeanDB.getDatabaseMinorVersion() > 3)) {
             sql.append("utf8mb4 COLLATE utf8mb4_general_ci");
@@ -220,8 +179,8 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
     }
 
     @Override
-    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return "DROP DATABASE IF EXISTS " + this.getSchemaName(sqlBeanDB, name);
+    public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+        return "DROP DATABASE IF EXISTS " + this.getSchemaName(sqlBeanDB, schemaName);
     }
 
 }

@@ -254,27 +254,27 @@ public interface DbManageService<T> {
     int alterRemarks(String remarks);
 
     /**
-     * 数据库列表
+     * 模式列表
      *
      * @param name
      * @return
      */
-    List<String> getDatabases(String name);
+    List<String> getSchemas(String name);
 
     /**
-     * 创建数据库
+     * 创建模式
      *
      * @param name
      * @return
      */
-    int createDatabase(String name);
+    int createSchema(String name);
 
     /**
-     * 删除数据库
+     * 删除模式
      *
      * @param name
      * @return
      */
-    int dropDatabase(String name);
+    int dropSchema(String name);
 
 }

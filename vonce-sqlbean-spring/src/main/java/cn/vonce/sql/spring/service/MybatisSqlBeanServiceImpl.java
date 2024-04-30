@@ -712,7 +712,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public List<String> getDatabases(String name) {
+    public List<String> getSchemas(String name) {
         if (getSqlBeanDB().getDbType() == DbType.SQLite) {
             return null;
         }
@@ -721,20 +721,20 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int createDatabase(String name) {
+    public int createSchema(String name) {
         if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Oracle) {
             return 0;
         }
-        return mybatisSqlBeanDao.createDatabase(getSqlBeanDB(), name);
+        return mybatisSqlBeanDao.createSchema(getSqlBeanDB(), name);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
-    public int dropDatabase(String name) {
+    public int dropSchema(String name) {
         if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Oracle) {
             return 0;
         }
-        return mybatisSqlBeanDao.dropDatabase(getSqlBeanDB(), name);
+        return mybatisSqlBeanDao.dropSchema(getSqlBeanDB(), name);
     }
 
     @DbSwitch(DbRole.MASTER)

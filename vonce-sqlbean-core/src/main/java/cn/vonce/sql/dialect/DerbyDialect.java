@@ -210,31 +210,25 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
         return changeSql.toString();
     }
 
-    /**
-     * 获取schema的SQL
-     *
-     * @param name
-     * @return
-     */
     @Override
-    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+    public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT SCHEMANAME as \"name\" FROM SYS.SYSSCHEMAS ");
-        if (StringUtil.isNotEmpty(name)) {
+        if (StringUtil.isNotEmpty(schemaName)) {
             sql.append("WHERE SCHEMANAME = ");
-            sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
         }
         return sql.toString();
     }
 
     @Override
-    public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return "CREATE SCHEMA AUTHORIZATION " + this.getSchemaName(sqlBeanDB, name);
+    public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+        return "CREATE SCHEMA AUTHORIZATION " + this.getSchemaName(sqlBeanDB, schemaName);
     }
 
     @Override
-    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
-        return "DROP SCHEMA " + this.getSchemaName(sqlBeanDB, name) + " RESTRICT";
+    public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+        return "DROP SCHEMA " + this.getSchemaName(sqlBeanDB, schemaName) + " RESTRICT";
     }
 
 }

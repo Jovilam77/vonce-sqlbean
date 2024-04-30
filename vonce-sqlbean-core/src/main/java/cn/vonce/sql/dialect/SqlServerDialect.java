@@ -236,34 +236,34 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
     }
 
     @Override
-    public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+    public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT name FROM master.sys.databases ");
-        if (StringUtil.isNotEmpty(name)) {
+        if (StringUtil.isNotEmpty(schemaName)) {
             sql.append("WHERE name = ");
-            sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
         }
         return sql.toString();
     }
 
     @Override
-    public String getCreateDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+    public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'");
-        sql.append(this.getSchemaName(sqlBeanDB, name));
+        sql.append(this.getSchemaName(sqlBeanDB, schemaName));
         sql.append("') BEGIN CREATE DATABASE [");
-        sql.append(this.getSchemaName(sqlBeanDB, name));
+        sql.append(this.getSchemaName(sqlBeanDB, schemaName));
         sql.append("]; END");
         return sql.toString();
     }
 
     @Override
-    public String getDropDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
+    public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("IF EXISTS (SELECT name FROM sys.databases WHERE name = N'");
-        sql.append(this.getSchemaName(sqlBeanDB, name));
+        sql.append(this.getSchemaName(sqlBeanDB, schemaName));
         sql.append("') BEGIN DROP DATABASE [");
-        sql.append(this.getSchemaName(sqlBeanDB, name));
+        sql.append(this.getSchemaName(sqlBeanDB, schemaName));
         sql.append("]; END");
         return sql.toString();
     }

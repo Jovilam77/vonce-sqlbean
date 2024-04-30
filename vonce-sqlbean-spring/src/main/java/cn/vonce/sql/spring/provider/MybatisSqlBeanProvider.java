@@ -364,8 +364,8 @@ public class MybatisSqlBeanProvider {
      * @param map
      * @return
      */
-    public String createDatabase(Map<String, Object> map) {
-        return SqlBeanProvider.createDatabaseSql((SqlBeanDB) map.get("sqlBeanDB"), (String) map.get("name"));
+    public String createSchema(Map<String, Object> map) {
+        return SqlBeanProvider.createSchemaSql((SqlBeanDB) map.get("sqlBeanDB"), (String) map.get("name"));
     }
 
     /**
@@ -374,8 +374,8 @@ public class MybatisSqlBeanProvider {
      * @param map
      * @return
      */
-    public String dropDatabase(Map<String, Object> map) {
-        return SqlBeanProvider.dropDatabaseSql((SqlBeanDB) map.get("sqlBeanDB"), (String) map.get("name"));
+    public String dropSchema(Map<String, Object> map) {
+        return SqlBeanProvider.dropSchemaSql((SqlBeanDB) map.get("sqlBeanDB"), (String) map.get("name"));
     }
 
 }
