@@ -239,9 +239,9 @@ public class OracleDialect implements SqlDialect<JavaMapOracleType> {
     @Override
     public String getDatabaseSql(SqlBeanDB sqlBeanDB, String name) {
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT DISTINCT OWNER AS as \"name\" FROM ALL_OBJECTS ");
+        sql.append("SELECT USERNAME AS \"name\" FROM ALL_USERS ");
         if (StringUtil.isNotEmpty(name)) {
-            sql.append("WHERE OWNER = ");
+            sql.append("WHERE USERNAME = ");
             sql.append("'" + this.getSchemaName(sqlBeanDB, name) + "'");
         }
         return sql.toString();

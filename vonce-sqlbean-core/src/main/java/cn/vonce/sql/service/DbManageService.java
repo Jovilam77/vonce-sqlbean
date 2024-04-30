@@ -17,13 +17,6 @@ import java.util.List;
 public interface DbManageService<T> {
 
     /**
-     * 获取Bean类型
-     *
-     * @return
-     */
-    Class<?> getBeanClass();
-
-    /**
      * 删除表结构
      *
      * @return

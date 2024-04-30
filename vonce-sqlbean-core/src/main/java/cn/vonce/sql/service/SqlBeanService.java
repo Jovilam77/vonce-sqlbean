@@ -14,6 +14,13 @@ import cn.vonce.sql.config.SqlBeanDB;
 public interface SqlBeanService<T, ID> extends SelectService<T, ID>, InsertService<T>, UpdateService<T, ID>, DeleteService<ID> {
 
     /**
+     * 获取Bean类型
+     *
+     * @return
+     */
+    Class<?> getBeanClass();
+
+    /**
      * 获得数据库相关信息
      *
      * @return
