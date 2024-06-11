@@ -61,7 +61,7 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                             List<String> databases = ((DbManageService) entry.getValue()).getSchemas(entry.getKey());
                             if (databases == null || databases.isEmpty()) {
                                 ((DbManageService) entry.getValue()).createSchema(entry.getKey());
-                                logger.info("-----'{}'schema不存在，已为你自动创建-----", entry.getKey());
+                                logger.info("-----Schema:[{}]不存在,已为你自动创建-----", entry.getKey());
                             }
                         }
                         List<TableInfo> tableList = ((DbManageService) entry.getValue()).getTableList();
@@ -90,7 +90,7 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                                 //创建表
                                 if (!isExist && sqlTable.autoCreate()) {
                                     ((DbManageService) sqlBeanService).createTable();
-                                    logger.info("-----'{}'表不存在，已为你自动创建-----", table.getName());
+                                    logger.info("-----Table:[{}]不存在,已为你自动创建-----", (StringUtil.isNotEmpty(table.getSchema()) ? table.getSchema() + "." + table.getName() : table.getName()));
                                     continue;
                                 }
                                 //更新表结构
