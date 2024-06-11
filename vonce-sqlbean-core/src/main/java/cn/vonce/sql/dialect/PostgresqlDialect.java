@@ -305,7 +305,7 @@ public class PostgresqlDialect implements SqlDialect<JavaMapPostgresqlType> {
 
     @Override
     public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
-        return "DROP DATABASE IF EXISTS " + this.getSchemaName(sqlBeanDB, schemaName);
+        return "DROP SCHEMA IF EXISTS " + this.getSchemaName(sqlBeanDB, schemaName);
     }
 
 }
