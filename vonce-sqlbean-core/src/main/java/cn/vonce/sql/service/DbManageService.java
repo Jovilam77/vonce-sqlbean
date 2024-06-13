@@ -245,36 +245,4 @@ public interface DbManageService<T> {
      */
     int alter(List<Alter> alterList);
 
-    /**
-     * 更改表注释
-     *
-     * @param remarks 注释
-     * @return
-     */
-    int alterRemarks(String remarks);
-
-    /**
-     * 模式列表
-     *
-     * @param name
-     * @return
-     */
-    List<String> getSchemas(String name);
-
-    /**
-     * 创建模式
-     *
-     * @param name
-     * @return
-     */
-    int createSchema(String name);
-
-    /**
-     * 删除模式
-     *
-     * @param name
-     * @return
-     */
-    int dropSchema(String name);
-
 }

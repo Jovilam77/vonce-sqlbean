@@ -7,6 +7,7 @@ import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.service.DbManageService;
 import cn.vonce.sql.service.SqlBeanService;
+import cn.vonce.sql.service.AdvancedDbManageService;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 import org.slf4j.Logger;
@@ -58,9 +59,9 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                             if (entry.getValue().getSqlBeanDB().getDbType() == DbType.SQLite || entry.getValue().getSqlBeanDB().getDbType() == DbType.Oracle) {
                                 continue;
                             }
-                            List<String> databases = ((DbManageService) entry.getValue()).getSchemas(entry.getKey());
+                            List<String> databases = ((AdvancedDbManageService) entry.getValue()).getSchemas(entry.getKey());
                             if (databases == null || databases.isEmpty()) {
-                                ((DbManageService) entry.getValue()).createSchema(entry.getKey());
+                                ((AdvancedDbManageService) entry.getValue()).createSchema(entry.getKey());
                                 logger.info("-----Schema:[{}]不存在,已为你自动创建-----", entry.getKey());
                             }
                         }
@@ -82,21 +83,21 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                                         isExist = true;
                                         //表注释不一致
                                         if (sqlTable.autoAlter() && !sqlTable.remarks().equals(tableInfo.getRemarks())) {
-                                            ((DbManageService) sqlBeanService).alterRemarks(sqlTable.remarks());
+                                            ((AdvancedDbManageService) sqlBeanService).alterRemarks(sqlTable.remarks());
                                         }
                                         break;
                                     }
                                 }
                                 //创建表
                                 if (!isExist && sqlTable.autoCreate()) {
-                                    ((DbManageService) sqlBeanService).createTable();
+                                    ((AdvancedDbManageService) sqlBeanService).createTable();
                                     logger.info("-----Table:[{}]不存在,已为你自动创建-----", (StringUtil.isNotEmpty(table.getSchema()) ? table.getSchema() + "." + table.getName() : table.getName()));
                                     continue;
                                 }
                                 //更新表结构
                                 if (isExist && sqlTable.autoAlter()) {
                                     try {
-                                        ((DbManageService) sqlBeanService).alter(table, ((DbManageService) sqlBeanService).getColumnInfoList(table.getName()));
+                                        ((AdvancedDbManageService) sqlBeanService).alter(table, ((DbManageService) sqlBeanService).getColumnInfoList(table.getName()));
                                     } catch (Exception e) {
                                         logger.error("更新表结构出错：" + e.getMessage(), e);
                                     }

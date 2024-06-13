@@ -10,7 +10,7 @@ import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.page.PageHelper;
 import cn.vonce.sql.page.ResultData;
 import cn.vonce.sql.provider.SqlBeanProvider;
-import cn.vonce.sql.service.DbManageService;
+import cn.vonce.sql.service.AdvancedDbManageService;
 import cn.vonce.sql.spring.annotation.DbSwitch;
 import cn.vonce.sql.spring.annotation.DbTransactional;
 import cn.vonce.sql.spring.config.UseMybatis;
@@ -42,7 +42,7 @@ import java.util.*;
  */
 @UseMybatis
 @Service
-public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl implements SqlBeanService<T, ID>, DbManageService<T> {
+public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl implements SqlBeanService<T, ID>, AdvancedDbManageService<T> {
 
     private Logger logger = LoggerFactory.getLogger(MybatisSqlBeanServiceImpl.class);
 
