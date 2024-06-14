@@ -19,41 +19,41 @@ import java.util.List;
  * @email imjovi@qq.com
  * @date 2023/6/30 15:23
  */
-public abstract class BaseMapper {
+public abstract class BaseMapper<T> {
 
     /**
      * 获取所有列名
      *
-     * @param baseResult
+     * @param resultSetDelegate
      * @return
      */
-    public abstract List<String> getColumnNameList(AutoCloseable baseResult);
+    public abstract List<String> getColumnNameList(ResultSetDelegate<T> resultSetDelegate);
 
     /**
      * 基础对象映射
      *
-     * @param baseResult
+     * @param resultSetDelegate
      * @return
      */
-    public abstract Object baseHandleResultSet(AutoCloseable baseResult);
+    public abstract Object baseHandleResultSet(ResultSetDelegate<T> resultSetDelegate);
 
     /**
      * map对象映射
      *
-     * @param baseResult
+     * @param resultSetDelegate
      * @return
      */
-    public abstract Object mapHandleResultSet(AutoCloseable baseResult);
+    public abstract Object mapHandleResultSet(ResultSetDelegate<T> resultSetDelegate);
 
     /**
      * bean对象映射处理
      *
      * @param clazz
-     * @param baseResult
+     * @param resultSetDelegate
      * @param columnNameList
      * @return
      */
-    public Object beanHandleResultSet(Class<?> clazz, AutoCloseable baseResult, List<String> columnNameList) {
+    public Object beanHandleResultSet(Class<?> clazz, ResultSetDelegate<T> resultSetDelegate, List<String> columnNameList) {
         Object bean = ReflectUtil.instance().newObject(clazz);
         String tableAlias = SqlBeanUtil.getTable(clazz).getAlias();
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
@@ -84,7 +84,7 @@ public abstract class BaseMapper {
                         }
                         String subFieldName = subField.getName();
                         subFieldName = subTableAlias + SqlConstant.UNDERLINE + subFieldName;
-                        setFieldValue(subBean, subField, subFieldName, baseResult);
+                        setFieldValue(subBean, subField, subFieldName, resultSetDelegate);
                     }
                     ReflectUtil.instance().set(bean.getClass(), bean, fieldName, subBean);
                     continue;
@@ -97,7 +97,7 @@ public abstract class BaseMapper {
                         fieldName = subTableAlias + SqlConstant.UNDERLINE + fieldName;
                     }
                     if (columnNameList.contains(fieldName)) {
-                        setFieldValue(bean, field, fieldName, baseResult);
+                        setFieldValue(bean, field, fieldName, resultSetDelegate);
                     }
                 }
             } else {
@@ -118,7 +118,7 @@ public abstract class BaseMapper {
                     }
                 }
                 if (columnNameList.contains(newFieldName)) {
-                    setFieldValue(bean, field, newFieldName, baseResult);
+                    setFieldValue(bean, field, newFieldName, resultSetDelegate);
                 }
             }
         }
@@ -131,10 +131,10 @@ public abstract class BaseMapper {
      * @param obj
      * @param field
      * @param fieldName
-     * @param baseResult
+     * @param resultSetDelegate
      */
-    public void setFieldValue(Object obj, Field field, String fieldName, AutoCloseable baseResult) {
-        Object value = getValue(field.getType().getName(), fieldName, baseResult);
+    public void setFieldValue(Object obj, Field field, String fieldName, ResultSetDelegate<T> resultSetDelegate) {
+        Object value = getValue(field.getType().getName(), fieldName, resultSetDelegate);
         if (value == null || value.equals("null")) {
             value = SqlBeanUtil.getDefaultValue(field.getType());
         }
@@ -150,20 +150,20 @@ public abstract class BaseMapper {
      *
      * @param fieldType
      * @param fieldName
-     * @param baseResult
+     * @param resultSetDelegate
      * @return
      */
-    public abstract Object getValue(String fieldType, String fieldName, AutoCloseable baseResult);
+    public abstract Object getValue(String fieldType, String fieldName, ResultSetDelegate<T> resultSetDelegate);
 
     /**
      * 获取该字段对应的值
      *
      * @param jdbcType
      * @param index
-     * @param baseResult
+     * @param resultSetDelegate
      * @return
      */
-    public abstract Object getValue(String jdbcType, int index, AutoCloseable baseResult);
+    public abstract Object getValue(String jdbcType, int index, ResultSetDelegate<T> resultSetDelegate);
 
     /**
      * 获取基本类型默认值

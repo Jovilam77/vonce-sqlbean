@@ -14,7 +14,7 @@ import cn.vonce.sql.spring.annotation.DbSwitch;
 import cn.vonce.sql.spring.annotation.DbTransactional;
 import cn.vonce.sql.spring.config.UseSpringJdbc;
 import cn.vonce.sql.spring.enumerate.DbRole;
-import cn.vonce.sql.spring.mapper.SpringJbdcSqlBeanMapper;
+import cn.vonce.sql.spring.mapper.SpringJdbcSqlBeanMapper;
 import cn.vonce.sql.provider.SqlBeanProvider;
 import cn.vonce.sql.service.SqlBeanService;
 import cn.vonce.sql.uitls.DateUtil;
@@ -84,7 +84,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @Override
     Long getAutoIncrId() {
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.lastInsertIdSql(), new SpringJbdcSqlBeanMapper<Long>(clazz, Long.class)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.lastInsertIdSql(), new SpringJdbcSqlBeanMapper<Long>(clazz, Long.class)));
     }
 
     @Override
@@ -98,7 +98,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (id == null) {
             return null;
         }
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectByIdSql(getSqlBeanDB(), clazz, null, id), new SpringJbdcSqlBeanMapper<T>(clazz, clazz)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectByIdSql(getSqlBeanDB(), clazz, null, id), new SpringJdbcSqlBeanMapper<T>(clazz, clazz)));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -107,7 +107,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (id == null) {
             return null;
         }
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectByIdSql(getSqlBeanDB(), clazz, returnType, id), new SpringJbdcSqlBeanMapper<R>(clazz, returnType)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectByIdSql(getSqlBeanDB(), clazz, returnType, id), new SpringJdbcSqlBeanMapper<R>(clazz, returnType)));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -116,7 +116,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (ids == null || ids.length == 0) {
             throw new SqlBeanException("selectByIds方法ids参数必须拥有一个值");
         }
-        return jdbcTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, null, ids), new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, null, ids), new SpringJdbcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -125,37 +125,37 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (ids == null || ids.length == 0) {
             throw new SqlBeanException("selectByIds方法ids参数必须拥有一个值");
         }
-        return jdbcTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, returnType, ids), new SpringJbdcSqlBeanMapper<R>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, returnType, ids), new SpringJdbcSqlBeanMapper<R>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public T selectOne(Select select) {
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJbdcSqlBeanMapper<T>(clazz, clazz)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<T>(clazz, clazz)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> R selectOne(Class<R> returnType, Select select) {
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, returnType, select), new SpringJbdcSqlBeanMapper<R>(clazz, returnType)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, returnType, select), new SpringJdbcSqlBeanMapper<R>(clazz, returnType)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public Map<String, Object> selectMap(Select select) {
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJbdcSqlBeanMapper<Map<String, Object>>(clazz, Map.class)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<Map<String, Object>>(clazz, Map.class)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public T selectOneBy(String where, Object... args) {
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, null, null, where, args), new SpringJbdcSqlBeanMapper<T>(clazz, clazz)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, null, null, where, args), new SpringJdbcSqlBeanMapper<T>(clazz, clazz)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> R selectOneBy(Class<R> returnType, String where, Object... args) {
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, returnType, null, where, args), new SpringJbdcSqlBeanMapper<>(clazz, returnType)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, returnType, null, where, args), new SpringJdbcSqlBeanMapper<>(clazz, returnType)));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -163,7 +163,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public T selectOneBy(Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJbdcSqlBeanMapper<>(clazz, clazz)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<>(clazz, clazz)));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -171,13 +171,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public <R> R selectOneBy(Class<R> returnType, Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, returnType, select), new SpringJbdcSqlBeanMapper<>(clazz, returnType)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, returnType, select), new SpringJdbcSqlBeanMapper<>(clazz, returnType)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> selectBy(Class<R> returnType, String where, Object... args) {
-        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, returnType, null, where, args), new SpringJbdcSqlBeanMapper<>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, returnType, null, where, args), new SpringJdbcSqlBeanMapper<>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -185,13 +185,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public <R> List<R> selectBy(Class<R> returnType, Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
-        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, returnType, select), new SpringJbdcSqlBeanMapper<>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, returnType, select), new SpringJdbcSqlBeanMapper<>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> selectBy(Class<R> returnType, Paging paging, String where, Object... args) {
-        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, returnType, paging, where, args), new SpringJbdcSqlBeanMapper<>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, returnType, paging, where, args), new SpringJdbcSqlBeanMapper<>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -201,13 +201,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         select.where(wrapper);
         select.page(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
-        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, returnType, select), new SpringJbdcSqlBeanMapper<>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, returnType, select), new SpringJdbcSqlBeanMapper<>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> selectBy(String where, Object... args) {
-        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, null, null, where, args), new SpringJbdcSqlBeanMapper<>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, null, null, where, args), new SpringJdbcSqlBeanMapper<>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -215,13 +215,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public List<T> selectBy(Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
-        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJbdcSqlBeanMapper<>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> selectBy(Paging paging, String where, Object... args) {
-        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, null, paging, where, args), new SpringJbdcSqlBeanMapper<>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, null, paging, where, args), new SpringJdbcSqlBeanMapper<>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -231,13 +231,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         select.where(wrapper);
         select.page(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
-        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJbdcSqlBeanMapper<>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public int countBy(String where, Object... args) {
-        return jdbcTemplate.queryForObject(SqlBeanProvider.countBySql(getSqlBeanDB(), clazz, where, args), new SpringJbdcSqlBeanMapper<>(clazz, Integer.class));
+        return jdbcTemplate.queryForObject(SqlBeanProvider.countBySql(getSqlBeanDB(), clazz, where, args), new SpringJdbcSqlBeanMapper<>(clazz, Integer.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -245,61 +245,61 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public int countBy(Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
-        return jdbcTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanDB(), clazz, null, select), new SpringJbdcSqlBeanMapper<>(clazz, Integer.class));
+        return jdbcTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<>(clazz, Integer.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public int count() {
-        return jdbcTemplate.queryForObject(SqlBeanProvider.countBySql(getSqlBeanDB(), clazz, null, null), new SpringJbdcSqlBeanMapper<>(clazz, Integer.class));
+        return jdbcTemplate.queryForObject(SqlBeanProvider.countBySql(getSqlBeanDB(), clazz, null, null), new SpringJdbcSqlBeanMapper<>(clazz, Integer.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> select() {
-        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, null, null), new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, null, null), new SpringJdbcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> select(Paging paging) {
-        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, null, paging), new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, null, paging), new SpringJdbcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> select(Class<R> returnType) {
-        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, returnType, null), new SpringJbdcSqlBeanMapper<R>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, returnType, null), new SpringJdbcSqlBeanMapper<R>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> select(Class<R> returnType, Paging paging) {
-        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, returnType, paging), new SpringJbdcSqlBeanMapper<R>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, returnType, paging), new SpringJdbcSqlBeanMapper<R>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<Map<String, Object>> selectMapList(Select select) {
-        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJbdcSqlBeanMapper<Map<String, Object>>(clazz, Map.class));
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<Map<String, Object>>(clazz, Map.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> select(Class<R> returnType, Select select) {
-        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, returnType, select), new SpringJbdcSqlBeanMapper<R>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, returnType, select), new SpringJdbcSqlBeanMapper<R>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> select(Select select) {
-        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJbdcSqlBeanMapper<T>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public int count(Select select) {
-        return jdbcTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanDB(), clazz, null, select), new SpringJbdcSqlBeanMapper<Integer>(clazz, Integer.class));
+        return jdbcTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<Integer>(clazz, Integer.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -710,7 +710,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
             return null;
         }
         String sql = SqlBeanProvider.databaseSql(getSqlBeanDB(), name);
-        return jdbcTemplate.query(sql, new SpringJbdcSqlBeanMapper<>(clazz, String.class));
+        return jdbcTemplate.query(sql, new SpringJdbcSqlBeanMapper<>(clazz, String.class));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -774,7 +774,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<TableInfo> getTableList(String schema, String tableName) {
-        return jdbcTemplate.query(SqlBeanProvider.selectTableListSql(getSqlBeanDB(), schema, tableName), new SpringJbdcSqlBeanMapper<TableInfo>(TableInfo.class, TableInfo.class));
+        return jdbcTemplate.query(SqlBeanProvider.selectTableListSql(getSqlBeanDB(), schema, tableName), new SpringJdbcSqlBeanMapper<TableInfo>(TableInfo.class, TableInfo.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -793,7 +793,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<ColumnInfo> getColumnInfoList(String schema, String tableName) {
-        List<ColumnInfo> columnInfoList = jdbcTemplate.query(SqlBeanProvider.selectColumnListSql(getSqlBeanDB(), schema, tableName), new SpringJbdcSqlBeanMapper<ColumnInfo>(ColumnInfo.class, ColumnInfo.class));
+        List<ColumnInfo> columnInfoList = jdbcTemplate.query(SqlBeanProvider.selectColumnListSql(getSqlBeanDB(), schema, tableName), new SpringJdbcSqlBeanMapper<ColumnInfo>(ColumnInfo.class, ColumnInfo.class));
         super.handleColumnInfo(columnInfoList);
         return columnInfoList;
     }

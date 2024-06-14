@@ -2,6 +2,7 @@ package cn.vonce.sql.spring.mapper;
 
 import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.bean.TableInfo;
+import cn.vonce.sql.mapper.ResultSetDelegate;
 import cn.vonce.sql.mapper.SqlBeanMapper;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
@@ -45,7 +46,8 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
                 Object parameterObj = parameterHandler.getParameterObject();
                 // 获取节点属性的集合
                 List<ResultMap> resultMaps = mappedStatement.getResultMaps();
-                return handleResultSet(((Statement) invocation.getArgs()[0]).getResultSet(), ((HashMap<String, Object>) parameterObj), resultMaps.get(0).getType());
+                ResultSetDelegate<ResultSet> resultSetDelegate = new ResultSetDelegate<>(((Statement) invocation.getArgs()[0]).getResultSet());
+                return handleResultSet(resultSetDelegate, ((HashMap<String, Object>) parameterObj), resultMaps.get(0).getType());
             }
         }
         return invocation.proceed();
@@ -65,21 +67,21 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
     /**
      * 对象映射处理
      *
-     * @param resultSet  获取当前结果集
-     * @param mapParam   获取当前dao方法参数map
-     * @param resultType 获取当前dao方法resultType的类型
+     * @param resultSetDelegate 获取当前结果集
+     * @param mapParam          获取当前dao方法参数map
+     * @param resultType        获取当前dao方法resultType的类型
      * @return
      */
-    private Object handleResultSet(ResultSet resultSet, Map<String, Object> mapParam, Class<?> resultType) {
-        if (null != resultSet) {
+    private Object handleResultSet(ResultSetDelegate<ResultSet> resultSetDelegate, Map<String, Object> mapParam, Class<?> resultType) {
+        if (null != resultSetDelegate.getDelegate()) {
             if (resultType == ColumnInfo.class || resultType == TableInfo.class) {
-                return beanHandleResultSet(resultType, resultSet, super.getColumnNameList(resultSet));
+                return beanHandleResultSet(resultType, resultSetDelegate, super.getColumnNameList(resultSetDelegate));
             }
             if (SqlBeanUtil.isBaseType(resultType)) {
-                return baseHandleResultSet(resultSet, resultType);
+                return baseHandleResultSet(resultSetDelegate, resultType);
             }
             if (SqlBeanUtil.isMap(resultType)) {
-                return mapHandleResultSet(resultSet);
+                return mapHandleResultSet(resultSetDelegate);
             }
             // 获取实际需要返回的类型
             Class<?> returnType;
@@ -89,12 +91,12 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
                 returnType = (Class<?>) mapParam.get("clazz");
             }
             if (SqlBeanUtil.isBaseType(returnType)) {
-                return baseHandleResultSet(resultSet, returnType);
+                return baseHandleResultSet(resultSetDelegate, returnType);
             }
             if (SqlBeanUtil.isMap(returnType)) {
-                return mapHandleResultSet(resultSet);
+                return mapHandleResultSet(resultSetDelegate);
             }
-            return beanHandleResultSet(returnType, resultSet, super.getColumnNameList(resultSet));
+            return beanHandleResultSet(returnType, resultSetDelegate, super.getColumnNameList(resultSetDelegate));
         }
         return null;
     }
@@ -102,21 +104,21 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
     /**
      * bean对象映射处理
      *
-     * @param resultSet
+     * @param resultSetDelegate
      * @param clazz
      * @return
      */
-    public List<Object> beanHandleResultSet(Class<?> clazz, ResultSet resultSet, List<String> columnNameList) {
+    public List<Object> beanHandleResultSet(Class<?> clazz, ResultSetDelegate<ResultSet> resultSetDelegate, List<String> columnNameList) {
         List<Object> resultList = new ArrayList<>();
-        if (null != resultSet) {
+        if (null != resultSetDelegate.getDelegate()) {
             try {
-                while (resultSet.next()) {
-                    resultList.add(super.beanHandleResultSet(clazz, resultSet, columnNameList));
+                while (resultSetDelegate.getDelegate().next()) {
+                    resultList.add(super.beanHandleResultSet(clazz, resultSetDelegate, columnNameList));
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             } finally {
-                closeResultSet(resultSet);
+                closeResultSet(resultSetDelegate);
             }
         }
         return resultList;
@@ -125,21 +127,21 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
     /**
      * map对象映射
      *
-     * @param resultSet
+     * @param resultSetDelegate
      * @return
      */
-    public List<Object> mapHandleResultSet(ResultSet resultSet) {
+    public List<Object> mapHandleResultSet(ResultSetDelegate<ResultSet> resultSetDelegate) {
         List<Object> resultList = new ArrayList<>();
-        if (null != resultSet) {
+        if (null != resultSetDelegate.getDelegate()) {
             try {
-                while (resultSet.next()) {
-                    resultList.add(super.mapHandleResultSet(resultSet));
+                while (resultSetDelegate.getDelegate().next()) {
+                    resultList.add(super.mapHandleResultSet(resultSetDelegate));
                 }
             } catch (SQLException e) {
                 logger.error("map对象映射异常SQLException，{}", e.getMessage());
             } finally {
                 // 关闭result set
-                closeResultSet(resultSet);
+                closeResultSet(resultSetDelegate);
             }
         }
         return resultList;
@@ -148,15 +150,15 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
     /**
      * 基础对象映射
      *
-     * @param resultSet
+     * @param resultSetDelegate
      * @return
      */
-    public List<Object> baseHandleResultSet(ResultSet resultSet, Class<?> returnType) {
+    public List<Object> baseHandleResultSet(ResultSetDelegate<ResultSet> resultSetDelegate, Class<?> returnType) {
         List<Object> resultList = new ArrayList<>();
-        if (null != resultSet) {
+        if (null != resultSetDelegate.getDelegate()) {
             try {
-                while (resultSet.next()) {
-                    Object value = super.baseHandleResultSet(resultSet);
+                while (resultSetDelegate.getDelegate().next()) {
+                    Object value = super.baseHandleResultSet(resultSetDelegate);
                     if (value != null && value.getClass() != returnType) {
                         value = SqlBeanUtil.getValueConvert(returnType, value);
                     }
@@ -166,7 +168,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
                 logger.error("基础对象映射异常SQLException，{}", e.getMessage());
             } finally {
                 // 关闭result set
-                closeResultSet(resultSet);
+                closeResultSet(resultSetDelegate);
             }
         }
         return resultList;
@@ -175,12 +177,12 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
     /**
      * 关闭ResultSet
      *
-     * @param resultSet
+     * @param resultSetDelegate
      */
-    private void closeResultSet(ResultSet resultSet) {
+    private void closeResultSet(ResultSetDelegate<ResultSet> resultSetDelegate) {
         try {
-            if (resultSet != null) {
-                resultSet.close();
+            if (resultSetDelegate.getDelegate() != null) {
+                resultSetDelegate.getDelegate().close();
             }
         } catch (SQLException e) {
             logger.error("关闭 result set异常,{}", e.getMessage());

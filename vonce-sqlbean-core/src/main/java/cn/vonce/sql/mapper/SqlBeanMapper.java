@@ -12,18 +12,18 @@ import java.util.*;
 /**
  * SqlBean 结果映射
  */
-public class SqlBeanMapper extends BaseMapper {
+public class SqlBeanMapper extends BaseMapper<ResultSet> {
 
     /**
      * 获取所有列名
      *
-     * @param autoCloseable
+     * @param resultSetDelegate
      * @return
      * @throws SQLException
      */
     @Override
-    public List<String> getColumnNameList(AutoCloseable autoCloseable) {
-        ResultSet resultSet = (ResultSet) autoCloseable;
+    public List<String> getColumnNameList(ResultSetDelegate<ResultSet> resultSetDelegate) {
+        ResultSet resultSet = resultSetDelegate.getDelegate();
         List<String> columnNameList = new ArrayList<>();
         try {
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
@@ -40,12 +40,12 @@ public class SqlBeanMapper extends BaseMapper {
     }
 
     @Override
-    public Object baseHandleResultSet(AutoCloseable autoCloseable) {
-        ResultSet resultSet = (ResultSet) autoCloseable;
+    public Object baseHandleResultSet(ResultSetDelegate<ResultSet> resultSetDelegate) {
+        ResultSet resultSet = resultSetDelegate.getDelegate();
         Object value = null;
         try {
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-            value = getValue(resultSetMetaData.getColumnTypeName(1), 1, resultSet);
+            value = getValue(resultSetMetaData.getColumnTypeName(1), 1, resultSetDelegate);
             if (value == null || value.equals("null")) {
                 value = getDefaultValueByColumnType(resultSetMetaData.getColumnTypeName(1));
             }
@@ -56,15 +56,15 @@ public class SqlBeanMapper extends BaseMapper {
     }
 
     @Override
-    public Object mapHandleResultSet(AutoCloseable autoCloseable) {
-        ResultSet resultSet = (ResultSet) autoCloseable;
+    public Object mapHandleResultSet(ResultSetDelegate<ResultSet> resultSetDelegate) {
+        ResultSet resultSet = resultSetDelegate.getDelegate();
         Map<String, Object> map = null;
         try {
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
             int columns = resultSetMetaData.getColumnCount();
             map = new HashMap<>();
             for (int i = 1; i <= columns; i++) {
-                Object value = getValue(resultSetMetaData.getColumnTypeName(i), i, resultSet);
+                Object value = getValue(resultSetMetaData.getColumnTypeName(i), i, resultSetDelegate);
                 if (value == null || value.equals("null")) {
                     value = getDefaultValueByColumnType(resultSetMetaData.getColumnTypeName(i));
                 }
@@ -77,8 +77,8 @@ public class SqlBeanMapper extends BaseMapper {
     }
 
     @Override
-    public Object getValue(String fieldType, String fieldName, AutoCloseable autoCloseable) {
-        ResultSet resultSet = (ResultSet) autoCloseable;
+    public Object getValue(String fieldType, String fieldName, ResultSetDelegate<ResultSet> resultSetDelegate) {
+        ResultSet resultSet = resultSetDelegate.getDelegate();
         Object value = null;
         try {
             switch (fieldType) {
@@ -187,8 +187,8 @@ public class SqlBeanMapper extends BaseMapper {
     }
 
     @Override
-    public Object getValue(String jdbcType, int index, AutoCloseable autoCloseable) {
-        ResultSet resultSet = (ResultSet) autoCloseable;
+    public Object getValue(String jdbcType, int index, ResultSetDelegate<ResultSet> resultSetDelegate) {
+        ResultSet resultSet = resultSetDelegate.getDelegate();
         Object value = null;
         try {
             switch (jdbcType) {
