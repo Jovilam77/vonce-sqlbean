@@ -28,10 +28,8 @@ public class SqlBeanMapper extends BaseMapper<ResultSet> {
         try {
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
             int columns = resultSetMetaData.getColumnCount();
-            if (columnNameList.size() == 0) {
-                for (int i = 1; i <= columns; i++) {
-                    columnNameList.add(resultSetMetaData.getColumnLabel(i));
-                }
+            for (int i = 1; i <= columns; i++) {
+                columnNameList.add(resultSetMetaData.getColumnLabel(i));
             }
         } catch (SQLException e) {
             e.printStackTrace();

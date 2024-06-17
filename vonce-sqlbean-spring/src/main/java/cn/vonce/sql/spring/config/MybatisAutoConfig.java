@@ -51,14 +51,7 @@ public class MybatisAutoConfig {
         if (sqlSessionFactory != null) {
             List<Interceptor> interceptorList = sqlSessionFactory.getConfiguration().getInterceptors();
             if (interceptorList != null) {
-                boolean exist = false;
-                for (Interceptor interceptor : interceptorList) {
-                    if (interceptor instanceof MybatisSqlBeanMapperInterceptor) {
-                        exist = true;
-                        break;
-                    }
-                }
-                if (!exist) {
+                if (!interceptorList.stream().anyMatch(item -> item instanceof MybatisSqlBeanMapperInterceptor)) {
                     sqlSessionFactory.getConfiguration().addInterceptor(mybatisMapperInterceptor);
                 }
             }

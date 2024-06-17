@@ -32,6 +32,7 @@ import java.util.*;
 public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements Interceptor {
 
     private Logger logger = LoggerFactory.getLogger(MybatisSqlBeanMapperInterceptor.class);
+    private static final String className = "cn.vonce.sql.spring.dao.MybatisSqlBeanDao";
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -42,7 +43,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             // 利用反射获取参数对象
             ParameterHandler parameterHandler = ReflectUtil.getFieldValue(resultSetHandler, "parameterHandler");
             MappedStatement mappedStatement = ReflectUtil.getFieldValue(resultSetHandler, "mappedStatement");
-            if (mappedStatement.getId().startsWith("cn.vonce.sql.spring.dao.MybatisSqlBeanDao")) {
+            if (mappedStatement.getId().startsWith(className)) {
                 Object parameterObj = parameterHandler.getParameterObject();
                 // 获取节点属性的集合
                 List<ResultMap> resultMaps = mappedStatement.getResultMaps();
