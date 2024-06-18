@@ -238,9 +238,7 @@ public class SqlHelperTest {
         Update update = new Update();
         update.setTable(User.class);
         update.setSqlBeanDB(sqlBeanDB);
-        update.filterFields("username");//java字段名
-        update.setUpdateBean(user);
-        update.setUpdateNotNull(true);
+        update.filterFields("username").bean(user).notNull(true);
         update.where().gt(SqlUser.id, 0).and().lt(SqlUser.id, 10);
         System.out.println("---update---");
         System.out.println(SqlHelper.buildUpdateSql(update));

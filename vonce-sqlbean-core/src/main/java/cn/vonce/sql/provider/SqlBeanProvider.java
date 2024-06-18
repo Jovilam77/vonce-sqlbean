@@ -252,7 +252,7 @@ public class SqlBeanProvider {
             Update<Object> update = new Update();
             update.setSqlBeanDB(sqlBeanDB);
             update.setTable(clazz);
-            update.setUpdateBean(newLogicallyDeleteBean(clazz));
+            update.bean(newLogicallyDeleteBean(clazz));
             update.where(delete.getWhereWrapper());
             update.where(delete.getWhere(), delete.getAgrs());
             update.where().setDataList(delete.where().getDataList());
@@ -292,7 +292,7 @@ public class SqlBeanProvider {
         try {
             update.setSqlBeanDB(sqlBeanDB);
             update.setTable(clazz);
-            update.setUpdateBean(newLogicallyDeleteBean(clazz));
+            update.bean(newLogicallyDeleteBean(clazz));
             Field idField = SqlBeanUtil.getIdField(clazz);
             SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
             update.where().in(SqlBeanUtil.getTableFieldName(update, idField, sqlTable), id);
@@ -317,7 +317,7 @@ public class SqlBeanProvider {
         try {
             update.setSqlBeanDB(sqlBeanDB);
             update.setTable(clazz);
-            update.setUpdateBean(newLogicallyDeleteBean(clazz));
+            update.bean(newLogicallyDeleteBean(clazz));
             update.where(where, args);
             setSchema(update, clazz);
         } catch (SqlBeanException e) {
@@ -339,7 +339,7 @@ public class SqlBeanProvider {
         try {
             update.setSqlBeanDB(sqlBeanDB);
             update.setTable(clazz);
-            update.setUpdateBean(newLogicallyDeleteBean(clazz));
+            update.bean(newLogicallyDeleteBean(clazz));
             update.where(wrapper);
             setSchema(update, clazz);
         } catch (SqlBeanException e) {
@@ -892,9 +892,7 @@ public class SqlBeanProvider {
         update.setSqlBeanDB(sqlBeanDB);
         update.setTable(clazz);
         update.setBeanClass(clazz);
-        update.setUpdateBean(bean);
-        update.setUpdateNotNull(updateNotNull);
-        update.setOptimisticLock(optimisticLock);
+        update.bean(bean).notNull(updateNotNull).optimisticLock(optimisticLock);
         setSchema(update, clazz);
         return update;
     }

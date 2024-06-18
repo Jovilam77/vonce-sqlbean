@@ -2,10 +2,8 @@ package cn.vonce.sql.bean;
 
 import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.uitls.LambdaUtil;
-
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,7 +24,7 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
     /**
      * 更新的实体对象
      */
-    private T updateBean = null;
+    private T bean = null;
     /**
      * 过滤的字段数组
      */
@@ -34,7 +32,7 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
     /**
      * 默认只更新不为空的字段
      */
-    private boolean updateNotNull = true;
+    private boolean notNull = true;
     /**
      * 是否使用乐观锁
      */
@@ -50,8 +48,8 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      *
      * @return
      */
-    public T getUpdateBean() {
-        return updateBean;
+    public T getBean() {
+        return bean;
     }
 
     /**
@@ -59,8 +57,9 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      *
      * @return
      */
-    public void setUpdateBean(T updateBean) {
-        this.updateBean = updateBean;
+    public Update<T> bean(T bean) {
+        this.bean = bean;
+        return this;
     }
 
     /**
@@ -68,7 +67,7 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      *
      * @param filterFields
      */
-    public Update filterFields(String... filterFields) {
+    public Update<T> filterFields(String... filterFields) {
         if (filterFields != null && filterFields.length > 0) {
             for (String filterField : filterFields) {
                 this.filterColumns.add(new Column(filterField));
@@ -91,7 +90,7 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      *
      * @param filterColumns
      */
-    public Update filterFields(Column... filterColumns) {
+    public Update<T> filterFields(Column... filterColumns) {
         if (filterColumns != null && filterColumns.length > 0) {
             for (Column column : filterColumns) {
                 this.filterColumns.add(column);
@@ -105,7 +104,7 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      *
      * @param columnFuns
      */
-    public <R> Update filterFields(ColumnFun<T, R>... columnFuns) {
+    public <R> Update<T> filterFields(ColumnFun<T, R>... columnFuns) {
         if (columnFuns != null && columnFuns.length > 0) {
             for (ColumnFun<T, R> columnFun : columnFuns) {
                 this.filterColumns.add(LambdaUtil.getColumn(columnFun));
@@ -119,17 +118,18 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      *
      * @return
      */
-    public boolean isUpdateNotNull() {
-        return updateNotNull;
+    public boolean isNotNull() {
+        return notNull;
     }
 
     /**
      * 设置是否仅更新不为空的字段
      *
-     * @param updateNotNull
+     * @param notNull
      */
-    public void setUpdateNotNull(boolean updateNotNull) {
-        this.updateNotNull = updateNotNull;
+    public Update<T> notNull(boolean notNull) {
+        this.notNull = notNull;
+        return this;
     }
 
     /**
@@ -146,8 +146,9 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      *
      * @param optimisticLock
      */
-    public void setOptimisticLock(boolean optimisticLock) {
+    public Update<T> optimisticLock(boolean optimisticLock) {
         this.optimisticLock = optimisticLock;
+        return this;
     }
 
     /**
@@ -157,15 +158,6 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      */
     public List<SetInfo> getSetInfoList() {
         return setInfoList;
-    }
-
-    /**
-     * 设置更新的字段列表
-     *
-     * @param setInfoList
-     */
-    public void setSetInfoList(List<SetInfo> setInfoList) {
-        this.setInfoList = setInfoList;
     }
 
     /**

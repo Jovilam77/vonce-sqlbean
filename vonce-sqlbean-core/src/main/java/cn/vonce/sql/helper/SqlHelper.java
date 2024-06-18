@@ -129,7 +129,7 @@ public class SqlHelper {
         }
         sqlSb.append(SqlConstant.SET);
         sqlSb.append(setSql(update));
-        sqlSb.append(whereSql(update, update.getUpdateBean()));
+        sqlSb.append(whereSql(update, update.getBean()));
         return sqlSb.toString();
     }
 
@@ -599,7 +599,7 @@ public class SqlHelper {
         StringBuffer setSql = new StringBuffer();
         String transferred = SqlBeanUtil.getTransferred(update);
         List<Column> filterColumns = update.getFilterColumns();
-        Object bean = update.getUpdateBean();
+        Object bean = update.getBean();
         boolean isToUpperCase = SqlBeanUtil.isToUpperCase(update);
         if (bean != null) {
             Table table = SqlBeanUtil.getTable(bean.getClass());
@@ -617,7 +617,7 @@ public class SqlHelper {
                 SqlDefaultValue sqlDefaultValue = field.getAnnotation(SqlDefaultValue.class);
                 SqlVersion sqlVersion = field.getAnnotation(SqlVersion.class);
                 //如果是只更新不为null的字段，那么该字段如果是null并且也不是乐观锁字段，也不是更新时填充默认值的字段则跳过
-                if (update.isUpdateNotNull() && objectValue == null && sqlVersion == null && (sqlDefaultValue == null || sqlDefaultValue.with() == FillWith.INSERT)) {
+                if (update.isNotNull() && objectValue == null && sqlVersion == null && (sqlDefaultValue == null || sqlDefaultValue.with() == FillWith.INSERT)) {
                     continue;
                 }
                 //如果不是乐观锁字段，那么字段如果是null并且没有标识乐观锁注解则跳过
