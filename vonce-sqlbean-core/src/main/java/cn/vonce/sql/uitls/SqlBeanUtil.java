@@ -904,11 +904,11 @@ public class SqlBeanUtil {
      * @return
      */
     public static WhatType whatType(Class<?> type) {
-        if (type == String.class || type == char.class || type == Character.class) {
+        if (type == String.class || type == char.class || type == Character.class || type == byte.class || type == Byte.class) {
             return WhatType.STRING_TYPE;
         } else if (type == boolean.class || type == Boolean.class) {
             return WhatType.BOOL_TYPE;
-        } else if (type == byte.class || type == Byte.class || type == short.class || type == Short.class
+        } else if (type == short.class || type == Short.class
                 || type == int.class || type == Integer.class || type == long.class
                 || type == Long.class || type == float.class || type == Float.class
                 || type == double.class || type == Double.class) {

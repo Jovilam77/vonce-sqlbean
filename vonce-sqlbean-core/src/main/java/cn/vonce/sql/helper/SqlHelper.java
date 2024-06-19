@@ -502,7 +502,8 @@ public class SqlHelper {
                         valueSql.append(SqlBeanUtil.getSqlValue(insert, value));
                     } else if (field.isAnnotationPresent(SqlLogically.class) && value == null) {
                         //如果标识逻辑删除的字段为空则自动填充
-                        valueSql.append(0);
+                        Object defaultValue = SqlBeanUtil.assignInitialValue(SqlBeanUtil.getEntityClassFieldType(field));
+                        valueSql.append(SqlBeanUtil.getSqlValue(insert, defaultValue));
                         ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), field.getType() == Boolean.class || field.getType() == boolean.class ? false : 0);
                     } else if (value == null && sqlDefaultValue != null && (sqlDefaultValue.with() == FillWith.INSERT || sqlDefaultValue.with() == FillWith.TOGETHER)) {
                         Object defaultValue = SqlBeanUtil.assignInitialValue(SqlBeanUtil.getEntityClassFieldType(field));
