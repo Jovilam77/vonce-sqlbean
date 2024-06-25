@@ -444,7 +444,7 @@ public class SqlHelper {
         StringBuffer valueSql = new StringBuffer();
         StringBuffer fieldAndValuesSql = new StringBuffer();
         List<String> valueSqlList = new ArrayList<>();
-        List objectList = insert.getInsertBean();
+        List objectList = insert.getBean();
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(insert.getBeanClass());
         //获取bean的全部字段
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(insert.getBeanClass());

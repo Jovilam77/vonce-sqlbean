@@ -3,6 +3,7 @@ package cn.vonce.sql.bean;
 import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.uitls.LambdaUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
+
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import java.util.List;
  */
 public class Insert<T> extends Common implements Serializable {
 
-    private List<T> insertBean = null;//插入的实体对象
+    private List<T> beanList = null;//插入的实体对象
     private List<Column> columnList = new ArrayList<>();//列字段对象列表
     private List<List<Object>> valuesList = new ArrayList<>();//值对象列表
 
@@ -28,8 +29,8 @@ public class Insert<T> extends Common implements Serializable {
      *
      * @return
      */
-    public List<T> getInsertBean() {
-        return insertBean;
+    public List<T> getBean() {
+        return beanList;
     }
 
     /**
@@ -37,8 +38,9 @@ public class Insert<T> extends Common implements Serializable {
      *
      * @param beanList
      */
-    public void setInsertBean(List<T> beanList) {
-        this.insertBean = beanList;
+    public Insert<T> setBean(List<T> beanList) {
+        this.beanList = beanList;
+        return this;
     }
 
     /**
@@ -46,21 +48,19 @@ public class Insert<T> extends Common implements Serializable {
      *
      * @param bean
      */
-    public void setInsertBean(T bean) {
-        if (bean == null) {
-            return;
-        }
-        if (this.insertBean == null) {
-            this.insertBean = new ArrayList<>();
+    public Insert<T> setBean(T bean) {
+        if (this.beanList == null) {
+            this.beanList = new ArrayList<>();
         }
         if (bean.getClass().isArray()) {
             T[] arrays = (T[]) bean;
             for (T item : arrays) {
-                this.insertBean.add(item);
+                this.beanList.add(item);
             }
         } else {
-            this.insertBean.add(bean);
+            this.beanList.add(bean);
         }
+        return this;
     }
 
     /**

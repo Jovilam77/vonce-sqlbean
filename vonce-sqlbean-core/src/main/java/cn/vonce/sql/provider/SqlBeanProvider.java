@@ -500,7 +500,7 @@ public class SqlBeanProvider {
         insert.setSqlBeanDB(sqlBeanDB);
         insert.setTable(clazz);
         insert.setBeanClass(clazz);
-        insert.setInsertBean(SqlBeanUtil.getObjectArray(bean));
+        insert.setBean(SqlBeanUtil.getObjectArray(bean));
         setSchema(insert, clazz);
         return SqlHelper.buildInsertSql(insert);
     }

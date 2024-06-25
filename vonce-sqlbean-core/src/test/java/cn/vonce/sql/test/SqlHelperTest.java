@@ -182,7 +182,7 @@ public class SqlHelperTest {
         user.setNickname("麻花疼");
         user.setHeadPortrait("logo.png");
         user.setGender(0);
-        insert.setInsertBean(user);
+        insert.setBean(user);
         System.out.println("---insert1---");
         System.out.println(SqlHelper.buildInsertSql(insert));
     }
@@ -206,7 +206,7 @@ public class SqlHelperTest {
             user.setGender(i % 2);
             list.add(user);
         }
-        insert.setInsertBean(list);
+        insert.setBean(list);
         System.out.println("---insert2---");
         System.out.println(SqlHelper.buildInsertSql(insert));
     }
