@@ -2,6 +2,7 @@ package cn.vonce.sql.define;
 
 import cn.vonce.sql.bean.Column;
 import cn.vonce.sql.bean.Original;
+import cn.vonce.sql.enumerate.TimeUnit;
 
 import java.util.Arrays;
 import java.util.List;
@@ -358,8 +359,8 @@ public class SqlFun extends Column {
      * @param endDate   表示时间段的结束时间
      * @return
      */
-    public static SqlFun timestampDiff(String unit, Object startDate, Object endDate) {
-        return new SqlFun("timestampDiff", new Object[]{unit, startDate, endDate});
+    public static SqlFun timestampDiff(TimeUnit unit, Object startDate, Object endDate) {
+        return new SqlFun("timestampDiff", new Object[]{unit.name(), startDate, endDate});
     }
 
     /**
@@ -370,8 +371,8 @@ public class SqlFun extends Column {
      * @param endDate   表示时间段的结束时间
      * @return
      */
-    public static <T, R> SqlFun timestampDiff(String unit, ColumnFun<T, R> startDate, Object endDate) {
-        return new SqlFun("timestampDiff", new Object[]{unit, startDate, endDate});
+    public static <T, R> SqlFun timestampDiff(TimeUnit unit, ColumnFun<T, R> startDate, Object endDate) {
+        return new SqlFun("timestampDiff", new Object[]{unit.name(), startDate, endDate});
     }
 
     /**
@@ -382,8 +383,8 @@ public class SqlFun extends Column {
      * @param endDate   表示时间段的结束时间
      * @return
      */
-    public static <T, R> SqlFun timestampDiff(String unit, ColumnFun<T, R> startDate, ColumnFun<T, R> endDate) {
-        return new SqlFun("timestampDiff", new Object[]{unit, startDate, endDate});
+    public static <T, R> SqlFun timestampDiff(TimeUnit unit, ColumnFun<T, R> startDate, ColumnFun<T, R> endDate) {
+        return new SqlFun("timestampDiff", new Object[]{unit.name(), startDate, endDate});
     }
 
     /**
@@ -427,8 +428,8 @@ public class SqlFun extends Column {
      * @param unit 是expr可解析的间隔单位，例如DAY，HOUR等.
      * @return
      */
-    public static SqlFun dateAdd(Object date, int num, String unit) {
-        return new SqlFun("date_add", new Object[]{date, new Original("interval " + num + " " + unit)});
+    public static SqlFun dateAdd(Object date, int num, TimeUnit unit) {
+        return new SqlFun("date_add", new Object[]{date, new Original("interval " + num + " " + unit.name())});
     }
 
     /**
@@ -439,8 +440,8 @@ public class SqlFun extends Column {
      * @param unit 是expr可解析的间隔单位，例如DAY，HOUR等.
      * @return
      */
-    public static <T, R> SqlFun dateAdd(ColumnFun<T, R> date, int num, String unit) {
-        return new SqlFun("date_add", new Object[]{date, new Original("interval " + num + " " + unit)});
+    public static <T, R> SqlFun dateAdd(ColumnFun<T, R> date, int num, TimeUnit unit) {
+        return new SqlFun("date_add", new Object[]{date, new Original("interval " + num + " " + unit.name())});
     }
 
     /**
@@ -451,8 +452,8 @@ public class SqlFun extends Column {
      * @param unit 是expr可解析的间隔单位，例如DAY，HOUR等.
      * @return
      */
-    public static SqlFun dateSub(Object date, int num, String unit) {
-        return new SqlFun("date_sub", new Object[]{date, new Original("interval " + num + " " + unit)});
+    public static SqlFun dateSub(Object date, int num, TimeUnit unit) {
+        return new SqlFun("date_sub", new Object[]{date, new Original("interval " + num + " " + unit.name())});
     }
 
     /**
@@ -463,8 +464,8 @@ public class SqlFun extends Column {
      * @param unit 是expr可解析的间隔单位，例如DAY，HOUR等.
      * @return
      */
-    public static <T, R> SqlFun dateSub(ColumnFun<T, R> date, int num, String unit) {
-        return new SqlFun("date_sub", new Object[]{date, new Original("interval " + num + " " + unit)});
+    public static <T, R> SqlFun dateSub(ColumnFun<T, R> date, int num, TimeUnit unit) {
+        return new SqlFun("date_sub", new Object[]{date, new Original("interval " + num + " " + unit.name())});
     }
 
     /**
