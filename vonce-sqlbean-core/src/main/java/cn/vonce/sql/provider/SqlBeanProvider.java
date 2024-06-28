@@ -759,8 +759,8 @@ public class SqlBeanProvider {
         ColumnInfo columnInfo = new ColumnInfo();
         columnInfo.setRemarks(remarks);
         alter.setColumnInfo(columnInfo);
-        String transferred = SqlBeanUtil.getTransferred(alter);
-        return sqlBeanDB.getDbType().getSqlDialect().addRemarks(true, alter, transferred);
+        String escape = SqlBeanUtil.getEscape(alter);
+        return sqlBeanDB.getDbType().getSqlDialect().addRemarks(true, alter, escape);
     }
 
     /**

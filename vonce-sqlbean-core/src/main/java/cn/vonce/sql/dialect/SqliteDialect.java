@@ -139,7 +139,7 @@ public class SqliteDialect implements SqlDialect<JavaMapSqliteType> {
     }
 
     @Override
-    public String addRemarks(boolean isTable, Alter item, String transferred) {
+    public String addRemarks(boolean isTable, Alter item, String escape) {
         return null;
     }
 

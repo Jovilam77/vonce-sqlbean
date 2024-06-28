@@ -66,10 +66,10 @@ public interface SqlDialect<T> {
      *
      * @param isTable
      * @param item
-     * @param transferred
+     * @param escape
      * @return
      */
-    String addRemarks(boolean isTable, Alter item, String transferred);
+    String addRemarks(boolean isTable, Alter item, String escape);
 
     /**
      * 获取模式列表sql

@@ -56,6 +56,13 @@ public class Alter extends Common {
         return oldColumnName;
     }
 
+    public String getOldColumnName(boolean toUpperCase) {
+        if (toUpperCase) {
+            return oldColumnName.toUpperCase();
+        }
+        return oldColumnName;
+    }
+
     public void setOldColumnName(String oldColumnName) {
         this.oldColumnName = oldColumnName;
     }

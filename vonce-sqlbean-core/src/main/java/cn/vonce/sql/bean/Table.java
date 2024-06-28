@@ -40,11 +40,25 @@ public class Table implements Serializable {
         return schema;
     }
 
+    public String getSchema(boolean toUpperCase) {
+        if (toUpperCase) {
+            return schema.toUpperCase();
+        }
+        return schema;
+    }
+
     public void setSchema(String schema) {
         this.schema = schema;
     }
 
     public String getName() {
+        return name;
+    }
+
+    public String getName(boolean toUpperCase) {
+        if (toUpperCase) {
+            return name.toUpperCase();
+        }
         return name;
     }
 

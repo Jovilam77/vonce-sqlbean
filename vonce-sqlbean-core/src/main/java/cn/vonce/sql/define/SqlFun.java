@@ -1,7 +1,7 @@
 package cn.vonce.sql.define;
 
 import cn.vonce.sql.bean.Column;
-import cn.vonce.sql.bean.Original;
+import cn.vonce.sql.bean.RawValue;
 import cn.vonce.sql.enumerate.TimeUnit;
 
 import java.util.Arrays;
@@ -429,7 +429,7 @@ public class SqlFun extends Column {
      * @return
      */
     public static SqlFun dateAdd(Object date, int num, TimeUnit unit) {
-        return new SqlFun("date_add", new Object[]{date, new Original("interval " + num + " " + unit.name())});
+        return new SqlFun("date_add", new Object[]{date, new RawValue("interval " + num + " " + unit.name())});
     }
 
     /**
@@ -441,7 +441,7 @@ public class SqlFun extends Column {
      * @return
      */
     public static <T, R> SqlFun dateAdd(ColumnFun<T, R> date, int num, TimeUnit unit) {
-        return new SqlFun("date_add", new Object[]{date, new Original("interval " + num + " " + unit.name())});
+        return new SqlFun("date_add", new Object[]{date, new RawValue("interval " + num + " " + unit.name())});
     }
 
     /**
@@ -453,7 +453,7 @@ public class SqlFun extends Column {
      * @return
      */
     public static SqlFun dateSub(Object date, int num, TimeUnit unit) {
-        return new SqlFun("date_sub", new Object[]{date, new Original("interval " + num + " " + unit.name())});
+        return new SqlFun("date_sub", new Object[]{date, new RawValue("interval " + num + " " + unit.name())});
     }
 
     /**
@@ -465,7 +465,7 @@ public class SqlFun extends Column {
      * @return
      */
     public static <T, R> SqlFun dateSub(ColumnFun<T, R> date, int num, TimeUnit unit) {
-        return new SqlFun("date_sub", new Object[]{date, new Original("interval " + num + " " + unit.name())});
+        return new SqlFun("date_sub", new Object[]{date, new RawValue("interval " + num + " " + unit.name())});
     }
 
     /**

@@ -145,9 +145,9 @@ public class SqlBeanUtil {
      * @return
      */
     public static String getTableName(Common common, String schema, String tableName) {
-        String transferred = getTransferred(common);
+        String escape = getEscape(common);
         if (StringUtil.isNotEmpty(schema)) {
-            tableName = transferred + schema + transferred + SqlConstant.POINT + transferred + tableName + transferred;
+            tableName = escape + schema + escape + SqlConstant.POINT + escape + tableName + escape;
         }
         return tableName;
     }
@@ -176,8 +176,8 @@ public class SqlBeanUtil {
         if (SqlBeanUtil.isToUpperCase(common)) {
             name = name.toUpperCase();
         }
-        String transferred = SqlBeanUtil.getTransferred(common);
-        return transferred + name + transferred;
+        String escape = SqlBeanUtil.getEscape(common);
+        return escape + name + escape;
     }
 
     /**
@@ -221,15 +221,37 @@ public class SqlBeanUtil {
      * @return
      */
     public static String getTableFieldFullName(Common common, String tableAlias, String tableFieldName) {
-        String transferred = getTransferred(common);
+        String escape = getEscape(common);
         StringBuffer fullName = new StringBuffer();
-        fullName.append(transferred);
+        fullName.append(escape);
         fullName.append(tableAlias);
-        fullName.append(transferred);
+        fullName.append(escape);
         fullName.append(SqlConstant.POINT);
-        fullName.append(transferred);
+        fullName.append(escape);
         fullName.append(SqlBeanUtil.isToUpperCase(common) ? tableFieldName.toUpperCase() : tableFieldName);
-        fullName.append(transferred);
+        fullName.append(escape);
+        return fullName.toString();
+    }
+
+    /**
+     * 获得新的表字段名
+     *
+     * @param common
+     * @param column
+     * @return
+     */
+    public static String getTableFieldFullName(Common common, Column column) {
+        String escape = getEscape(common);
+        StringBuffer fullName = new StringBuffer();
+        if (StringUtil.isNotEmpty(column.getTableAlias())) {
+            fullName.append(escape);
+            fullName.append(column.getTableAlias());
+            fullName.append(escape);
+            fullName.append(SqlConstant.POINT);
+        }
+        fullName.append(column.isNameEscape() ? escape : "");
+        fullName.append(column.getName(SqlBeanUtil.isToUpperCase(common)));
+        fullName.append(column.isNameEscape() ? escape : "");
         return fullName.toString();
     }
 
@@ -256,7 +278,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static String fromFullName(String schema, String tableName, String tableAlias, Common common) {
-        String transferred = SqlBeanUtil.getTransferred(common);
+        String escape = SqlBeanUtil.getEscape(common);
         StringBuffer fromSql = new StringBuffer();
         if (SqlBeanUtil.isToUpperCase(common)) {
             tableName = tableName.toUpperCase();
@@ -268,9 +290,9 @@ public class SqlBeanUtil {
         }
         fromSql.append(tableName);
         fromSql.append(SqlConstant.SPACES);
-        fromSql.append(transferred);
+        fromSql.append(escape);
         fromSql.append(tableAlias);
-        fromSql.append(transferred);
+        fromSql.append(escape);
         return fromSql.toString();
     }
 
@@ -719,7 +741,7 @@ public class SqlBeanUtil {
                         continue;
                     }
                     select.addJoin(join);
-                    join.on(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), sqlJoin.tableKeyword()), new Original(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
+                    join.on(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), sqlJoin.tableKeyword()), new RawValue(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
                 } else if (sqlJoin != null && sqlJoin.isBean()) {
                     String tableKeyword = getTableFieldName(getIdField(subClazz), sqlTable);
                     key = Md5Util.encode(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
@@ -727,7 +749,7 @@ public class SqlBeanUtil {
                         continue;
                     }
                     select.addJoin(join);
-                    join.on(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), tableKeyword), new Original(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
+                    join.on(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), tableKeyword), new RawValue(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
                 }
             }
             joinFieldMap.put(key, join);
@@ -775,7 +797,7 @@ public class SqlBeanUtil {
                 }
                 if (objects != null) {
                     for (int i = 0; i < objects.length; i++) {
-                        value.append(getOriginal(common, objects[i]));
+                        value.append(getActualValue(common, objects[i]));
                         value.append(SqlConstant.COMMA);
                     }
                     value.delete(value.length() - SqlConstant.COMMA.length(), value.length());
@@ -806,11 +828,11 @@ public class SqlBeanUtil {
             column = (Column) columnObject;
         }
         if (column != null) {
-            String transferred = getTransferred(common);
+            String escape = getEscape(common);
             if (StringUtil.isNotEmpty(column.getTableAlias())) {
-                value.append(transferred);
+                value.append(escape);
                 value.append(column.getTableAlias());
-                value.append(transferred);
+                value.append(escape);
                 value.append(SqlConstant.POINT);
             }
             value.append(column.getName());
@@ -827,18 +849,18 @@ public class SqlBeanUtil {
      * @param value
      * @return
      */
-    public static Object getOriginal(Common common, Object value) {
+    public static Object getActualValue(Common common, Object value) {
         if (value instanceof SqlFun) {
             return getSqlFunction(common, (SqlFun) value);
         } else if (value instanceof Column) {
             Column column = (Column) value;
-            return SqlBeanUtil.getTableFieldFullName(common, column.getTableAlias(), column.getName());
+            return SqlBeanUtil.getTableFieldFullName(common, column);
         } else if (value instanceof ColumnFun) {
             Column column = LambdaUtil.getColumn((ColumnFun) value);
-            return SqlBeanUtil.getTableFieldFullName(common, column.getTableAlias(), column.getName());
-        } else if (value instanceof Original) {
-            Original original = (Original) value;
-            return original.getValue();
+            return SqlBeanUtil.getTableFieldFullName(common, column);
+        } else if (value instanceof RawValue) {
+            RawValue original = (RawValue) value;
+            return getActualValue(common, original.getValue());
         }
         return getSqlValue(common, value);
     }
@@ -856,7 +878,7 @@ public class SqlBeanUtil {
         fun.append(SqlConstant.BEGIN_BRACKET);
         if (sqlFun.getValues() != null && sqlFun.getValues().length > 0) {
             for (Object value : sqlFun.getValues()) {
-                fun.append(SqlBeanUtil.getOriginal(common, value));
+                fun.append(SqlBeanUtil.getActualValue(common, value));
                 fun.append(SqlConstant.COMMA);
             }
             fun.deleteCharAt(fun.length() - SqlConstant.COMMA.length());
@@ -908,14 +930,9 @@ public class SqlBeanUtil {
             return WhatType.STRING_TYPE;
         } else if (type == boolean.class || type == Boolean.class) {
             return WhatType.BOOL_TYPE;
-        } else if (type == short.class || type == Short.class
-                || type == int.class || type == Integer.class || type == long.class
-                || type == Long.class || type == float.class || type == Float.class
-                || type == double.class || type == Double.class) {
+        } else if (type == short.class || type == Short.class || type == int.class || type == Integer.class || type == long.class || type == Long.class || type == float.class || type == Float.class || type == double.class || type == Double.class) {
             return WhatType.VALUE_TYPE;
-        } else if (type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class
-                || type == java.sql.Timestamp.class || type == java.sql.Time.class
-                || type == LocalDate.class || type == LocalTime.class || type == LocalDateTime.class) {
+        } else if (type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class || type == LocalDate.class || type == LocalTime.class || type == LocalDateTime.class) {
             return WhatType.DATE_TYPE;
         }
         return WhatType.OBJECT_TYPE;
@@ -978,16 +995,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean isBaseType(Class<?> type) {
-        if (type == String.class || type == char.class || type == Character.class
-                || type == boolean.class || type == Boolean.class || type == byte.class
-                || type == Byte.class || type == short.class || type == Short.class
-                || type == int.class || type == Integer.class || type == long.class
-                || type == Long.class || type == float.class || type == Float.class
-                || type == double.class || type == Double.class || type == Date.class
-                || type == java.sql.Date.class || type == java.sql.Timestamp.class
-                || type == java.sql.Timestamp.class || type == java.sql.Time.class
-                || type == LocalDate.class || type == LocalTime.class || type == LocalDateTime.class
-                || type == BigDecimal.class) {
+        if (type == String.class || type == char.class || type == Character.class || type == boolean.class || type == Boolean.class || type == byte.class || type == Byte.class || type == short.class || type == Short.class || type == int.class || type == Integer.class || type == long.class || type == Long.class || type == float.class || type == Float.class || type == double.class || type == Double.class || type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class || type == LocalDate.class || type == LocalTime.class || type == LocalDateTime.class || type == BigDecimal.class) {
             return true;
         }
         return false;
@@ -1108,13 +1116,13 @@ public class SqlBeanUtil {
      * @param common
      * @return
      */
-    public static String getTransferred(Common common) {
-        String transferred = SqlConstant.DOUBLE_ESCAPE_CHARACTER;
+    public static String getEscape(Common common) {
+        String escape = SqlConstant.DOUBLE_ESCAPE_CHARACTER;
         DbType dbType = common.getSqlBeanDB().getDbType();
         if (dbType == DbType.MySQL || dbType == DbType.MariaDB) {
-            transferred = SqlConstant.SINGLE_ESCAPE_CHARACTER;
+            escape = SqlConstant.SINGLE_ESCAPE_CHARACTER;
         }
-        return transferred;
+        return escape;
     }
 
     /**
@@ -1178,8 +1186,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean versionEffectiveness(Class<?> type) {
-        if (type == int.class || type == Integer.class || type == long.class || type == Long.class
-                || type == Date.class || type == java.sql.Timestamp.class || type == LocalDateTime.class) {
+        if (type == int.class || type == Integer.class || type == long.class || type == Long.class || type == Date.class || type == java.sql.Timestamp.class || type == LocalDateTime.class) {
             return true;
         }
         return false;
@@ -1409,13 +1416,13 @@ public class SqlBeanUtil {
             }
             //存在排序
             if (StringUtil.isNotBlank(afterColumnName)) {
-                String transferred = SqlBeanUtil.getTransferred(common);
+                String escape = SqlBeanUtil.getEscape(common);
                 sql.append(SqlConstant.SPACES);
                 sql.append(SqlConstant.AFTER);
                 sql.append(SqlConstant.SPACES);
-                sql.append(transferred);
+                sql.append(escape);
                 sql.append(afterColumnName);
-                sql.append(transferred);
+                sql.append(escape);
             }
         }
         return sql.toString();
@@ -1463,10 +1470,13 @@ public class SqlBeanUtil {
         String fieldName = Introspector.decapitalize(getter.replace("get", ""));
         try {
             Class<?> tableClass = Class.forName(lambda.getImplClass().replace("/", "."));
-            Field field = tableClass.getDeclaredField(fieldName);
             String methodType = lambda.getInstantiatedMethodType();
             SqlTable sqlTable = SqlBeanUtil.getSqlTable(Class.forName(methodType.substring(methodType.indexOf("(L") + 2, methodType.indexOf(";")).replace("/", ".")));
             String tableAlias = sqlTable != null ? (StringUtil.isNotBlank(sqlTable.alias()) ? sqlTable.alias() : sqlTable.value()) : tableClass.getSimpleName();
+            if ("class".equals(fieldName)) {
+                return new Column(tableAlias, "*", "", false);
+            }
+            Field field = tableClass.getDeclaredField(fieldName);
             String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
             return new Column(tableAlias, columnName, "");
         } catch (ClassNotFoundException e) {

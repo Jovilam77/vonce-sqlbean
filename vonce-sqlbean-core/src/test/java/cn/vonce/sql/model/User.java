@@ -37,6 +37,9 @@ public class User {
     @SqlColumn(value = "gender")
     private Integer gender;
 
+    @SqlColumn(value = "integral")
+    private Integer integral;
+
     public String getId() {
         return id;
     }
@@ -75,6 +78,14 @@ public class User {
 
     public void setGender(Integer gender) {
         this.gender = gender;
+    }
+
+    public Integer getIntegral() {
+        return integral;
+    }
+
+    public void setIntegral(Integer integral) {
+        this.integral = integral;
     }
 
     @Override

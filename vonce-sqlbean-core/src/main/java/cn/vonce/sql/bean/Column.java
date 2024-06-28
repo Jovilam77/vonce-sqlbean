@@ -24,20 +24,30 @@ public class Column implements Serializable {
     }
 
     public Column(String tableAlias, String name, String alias) {
-        this(false, tableAlias, name, alias);
+        this(false, tableAlias, name, alias, true);
+    }
+
+    public Column(String tableAlias, String name, String alias, boolean nameEscape) {
+        this(false, tableAlias, name, alias, nameEscape);
     }
 
     public Column(boolean immutable, String tableAlias, String name, String alias) {
+        this(immutable, tableAlias, name, alias, true);
+    }
+
+    public Column(boolean immutable, String tableAlias, String name, String alias, boolean nameEscape) {
         this.immutable = immutable;
         this.tableAlias = tableAlias;
         this.name = name;
         this.alias = alias;
+        this.nameEscape = nameEscape;
     }
 
     private boolean immutable;
     private String tableAlias;
     private String name;
     private String alias;
+    private boolean nameEscape;
 
     public String getTableAlias() {
         return tableAlias;
@@ -51,6 +61,13 @@ public class Column implements Serializable {
     }
 
     public String getName() {
+        return name;
+    }
+
+    public String getName(boolean toUpperCase) {
+        if (toUpperCase) {
+            return name.toUpperCase();
+        }
         return name;
     }
 
@@ -70,6 +87,14 @@ public class Column implements Serializable {
             return;
         }
         this.alias = alias;
+    }
+
+    public boolean isImmutable() {
+        return immutable;
+    }
+
+    public boolean isNameEscape() {
+        return nameEscape;
     }
 
     @Override

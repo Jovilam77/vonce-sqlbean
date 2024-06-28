@@ -2,6 +2,7 @@ package cn.vonce.sql.bean;
 
 import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.uitls.LambdaUtil;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -201,7 +202,7 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      * 设置字段值
      *
      * @param columnFun 字段信息
-     * @param value          值
+     * @param value     值
      * @param <R>
      * @return
      */
@@ -255,8 +256,8 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      * 设置字段值 值相加
      *
      * @param columnFun 字段信息
-     * @param value1         第一个值
-     * @param value2         第二个值
+     * @param value1    第一个值
+     * @param value2    第二个值
      * @return
      */
     public <R> Update<T> setAdd(ColumnFun<T, R> columnFun, Object value1, Object value2) {
@@ -269,8 +270,8 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      * 设置字段值 值相加
      *
      * @param columnFun 字段信息
-     * @param value1         第一个值（字段信息）
-     * @param value2         第二个值
+     * @param value1    第一个值（字段信息）
+     * @param value2    第二个值
      * @return
      */
     public <k, R> Update<T> setAdd(ColumnFun<T, R> columnFun, ColumnFun<k, R> value1, Object value2) {
@@ -323,8 +324,8 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      * 设置字段值 值相减
      *
      * @param columnFun 字段信息
-     * @param value1         第一个值
-     * @param value2         第二个值
+     * @param value1    第一个值
+     * @param value2    第二个值
      * @return
      */
     public <R> Update<T> setSub(ColumnFun<T, R> columnFun, Object value1, Object value2) {
@@ -337,8 +338,8 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
      * 设置字段值 值相减
      *
      * @param columnFun 字段信息
-     * @param value1         第一个值（字段信息）
-     * @param value2         第二个值
+     * @param value1    第一个值（字段信息）
+     * @param value2    第二个值
      * @return
      */
     public <k, R> Update<T> setSub(ColumnFun<T, R> columnFun, ColumnFun<k, R> value1, Object value2) {

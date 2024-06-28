@@ -135,7 +135,7 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
                 sql.append(SqlConstant.DROP);
                 sql.append(SqlConstant.COLUMN);
                 sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
-                sql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
+                sql.append(alter.getColumnInfo().getName(SqlBeanUtil.isToUpperCase(alter)));
                 sql.append(SqlConstant.END_SQUARE_BRACKETS);
             }
             sql.append(SqlConstant.SPACES);
@@ -171,7 +171,7 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
 //        sql.append(SqlConstant.END_SQUARE_BRACKETS);
 //        sql.append(SqlConstant.POINT);
         sql.append(SqlConstant.BEGIN_SQUARE_BRACKETS);
-        sql.append(SqlBeanUtil.isToUpperCase(alter) ? table.getName().toUpperCase() : table.getName());
+        sql.append(table.getName(SqlBeanUtil.isToUpperCase(alter)));
         sql.append(SqlConstant.END_SQUARE_BRACKETS);
         if (rename) {
             sql.append(SqlConstant.POINT);
@@ -232,7 +232,7 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
     }
 
     @Override
-    public String addRemarks(boolean isTable, Alter item, String transferred) {
+    public String addRemarks(boolean isTable, Alter item, String escape) {
         String remarks = StringUtil.isNotBlank(item.getColumnInfo().getRemarks()) ? item.getColumnInfo().getRemarks() : "''";
         StringBuffer remarksSql = new StringBuffer();
         String schema = SqlConstant.DBO;

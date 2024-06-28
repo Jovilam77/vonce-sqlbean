@@ -7,13 +7,13 @@ import java.io.Serializable;
 /**
  * 原始的值（既不会对它进行任何处理，传入什么即是什么）
  */
-public class Original implements Serializable {
+public class RawValue implements Serializable {
 
-    public <T, R> Original(ColumnFun<T, R> value) {
+    public <T, R> RawValue(ColumnFun<T, R> value) {
         this.value = value;
     }
 
-    public Original(Object value) {
+    public RawValue(Object value) {
         this.value = value;
     }
 
@@ -25,7 +25,7 @@ public class Original implements Serializable {
 
     @Override
     public String toString() {
-        return "Original{" +
+        return "RawValue{" +
                 "value='" + value + '\'' +
                 '}';
     }

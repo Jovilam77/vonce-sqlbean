@@ -95,7 +95,7 @@ public class PostgresqlDialect implements SqlDialect<JavaMapPostgresqlType> {
     @Override
     public List<String> alterTable(List<Alter> alterList) {
         List<String> sqlList = new ArrayList<>();
-        String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
+        String escape = SqlBeanUtil.getEscape(alterList.get(0));
         Table table = alterList.get(0).getTable();
         StringBuffer alertSql = new StringBuffer();
         alertSql.append(SqlConstant.ALTER_TABLE);
@@ -110,27 +110,27 @@ public class PostgresqlDialect implements SqlDialect<JavaMapPostgresqlType> {
                 addOrModifySql.append(SqlConstant.ADD);
                 addOrModifySql.append(SqlConstant.COLUMN);
                 addOrModifySql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), null));
-                sqlList.add(addRemarks(false, alter, transferred));
+                sqlList.add(addRemarks(false, alter, escape));
             } else if (alter.getType() == AlterType.MODIFY) {
                 if (addOrModifySql.length() > 0) {
                     addOrModifySql.append(SqlConstant.COMMA);
                 }
                 addOrModifySql.append(modifyColumn(alter));
-                sqlList.add(addRemarks(false, alter, transferred));
+                sqlList.add(addRemarks(false, alter, escape));
             } else if (alter.getType() == AlterType.DROP) {
                 StringBuffer dropSql = new StringBuffer();
                 dropSql.append(SqlConstant.ALTER_TABLE);
                 dropSql.append(getFullName(alter, table));
                 dropSql.append(SqlConstant.DROP);
                 dropSql.append(SqlConstant.BEGIN_BRACKET);
-                dropSql.append(transferred);
-                dropSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
-                dropSql.append(transferred);
+                dropSql.append(escape);
+                dropSql.append(alter.getColumnInfo().getName(SqlBeanUtil.isToUpperCase(alter)));
+                dropSql.append(escape);
                 dropSql.append(SqlConstant.END_BRACKET);
                 sqlList.add(dropSql.toString());
             } else if (alter.getType() == AlterType.CHANGE) {
                 sqlList.add(changeColumn(alter));
-                sqlList.add(addRemarks(false, alter, transferred));
+                sqlList.add(addRemarks(false, alter, escape));
                 //更改名称的同时可能也更改其他信息
                 if (addOrModifySql.length() > 0) {
                     addOrModifySql.append(SqlConstant.COMMA);
@@ -153,18 +153,18 @@ public class PostgresqlDialect implements SqlDialect<JavaMapPostgresqlType> {
      * @return
      */
     private String getFullName(Common common, Table table) {
-        String transferred = SqlBeanUtil.getTransferred(common);
+        String escape = SqlBeanUtil.getEscape(common);
         boolean toUpperCase = SqlBeanUtil.isToUpperCase(common);
         StringBuffer sql = new StringBuffer();
         if (StringUtil.isNotBlank(table.getSchema())) {
-            sql.append(transferred);
-            sql.append(toUpperCase ? table.getSchema().toUpperCase() : table.getSchema());
-            sql.append(transferred);
+            sql.append(escape);
+            sql.append(table.getSchema(toUpperCase));
+            sql.append(escape);
             sql.append(SqlConstant.POINT);
         }
-        sql.append(transferred);
-        sql.append(toUpperCase ? table.getName().toUpperCase() : table.getName());
-        sql.append(transferred);
+        sql.append(escape);
+        sql.append(table.getName(toUpperCase));
+        sql.append(escape);
         sql.append(SqlConstant.SPACES);
         return sql.toString();
     }
@@ -261,14 +261,14 @@ public class PostgresqlDialect implements SqlDialect<JavaMapPostgresqlType> {
         changeSql.append(getFullName(alter, alter.getTable()));
         changeSql.append(SqlConstant.RENAME);
         changeSql.append(SqlConstant.COLUMN);
-        changeSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getOldColumnName().toUpperCase() : alter.getOldColumnName());
+        changeSql.append(alter.getOldColumnName(SqlBeanUtil.isToUpperCase(alter)));
         changeSql.append(SqlConstant.TO);
-        changeSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
+        changeSql.append(alter.getColumnInfo().getName(SqlBeanUtil.isToUpperCase(alter)));
         return changeSql.toString();
     }
 
     @Override
-    public String addRemarks(boolean isTable, Alter item, String transferred) {
+    public String addRemarks(boolean isTable, Alter item, String escape) {
         StringBuffer remarksSql = new StringBuffer();
         remarksSql.append(SqlConstant.COMMENT);
         remarksSql.append(SqlConstant.ON);
@@ -276,9 +276,9 @@ public class PostgresqlDialect implements SqlDialect<JavaMapPostgresqlType> {
         remarksSql.append(getFullName(item, item.getTable()));
         if (!isTable) {
             remarksSql.append(SqlConstant.POINT);
-            remarksSql.append(transferred);
+            remarksSql.append(escape);
             remarksSql.append(item.getColumnInfo().getName());
-            remarksSql.append(transferred);
+            remarksSql.append(escape);
         }
         remarksSql.append(SqlConstant.IS);
         remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);

@@ -10,10 +10,6 @@ import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.model.Essay;
 import cn.vonce.sql.model.User;
-import cn.vonce.sql.model.sql.SqlEssay;
-import cn.vonce.sql.model.sql.SqlUser;
-import cn.vonce.sql.page.PageHelper;
-import cn.vonce.sql.page.ResultData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,15 +73,15 @@ public class SqlHelperTest {
         Select select = new Select();
         select.setSqlBeanDB(sqlBeanDB);
         select.setBeanClass(Essay.class);
-        select.column(SqlEssay._all);
-        select.column(SqlUser.headPortrait, "头像");
-        select.column(SqlUser.nickname, "昵称");
-        select.setTable(SqlEssay._tableName);
-        select.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id, SqlEssay.userId);
-        select.where().eq(SqlEssay.userId, "1111");
+        select.column(Essay::getClass);
+        select.column(User::getHeadPortrait, "头像");
+        select.column(User::getNickname, "昵称");
+        select.setTable(Essay.class);
+        select.innerJoin(User.class).on(User::getId, Essay::getUserId);
+        select.where().eq(Essay::getClass, "1111");
         //value 直接输入字符串 会当作字符串处理，sql中会带''，如果希望不被做处理则使用Original
-        select.where().eq(SqlFun.date_format(SqlEssay.creationTime$, "%Y-%m-%d"), SqlFun.date_format(SqlFun.now(), "%Y-%m-%d"));
-        select.orderByDesc(SqlEssay.id);
+        select.where().eq(SqlFun.date_format(Essay::getCreationTime, "%Y-%m-%d"), SqlFun.date_format(SqlFun.now(), "%Y-%m-%d"));
+        select.orderByDesc(Essay::getId);
         System.out.println("---select1---");
         System.out.println(SqlHelper.buildSelectSql(select));
     }
@@ -99,19 +95,18 @@ public class SqlHelperTest {
         Select select2 = new Select();
         select2.setSqlBeanDB(sqlBeanDB);
         select2.setBeanClass(Essay.class);
-        select2.column(SqlEssay.id, "序号")
-                .column(SqlEssay.content, "文章内容")
-                .column(SqlEssay.creationTime, "创建时间")
-                .column(SqlUser.nickname, "用户昵称");
-        select2.setTable(SqlEssay._tableName);
-//        select2.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id.getName(), SqlEssay.userId.getName());
-//        select2.innerJoin(User.class).on(SqlUser.id$, SqlEssay.userId$);
-        select2.innerJoin(User.class).on().eq(SqlUser.id$, SqlEssay.userId$).and().gt(SqlUser.id$, 1);
-        select2.where().gt(SqlFun.date_format(SqlEssay.creationTime$, "%Y-%m-%d"), "2020-01-01").and().eq(SqlUser.nickname, "vicky");
+        select2.column(Essay::getId, "序号")
+                .column(Essay::getContent, "文章内容")
+                .column(Essay::getCreationTime, "创建时间")
+                .column(User::getNickname, "用户昵称");
+        select2.setTable(Essay.class);
+//        select2.join(JoinType.INNER_JOIN, SqlUser._tableAlias, SqlUser.id.getName(), Essay.userId.getName());
+//        select2.innerJoin(User.class).on(SqlUser.id$, Essay.userId$);
+        select2.innerJoin(User.class).on().eq(User::getId, Essay::getUserId).and().gt(User::getId, 1);
+        select2.where().gt(SqlFun.date_format(Essay::getCreationTime, "%Y-%m-%d"), "2020-01-01").and().eq(User::getNickname, "vicky");
         System.out.println("---select2---");
         System.out.println(SqlHelper.buildSelectSql(select2));
     }
-
 
 
     /**
@@ -141,12 +136,12 @@ public class SqlHelperTest {
         Select select4 = new Select();
         select4.setSqlBeanDB(sqlBeanDB);
         select4.setBeanClass(Essay.class);
-        select4.column(SqlUser._all);
-        select4.setTable(SqlUser._tableName);
+        select4.column(User::getClass);
+        select4.setTable(User.class);
         Integer[] gender = {0, 1};
         select4.where(
-                Wrapper.where(Cond.between(SqlUser.id, 2, 6)).
-                        and(Wrapper.where(Cond.eq(SqlUser.nickname, "vicky")).or(Cond.in(SqlUser.gender, gender))));
+                Wrapper.where(Cond.between(User::getId, 2, 6)).
+                        and(Wrapper.where(Cond.eq(User::getNickname, "vicky")).or(Cond.in(User::getGender, gender))));
         System.out.println("---select4---");
         System.out.println(SqlHelper.buildSelectSql(select4));
     }
@@ -160,9 +155,9 @@ public class SqlHelperTest {
         Select select5 = new Select();
         select5.setSqlBeanDB(sqlBeanDB);
         select5.setBeanClass(Essay.class);
-        select5.column(SqlUser._all);
-        select5.setTable(SqlUser._tableName);
-        select5.where(Wrapper.where(Cond.eq(SqlUser.id, 1)).and(Wrapper.where(Cond.eq(SqlUser.gender, "1")).or(Cond.eq(SqlUser.nickname, 1))));
+        select5.column(User::getClass);
+        select5.setTable(User.class);
+        select5.where(Wrapper.where(Cond.eq(User::getId, 1)).and(Wrapper.where(Cond.eq(User::getGender, "1")).or(Cond.eq(User::getNickname, 1))));
         System.out.println("---select5---");
         System.out.println(SqlHelper.buildSelectSql(select5));
     }
@@ -235,11 +230,11 @@ public class SqlHelperTest {
         user.setHeadPortrait("logo.png");
         user.setUsername("123");
         user.setGender(1);
-        Update update = new Update();
+        Update<User> update = new Update();
         update.setTable(User.class);
         update.setSqlBeanDB(sqlBeanDB);
         update.filterFields("username").bean(user).notNull(true);
-        update.where().gt(SqlUser.id, 0).and().lt(SqlUser.id, 10);
+        update.where().gt(User::getId, 0).and().lt(User::getId, 10);
         System.out.println("---update---");
         System.out.println(SqlHelper.buildUpdateSql(update));
 
@@ -255,9 +250,9 @@ public class SqlHelperTest {
         Update<User> update = new Update();
         update.setTable(User.class);
         update.setSqlBeanDB(sqlBeanDB);
-        update.set(SqlUser.id, 1).
-                set(SqlUser.nickname, "jovi").
-                setAdd(SqlUser.integral$, SqlUser.integral$, SqlUser.integral$).
+        update.set(User::getId, 1).
+                set(User::getNickname, "jovi").
+                setAdd(User::getIntegral, User::getIntegral, new RawValue(User::getIntegral)).
                 setSub(User::getGender, User::getGender, 1).
                 where().gt(User::getId, 0).and().lt(User::getId, 10);
         System.out.println("---update2---");

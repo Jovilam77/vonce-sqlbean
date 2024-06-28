@@ -134,7 +134,7 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
                 sql.append(getFullName(alter, alter.getTable(), null));
                 sql.append(SqlConstant.DROP);
                 sql.append(SqlConstant.COLUMN);
-                sql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
+                sql.append(alter.getColumnInfo().getName(SqlBeanUtil.isToUpperCase(alter)));
                 sqlList.add(sql.toString());
             }
         }
@@ -142,7 +142,7 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
     }
 
     @Override
-    public String addRemarks(boolean isTable, Alter item, String transferred) {
+    public String addRemarks(boolean isTable, Alter item, String escape) {
         return null;
     }
 
@@ -158,13 +158,13 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
         boolean toUpperCase = SqlBeanUtil.isToUpperCase(alter);
         StringBuffer sql = new StringBuffer();
         if (StringUtil.isNotBlank(table.getSchema())) {
-            sql.append(toUpperCase ? table.getSchema().toUpperCase() : table.getSchema());
+            sql.append(table.getSchema(toUpperCase));
             sql.append(SqlConstant.POINT);
         }
-        sql.append(toUpperCase ? table.getName().toUpperCase() : table.getName());
+        sql.append(table.getName(toUpperCase));
         if (rename) {
             sql.append(SqlConstant.POINT);
-            sql.append(SqlBeanUtil.isToUpperCase(alter) ? columnName : columnName);
+            sql.append(toUpperCase ? columnName.toUpperCase() : columnName);
         }
         sql.append(SqlConstant.SPACES);
         return sql.toString();
@@ -206,7 +206,7 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
         changeSql.append(SqlConstant.COLUMN);
         changeSql.append(getFullName(alter, alter.getTable(), alter.getOldColumnName()));
         changeSql.append(SqlConstant.TO);
-        changeSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
+        changeSql.append(alter.getColumnInfo().getName(SqlBeanUtil.isToUpperCase(alter) ));
         return changeSql.toString();
     }
 

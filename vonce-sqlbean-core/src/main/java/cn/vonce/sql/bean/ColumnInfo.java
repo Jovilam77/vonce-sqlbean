@@ -66,6 +66,13 @@ public class ColumnInfo {
         return name;
     }
 
+    public String getName(boolean toUpperCase) {
+        if (toUpperCase) {
+            return name.toUpperCase();
+        }
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
     }

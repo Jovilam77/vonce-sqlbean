@@ -88,19 +88,19 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
 
     @Override
     public List<String> alterTable(List<Alter> alterList) {
-        String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
+        String escape = SqlBeanUtil.getEscape(alterList.get(0));
         Table table = alterList.get(0).getTable();
         StringBuffer sql = new StringBuffer();
         sql.append(SqlConstant.ALTER_TABLE);
         if (StringUtil.isNotBlank(table.getSchema())) {
-            sql.append(transferred);
+            sql.append(escape);
             sql.append(table.getSchema());
-            sql.append(transferred);
+            sql.append(escape);
             sql.append(SqlConstant.POINT);
         }
-        sql.append(transferred);
+        sql.append(escape);
         sql.append(table.getName());
-        sql.append(transferred);
+        sql.append(escape);
         sql.append(SqlConstant.SPACES);
         for (int i = 0; i < alterList.size(); i++) {
             Alter alter = alterList.get(i);
@@ -115,12 +115,12 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
             } else if (alter.getType() == AlterType.CHANGE) {
                 sql.append(SqlConstant.CHANGE);
                 sql.append(SqlConstant.COLUMN);
-                sql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getOldColumnName().toUpperCase() : alter.getOldColumnName());
+                sql.append(alter.getOldColumnName(SqlBeanUtil.isToUpperCase(alter)));
                 sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
             } else if (alter.getType() == AlterType.DROP) {
                 sql.append(SqlConstant.DROP);
                 sql.append(SqlConstant.COLUMN);
-                sql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
+                sql.append(alter.getColumnInfo().getName(SqlBeanUtil.isToUpperCase(alter)));
             }
             sql.append(SqlConstant.SPACES);
             if (i < alterList.size() - 1) {
@@ -133,18 +133,18 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
     }
 
     @Override
-    public String addRemarks(boolean isTable, Alter item, String transferred) {
+    public String addRemarks(boolean isTable, Alter item, String escape) {
         StringBuffer remarksSql = new StringBuffer();
         remarksSql.append(SqlConstant.ALTER_TABLE);
         if (StringUtil.isNotBlank(item.getTable().getSchema())) {
-            remarksSql.append(transferred);
+            remarksSql.append(escape);
             remarksSql.append(item.getTable().getSchema());
-            remarksSql.append(transferred);
+            remarksSql.append(escape);
             remarksSql.append(SqlConstant.POINT);
         }
-        remarksSql.append(transferred);
+        remarksSql.append(escape);
         remarksSql.append(item.getTable().getName());
-        remarksSql.append(transferred);
+        remarksSql.append(escape);
         remarksSql.append(SqlConstant.COMMENT);
         remarksSql.append(SqlConstant.EQUAL_TO);
         remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);

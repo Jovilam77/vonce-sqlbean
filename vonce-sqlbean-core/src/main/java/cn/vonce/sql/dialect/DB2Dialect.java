@@ -87,7 +87,7 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
     @Override
     public List<String> alterTable(List<Alter> alterList) {
         List<String> sqlList = new ArrayList<>();
-        String transferred = SqlBeanUtil.getTransferred(alterList.get(0));
+        String escape = SqlBeanUtil.getEscape(alterList.get(0));
         for (int i = 0; i < alterList.size(); i++) {
             Alter alter = alterList.get(i);
             if (alter.getType() == AlterType.ADD) {
@@ -97,7 +97,7 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
                 sql.append(SqlConstant.ADD);
                 sql.append(SqlBeanUtil.addColumn(alter, alter.getColumnInfo(), alter.getAfterColumnName()));
                 sqlList.add(sql.toString());
-                String remarks = addRemarks(false, alter, transferred);
+                String remarks = addRemarks(false, alter, escape);
                 if (StringUtil.isNotBlank(remarks)) {
                     sqlList.add(remarks);
                 }
@@ -111,7 +111,7 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
                     sql.append(modifySql);
                 }
                 sqlList.add(sql.toString());
-                String remarks = addRemarks(false, alter, transferred);
+                String remarks = addRemarks(false, alter, escape);
                 if (StringUtil.isNotBlank(remarks)) {
                     sqlList.add(remarks);
                 }
@@ -120,7 +120,7 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
                 if (modifySql.length() > 0) {
                     sqlList.add(modifySql.toString());
                 }
-                String remarks = addRemarks(false, alter, transferred);
+                String remarks = addRemarks(false, alter, escape);
                 if (StringUtil.isNotBlank(remarks)) {
                     sqlList.add(remarks);
                 }
@@ -130,7 +130,7 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
                 sql.append(getFullName(alter, alter.getTable()));
                 sql.append(SqlConstant.DROP);
                 sql.append(SqlConstant.COLUMN);
-                sql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
+                sql.append(alter.getColumnInfo().getName(SqlBeanUtil.isToUpperCase(alter)));
                 sqlList.add(sql.toString());
             }
             sqlList.add(recast(alterList.get(i)));
@@ -146,18 +146,18 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
      * @return
      */
     private String getFullName(Common common, Table table) {
-        String transferred = SqlBeanUtil.getTransferred(common);
+        String escape = SqlBeanUtil.getEscape(common);
         boolean toUpperCase = SqlBeanUtil.isToUpperCase(common);
         StringBuffer sql = new StringBuffer();
         if (StringUtil.isNotBlank(table.getSchema())) {
-            sql.append(transferred);
-            sql.append(toUpperCase ? table.getSchema().toUpperCase() : table.getSchema());
-            sql.append(transferred);
+            sql.append(escape);
+            sql.append(table.getSchema(toUpperCase));
+            sql.append(escape);
             sql.append(SqlConstant.POINT);
         }
-        sql.append(transferred);
-        sql.append(toUpperCase ? table.getName().toUpperCase() : table.getName());
-        sql.append(transferred);
+        sql.append(escape);
+        sql.append(table.getName(toUpperCase));
+        sql.append(escape);
         sql.append(SqlConstant.SPACES);
         return sql.toString();
     }
@@ -181,7 +181,7 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
                 modifySql.append(getFullName(alter, alter.getTable()));
                 modifySql.append(SqlConstant.ALTER);
                 modifySql.append(SqlConstant.COLUMN);
-                modifySql.append(SqlBeanUtil.isToUpperCase(alter) ? columnInfo.getName().toUpperCase() : columnInfo.getName());
+                modifySql.append(columnInfo.getName(SqlBeanUtil.isToUpperCase(alter)));
             }
             if (alterDifference == AlterDifference.NOT_NULL) {
                 if ((columnInfo.getNotnull() != null && columnInfo.getNotnull()) || columnInfo.getPk()) {
@@ -224,14 +224,14 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
         changeSql.append(getFullName(alter, alter.getTable()));
         changeSql.append(SqlConstant.RENAME);
         changeSql.append(SqlConstant.COLUMN);
-        changeSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getOldColumnName().toUpperCase() : alter.getOldColumnName());
+        changeSql.append(alter.getOldColumnName(SqlBeanUtil.isToUpperCase(alter)));
         changeSql.append(SqlConstant.TO);
-        changeSql.append(SqlBeanUtil.isToUpperCase(alter) ? alter.getColumnInfo().getName().toUpperCase() : alter.getColumnInfo().getName());
+        changeSql.append(alter.getColumnInfo().getName(SqlBeanUtil.isToUpperCase(alter)));
         return changeSql.toString();
     }
 
     @Override
-    public String addRemarks(boolean isTable, Alter item, String transferred) {
+    public String addRemarks(boolean isTable, Alter item, String escape) {
         StringBuffer remarksSql = new StringBuffer();
         remarksSql.append(SqlConstant.COMMENT);
         remarksSql.append(SqlConstant.ON);
@@ -239,9 +239,9 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
         remarksSql.append(getFullName(item, item.getTable()));
         if (!isTable) {
             remarksSql.append(SqlConstant.POINT);
-            remarksSql.append(transferred);
+            remarksSql.append(escape);
             remarksSql.append(item.getColumnInfo().getName());
-            remarksSql.append(transferred);
+            remarksSql.append(escape);
         }
         remarksSql.append(SqlConstant.IS);
         remarksSql.append(SqlConstant.SINGLE_QUOTATION_MARK);
