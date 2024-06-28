@@ -1,7 +1,9 @@
 package cn.vonce.sql.bean;
 
 
+import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.enumerate.SqlSort;
+import cn.vonce.sql.uitls.LambdaUtil;
 
 import java.io.Serializable;
 
@@ -48,6 +50,10 @@ public class Paging implements Serializable {
 
     public Paging(Integer pagenum, Integer pagesize, Column column, SqlSort sqlSort) {
         this(pagenum, pagesize, true, new Order[]{new Order(column, sqlSort)});
+    }
+
+    public <T, R> Paging(Integer pagenum, Integer pagesize, ColumnFun<T, R> columnFun, SqlSort sqlSort) {
+        this(pagenum, pagesize, true, new Order[]{new Order(LambdaUtil.getColumn(columnFun), sqlSort)});
     }
 
     public Paging(Integer pagenum, Integer pagesize, boolean startByZero, Column column, SqlSort sqlSort) {
