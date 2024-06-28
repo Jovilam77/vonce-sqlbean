@@ -10,7 +10,10 @@ import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.model.Essay;
 import cn.vonce.sql.model.User;
+import cn.vonce.sql.model.union.EssayUnion;
+import cn.vonce.sql.uitls.SqlBeanUtil;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +24,7 @@ import java.util.List;
  */
 public class SqlHelperTest {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         SqlBeanDB sqlBeanDB = new SqlBeanDB();
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig();
         sqlBeanConfig.setToUpperCase(false);
@@ -38,27 +41,27 @@ public class SqlHelperTest {
 
         // select3
         select3(sqlBeanDB);
-
-        // select4
-        select4(sqlBeanDB);
-
-        // select5
-        select5(sqlBeanDB);
-
-        // insert1
-        insert1(sqlBeanDB);
-
-        // insert2
-        insert2(sqlBeanDB);
-
-        // update
-        update(sqlBeanDB);
-
-        // update2
-        update2(sqlBeanDB);
-
-        // delete
-        delete(sqlBeanDB);
+//
+//        // select4
+//        select4(sqlBeanDB);
+//
+//        // select5
+//        select5(sqlBeanDB);
+//
+//        // insert1
+//        insert1(sqlBeanDB);
+//
+//        // insert2
+//        insert2(sqlBeanDB);
+//
+//        // update
+//        update(sqlBeanDB);
+//
+//        // update2
+//        update2(sqlBeanDB);
+//
+//        // delete
+//        delete(sqlBeanDB);
 
         float excTime = (float) (System.currentTimeMillis() - startTime) / 1000;
         System.out.println("耗时：" + excTime + "秒");
@@ -114,13 +117,14 @@ public class SqlHelperTest {
      *
      * @param sqlBeanDB
      */
-    private static void select3(SqlBeanDB sqlBeanDB) {
+    private static void select3(SqlBeanDB sqlBeanDB) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         Select select3 = new Select();
         select3.setSqlBeanDB(sqlBeanDB);
         select3.setBeanClass(Essay.class);
         select3.column(SqlFun.count(Essay::getId), "count")
                 .column(Essay::getCategoryId);
         select3.setTable(Essay.class);
+        SqlBeanUtil.setJoin(select3,EssayUnion.class);
         select3.groupBy(Essay::getCategoryId);
         select3.having().eq("count", 5);
         System.out.println("---select3---");

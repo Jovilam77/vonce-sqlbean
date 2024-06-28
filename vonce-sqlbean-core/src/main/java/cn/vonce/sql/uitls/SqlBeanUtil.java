@@ -741,7 +741,7 @@ public class SqlBeanUtil {
                         continue;
                     }
                     select.addJoin(join);
-                    join.on(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), sqlJoin.tableKeyword()), new RawValue(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
+                    join.on(join.getTableAlias(), sqlJoin.tableKeyword(), new RawValue(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
                 } else if (sqlJoin != null && sqlJoin.isBean()) {
                     String tableKeyword = getTableFieldName(getIdField(subClazz), sqlTable);
                     key = Md5Util.encode(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
@@ -749,7 +749,7 @@ public class SqlBeanUtil {
                         continue;
                     }
                     select.addJoin(join);
-                    join.on(SqlBeanUtil.getTableFieldFullName(select, join.getTableAlias(), tableKeyword), new RawValue(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
+                    join.on(join.getTableAlias(), tableKeyword, new RawValue(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
                 }
             }
             joinFieldMap.put(key, join);
@@ -859,8 +859,11 @@ public class SqlBeanUtil {
             Column column = LambdaUtil.getColumn((ColumnFun) value);
             return SqlBeanUtil.getTableFieldFullName(common, column);
         } else if (value instanceof RawValue) {
-            RawValue original = (RawValue) value;
-            return getActualValue(common, original.getValue());
+            Object raw = ((RawValue) value).getValue();
+            if (raw instanceof SqlFun) {
+                return getSqlFunction(common, (SqlFun) raw);
+            }
+            return raw;
         }
         return getSqlValue(common, value);
     }
