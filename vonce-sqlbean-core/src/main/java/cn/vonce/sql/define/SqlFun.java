@@ -353,34 +353,70 @@ public class SqlFun extends Column {
     /**
      * 计算两个DATE，DATETIME或TIMESTAMP值之间的天数。
      *
-     * @param date1 合法的日期1
-     * @param date2 合法的日期2
+     * @param unit      表示差值的单位，可以是以下值之一：MICROSECOND（微秒）、SECOND（秒）、MINUTE（分）、HOUR（小时）、DAY（天）、WEEK（周）、MONTH（月）、QUARTER（季度）或 YEAR（年）
+     * @param startDate 表示时间段的起始时间
+     * @param endDate   表示时间段的结束时间
      * @return
      */
-    public static SqlFun dateDiff(Object date1, Object date2) {
-        return new SqlFun("dateDiff", new Object[]{date1, date2});
+    public static SqlFun timestampDiff(String unit, Object startDate, Object endDate) {
+        return new SqlFun("timestampDiff", new Object[]{unit, startDate, endDate});
     }
 
     /**
      * 计算两个DATE，DATETIME或TIMESTAMP值之间的天数。
      *
-     * @param date1 合法的日期1
-     * @param date2 合法的日期2
+     * @param unit      表示差值的单位，可以是以下值之一：MICROSECOND（微秒）、SECOND（秒）、MINUTE（分）、HOUR（小时）、DAY（天）、WEEK（周）、MONTH（月）、QUARTER（季度）或 YEAR（年）
+     * @param startDate 表示时间段的起始时间
+     * @param endDate   表示时间段的结束时间
      * @return
      */
-    public static <T, R> SqlFun dateDiff(ColumnFun<T, R> date1, Object date2) {
-        return new SqlFun("dateDiff", new Object[]{date1, date2});
+    public static <T, R> SqlFun timestampDiff(String unit, ColumnFun<T, R> startDate, Object endDate) {
+        return new SqlFun("timestampDiff", new Object[]{unit, startDate, endDate});
     }
 
     /**
      * 计算两个DATE，DATETIME或TIMESTAMP值之间的天数。
      *
-     * @param date1 合法的日期1
-     * @param date2 合法的日期2
+     * @param unit      表示差值的单位，可以是以下值之一：MICROSECOND（微秒）、SECOND（秒）、MINUTE（分）、HOUR（小时）、DAY（天）、WEEK（周）、MONTH（月）、QUARTER（季度）或 YEAR（年）
+     * @param startDate 表示时间段的起始时间
+     * @param endDate   表示时间段的结束时间
      * @return
      */
-    public static <T, R> SqlFun dateDiff(ColumnFun<T, R> date1, ColumnFun<T, R> date2) {
-        return new SqlFun("dateDiff", new Object[]{date1, date2});
+    public static <T, R> SqlFun timestampDiff(String unit, ColumnFun<T, R> startDate, ColumnFun<T, R> endDate) {
+        return new SqlFun("timestampDiff", new Object[]{unit, startDate, endDate});
+    }
+
+    /**
+     * 计算两个DATE，DATETIME或TIMESTAMP值之间的天数。
+     *
+     * @param startDate 表示时间段的起始时间
+     * @param endDate   表示时间段的结束时间
+     * @return
+     */
+    public static SqlFun dateDiff(Object startDate, Object endDate) {
+        return new SqlFun("dateDiff", new Object[]{endDate, endDate});
+    }
+
+    /**
+     * 计算两个DATE，DATETIME或TIMESTAMP值之间的天数。
+     *
+     * @param startDate 表示时间段的起始时间
+     * @param endDate   表示时间段的结束时间
+     * @return
+     */
+    public static <T, R> SqlFun dateDiff(ColumnFun<T, R> startDate, Object endDate) {
+        return new SqlFun("dateDiff", new Object[]{startDate, endDate});
+    }
+
+    /**
+     * 计算两个DATE，DATETIME或TIMESTAMP值之间的天数。
+     *
+     * @param startDate 表示时间段的起始时间
+     * @param endDate   表示时间段的结束时间
+     * @return
+     */
+    public static <T, R> SqlFun dateDiff(ColumnFun<T, R> startDate, ColumnFun<T, R> endDate) {
+        return new SqlFun("dateDiff", new Object[]{startDate, endDate});
     }
 
     /**
@@ -388,11 +424,11 @@ public class SqlFun extends Column {
      *
      * @param date 是DATE或DATETIME的起始值。
      * @param num  是一个字符串，用于确定从起始日期增加的间隔值。
-     * @param type 是expr可解析的间隔单位，例如DAY，HOUR等.
+     * @param unit 是expr可解析的间隔单位，例如DAY，HOUR等.
      * @return
      */
-    public static SqlFun dateAdd(Object date, int num, String type) {
-        return new SqlFun("date_add", new Object[]{date, new Original("interval " + num + " " + type)});
+    public static SqlFun dateAdd(Object date, int num, String unit) {
+        return new SqlFun("date_add", new Object[]{date, new Original("interval " + num + " " + unit)});
     }
 
     /**
@@ -400,11 +436,11 @@ public class SqlFun extends Column {
      *
      * @param date 是DATE或DATETIME的起始值。
      * @param num  是一个字符串，用于确定从起始日期增加的间隔值。
-     * @param type 是expr可解析的间隔单位，例如DAY，HOUR等.
+     * @param unit 是expr可解析的间隔单位，例如DAY，HOUR等.
      * @return
      */
-    public static <T, R> SqlFun dateAdd(ColumnFun<T, R> date, int num, String type) {
-        return new SqlFun("date_add", new Object[]{date, new Original("interval " + num + " " + type)});
+    public static <T, R> SqlFun dateAdd(ColumnFun<T, R> date, int num, String unit) {
+        return new SqlFun("date_add", new Object[]{date, new Original("interval " + num + " " + unit)});
     }
 
     /**
@@ -412,11 +448,11 @@ public class SqlFun extends Column {
      *
      * @param date 是DATE或DATETIME的起始值。
      * @param num  是一个字符串，用于确定从起始日期减去的间隔值。
-     * @param type 是expr可解析的间隔单位，例如DAY，HOUR等.
+     * @param unit 是expr可解析的间隔单位，例如DAY，HOUR等.
      * @return
      */
-    public static SqlFun dateSub(Object date, int num, String type) {
-        return new SqlFun("date_sub", new Object[]{date, new Original("interval " + num + " " + type)});
+    public static SqlFun dateSub(Object date, int num, String unit) {
+        return new SqlFun("date_sub", new Object[]{date, new Original("interval " + num + " " + unit)});
     }
 
     /**
@@ -424,11 +460,11 @@ public class SqlFun extends Column {
      *
      * @param date 是DATE或DATETIME的起始值。
      * @param num  是一个字符串，用于确定从起始日期减去的间隔值。
-     * @param type 是expr可解析的间隔单位，例如DAY，HOUR等.
+     * @param unit 是expr可解析的间隔单位，例如DAY，HOUR等.
      * @return
      */
-    public static <T, R> SqlFun dateSub(ColumnFun<T, R> date, int num, String type) {
-        return new SqlFun("date_sub", new Object[]{date, new Original("interval " + num + " " + type)});
+    public static <T, R> SqlFun dateSub(ColumnFun<T, R> date, int num, String unit) {
+        return new SqlFun("date_sub", new Object[]{date, new Original("interval " + num + " " + unit)});
     }
 
     /**
