@@ -30,7 +30,6 @@ public class PageHelper<T> implements Serializable {
     public static final String COUNT = "count";
 
     public PageHelper() {
-        this(1, 10);
     }
 
     /**
