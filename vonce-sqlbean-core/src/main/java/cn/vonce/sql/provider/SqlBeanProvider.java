@@ -213,7 +213,7 @@ public class SqlBeanProvider {
             return null;
         }
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-        delete.where().in(SqlBeanUtil.getTableFieldName(delete, idField, sqlTable), id);
+        delete.where().in(SqlBeanUtil.getTableFieldName(idField, sqlTable), id);
         return SqlHelper.buildDeleteSql(delete);
     }
 
@@ -295,7 +295,7 @@ public class SqlBeanProvider {
             update.bean(newLogicallyDeleteBean(clazz));
             Field idField = SqlBeanUtil.getIdField(clazz);
             SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-            update.where().in(SqlBeanUtil.getTableFieldName(update, idField, sqlTable), id);
+            update.where().in(SqlBeanUtil.getTableFieldName(idField, sqlTable), id);
             setSchema(update, clazz);
         } catch (SqlBeanException e) {
             e.printStackTrace();
@@ -411,7 +411,7 @@ public class SqlBeanProvider {
             return null;
         }
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-        update.where().eq(SqlBeanUtil.getTableFieldName(update, idField, sqlTable), id);
+        update.where().eq(SqlBeanUtil.getTableFieldName(idField, sqlTable), id);
         return SqlHelper.buildUpdateSql(update);
     }
 
@@ -442,7 +442,7 @@ public class SqlBeanProvider {
                 }
             }
             SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
-            update.where().eq(SqlBeanUtil.getTableFieldName(update, idField, sqlTable), id);
+            update.where().eq(SqlBeanUtil.getTableFieldName(idField, sqlTable), id);
         } catch (SqlBeanException e) {
             e.printStackTrace();
             return null;
