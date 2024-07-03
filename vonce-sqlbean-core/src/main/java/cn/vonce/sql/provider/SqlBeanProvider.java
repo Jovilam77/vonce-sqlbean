@@ -64,11 +64,11 @@ public class SqlBeanProvider {
             e.printStackTrace();
             return null;
         }
-        SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
+        Column column =  SqlBeanUtil.getColumnByField(idField);
         if (ids.length > 1) {
-            select.where().in(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), idField, sqlTable), ids);
+            select.where().in(column, ids);
         } else {
-            select.where().eq(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), idField, sqlTable), ids[0]);
+            select.where().eq(column, ids[0]);
         }
         return SqlHelper.buildSelectSql(select);
     }

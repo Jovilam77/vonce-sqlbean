@@ -223,10 +223,12 @@ public class SqlBeanUtil {
     public static String getTableFieldFullName(Common common, String tableAlias, String tableFieldName) {
         String escape = getEscape(common);
         StringBuffer fullName = new StringBuffer();
-        fullName.append(escape);
-        fullName.append(tableAlias);
-        fullName.append(escape);
-        fullName.append(SqlConstant.POINT);
+        if (StringUtil.isNotEmpty(tableAlias)) {
+            fullName.append(escape);
+            fullName.append(tableAlias);
+            fullName.append(escape);
+            fullName.append(SqlConstant.POINT);
+        }
         fullName.append(escape);
         fullName.append(SqlBeanUtil.isToUpperCase(common) ? tableFieldName.toUpperCase() : tableFieldName);
         fullName.append(escape);
@@ -1458,8 +1460,8 @@ public class SqlBeanUtil {
      * @return Column
      */
     public static Column getColumnByField(Field field) {
-        SqlTable sqlTable = SqlBeanUtil.getSqlTable(field.getDeclaringClass());
-        return new Column(sqlTable.alias(), SqlBeanUtil.getTableFieldName(field, sqlTable), "");
+        Table table = SqlBeanUtil.getTable(field.getDeclaringClass());
+        return new Column(table.getAlias(), SqlBeanUtil.getTableFieldName(field, SqlBeanUtil.getSqlTable(field.getDeclaringClass())), "");
     }
 
     /**
