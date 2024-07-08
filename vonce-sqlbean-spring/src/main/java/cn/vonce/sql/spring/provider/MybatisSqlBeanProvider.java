@@ -266,7 +266,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String insert(Map<String, Object> map) {
-        return SqlBeanProvider.insertBeanSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("insert"));
+        return SqlBeanProvider.insertSql((SqlBeanDB) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Insert) map.get("insert"));
     }
 
     /**

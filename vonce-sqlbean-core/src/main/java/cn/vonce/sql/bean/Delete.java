@@ -13,9 +13,9 @@ import java.io.Serializable;
 public class Delete extends CommonCondition<Delete> implements Serializable {
 
     /**
-     * 是否为逻辑删除
+     * 是否为逻辑删除(优先走逻辑删除,该属性为true且实体类存在有@SqlLogically注解才走逻辑删除)
      */
-    private boolean logicallyDelete = false;
+    private boolean logicallyDelete = true;
 
     public Delete() {
         super();

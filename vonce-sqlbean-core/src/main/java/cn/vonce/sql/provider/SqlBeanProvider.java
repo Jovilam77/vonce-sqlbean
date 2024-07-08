@@ -64,7 +64,7 @@ public class SqlBeanProvider {
             e.printStackTrace();
             return null;
         }
-        Column column =  SqlBeanUtil.getColumnByField(idField);
+        Column column = SqlBeanUtil.getColumnByField(idField, clazz);
         if (ids.length > 1) {
             select.where().in(column, ids);
         } else {
@@ -248,7 +248,7 @@ public class SqlBeanProvider {
      */
     public static String deleteSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Delete delete, boolean ignore) {
         //如果是逻辑删除那么将Delete对象转为Update对象
-        if (delete.isLogicallyDelete()) {
+        if (delete.isLogicallyDelete() && SqlBeanUtil.checkLogically(clazz)) {
             Update<Object> update = new Update();
             update.setSqlBeanDB(sqlBeanDB);
             update.setTable(clazz);

@@ -363,7 +363,6 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Override
     public int deleteBy(Wrapper wrapper) {
         Delete delete = new Delete();
-        delete.setLogicallyDelete(SqlBeanUtil.checkLogically(clazz));
         delete.where(wrapper);
         return mybatisSqlBeanDao.delete(getSqlBeanDB(), clazz, delete, false);
     }
@@ -512,13 +511,13 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBean(T bean, String where) {
-        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, true, false, null, null);
+        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, true, false, where, null);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String where) {
-        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, null, null);
+        return mybatisSqlBeanDao.updateByBean(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, where, null);
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -566,7 +565,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Override
     public int insert(Insert<T> insert) {
         int count = mybatisSqlBeanDao.insert(getSqlBeanDB(), clazz, insert);
-        super.setAutoIncrId(clazz, insert.getInsertBean());
+        super.setAutoIncrId(clazz, insert.getBean());
         return count;
     }
 

@@ -1467,6 +1467,17 @@ public class SqlBeanUtil {
     /**
      * 获取列字段对象
      *
+     * @param field
+     * @return Column
+     */
+    public static Column getColumnByField(Field field, Class<?> clazz) {
+        Table table = SqlBeanUtil.getTable(field.getDeclaringClass());
+        return new Column(table.getAlias(), SqlBeanUtil.getTableFieldName(field, SqlBeanUtil.getSqlTable(field.getDeclaringClass())), "");
+    }
+
+    /**
+     * 获取列字段对象
+     *
      * @param lambda
      * @return Column
      */

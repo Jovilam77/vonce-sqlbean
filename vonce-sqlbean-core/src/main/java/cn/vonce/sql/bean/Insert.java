@@ -93,7 +93,7 @@ public class Insert<T> extends Common implements Serializable {
             if (fieldList != null && fieldList.size() > 0) {
                 columnList.clear();
                 for (Field field : fieldList) {
-                    columnList.add(SqlBeanUtil.getColumnByField(field));
+                    columnList.add(SqlBeanUtil.getColumnByField(field, clazz));
                 }
             }
         }

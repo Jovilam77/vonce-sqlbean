@@ -357,7 +357,6 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @Override
     public int deleteBy(Wrapper wrapper) {
         Delete delete = new Delete();
-        delete.setLogicallyDelete(SqlBeanUtil.checkLogically(clazz));
         delete.where(wrapper);
         return jdbcTemplate.update(SqlBeanProvider.deleteSql(getSqlBeanDB(), clazz, delete, false));
     }
@@ -559,7 +558,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @Override
     public int insert(Insert insert) {
         int count = jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), clazz, insert));
-        super.setAutoIncrId(clazz, insert.getInsertBean());
+        super.setAutoIncrId(clazz, insert.getBean());
         return count;
     }
 
