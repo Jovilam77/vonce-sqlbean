@@ -119,7 +119,7 @@
 
     <groupId>cn.vonce</groupId>
     <artifactId>vonce-sqlbean-core</artifactId>
-    <version>1.2.0-beta26</version>
+    <version>1.3.0-beta1</version>
 
     <!-- 版本信息 -->
     <properties>
@@ -132,6 +132,11 @@
             <artifactId>reflectasm</artifactId>
             <version>${com.esotericsoftware.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.javaparser</groupId>
+            <artifactId>javaparser-core</artifactId>
+            <version>3.26.1</version>
         </dependency>
     </dependencies>
 
