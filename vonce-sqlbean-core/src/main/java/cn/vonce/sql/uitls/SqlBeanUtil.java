@@ -358,7 +358,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static ColumnInfo buildColumnInfo(SqlBeanDB sqlBeanDB, Field field) {
-        return buildColumnInfo(sqlBeanDB, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class));
+        return buildColumnInfo(sqlBeanDB, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class), field.getDeclaringClass());
     }
 
     /**
@@ -368,9 +368,10 @@ public class SqlBeanUtil {
      * @param field
      * @param sqlTable
      * @param sqlColumn
+     * @param constantClass
      * @return
      */
-    public static ColumnInfo buildColumnInfo(SqlBeanDB sqlBeanDB, Field field, SqlTable sqlTable, SqlColumn sqlColumn) {
+    public static ColumnInfo buildColumnInfo(SqlBeanDB sqlBeanDB, Field field, SqlTable sqlTable, SqlColumn sqlColumn, Class constantClass) {
         String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
         ColumnInfo columnInfo = new ColumnInfo();
         columnInfo.setName(SqlBeanUtil.isToUpperCase(sqlBeanDB) ? columnName.toUpperCase() : columnName);
@@ -409,7 +410,7 @@ public class SqlBeanUtil {
         if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.remarks())) {
             columnInfo.setRemarks(sqlColumn.remarks());
         } else {
-            columnInfo.setRemarks("");
+            columnInfo.setRemarks(SqlBeanUtil.getFiledRemarks(constantClass, columnInfo.getName()));
         }
         return columnInfo;
     }
@@ -1611,5 +1612,65 @@ public class SqlBeanUtil {
         }
         return null;
     }
+
+    /**
+     * 获得实体类对应的常量类
+     *
+     * @param clazz
+     * @return
+     * @throws ClassNotFoundException
+     */
+    public static Class getConstantClass(Class<?> clazz) {
+        String name = clazz.getName();
+        String constantClassName = name.substring(0, name.indexOf(clazz.getSimpleName())) + "sql." + clazz.getSimpleName() + "$";
+        try {
+            return Class.forName(constantClassName);
+        } catch (ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * 获取实体类常量类中的备注
+     *
+     * @param constantClass
+     * @return
+     */
+    public static String getBeanRemarks(Class constantClass) {
+        if (constantClass == null) {
+            return "";
+        }
+        try {
+            return (String) constantClass.getField("_remarks").get(null);
+        } catch (IllegalAccessException e) {
+            System.out.println(e.getMessage());
+        } catch (NoSuchFieldException e) {
+            System.out.println(e.getMessage());
+        }
+        return "";
+    }
+
+    /**
+     * 获取实体类常量类中的字段备注
+     *
+     * @param constantClass
+     * @param fieldName
+     * @return
+     */
+    public static String getFiledRemarks(Class<?> constantClass, String fieldName) {
+        if (constantClass == null || StringUtil.isEmpty(fieldName)) {
+            return "";
+        }
+        try {
+            return ((Column) constantClass.getField(fieldName + "$").get(null)).getRemarks();
+        } catch (IllegalAccessException e) {
+            System.out.println(e.getMessage());
+        } catch (NoSuchFieldException e) {
+            System.out.println(e.getMessage());
+        }
+        return "";
+    }
+
 
 }

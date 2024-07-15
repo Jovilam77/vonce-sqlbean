@@ -653,6 +653,7 @@ public class SqlBeanProvider {
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
         fieldList = fieldList.stream().filter(item -> !SqlBeanUtil.isIgnore(item)).collect(Collectors.toList());
         List<Alter> alterList = new ArrayList<>();
+        Class constantClass = SqlBeanUtil.getConstantClass(clazz);
         for (int i = 0; i < fieldList.size(); i++) {
             Field field = fieldList.get(i);
             if (SqlBeanUtil.isIgnore(field)) {
@@ -664,7 +665,7 @@ public class SqlBeanProvider {
             alter.setSqlBeanDB(sqlBeanDB);
             alter.setTable(clazz);
             String oldName = sqlColumn == null ? "" : (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) ? sqlColumn.oldName().toUpperCase() : sqlColumn.oldName();
-            ColumnInfo columnInfo = SqlBeanUtil.buildColumnInfo(alter.getSqlBeanDB(), field, sqlTable, sqlColumn);
+            ColumnInfo columnInfo = SqlBeanUtil.buildColumnInfo(alter.getSqlBeanDB(), field, sqlTable, sqlColumn, constantClass);
             boolean exist = false;
 
             //优先比较字段改名的

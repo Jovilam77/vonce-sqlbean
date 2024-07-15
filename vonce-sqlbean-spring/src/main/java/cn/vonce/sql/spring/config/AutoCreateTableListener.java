@@ -93,9 +93,14 @@ public class AutoCreateTableListener implements ApplicationListener<ContextRefre
                         for (TableInfo tableInfo : tableList) {
                             if (tableInfo.getName().equalsIgnoreCase(table.getName())) {
                                 isExist = true;
+                                String remarks = sqlTable.remarks();
+                                //如果没有设置表注释，则从类上获取
+                                if (StringUtil.isEmpty(remarks)) {
+                                    remarks = SqlBeanUtil.getBeanRemarks(SqlBeanUtil.getConstantClass(clazz));
+                                }
                                 //表注释不一致
-                                if (sqlTable.autoAlter() && !sqlTable.remarks().equals(tableInfo.getRemarks())) {
-                                    ((AdvancedDbManageService) sqlBeanService).alterRemarks(sqlTable.remarks());
+                                if (sqlTable.autoAlter() && !remarks.equals(tableInfo.getRemarks())) {
+                                    ((AdvancedDbManageService) sqlBeanService).alterRemarks(remarks);
                                 }
                                 break;
                             }

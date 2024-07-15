@@ -2,6 +2,7 @@ package cn.vonce.sql.processor;
 
 import cn.vonce.sql.annotation.SqlColumn;
 import cn.vonce.sql.annotation.SqlTable;
+import cn.vonce.sql.uitls.JavaParserUtil;
 import cn.vonce.sql.uitls.StringUtil;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
@@ -9,8 +10,6 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.comments.Comment;
-
 import javax.annotation.processing.*;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
@@ -81,7 +80,7 @@ public class SqlConstantProcessor extends AbstractProcessor {
                         JavaFileObject fileObject = filer.createSourceFile(packageName + "." + className, enclosingElement);
                         Writer writer = fileObject.openWriter();
                         //写入java代码
-                        writer.write(buildCode(element, subElementList, sqlTable, packageName, className).toString());
+                        writer.write(this.buildCode(element, subElementList, sqlTable, packageName, className).toString());
                         writer.flush();
                         writer.close();
                     } catch (IOException e) {
@@ -98,20 +97,18 @@ public class SqlConstantProcessor extends AbstractProcessor {
     private StringBuffer buildCode(Element element, List<Element> subElementList, SqlTable sqlTable, String packageName, String className) {
         StringBuffer code = new StringBuffer();
         try {
+            //获取源码根目录
             URL url = getClass().getClassLoader().getResource("");
-            System.out.println("url: " + url);
-            String sourceRoot = url.getPath().substring(1, url.getPath().lastIndexOf("/target/classes/"));
-            System.out.println("sourceRoot: " + sourceRoot);
-            JavaParser javaParser = new JavaParser();
-            ParseResult<CompilationUnit> result = null;
-
-            String javaFilePath = sourceRoot + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + ((PackageElement) element.getEnclosingElement()).getQualifiedName().toString().replace(".", File.separator) + File.separator + element.getSimpleName().toString() + ".java";
-            System.out.println("javaFilePath: " + javaFilePath);
-            result = javaParser.parse(new File(javaFilePath));
-            CompilationUnit cu = result.getResult().get();
-            NodeList<TypeDeclaration<?>> typeDeclarations = cu.getTypes();
-            TypeDeclaration typeDeclaration = typeDeclarations.get(0);
-            System.out.println("Class Comment:" + typeDeclaration.getComment().get().getContent());
+            String sourceRoot = url.getPath().substring(1, url.getPath().lastIndexOf("/target/classes/")) + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator;
+            String javaFilePath = sourceRoot + ((PackageElement) element.getEnclosingElement()).getQualifiedName().toString().replace(".", File.separator) + File.separator + element.getSimpleName().toString() + ".java";
+            //获取编译单元
+            CompilationUnit compilationUnit = this.getCompilationUnit(javaFilePath);
+            TypeDeclaration typeDeclaration = null;
+            List<FieldDeclaration> fieldDeclarationList = null;
+            if (compilationUnit != null && compilationUnit.getTypes() != null && compilationUnit.getTypes().size() > 0) {
+                NodeList<TypeDeclaration<?>> typeDeclarations = compilationUnit.getTypes();
+                typeDeclaration = typeDeclarations.get(0);
+            }
             String schema = "";
             String tableName = element.getSimpleName().toString();
             String tableAlias = "";
@@ -130,24 +127,22 @@ public class SqlConstantProcessor extends AbstractProcessor {
             code.append(String.format("\tpublic static final String _schema = \"%s\";\n", schema));
             code.append(String.format("\tpublic static final String _tableName = \"%s\";\n", tableName));
             code.append(String.format("\tpublic static final String _tableAlias = \"%s\";\n", tableAlias));
+            if (typeDeclaration != null) {
+                code.append(String.format("\tpublic static final String _remarks = \"%s\";\n", JavaParserUtil.getCommentContent(typeDeclaration.getComment().get().getContent())));
+                fieldDeclarationList = JavaParserUtil.getAllFieldDeclaration(sourceRoot, compilationUnit, typeDeclaration);
+            }
             code.append(String.format("\tpublic static final String _all = \"%s.*\";\n", tableAlias));
             code.append("\tpublic static final String _count = \"COUNT(*)\";\n");
 
+            //遍历所有字段
             for (Element subElement : subElementList) {
-                String sqlFieldName = subElement.getSimpleName().toString();
-                System.out.println("sqlFieldName: " + sqlFieldName);
-                Optional<FieldDeclaration> fieldDeclarationOptional = typeDeclaration.getFieldByName(sqlFieldName);
-                if (fieldDeclarationOptional != null && fieldDeclarationOptional.isPresent()) {
-                    Optional<Comment> commentOptional = fieldDeclarationOptional.get().getComment();
-                    if (commentOptional != null && commentOptional.isPresent()) {
-                        System.out.println("Field Comment:" + commentOptional.get().getContent());
-                    }
-                }
                 SqlColumn sqlColumn = subElement.getAnnotation(SqlColumn.class);
                 //不存在数据库的字段跳过
                 if (sqlColumn != null && sqlColumn.ignore()) {
                     continue;
                 }
+                String sqlFieldName = subElement.getSimpleName().toString();
+                String sqlFieldRemarks = JavaParserUtil.getFieldCommentContent(sqlFieldName, fieldDeclarationList);
                 if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.value())) {
                     sqlFieldName = sqlColumn.value();
                 } else {
@@ -156,7 +151,7 @@ public class SqlConstantProcessor extends AbstractProcessor {
                     }
                 }
                 code.append(String.format("\tpublic static final String %s = \"%s\";\n", sqlFieldName, sqlFieldName));
-                code.append(String.format("\tpublic static final Column %s$ = new Column(true,_tableAlias,%s,\"\");\n", sqlFieldName, sqlFieldName));
+                code.append(String.format("\tpublic static final Column %s$ = new Column(true,_tableAlias,%s,\"\",\"%s\");\n", sqlFieldName, sqlFieldName,sqlFieldRemarks));
             }
 
             code.append("\n}");
@@ -164,6 +159,16 @@ public class SqlConstantProcessor extends AbstractProcessor {
             System.out.println("error:" + e.getMessage());
         }
         return code;
+    }
+
+    private CompilationUnit getCompilationUnit(String javaFilePath) throws FileNotFoundException {
+        JavaParser javaParser = new JavaParser();
+        ParseResult<CompilationUnit> result = javaParser.parse(new File(javaFilePath));
+        Optional<CompilationUnit> compilationUnitOptional = result.getResult();
+        if (compilationUnitOptional.isPresent()) {
+            return compilationUnitOptional.get();
+        }
+        return null;
     }
 
 }

@@ -185,12 +185,18 @@ public class SqlHelper {
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(create.getBeanClass());
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(create.getBeanClass());
         DbType dbType = create.getSqlBeanDB().getDbType();
+        Class constantClass = SqlBeanUtil.getConstantClass(create.getBeanClass());
+        String remarks = sqlTable.remarks();
+        //如果没有设置表注释，则从类上获取
+        if (StringUtil.isEmpty(remarks)) {
+            remarks = SqlBeanUtil.getBeanRemarks(constantClass);
+        }
         for (int i = 0; i < fieldList.size(); i++) {
             if (SqlBeanUtil.isIgnore(fieldList.get(i))) {
                 continue;
             }
             SqlColumn sqlColumn = fieldList.get(i).getAnnotation(SqlColumn.class);
-            sqlSb.append(SqlBeanUtil.addColumn(create, SqlBeanUtil.buildColumnInfo(create.getSqlBeanDB(), fieldList.get(i), sqlTable, sqlColumn), null));
+            sqlSb.append(SqlBeanUtil.addColumn(create, SqlBeanUtil.buildColumnInfo(create.getSqlBeanDB(), fieldList.get(i), sqlTable, sqlColumn, constantClass), null));
             sqlSb.append(SqlConstant.COMMA);
         }
         Field idField = SqlBeanUtil.getIdField(create.getBeanClass());
@@ -206,12 +212,12 @@ public class SqlHelper {
         }
         sqlSb.append(SqlConstant.END_BRACKET);
         //如果是Mysql或MariaDB可直接保存备注
-        if (sqlTable != null && StringUtil.isNotBlank(sqlTable.remarks()) && (dbType == DbType.MySQL || dbType == DbType.MariaDB)) {
+        if (StringUtil.isNotBlank(remarks) && (dbType == DbType.MySQL || dbType == DbType.MariaDB)) {
             sqlSb.append(SqlConstant.SPACES);
             sqlSb.append(SqlConstant.COMMENT);
             sqlSb.append(SqlConstant.EQUAL_TO);
             sqlSb.append(SqlConstant.SINGLE_QUOTATION_MARK);
-            sqlSb.append(sqlTable.remarks());
+            sqlSb.append(remarks);
             sqlSb.append(SqlConstant.SINGLE_QUOTATION_MARK);
         }
         return sqlSb.toString();
