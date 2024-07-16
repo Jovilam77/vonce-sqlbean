@@ -223,11 +223,11 @@ public interface DbManageService<T> {
     /**
      * 更改表结构
      *
-     * @param table          表对象
+     * @param clazz          实体类
      * @param columnInfoList 列表信息列表
      * @return
      */
-    int alter(Table table, List<ColumnInfo> columnInfoList);
+    int alter(Class clazz, List<ColumnInfo> columnInfoList);
 
     /**
      * 更改表结构

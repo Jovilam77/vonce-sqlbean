@@ -2,10 +2,10 @@ package cn.vonce.sql.uitls;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjusters;
+//import java.time.*;
+//import java.time.format.DateTimeFormatter;
+//import java.time.temporal.ChronoUnit;
+//import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 /**
@@ -14,8 +14,8 @@ import java.util.*;
 
 public class DateUtil {
 
-    public static final DateTimeFormatter FORMATTER_FULL = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("+8"));
-    public static final DateTimeFormatter DATE_STR = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.of("+8"));
+//    public static final DateTimeFormatter FORMATTER_FULL = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("+8"));
+//    public static final DateTimeFormatter DATE_STR = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.of("+8"));
 
     /**
      * 获取时间间隔(用于显示动态)
@@ -152,112 +152,112 @@ public class DateUtil {
         }
     }
 
-    /**
-     * 将字符串 转成 LocalDateTime 示例："2016-04-04 11:50:53"
-     *
-     * @param dateTime 时间
-     * @return LocalDateTime
-     */
-    public static LocalDateTime strTimeToLocalDateTime(String dateTime) {
-        return LocalDateTime.parse(dateTime, FORMATTER_FULL);
-    }
-
-    /**
-     * 将字符串 转成 LocalDateTime 示例："2016-04-04 11:50:53"
-     *
-     * @param dateTime          时间
-     * @param dateTimeFormatter 格式化
-     * @return LocalDateTime
-     */
-    public static LocalDateTime strTimeToLocalDateTime(String dateTime, DateTimeFormatter dateTimeFormatter) {
-        return LocalDateTime.parse(dateTime, dateTimeFormatter);
-    }
-
-    /**
-     * date 转成 LocalDateTime
-     *
-     * @param date 日期
-     */
-    public static LocalDateTime dateToLocalDateTime(Date date) {
-        if (date == null) {
-            return null;
-        }
-        Instant instant = date.toInstant();
-        ZoneId zone = ZoneId.systemDefault();
-        return LocalDateTime.ofInstant(instant, zone);
-    }
-
-    /**
-     * date 转成 LocalDate
-     *
-     * @param date 日期
-     */
-    public static LocalDate dateToLocalDate(Date date) {
-        if (date == null) {
-            return null;
-        }
-        Instant instant = date.toInstant();
-        ZoneId zone = ZoneId.systemDefault();
-        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
-        return localDateTime.toLocalDate();
-    }
-
-    /**
-     * date 转成 LocalTime
-     *
-     * @param date 日期
-     */
-    public static LocalTime dateToLocalTime(Date date) {
-        if (date == null) {
-            return null;
-        }
-        Instant instant = date.toInstant();
-        ZoneId zone = ZoneId.systemDefault();
-        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
-        return localDateTime.toLocalTime();
-    }
-
-    /**
-     * LocalDateTime 转成 Date
-     *
-     * @param localDateTime 时间
-     * @return 结果集
-     */
-    public static Date localDateTimeToDate(LocalDateTime localDateTime) {
-        if (localDateTime == null) {
-            return null;
-        }
-        ZoneId zone = ZoneId.systemDefault();
-        Instant instant = localDateTime.atZone(zone).toInstant();
-        return Date.from(instant);
-    }
-
-    /**
-     * localDate 转成 Date
-     *
-     * @param localDate 结果集
-     */
-    public static Date localDateToDate(LocalDate localDate) {
-        if (localDate == null) {
-            return null;
-        }
-        ZoneId zone = ZoneId.systemDefault();
-        Instant instant = localDate.atStartOfDay().atZone(zone).toInstant();
-        return Date.from(instant);
-    }
-
-    /**
-     * LocalTime 转成 Date
-     *
-     * @param localTime 本地时间
-     * @param localDate 时间
-     */
-    public static Date localTimeToDate(LocalTime localTime, LocalDate localDate) {
-        LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
-        ZoneId zone = ZoneId.systemDefault();
-        Instant instant = localDateTime.atZone(zone).toInstant();
-        return Date.from(instant);
-    }
+//    /**
+//     * 将字符串 转成 LocalDateTime 示例："2016-04-04 11:50:53"
+//     *
+//     * @param dateTime 时间
+//     * @return LocalDateTime
+//     */
+//    public static LocalDateTime strTimeToLocalDateTime(String dateTime) {
+//        return LocalDateTime.parse(dateTime, FORMATTER_FULL);
+//    }
+//
+//    /**
+//     * 将字符串 转成 LocalDateTime 示例："2016-04-04 11:50:53"
+//     *
+//     * @param dateTime          时间
+//     * @param dateTimeFormatter 格式化
+//     * @return LocalDateTime
+//     */
+//    public static LocalDateTime strTimeToLocalDateTime(String dateTime, DateTimeFormatter dateTimeFormatter) {
+//        return LocalDateTime.parse(dateTime, dateTimeFormatter);
+//    }
+//
+//    /**
+//     * date 转成 LocalDateTime
+//     *
+//     * @param date 日期
+//     */
+//    public static LocalDateTime dateToLocalDateTime(Date date) {
+//        if (date == null) {
+//            return null;
+//        }
+//        Instant instant = date.toInstant();
+//        ZoneId zone = ZoneId.systemDefault();
+//        return LocalDateTime.ofInstant(instant, zone);
+//    }
+//
+//    /**
+//     * date 转成 LocalDate
+//     *
+//     * @param date 日期
+//     */
+//    public static LocalDate dateToLocalDate(Date date) {
+//        if (date == null) {
+//            return null;
+//        }
+//        Instant instant = date.toInstant();
+//        ZoneId zone = ZoneId.systemDefault();
+//        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
+//        return localDateTime.toLocalDate();
+//    }
+//
+//    /**
+//     * date 转成 LocalTime
+//     *
+//     * @param date 日期
+//     */
+//    public static LocalTime dateToLocalTime(Date date) {
+//        if (date == null) {
+//            return null;
+//        }
+//        Instant instant = date.toInstant();
+//        ZoneId zone = ZoneId.systemDefault();
+//        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
+//        return localDateTime.toLocalTime();
+//    }
+//
+//    /**
+//     * LocalDateTime 转成 Date
+//     *
+//     * @param localDateTime 时间
+//     * @return 结果集
+//     */
+//    public static Date localDateTimeToDate(LocalDateTime localDateTime) {
+//        if (localDateTime == null) {
+//            return null;
+//        }
+//        ZoneId zone = ZoneId.systemDefault();
+//        Instant instant = localDateTime.atZone(zone).toInstant();
+//        return Date.from(instant);
+//    }
+//
+//    /**
+//     * localDate 转成 Date
+//     *
+//     * @param localDate 结果集
+//     */
+//    public static Date localDateToDate(LocalDate localDate) {
+//        if (localDate == null) {
+//            return null;
+//        }
+//        ZoneId zone = ZoneId.systemDefault();
+//        Instant instant = localDate.atStartOfDay().atZone(zone).toInstant();
+//        return Date.from(instant);
+//    }
+//
+//    /**
+//     * LocalTime 转成 Date
+//     *
+//     * @param localTime 本地时间
+//     * @param localDate 时间
+//     */
+//    public static Date localTimeToDate(LocalTime localTime, LocalDate localDate) {
+//        LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
+//        ZoneId zone = ZoneId.systemDefault();
+//        Instant instant = localDateTime.atZone(zone).toInstant();
+//        return Date.from(instant);
+//    }
 
     /**
      * 日期转字符串 支持Jdk8之前日期及Jdk8+的日期
@@ -269,13 +269,13 @@ public class DateUtil {
         if (date == null) {
             return null;
         }
-        if (date instanceof LocalDateTime) {
+        /*if (date instanceof LocalDateTime) {
             return ((LocalDateTime) date).format(FORMATTER_FULL);
         } else if (date instanceof LocalDate) {
             return ((LocalDate) date).format(DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.of("+8")));
         } else if (date instanceof LocalTime) {
             return ((LocalTime) date).format(DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.of("+8")));
-        } else if (date instanceof Date || date instanceof java.sql.Date || date instanceof java.sql.Timestamp || date instanceof java.sql.Time) {
+        } else */if (date instanceof Date || date instanceof java.sql.Date || date instanceof java.sql.Timestamp || date instanceof java.sql.Time) {
             return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
         }
         return null;
@@ -292,99 +292,99 @@ public class DateUtil {
         if (date == null) {
             return null;
         }
-        if (date instanceof LocalDateTime) {
+        /*if (date instanceof LocalDateTime) {
             return ((LocalDateTime) date).format(DateTimeFormatter.ofPattern(format).withZone(ZoneId.of("+8")));
         } else if (date instanceof LocalDate) {
             return ((LocalDate) date).format(DateTimeFormatter.ofPattern(format).withZone(ZoneId.of("+8")));
         } else if (date instanceof LocalTime) {
             return ((LocalTime) date).format(DateTimeFormatter.ofPattern(format).withZone(ZoneId.of("+8")));
-        } else if (date instanceof Date || date instanceof java.sql.Date || date instanceof java.sql.Timestamp || date instanceof java.sql.Time) {
+        } else */if (date instanceof Date || date instanceof java.sql.Date || date instanceof java.sql.Timestamp || date instanceof java.sql.Time) {
             return new SimpleDateFormat(format).format(date);
         }
         return null;
     }
 
 
-    /**
-     * 获取前一个月的第一天的时间
-     *
-     * @return 几号
-     */
-    public Integer getLastMonthEndDay() {
-        LocalDate with = LocalDate.now().plusMonths(-1).with(TemporalAdjusters.firstDayOfMonth());
-        return with.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
-    }
-
-    /**
-     * 获取后一个月的第一天的时间
-     *
-     * @return 几号
-     */
-    public static Integer getNextMonthEndDay() {
-        LocalDate with = LocalDate.now().plusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
-        return with.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
-    }
-
-    /**
-     * 获取日历表
-     *
-     * @param index -1表示上月 0表示当月 1表示下月
-     * @return 结果集
-     */
-    public static List<String[]> getCalendarTable(Integer index) {
-        // 根据输入确定月份
-        LocalDate months = LocalDate.now().plusMonths(index);
-        // 获取当前月的第一天
-        LocalDate currentMonthFirstDay = months.with(TemporalAdjusters.firstDayOfMonth());
-        // 获取当前月的最后一天
-        LocalDate currentMonthEndDay = months.with(TemporalAdjusters.lastDayOfMonth());
-        // 获取一个月多少 //当月的天数
-        int days = LocalDate.now().lengthOfMonth();
-        // 获取周几
-        int dayOfWeek = currentMonthFirstDay.getDayOfWeek().getValue();
-        // 获取日历第一天
-        LocalDate calendarFirstDay = months.minus(dayOfWeek - 1, ChronoUnit.DAYS);
-        // 获取日历最后一天
-        LocalDate calendarEndDay = currentMonthEndDay.plus(42 - days - (dayOfWeek - 1), ChronoUnit.DAYS);
-        List<String[]> localDateList = new ArrayList<>();
-        long length = calendarEndDay.toEpochDay() - calendarFirstDay.toEpochDay();
-        String[] dataCalendarDTO;
-        for (long i = length; i >= 0; i--) {
-            dataCalendarDTO = new String[2];
-            // 当前日期
-            LocalDate localDate = calendarEndDay.minusDays(i);
-            dataCalendarDTO[0] = localDate.format(DATE_STR);
-            // 周几
-            dataCalendarDTO[1] = localDate.getDayOfWeek().getValue() + "";
-            localDateList.add(dataCalendarDTO);
-        }
-        return localDateList;
-    }
-
-    /**
-     * @param begin 开始日期
-     * @param end   结束日期
-     * @return 开始与结束之间的所以日期，包括起止
-     */
-    public static List<LocalDate> getMiddleAllDate(LocalDate begin, LocalDate end) {
-        List<LocalDate> localDateList = new ArrayList<>();
-        long length = end.toEpochDay() - begin.toEpochDay();
-        for (long i = length; i >= 0; i--) {
-            localDateList.add(end.minusDays(i));
-        }
-        return localDateList;
-    }
-
-    /**
-     * 获取前几天或者后几天的时间
-     *
-     * @param offSet     负数代表前几天
-     * @param timeFormat 时间格式化类型
-     * @return 格式化后的结果
-     */
-    public static String getYesterdayByFormat(Integer offSet, String timeFormat) {
-        return LocalDateTime.now().plusDays(offSet).format(DateTimeFormatter.ofPattern(timeFormat));
-    }
+//    /**
+//     * 获取前一个月的第一天的时间
+//     *
+//     * @return 几号
+//     */
+//    public Integer getLastMonthEndDay() {
+//        LocalDate with = LocalDate.now().plusMonths(-1).with(TemporalAdjusters.firstDayOfMonth());
+//        return with.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
+//    }
+//
+//    /**
+//     * 获取后一个月的第一天的时间
+//     *
+//     * @return 几号
+//     */
+//    public static Integer getNextMonthEndDay() {
+//        LocalDate with = LocalDate.now().plusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
+//        return with.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
+//    }
+//
+//    /**
+//     * 获取日历表
+//     *
+//     * @param index -1表示上月 0表示当月 1表示下月
+//     * @return 结果集
+//     */
+//    public static List<String[]> getCalendarTable(Integer index) {
+//        // 根据输入确定月份
+//        LocalDate months = LocalDate.now().plusMonths(index);
+//        // 获取当前月的第一天
+//        LocalDate currentMonthFirstDay = months.with(TemporalAdjusters.firstDayOfMonth());
+//        // 获取当前月的最后一天
+//        LocalDate currentMonthEndDay = months.with(TemporalAdjusters.lastDayOfMonth());
+//        // 获取一个月多少 //当月的天数
+//        int days = LocalDate.now().lengthOfMonth();
+//        // 获取周几
+//        int dayOfWeek = currentMonthFirstDay.getDayOfWeek().getValue();
+//        // 获取日历第一天
+//        LocalDate calendarFirstDay = months.minus(dayOfWeek - 1, ChronoUnit.DAYS);
+//        // 获取日历最后一天
+//        LocalDate calendarEndDay = currentMonthEndDay.plus(42 - days - (dayOfWeek - 1), ChronoUnit.DAYS);
+//        List<String[]> localDateList = new ArrayList<>();
+//        long length = calendarEndDay.toEpochDay() - calendarFirstDay.toEpochDay();
+//        String[] dataCalendarDTO;
+//        for (long i = length; i >= 0; i--) {
+//            dataCalendarDTO = new String[2];
+//            // 当前日期
+//            LocalDate localDate = calendarEndDay.minusDays(i);
+//            dataCalendarDTO[0] = localDate.format(DATE_STR);
+//            // 周几
+//            dataCalendarDTO[1] = localDate.getDayOfWeek().getValue() + "";
+//            localDateList.add(dataCalendarDTO);
+//        }
+//        return localDateList;
+//    }
+//
+//    /**
+//     * @param begin 开始日期
+//     * @param end   结束日期
+//     * @return 开始与结束之间的所以日期，包括起止
+//     */
+//    public static List<LocalDate> getMiddleAllDate(LocalDate begin, LocalDate end) {
+//        List<LocalDate> localDateList = new ArrayList<>();
+//        long length = end.toEpochDay() - begin.toEpochDay();
+//        for (long i = length; i >= 0; i--) {
+//            localDateList.add(end.minusDays(i));
+//        }
+//        return localDateList;
+//    }
+//
+//    /**
+//     * 获取前几天或者后几天的时间
+//     *
+//     * @param offSet     负数代表前几天
+//     * @param timeFormat 时间格式化类型
+//     * @return 格式化后的结果
+//     */
+//    public static String getYesterdayByFormat(Integer offSet, String timeFormat) {
+//        return LocalDateTime.now().plusDays(offSet).format(DateTimeFormatter.ofPattern(timeFormat));
+//    }
 
     /**
      * 获取当前时间的这个周的周一

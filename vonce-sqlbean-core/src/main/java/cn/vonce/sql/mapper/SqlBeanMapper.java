@@ -163,15 +163,15 @@ public class SqlBeanMapper extends BaseMapper<ResultSet> {
                 case "java.sql.Timestamp":
                     value = resultSet.getTimestamp(fieldName);
                     break;
-                case "java.time.LocalDate":
-                    value = DateUtil.dateToLocalDate(resultSet.getTimestamp(fieldName));
-                    break;
-                case "java.time.LocalTime":
-                    value = DateUtil.dateToLocalTime(resultSet.getTimestamp(fieldName));
-                    break;
-                case "java.time.LocalDateTime":
-                    value = DateUtil.dateToLocalDateTime(resultSet.getTimestamp(fieldName));
-                    break;
+//                case "java.time.LocalDate":
+//                    value = DateUtil.dateToLocalDate(resultSet.getTimestamp(fieldName));
+//                    break;
+//                case "java.time.LocalTime":
+//                    value = DateUtil.dateToLocalTime(resultSet.getTimestamp(fieldName));
+//                    break;
+//                case "java.time.LocalDateTime":
+//                    value = DateUtil.dateToLocalDateTime(resultSet.getTimestamp(fieldName));
+//                    break;
                 case "java.math.BigDecimal":
                     value = resultSet.getBigDecimal(fieldName);
                     break;
