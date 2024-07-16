@@ -39,20 +39,22 @@ public class ReflectJdkUtil extends ReflectUtil {
     public Object newObject(Class<?> clazz) {
         Constructor constructor = constructorMap.get(clazz);
         Object object = null;
-        if (constructor == null) {
-            try {
+        try {
+            if (constructor == null) {
                 constructor = clazz.getDeclaredConstructor();
                 object = constructor.newInstance();
                 constructorMap.put(clazz, constructor);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
+            } else {
+                object = constructor.newInstance();
             }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
         }
         return object;
     }
