@@ -17,9 +17,9 @@ import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-//import java.time.LocalDate;
-//import java.time.LocalDateTime;
-//import java.time.LocalTime;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 /**
@@ -937,7 +937,7 @@ public class SqlBeanUtil {
             return WhatType.BOOL_TYPE;
         } else if (type == short.class || type == Short.class || type == int.class || type == Integer.class || type == long.class || type == Long.class || type == float.class || type == Float.class || type == double.class || type == Double.class) {
             return WhatType.VALUE_TYPE;
-        } else if (type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class /*|| type == LocalDate.class || type == LocalTime.class || type == LocalDateTime.class*/) {
+        } else if (type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class || type == LocalDate.class || type == LocalTime.class || type == LocalDateTime.class) {
             return WhatType.DATE_TYPE;
         }
         return WhatType.OBJECT_TYPE;
@@ -1000,7 +1000,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean isBaseType(Class<?> type) {
-        if (type == String.class || type == char.class || type == Character.class || type == boolean.class || type == Boolean.class || type == byte.class || type == Byte.class || type == short.class || type == Short.class || type == int.class || type == Integer.class || type == long.class || type == Long.class || type == float.class || type == Float.class || type == double.class || type == Double.class || type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class /*|| type == LocalDate.class || type == LocalTime.class || type == LocalDateTime.class*/ || type == BigDecimal.class) {
+        if (type == String.class || type == char.class || type == Character.class || type == boolean.class || type == Boolean.class || type == byte.class || type == Byte.class || type == short.class || type == Short.class || type == int.class || type == Integer.class || type == long.class || type == Long.class || type == float.class || type == Float.class || type == double.class || type == Double.class || type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class || type == LocalDate.class || type == LocalTime.class || type == LocalDateTime.class || type == BigDecimal.class) {
             return true;
         }
         return false;
@@ -1178,9 +1178,9 @@ public class SqlBeanUtil {
         if (type == Date.class || type == java.sql.Timestamp.class) {
             return new Date();
         }
-        /*if (type == LocalDateTime.class) {
+        if (type == LocalDateTime.class) {
             return LocalDateTime.now();
-        }*/
+        }
         return null;
     }
 
@@ -1191,7 +1191,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean versionEffectiveness(Class<?> type) {
-        if (type == int.class || type == Integer.class || type == long.class || type == Long.class || type == Date.class || type == java.sql.Timestamp.class /*|| type == LocalDateTime.class*/) {
+        if (type == int.class || type == Integer.class || type == long.class || type == Long.class || type == Date.class || type == java.sql.Timestamp.class || type == LocalDateTime.class) {
             return true;
         }
         return false;
@@ -1259,7 +1259,7 @@ public class SqlBeanUtil {
         if (type == BigDecimal.class) {
             return new BigDecimal(0);
         }
-        /*if (type == LocalDate.class) {
+        if (type == LocalDate.class) {
             return LocalDate.now();
         }
         if (type == LocalTime.class) {
@@ -1267,7 +1267,7 @@ public class SqlBeanUtil {
         }
         if (type == LocalDateTime.class) {
             return LocalDateTime.now();
-        }*/
+        }
         return null;
     }
 
@@ -1346,7 +1346,7 @@ public class SqlBeanUtil {
         if (type == BigDecimal.class) {
             return new BigDecimal(value.toString());
         }
-        /*if (type == LocalDate.class) {
+        if (type == LocalDate.class) {
             LocalDateTime localDateTime = DateUtil.strTimeToLocalDateTime(value.toString());
             return localDateTime == null ? null : localDateTime.toLocalDate();
         }
@@ -1356,7 +1356,7 @@ public class SqlBeanUtil {
         }
         if (type == LocalDateTime.class) {
             return DateUtil.strTimeToLocalDateTime(value.toString());
-        }*/
+        }
         return null;
     }
 
