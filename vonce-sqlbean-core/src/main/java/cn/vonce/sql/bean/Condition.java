@@ -1,9 +1,9 @@
 package cn.vonce.sql.bean;
 
-import cn.vonce.sql.define.ColumnFun;
+//import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.enumerate.SqlLogic;
 import cn.vonce.sql.enumerate.SqlOperator;
-import cn.vonce.sql.uitls.LambdaUtil;
+//import cn.vonce.sql.uitls.LambdaUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -98,29 +98,29 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 等于
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> eq(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.EQUAL_TO, value)));
-        return logic;
-    }
-
-    /**
-     * 等于
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, K, R> Logic<Action> eq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.EQUAL_TO, value)));
-        return logic;
-    }
+//    /**
+//     * 等于
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> eq(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.EQUAL_TO, value)));
+//        return logic;
+//    }
+//
+//    /**
+//     * 等于
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, K, R> Logic<Action> eq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.EQUAL_TO, value)));
+//        return logic;
+//    }
 
     /**
      * 不等于
@@ -159,29 +159,29 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 不等于
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> notEq(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_EQUAL_TO, value)));
-        return logic;
-    }
-
-    /**
-     * 不等于
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, K, R> Logic<Action> notEq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_EQUAL_TO, value)));
-        return logic;
-    }
+//    /**
+//     * 不等于
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> notEq(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_EQUAL_TO, value)));
+//        return logic;
+//    }
+//
+//    /**
+//     * 不等于
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, K, R> Logic<Action> notEq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_EQUAL_TO, value)));
+//        return logic;
+//    }
 
     /**
      * 小于
@@ -220,29 +220,29 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 小于
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> lt(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LESS_THAN, value)));
-        return logic;
-    }
-
-    /**
-     * 小于
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, K, R> Logic<Action> lt(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LESS_THAN, value)));
-        return logic;
-    }
+//    /**
+//     * 小于
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> lt(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LESS_THAN, value)));
+//        return logic;
+//    }
+//
+//    /**
+//     * 小于
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, K, R> Logic<Action> lt(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LESS_THAN, value)));
+//        return logic;
+//    }
 
     /**
      * 大于
@@ -281,29 +281,29 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 大于
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> gt(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.GREATER_THAN, value)));
-        return logic;
-    }
-
-    /**
-     * 大于
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, K, R> Logic<Action> gt(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.GREATER_THAN, value)));
-        return logic;
-    }
+//    /**
+//     * 大于
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> gt(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.GREATER_THAN, value)));
+//        return logic;
+//    }
+//
+//    /**
+//     * 大于
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, K, R> Logic<Action> gt(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.GREATER_THAN, value)));
+//        return logic;
+//    }
 
     /**
      * 小于等于
@@ -343,29 +343,29 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 小于等于
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> ltEq(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LESS_THAN_OR_EQUAL_TO, value)));
-        return logic;
-    }
-
-    /**
-     * 小于等于
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, K, R> Logic<Action> ltEq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LESS_THAN_OR_EQUAL_TO, value)));
-        return logic;
-    }
+//    /**
+//     * 小于等于
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> ltEq(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LESS_THAN_OR_EQUAL_TO, value)));
+//        return logic;
+//    }
+//
+//    /**
+//     * 小于等于
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, K, R> Logic<Action> ltEq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LESS_THAN_OR_EQUAL_TO, value)));
+//        return logic;
+//    }
 
     /**
      * 大于等于
@@ -404,29 +404,29 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 大于等于
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> gtEq(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.GREAT_THAN_OR_EQUAL_TO, value)));
-        return logic;
-    }
-
-    /**
-     * 大于等于
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, K, R> Logic<Action> gtEq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.GREAT_THAN_OR_EQUAL_TO, value)));
-        return logic;
-    }
+//    /**
+//     * 大于等于
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> gtEq(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.GREAT_THAN_OR_EQUAL_TO, value)));
+//        return logic;
+//    }
+//
+//    /**
+//     * 大于等于
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, K, R> Logic<Action> gtEq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.GREAT_THAN_OR_EQUAL_TO, value)));
+//        return logic;
+//    }
 
     /**
      * 全模糊 包含
@@ -466,17 +466,17 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 全模糊 包含
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> like(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LIKE, value)));
-        return logic;
-    }
+//    /**
+//     * 全模糊 包含
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> like(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LIKE, value)));
+//        return logic;
+//    }
 
     /**
      * 左模糊 包含
@@ -516,17 +516,17 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 左模糊 包含
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> likeL(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LIKE_L, value)));
-        return logic;
-    }
+//    /**
+//     * 左模糊 包含
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> likeL(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LIKE_L, value)));
+//        return logic;
+//    }
 
     /**
      * 右模糊 包含
@@ -566,17 +566,17 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 右模糊 包含
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> likeR(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LIKE_R, value)));
-        return logic;
-    }
+//    /**
+//     * 右模糊 包含
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> likeR(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LIKE_R, value)));
+//        return logic;
+//    }
 
     /**
      * 全模糊 不包含
@@ -615,17 +615,17 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 全模糊 不包含
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> notLike(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_LIKE, value)));
-        return logic;
-    }
+//    /**
+//     * 全模糊 不包含
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> notLike(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_LIKE, value)));
+//        return logic;
+//    }
 
     /**
      * 左模糊 不包含
@@ -664,17 +664,17 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 左模糊 不包含
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> notLikeL(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_LIKE_L, value)));
-        return logic;
-    }
+//    /**
+//     * 左模糊 不包含
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> notLikeL(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_LIKE_L, value)));
+//        return logic;
+//    }
 
     /**
      * 右模糊 不包含
@@ -713,17 +713,17 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 右模糊 不包含
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> notLikeR(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_LIKE_R, value)));
-        return logic;
-    }
+//    /**
+//     * 右模糊 不包含
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> notLikeR(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_LIKE_R, value)));
+//        return logic;
+//    }
 
     /**
      * 是
@@ -762,29 +762,29 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 是
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> is(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS, value)));
-        return logic;
-    }
+//    /**
+//     * 是
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> is(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS, value)));
+//        return logic;
+//    }
 
-    /**
-     * 是
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, K, R> Logic<Action> is(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS, value)));
-        return logic;
-    }
+//    /**
+//     * 是
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, K, R> Logic<Action> is(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS, value)));
+//        return logic;
+//    }
 
     /**
      * 不是
@@ -824,29 +824,29 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 不是
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> isNot(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS_NOT, value)));
-        return logic;
-    }
-
-    /**
-     * 不是
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, K, R> Logic<Action> isNot(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS_NOT, value)));
-        return logic;
-    }
+//    /**
+//     * 不是
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> isNot(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS_NOT, value)));
+//        return logic;
+//    }
+//
+//    /**
+//     * 不是
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, K, R> Logic<Action> isNot(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS_NOT, value)));
+//        return logic;
+//    }
 
     /**
      * 是null
@@ -882,16 +882,16 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 是null
-     *
-     * @param columnFun
-     * @return
-     */
-    public <T, R> Logic<Action> isNull(ColumnFun<T, R> columnFun) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS_NULL, null)));
-        return logic;
-    }
+//    /**
+//     * 是null
+//     *
+//     * @param columnFun
+//     * @return
+//     */
+//    public <T, R> Logic<Action> isNull(ColumnFun<T, R> columnFun) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS_NULL, null)));
+//        return logic;
+//    }
 
     /**
      * 不是null
@@ -927,16 +927,16 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 不是null
-     *
-     * @param columnFun
-     * @return
-     */
-    public <T, R> Logic<Action> isNotNull(ColumnFun<T, R> columnFun) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS_NOT_NULL, null)));
-        return logic;
-    }
+//    /**
+//     * 不是null
+//     *
+//     * @param columnFun
+//     * @return
+//     */
+//    public <T, R> Logic<Action> isNotNull(ColumnFun<T, R> columnFun) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS_NOT_NULL, null)));
+//        return logic;
+//    }
 
     /**
      * 包含
@@ -975,17 +975,17 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 包含
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> in(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IN, value)));
-        return logic;
-    }
+//    /**
+//     * 包含
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> in(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IN, value)));
+//        return logic;
+//    }
 
     /**
      * 不包含
@@ -1024,17 +1024,17 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 不包含
-     *
-     * @param columnFun
-     * @param value
-     * @return
-     */
-    public <T, R> Logic<Action> notIn(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_IN, value)));
-        return logic;
-    }
+//    /**
+//     * 不包含
+//     *
+//     * @param columnFun
+//     * @param value
+//     * @return
+//     */
+//    public <T, R> Logic<Action> notIn(ColumnFun<T, R> columnFun, Object value) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_IN, value)));
+//        return logic;
+//    }
 
     /**
      * 介于
@@ -1076,18 +1076,18 @@ public class Condition<Action> implements Serializable {
         return logic;
     }
 
-    /**
-     * 介于
-     *
-     * @param columnFun
-     * @param value1
-     * @param value2
-     * @return
-     */
-    public <T, R> Logic<Action> between(ColumnFun<T, R> columnFun, Object value1, Object value2) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.BETWEEN, new Object[]{value1, value2})));
-        return logic;
-    }
+//    /**
+//     * 介于
+//     *
+//     * @param columnFun
+//     * @param value1
+//     * @param value2
+//     * @return
+//     */
+//    public <T, R> Logic<Action> between(ColumnFun<T, R> columnFun, Object value1, Object value2) {
+//        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.BETWEEN, new Object[]{value1, value2})));
+//        return logic;
+//    }
 
     private ConditionInfo newConditionInfo(String tableAlias, String name, SqlOperator sqlOperator, Object value) {
         return new ConditionInfo(null, tableAlias, name, value, sqlOperator);
@@ -1097,8 +1097,8 @@ public class Condition<Action> implements Serializable {
         return new ConditionInfo(null, column, value, sqlOperator);
     }
 
-    private <T, R> ConditionInfo newConditionInfo(ColumnFun<T, R> columnFun, SqlOperator sqlOperator, Object value) {
-        return new ConditionInfo(null, LambdaUtil.getColumn(columnFun), value, sqlOperator);
-    }
+//    private <T, R> ConditionInfo newConditionInfo(ColumnFun<T, R> columnFun, SqlOperator sqlOperator, Object value) {
+//        return new ConditionInfo(null, LambdaUtil.getColumn(columnFun), value, sqlOperator);
+//    }
 
 }

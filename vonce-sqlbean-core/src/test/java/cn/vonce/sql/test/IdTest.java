@@ -13,11 +13,11 @@ import cn.vonce.sql.processor.UniqueIdProcessor;
 public class IdTest {
 
     public static void main(String[] args) {
-        UniqueIdProcessor uniqueIdProcessor = new DefaultUniqueIdProcessor();
-        System.out.println(uniqueIdProcessor.uniqueId(IdType.SNOWFLAKE_ID_16));
-        System.out.println(uniqueIdProcessor.uniqueId(IdType.SNOWFLAKE_ID_18));
-        System.out.println(uniqueIdProcessor.uniqueId(IdType.UUID));
-        System.out.println(uniqueIdProcessor.uniqueId(IdType.ULID));
+//        UniqueIdProcessor uniqueIdProcessor = new DefaultUniqueIdProcessor();
+//        System.out.println(uniqueIdProcessor.uniqueId(IdType.SNOWFLAKE_ID_16));
+//        System.out.println(uniqueIdProcessor.uniqueId(IdType.SNOWFLAKE_ID_18));
+//        System.out.println(uniqueIdProcessor.uniqueId(IdType.UUID));
+//        System.out.println(uniqueIdProcessor.uniqueId(IdType.ULID));
     }
 
 }

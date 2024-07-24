@@ -1,7 +1,7 @@
 package cn.vonce.sql.bean;
 
-import cn.vonce.sql.define.ColumnFun;
-import cn.vonce.sql.uitls.LambdaUtil;
+//import cn.vonce.sql.define.ColumnFun;
+//import cn.vonce.sql.uitls.LambdaUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 
 import java.io.Serializable;
@@ -114,22 +114,22 @@ public class Insert<T> extends Common implements Serializable {
         return this;
     }
 
-    /**
-     * 指定字段
-     *
-     * @param columnFun 字段信息
-     * @param <R>
-     * @return
-     */
-    public <R> Insert<T> column(ColumnFun<T, R>... columnFun) {
-        if (columnFun != null && columnFun.length > 0) {
-            columnList.clear();
-            for (ColumnFun<T, R> trColumnFun : columnFun) {
-                columnList.add(LambdaUtil.getColumn(trColumnFun));
-            }
-        }
-        return this;
-    }
+//    /**
+//     * 指定字段
+//     *
+//     * @param columnFun 字段信息
+//     * @param <R>
+//     * @return
+//     */
+//    public <R> Insert<T> column(ColumnFun<T, R>... columnFun) {
+//        if (columnFun != null && columnFun.length > 0) {
+//            columnList.clear();
+//            for (ColumnFun<T, R> trColumnFun : columnFun) {
+//                columnList.add(LambdaUtil.getColumn(trColumnFun));
+//            }
+//        }
+//        return this;
+//    }
 
     /**
      * 设置字段值

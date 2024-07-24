@@ -1,6 +1,6 @@
 package cn.vonce.sql.bean;
 
-import cn.vonce.sql.define.ColumnFun;
+//import cn.vonce.sql.define.ColumnFun;
 
 import java.io.Serializable;
 
@@ -9,9 +9,9 @@ import java.io.Serializable;
  */
 public class RawValue implements Serializable {
 
-    public <T, R> RawValue(ColumnFun<T, R> value) {
-        this.value = value;
-    }
+//    public <T, R> RawValue(ColumnFun<T, R> value) {
+//        this.value = value;
+//    }
 
     public RawValue(Object value) {
         this.value = value;

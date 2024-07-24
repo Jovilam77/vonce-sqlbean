@@ -2,7 +2,7 @@ package cn.vonce.sql.service;
 
 import cn.vonce.sql.bean.Column;
 import cn.vonce.sql.bean.Update;
-import cn.vonce.sql.define.ColumnFun;
+//import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.helper.Wrapper;
 
 /**
@@ -48,17 +48,17 @@ public interface UpdateService<T, ID> {
      */
     int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, Column... filterColumns);
 
-    /**
-     * 根据实体类id条件更新
-     *
-     * @param bean           更新的bean实体
-     * @param id             id条件
-     * @param updateNotNull  是否仅更新不为null的字段
-     * @param optimisticLock 是否使用乐观锁
-     * @param filterColumns  过滤不需更新的字段
-     * @return
-     */
-    <R> int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns);
+//    /**
+//     * 根据实体类id条件更新
+//     *
+//     * @param bean           更新的bean实体
+//     * @param id             id条件
+//     * @param updateNotNull  是否仅更新不为null的字段
+//     * @param optimisticLock 是否使用乐观锁
+//     * @param filterColumns  过滤不需更新的字段
+//     * @return
+//     */
+//    <R> int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns);
 
     /**
      * 根据实体类id条件更新
@@ -89,16 +89,16 @@ public interface UpdateService<T, ID> {
      */
     int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, Column... filterColumns);
 
-    /**
-     * 根据实体类id条件更新
-     *
-     * @param bean           更新的bean实体
-     * @param updateNotNull  是否仅更新不为null的字段
-     * @param optimisticLock 是否使用乐观锁
-     * @param filterColumns  过滤不需更新的字段
-     * @return
-     */
-    <R> int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns);
+//    /**
+//     * 根据实体类id条件更新
+//     *
+//     * @param bean           更新的bean实体
+//     * @param updateNotNull  是否仅更新不为null的字段
+//     * @param optimisticLock 是否使用乐观锁
+//     * @param filterColumns  过滤不需更新的字段
+//     * @return
+//     */
+//    <R> int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns);
 
     /**
      * 根据条件更新
@@ -153,16 +153,16 @@ public interface UpdateService<T, ID> {
      */
     int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper, Column... filterColumns);
 
-    /**
-     * 根据条件更新
-     *
-     * @param bean           更新的bean实体
-     * @param updateNotNull  是否仅更新不为null的字段
-     * @param optimisticLock 是否使用乐观锁
-     * @param wrapper        条件包装器
-     * @return
-     */
-    <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper, ColumnFun<T, R>... filterColumns);
+//    /**
+//     * 根据条件更新
+//     *
+//     * @param bean           更新的bean实体
+//     * @param updateNotNull  是否仅更新不为null的字段
+//     * @param optimisticLock 是否使用乐观锁
+//     * @param wrapper        条件包装器
+//     * @return
+//     */
+//    <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper, ColumnFun<T, R>... filterColumns);
 
     /**
      * 根据条件更新
@@ -209,17 +209,17 @@ public interface UpdateService<T, ID> {
      */
     int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String where, Column... filterColumns);
 
-    /**
-     * 根据实体类字段条件更新
-     *
-     * @param bean           更新的bean实体
-     * @param updateNotNull  是否仅更新不为null的字段
-     * @param optimisticLock 是否使用乐观锁
-     * @param where          条件字符串表达式
-     * @param filterColumns  过滤不需更新的字段
-     * @return
-     */
-    <R> int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String where, ColumnFun<T, R>[] filterColumns);
+//    /**
+//     * 根据实体类字段条件更新
+//     *
+//     * @param bean           更新的bean实体
+//     * @param updateNotNull  是否仅更新不为null的字段
+//     * @param optimisticLock 是否使用乐观锁
+//     * @param where          条件字符串表达式
+//     * @param filterColumns  过滤不需更新的字段
+//     * @return
+//     */
+//    <R> int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String where, ColumnFun<T, R>[] filterColumns);
 
     /**
      * 更新(where条件为空会抛异常，因为更新全部非常危险)
