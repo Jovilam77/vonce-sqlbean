@@ -697,7 +697,7 @@ public class SqlHelper {
      */
     @SuppressWarnings("unchecked")
     public static String whereSql(CommonCondition commonCondition, Object bean) {
-        return conditionHandle(ConditionType.WHERE, commonCondition, commonCondition.getWhere(), commonCondition.getAgrs(), bean, commonCondition.where(), commonCondition.getWhereWrapper());
+        return conditionHandle(ConditionType.WHERE, commonCondition, commonCondition.getWhere(), commonCondition.getArgs(), bean, commonCondition.where(), commonCondition.getWhereWrapper());
     }
 
     /**

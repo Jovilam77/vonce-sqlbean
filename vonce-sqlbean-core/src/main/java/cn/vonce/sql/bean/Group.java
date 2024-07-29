@@ -1,9 +1,11 @@
 package cn.vonce.sql.bean;
 
+import java.io.Serializable;
+
 /**
  * Group By
  */
-public class Group {
+public class Group implements Serializable {
 
     private Column column;
 
