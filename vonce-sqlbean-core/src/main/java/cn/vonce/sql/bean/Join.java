@@ -45,17 +45,13 @@ public class Join implements Serializable {
     private String mainKeyword;
     @Deprecated
     private String on;
-//    /**
-//     * 链式返回对象
-//     */
-//    private Select returnObj;
+
     /**
      * Join 条件
      */
     private Condition<Select> joinCondition;
 
     protected void setReturnObj(Select returnObj) {
-//        this.returnObj = returnObj;
         joinCondition = new Condition<>(returnObj);
     }
 

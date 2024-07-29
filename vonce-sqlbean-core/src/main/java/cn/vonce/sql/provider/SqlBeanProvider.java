@@ -254,7 +254,7 @@ public class SqlBeanProvider {
             update.setTable(clazz);
             update.bean(newLogicallyDeleteBean(clazz));
             update.where(delete.getWhereWrapper());
-            update.where(delete.getWhere(), delete.getAgrs());
+            update.where(delete.getWhere(), delete.getArgs());
             update.where().setDataList(delete.where().getDataList());
             return updateSql(sqlBeanDB, clazz, update, ignore);
         }

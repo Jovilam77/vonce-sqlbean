@@ -23,7 +23,7 @@ public class CommonCondition<T> extends Common {
     /**
      * where 条件表达式参数
      */
-    private Object[] agrs = null;
+    private Object[] args = null;
     /**
      * where 条件包装器 优先级二
      */
@@ -55,7 +55,7 @@ public class CommonCondition<T> extends Common {
      */
     public T where(String where, Object... args) {
         this.where = where;
-        this.agrs = args;
+        this.args = args;
         return returnObj;
     }
 
@@ -64,8 +64,8 @@ public class CommonCondition<T> extends Common {
      *
      * @return
      */
-    public Object[] getAgrs() {
-        return agrs;
+    public Object[] getArgs() {
+        return args;
     }
 
     public Condition<T> where() {
