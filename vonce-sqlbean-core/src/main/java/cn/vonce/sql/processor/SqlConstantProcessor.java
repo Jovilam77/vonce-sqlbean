@@ -10,6 +10,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
+
 import javax.annotation.processing.*;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
@@ -97,6 +98,8 @@ public class SqlConstantProcessor extends AbstractProcessor {
     private StringBuffer buildCode(Element element, List<Element> subElementList, SqlTable sqlTable, String packageName, String className) {
         StringBuffer code = new StringBuffer();
         try {
+            String schema = "", tableAlias = "", tableRemarks = "";
+            String tableName = element.getSimpleName().toString();
             //获取源码根目录
             URL url = getClass().getClassLoader().getResource("");
             String sourceRoot = url.getPath().substring(1, url.getPath().lastIndexOf("/target/classes/")) + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator;
@@ -109,9 +112,10 @@ public class SqlConstantProcessor extends AbstractProcessor {
                 NodeList<TypeDeclaration<?>> typeDeclarations = compilationUnit.getTypes();
                 typeDeclaration = typeDeclarations.get(0);
             }
-            String schema = "";
-            String tableName = element.getSimpleName().toString();
-            String tableAlias = "";
+            if (typeDeclaration != null) {
+                fieldDeclarationList = JavaParserUtil.getAllFieldDeclaration(sourceRoot, compilationUnit, typeDeclaration);
+                tableRemarks = JavaParserUtil.getCommentContent(typeDeclaration.getComment().get().getContent());
+            }
             if (sqlTable != null) {
                 schema = sqlTable.schema();
                 tableName = sqlTable.value();
@@ -127,10 +131,7 @@ public class SqlConstantProcessor extends AbstractProcessor {
             code.append(String.format("\tpublic static final String _schema = \"%s\";\n", schema));
             code.append(String.format("\tpublic static final String _tableName = \"%s\";\n", tableName));
             code.append(String.format("\tpublic static final String _tableAlias = \"%s\";\n", tableAlias));
-            if (typeDeclaration != null) {
-                code.append(String.format("\tpublic static final String _remarks = \"%s\";\n", JavaParserUtil.getCommentContent(typeDeclaration.getComment().get().getContent())));
-                fieldDeclarationList = JavaParserUtil.getAllFieldDeclaration(sourceRoot, compilationUnit, typeDeclaration);
-            }
+            code.append(String.format("\tpublic static final String _remarks = \"%s\";\n", tableRemarks));
             code.append(String.format("\tpublic static final String _all = \"%s.*\";\n", tableAlias));
             code.append("\tpublic static final String _count = \"COUNT(*)\";\n");
 
@@ -151,7 +152,7 @@ public class SqlConstantProcessor extends AbstractProcessor {
                     }
                 }
                 code.append(String.format("\tpublic static final String %s = \"%s\";\n", sqlFieldName, sqlFieldName));
-                code.append(String.format("\tpublic static final Column %s$ = new Column(true,_tableAlias,%s,\"\",\"%s\");\n", sqlFieldName, sqlFieldName,sqlFieldRemarks));
+                code.append(String.format("\tpublic static final Column %s$ = new Column(true,_tableAlias,%s,\"\",\"%s\");\n", sqlFieldName, sqlFieldName, sqlFieldRemarks));
             }
 
             code.append("\n}");
