@@ -31,7 +31,7 @@ public interface EssayService extends UpdateService<Essay, Long> {
 
 }
 ```
-##### 六. 仅表操作接口[TableService 查看文档](Table.md "TableService")
+##### 六. 仅表操作接口[TableService 查看文档](DbManage.md "TableService")
 ```java
 public interface EssayService extends TableService {
 

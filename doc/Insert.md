@@ -1,4 +1,6 @@
+#### 更多实例Sqlbean使用实例以及代码生成点击这里👉 [https://gitee.com/iJovi/sqlbean-example](https://gitee.com/iJovi/sqlbean-example "sqlbean-example")
 #### 一. Insert对象使用示例（通常情况下不使用该方式，查看下方文档使用更简便方式）
+######1.使用实体类方式插入
 ```java
     Date date = new Date();
     //单条插入
@@ -30,6 +32,29 @@
     insert2.setTable(Essay.class);
     insert2.setInsertBean(essay);
     essayService.insert(insert2);
+```
+######2.拟SQL语句方式插入
+```java
+Insert userInsert = new Insert<User>().column(
+                        User::getId,
+                        User::getAge,
+                        User::getUserName,
+                        User::getNickName,
+                        User::getEmail,
+                        User::getGender,
+                        User::getMobilePhone,
+                        User::getStatus,
+                        User::getPassword)
+                .values(IdBuilder.snowflake16(),
+                        18,
+                        "Jovi",
+                        "Jovi Lam",
+                        "imjovi@qq.com",
+                        1,
+                        "18888888888",
+                        UserStatus.NORMAL,
+                        "123456");
+userService.insert(userInsert);
 ```
 #### 二. InsertService接口文档
 ###### 1：插入单条或多条数组形式的数据
