@@ -12,7 +12,9 @@
 
 ###### Sqlbean For Android请移步这里👉 [gitee(推荐)](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")、 [github](https://github.com/Jovilam77/vonce-sqlbean-android "vonce-sqlbean-android")
 
-#### 简单上手
+###### Sqlbean使用实例以及代码生成点击这里👉 [https://gitee.com/iJovi/sqlbean-example](https://gitee.com/iJovi/sqlbean-example "sqlbean-example")
+
+#### 快速开始
 
 ###### 1.引入Maven依赖
 
@@ -25,18 +27,66 @@
 ###### 2.标注实体类
 
 ```java
+@Data
+public class BaseEntity {
 
-@SqlTable("d_user")
-public class User {
     @SqlId(type = IdType.SNOWFLAKE_ID_16)
+    @SqlColumn(notNull = true, remarks = "唯一id")//创建表或同步表结构需要，不写则默认
     private Long id;
-    private String name;
-    private Integer age;
-    private Integer stature;
-    private Integer gender;
-    private String phone;
+
+    @SqlColumn(remarks = "创建者")//创建表或同步表结构需要，不写则默认
+    private Long creator;
+
+    @SqlDefaultValue(with = FillWith.INSERT)
+    @SqlColumn(remarks = "创建时间")//创建表或同步表结构需要，不写则默认
     private Date createTime;
-    /**省略get set方法*/
+
+    @SqlColumn(remarks = "更新者")//创建表或同步表结构需要，不写则默认
+    private Long updater;
+
+    @SqlDefaultValue(with = FillWith.UPDATE)
+    @SqlColumn(remarks = "更新时间")//创建表或同步表结构需要，不写则默认
+    private Date updateTime;
+
+    @SqlLogically
+    @SqlColumn(remarks = "是否删除(0正常 1删除)")//创建表或同步表结构需要，不写则默认
+    private Boolean deleted;
+
+}
+
+@Data
+//autoAlter = true 设置为true时，实体类有变动时自动同步表结构
+@SqlTable(autoAlter = true, value = "t_user", remarks = "用户")
+public class User extends BaseEntity {
+
+    @SqlColumn(notNull = true, remarks = "用户名")//创建表或同步表结构需要，不写则默认
+    private String userName;
+
+    @SqlColumn(remarks = "姓名")//创建表或同步表结构需要，不写则默认
+    private String nickName;
+
+    @SqlColumn(notNull = true, remarks = "手机号码")//创建表或同步表结构需要，不写则默认
+    private String mobilePhone;
+
+    @SqlColumn(notNull = true, remarks = "密码")//创建表或同步表结构需要，不写则默认
+    private String password;
+
+    @SqlColumn(notNull = true, remarks = "性别")//创建表或同步表结构需要，不写则默认
+    private Integer gender;
+
+    @SqlColumn(remarks = "年龄")//创建表或同步表结构需要，不写则默认
+    private Integer age;
+
+    @SqlColumn(remarks = "电子邮箱")//创建表或同步表结构需要，不写则默认
+    private String email;
+
+    @SqlColumn(remarks = "头像", oldName = "head_portrait")//创建表或同步表结构需要，不写则默认
+    private String avatar;
+
+    @SqlDefaultValue(with = FillWith.INSERT)
+    @SqlColumn(notNull = true, remarks = "状态(0正常 1停用)")//创建表或同步表结构需要，不写则默认
+    private UserStatus status;
+
 }
 ```
 
@@ -77,18 +127,18 @@ public class UserController {
         List<User> list = userService.select();
         list = userService.selectBy(Wrapper.where(Cond.gt(User::getId, 10)).and(Cond.lt(User::getId, 20)));
         //指定查询
-        list = userService.select(new Select().column(User::getId, User::getName, User::getPhone).where().gt(User::getId, 10));
+        list = userService.select(new Select().column(User::getId, User::getUserName, User::getMobilePhone).where().gt(User::getId, 10));
 
         //查询一条
-        User user = userService.selectById(1);
+        User user = userService.selectById(1L);
         user = userService.selectOneBy(Wrapper.where(eq(User::getId, 1001)));
 
         //sql语义化查询《20岁且是女性的用户根据创建时间倒序，获取前10条》
-        list = userService.select(new Select().column(User::getId, User::getName, User::getPhone).where().eq(User::getAge, 22).and().eq(User::getGender, 0).back().orderByDesc(User::getCreateTime).page(0, 10));
+        list = userService.select(new Select().column(User::getId, User::getUserName, User::getMobilePhone).where().eq(User::getAge, 22).and().eq(User::getGender, 0).back().orderByDesc(User::getCreateTime).page(0, 10));
 
         //联表查询《20岁且是女性的用户根据创建时间倒序，查询前10条用户的信息和地址》
         Select select = new Select();
-        select.column(User::getId, User::getName, User::getPhone, UserAddress::getProvince, UserAddress::getCity, UserAddress::getArea, UserAddress::getDetails);
+        select.column(User::getId, User::getUserName, User::getMobilePhone, UserAddress::getProvince, UserAddress::getCity, UserAddress::getArea, UserAddress::getDetails);
         select.innerJoin(UserAddress.class).on().eq(UserAddress::getId, User::getId);
         select.where().gt(User::getAge, 22).and().eq(User::getGender, 0);
         select.orderByDesc(User::getCreateTime);
@@ -110,6 +160,18 @@ public class UserController {
         pageHelper.paging(select, userService);
         return pageHelper.toResult("获取列表成功");
     }
+    
+    //统计（函数使用）
+    @GetMapping("getStatistics")
+    public Result getStatistics() {
+        Select select = new Select();
+        select.column(SqlFun.count(User::getId), "count").column(SqlFun.avg(User::getAge));
+        select.where().gt(SqlFun.date_format(User::getCreateTime, "%Y-%m-%d"), "2024-06-24");
+        select.groupBy(User::getGender);
+        select.orderByDesc("count");
+        List<Map<String, Object>> mapList = userService.selectMapList(select);
+        return Result.success(mapList);
+    }
 
     //更新
     @PostMapping("update")
@@ -119,7 +181,7 @@ public class UserController {
         //根据条件更新
         //i = userService.updateBy(Wrapper.where(Cond.gt(User::getAge, 22)).and(Cond.eq(User::getGender, 1)));
         //指定更新某个字段 UPDATE user SET gender = 1, name = 'Jovi' ,age = age + 1 WHERE = id = 111
-        userService.update(new Update<User>().set(User::getGender, 1).set(User::getName, "Jovi").setAdd(User::getAge, User::getAge, 1).where().eq(User::getId, 111).back());
+        userService.update(new Update<User>().set(User::getGender, 1).set(User::getUserName, "Jovi").setAdd(User::getAge, User::getAge, 1).where().eq(User::getId, 111).back());
         if (i > 0) {
             return super.successHint("更新成功");
         }
@@ -158,7 +220,7 @@ public class UserController {
 
 #### 文档说明
 
-###### [0️⃣. 注解详情与使用](doc/Annotation.md "注解详情与使用")
+###### [0️⃣. 注解和枚举使用](doc/Annotation.md "注解和枚举使用")
 
 ###### [1️⃣. Select](doc/Select.md "Select")
 
@@ -168,7 +230,7 @@ public class UserController {
 
 ###### [4️⃣. Update](doc/Update.md "Update")
 
-###### [5️⃣. 表操作相关](doc/Table.md "表操作相关")
+###### [5️⃣. 数据库相关操作](doc/DbManage.md "数据库相关操作")
 
 ###### [6️⃣. 分页查询](doc/Paging.md "分页查询")
 

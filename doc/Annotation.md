@@ -2,16 +2,17 @@
 ```java
 1.@SqlTable     //标识表名
 ```
-属性  | 解释  | 默认 | 必须
- :----: | :-----: | :-----: | :------:  
- autoCreate  | 是否表不存在则自动创建（SqlBeanConfig中含有总开关，默认开启） | true | 否
- constant  | 是否生成实体类对应表的字段常量 | true | 否
- mapUsToCc  | 是否开启Java字段驼峰命名转Sql字段下划线命名 | true | 否
+属性  | 解释  |  默认   | 必须
+ :----: | :-----: |:-----:| :------:  
+ autoCreate  | 是否表不存在则自动创建（SqlBeanConfig中含有总开关，默认开启） | true  | 否
+ autoAlter  | 是否自动更改表结构 | false | 否
+ constant  | 是否生成实体类对应表的字段常量 | true  | 否
+ mapUsToCc  | 是否开启Java字段驼峰命名转Sql字段下划线命名 | true  | 否
  isView  | 是否为视图 | false | 否
- value  | 表名 |  | 是
- alias  | 表别名 | "" | 否
- schema  | schema | "" | 否
- remarks  | 表注释 | "" | 否
+ value  | 表名 |       | 是
+ alias  | 表别名 |  ""   | 否
+ schema  | schema |  ""   | 否
+ remarks  | 表注释 |  ""   | 否
 
 ```java
 2.@SqlId     //标识id，目前仅支持UUID, SNOWFLAKE_ID_16, SNOWFLAKE_ID_18，请查看IdType枚举类
@@ -27,7 +28,7 @@
 
 属性  | 解释  | 默认 | 必须
  :----: | :-----: | :-----: | :------: 
- value  | 表列字段名 |  | 是
+ value  | 表列字段名 | "" | 否
  notNull  | 不是null(创建表使用) | false | 否
  type  | 类型(创建表使用) | JdbcType.NULL | 否
  length  | 长度(创建表使用) | 0 | 否
@@ -75,39 +76,30 @@ with  | 填充类型（insert=新增、update=更新，together=新增更新同�
 
 #### 二. 示例.单表用法（该例子已包含表生成、常量生成、id生成、乐观锁、插入时间、更新时间）
 ```java
+@Data
 @SqlTable("d_essay") //表名
 public class Essay {
 
 	@SqlId(type = IdType.UUID) //id生成方式
-	//@SqlColumn("id")
 	private String id;
 
-	//@SqlColumn("user_id" )
 	private String userId;
 	
-	//@SqlColumn("original_author_id" )
 	private String originalAuthorId;
 
-	//@SqlColumn("content" )
 	private String content;
 	
 	@SqlLogically //逻辑删除
-	//@SqlColumn("is_deleted" )
 	private Integer isDeleted;
 	
 	@SqlVersion //乐观锁
-	//@SqlColumn("version" )
 	private Long version;
 
-    @SqlDefaultValue(with = FillWith.INSERT)
-	//@SqlColumn("creation_time" )
+	@SqlDefaultValue(with = FillWith.INSERT)
 	private Date creationTime;
 
-    @SqlDefaultValue(with = FillWith.UPDATE)
-	//@SqlColumn("update_time" )
+	@SqlDefaultValue(with = FillWith.UPDATE)
 	private Date updateTime;
-	
-	/**省略get set方法*/
 	
 }
 ```
@@ -254,5 +246,33 @@ public class XxxController {
         return essayService.select(EssayUnion.class);//最后查询时需指定类型EssayUnion.class，所有selectXX方法都支持
     }
     
+}
+```
+#### 七. 枚举使用实例
+```
+使用枚举需要在枚举中实现SqlEnum接口
+```
+```java
+public enum UserStatus implements SqlEnum<Integer> {
+    DISABLE(0, "禁用"), NORMAL(1, "正常");
+
+    UserStatus(Integer code, String desc) {
+        this.code = code;
+        this.desc = desc;
+    }
+
+    private Integer code;
+    private String desc;
+
+    @Override
+    public Integer getCode() {
+        return this.code;
+    }
+
+    @Override
+    public String getDesc() {
+        return this.desc;
+    }
+
 }
 ```

@@ -1,14 +1,5 @@
 #### 一. TableService接口文档
-###### 1：获取Bean类型
-```java
-    /**
-     * 获取Bean类型
-     *
-     * @return
-     */
-    Class<?> getBeanClass();
-```
-###### 2：删除表结构
+###### 1：删除表结构
 ```java
     /**
      * 删除表结构
@@ -17,7 +8,7 @@
      */
     void dropTable();
 ```
-###### 3：创建表结构
+###### 2：创建表结构
 ```java
     /**
      * 创建表结构
@@ -26,14 +17,14 @@
      */
     void createTable();
 ```
-###### 4：删除并创建表结构
+###### 3：删除并创建表结构
 ```java
     /**
      * 删除并创建表结构
      */
     void dropAndCreateTable();
 ```
-###### 5：获取表名列表
+###### 4：获取表名列表
 ```java
     /**
      * 获取表名列表
@@ -43,7 +34,7 @@
      */
     List<TableInfo> getTableList(String tableName);
 ```
-###### 6：获取表名列表
+###### 5：获取表名列表
 ```java
     /**
      * 获取表名列表
@@ -54,7 +45,7 @@
      */
     List<TableInfo> getTableList(String schema, String tableName);
 ```
-###### 7：获取列信息列表
+###### 6：获取列信息列表
 ```java
     /**
      * 获取列信息列表
@@ -64,7 +55,7 @@
      */
     List<ColumnInfo> getColumnInfoList(String tableName);
 ```
-###### 8：获取列信息列表
+###### 7：获取列信息列表
 ```java
     /**
      * 获取列信息列表
@@ -75,7 +66,7 @@
      */
     List<ColumnInfo> getColumnInfoList(String schema, String tableName);
 ```
-###### 9：备份表和数据到一张新表(表名_+时间)
+###### 8：备份表和数据到一张新表(表名_+时间)
 ```java
     /**
      * 备份表和数据到一张新表(表名_+时间)
@@ -84,7 +75,7 @@
      */
     String backup();
 ```
-###### 10：备份表和数据到一张指定名称的新表
+###### 9：备份表和数据到一张指定名称的新表
 ```java
     /**
      * 备份表和数据到一张指定名称的新表
@@ -94,7 +85,7 @@
      */
     void backup(String targetTableName);
 ```
-###### 11：备份表和数据到一张指定名称的新表
+###### 10：备份表和数据到一张指定名称的新表
 ```java
     /**
      * 备份表和数据到一张指定名称的新表
@@ -105,7 +96,7 @@
      */
     void backup(String targetSchema, String targetTableName);
 ```
-###### 12：根据条件备份表和数据到一张指定名称的新表
+###### 11：根据条件备份表和数据到一张指定名称的新表
 ```java
     /**
      * 根据条件备份表和数据到一张指定名称的新表
@@ -117,7 +108,7 @@
      */
     void backup(Wrapper wrapper, String targetTableName, Column... columns);
 ```
-###### 13：根据条件备份表和数据到一张指定名称的新表
+###### 12：根据条件备份表和数据到一张指定名称的新表
 ```java
     /**
      * 根据条件备份表和数据到一张指定名称的新表
@@ -129,7 +120,7 @@
      */
     <R> void backup(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns);
 ```
-###### 14：根据条件备份表和数据到一张指定名称的新表
+###### 13：根据条件备份表和数据到一张指定名称的新表
 ```java
     /**
      * 根据条件备份表和数据到一张指定名称的新表
@@ -142,7 +133,7 @@
      */
     void backup(Wrapper wrapper, String targetSchema, String targetTableName, Column... columns);
 ```
-###### 15：根据条件备份表和数据到一张指定名称的新表
+###### 14：根据条件备份表和数据到一张指定名称的新表
 ```java
     /**
      * 根据条件备份表和数据到一张指定名称的新表
@@ -155,7 +146,7 @@
      */
     <R> void backup(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns);
 ```
-###### 16：根据条件将数据复制插入到同样结构的表中
+###### 15：根据条件将数据复制插入到同样结构的表中
 ```java
     /**
      * 根据条件将数据复制插入到同样结构的表中
@@ -166,7 +157,7 @@
      */
     int copy(Wrapper wrapper, String targetTableName);
 ```
-###### 17：根据条件将数据复制插入到同样结构的表中
+###### 16：根据条件将数据复制插入到同样结构的表中
 ```java
     /**
      * 根据条件将数据复制插入到同样结构的表中
@@ -178,7 +169,7 @@
      */
     int copy(Wrapper wrapper, String targetSchema, String targetTableName);
 ```
-###### 18：根据条件将数据复制插入到指定结构的表中
+###### 17：根据条件将数据复制插入到指定结构的表中
 ```java
     /**
      * 根据条件将数据复制插入到指定结构的表中
@@ -190,7 +181,7 @@
      */
     int copy(Wrapper wrapper, String targetTableName, Column... columns);
 ```
-###### 19：根据条件将数据复制插入到指定结构的表中
+###### 18：根据条件将数据复制插入到指定结构的表中
 ```java
     /**
      * 根据条件将数据复制插入到指定结构的表中
@@ -202,7 +193,7 @@
      */
     <R> int copy(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns);
 ```
-###### 20：根据条件将数据复制插入到指定结构的表中
+###### 19：根据条件将数据复制插入到指定结构的表中
 ```java
     /**
      * 根据条件将数据复制插入到指定结构的表中
@@ -215,7 +206,7 @@
      */
     int copy(Wrapper wrapper, String targetSchema, String targetTableName, Column... columns);
 ```
-###### 21：根据条件将数据复制插入到指定结构的表中
+###### 20：根据条件将数据复制插入到指定结构的表中
 ```java
     /**
      * 根据条件将数据复制插入到指定结构的表中
@@ -228,7 +219,7 @@
      */
     <R> int copy(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns);
 ```
-###### 22：更改表结构
+###### 21：更改表结构
 ```java
     /**
      * 更改表结构
@@ -239,7 +230,7 @@
      */
     int alter(Table table, List<ColumnInfo> columnInfoList);
 ```
-###### 23：更改表结构
+###### 22：更改表结构
 ```java
     /**
      * 更改表结构
@@ -249,7 +240,7 @@
      */
     int alter(Alter alter);
 ```
-###### 24：更改表结构
+###### 23：更改表结构
 ```java
     /**
      * 更改表结构
@@ -259,7 +250,7 @@
      */
     int alter(List<Alter> alterList);
 ```
-###### 25：更改表注释
+###### 24：更改表注释
 ```java
     /**
      * 更改表注释
@@ -268,4 +259,34 @@
      * @return
      */
     int alterRemarks(String remarks);
+```
+###### 25：模式列表
+```java
+    /**
+     * 模式列表
+     *
+     * @param name
+     * @return
+     */
+    List<String> getSchemas(String name);
+```
+###### 26：创建模式
+```java
+    /**
+     * 创建模式
+     *
+     * @param name
+     * @return
+     */
+    int createSchema(String name);
+```
+###### 27：删除模式
+```java
+    /**
+     * 删除模式
+     *
+     * @param name
+     * @return
+     */
+    int dropSchema(String name);
 ```
