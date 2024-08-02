@@ -31,60 +31,60 @@
 public class BaseEntity {
 
     @SqlId(type = IdType.SNOWFLAKE_ID_16)
-    @SqlColumn(notNull = true, remarks = "唯一id")//创建表或同步表结构需要，不写则默认
+    @SqlColumn(notNull = true, remarks = "唯一id")//字段不能为null,表字段注释
     private Long id;
 
-    @SqlColumn(remarks = "创建者")//创建表或同步表结构需要，不写则默认
+    @SqlColumn(remarks = "创建者")//表字段注释
     private Long creator;
 
     @SqlDefaultValue(with = FillWith.INSERT)
-    @SqlColumn(remarks = "创建时间")//创建表或同步表结构需要，不写则默认
+    @SqlColumn(remarks = "创建时间")//表字段注释
     private Date createTime;
 
-    @SqlColumn(remarks = "更新者")//创建表或同步表结构需要，不写则默认
+    @SqlColumn(remarks = "更新者")//表字段注释
     private Long updater;
 
     @SqlDefaultValue(with = FillWith.UPDATE)
-    @SqlColumn(remarks = "更新时间")//创建表或同步表结构需要，不写则默认
+    @SqlColumn(remarks = "更新时间")//表字段注释
     private Date updateTime;
 
     @SqlLogically
-    @SqlColumn(remarks = "是否删除(0正常 1删除)")//创建表或同步表结构需要，不写则默认
+    @SqlColumn(remarks = "是否删除(0正常 1删除)")//表字段注释
     private Boolean deleted;
 
 }
 
 @Data
-//autoAlter = true 设置为true时，实体类有变动时自动同步表结构
+//autoAlter设置为true，实体类有变动时自动同步表结构
 @SqlTable(autoAlter = true, value = "t_user", remarks = "用户")
 public class User extends BaseEntity {
 
-    @SqlColumn(notNull = true, remarks = "用户名")//创建表或同步表结构需要，不写则默认
+    @SqlColumn(notNull = true, remarks = "用户名")//字段不能为null,表字段注释
     private String userName;
 
-    @SqlColumn(remarks = "姓名")//创建表或同步表结构需要，不写则默认
+    @SqlColumn(remarks = "姓名")//表字段注释
     private String nickName;
 
-    @SqlColumn(notNull = true, remarks = "手机号码")//创建表或同步表结构需要，不写则默认
+    @SqlColumn(notNull = true, remarks = "手机号码")//表字段注释
     private String mobilePhone;
 
-    @SqlColumn(notNull = true, remarks = "密码")//创建表或同步表结构需要，不写则默认
+    @SqlColumn(notNull = true, remarks = "密码")//表字段注释
     private String password;
 
-    @SqlColumn(notNull = true, remarks = "性别")//创建表或同步表结构需要，不写则默认
+    @SqlColumn(notNull = true, remarks = "性别")//表字段注释
     private Integer gender;
 
-    @SqlColumn(remarks = "年龄")//创建表或同步表结构需要，不写则默认
+    @SqlColumn(remarks = "年龄")//表字段注释
     private Integer age;
 
-    @SqlColumn(remarks = "电子邮箱")//创建表或同步表结构需要，不写则默认
+    @SqlColumn(remarks = "电子邮箱")//表字段注释
     private String email;
 
-    @SqlColumn(remarks = "头像", oldName = "head_portrait")//创建表或同步表结构需要，不写则默认
+    @SqlColumn(remarks = "头像", oldName = "head_portrait")//表字段注释,修改表字段名称需要在oldName指定旧的名称
     private String avatar;
 
     @SqlDefaultValue(with = FillWith.INSERT)
-    @SqlColumn(notNull = true, remarks = "状态(0正常 1停用)")//创建表或同步表结构需要，不写则默认
+    @SqlColumn(notNull = true, remarks = "状态(0正常 1停用)")//字段不能为null,表字段注释
     private UserStatus status;
 
 }
