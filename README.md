@@ -1,8 +1,8 @@
-## Sqlbean
+## SqlBean
 
 #### 介绍
 
-###### Sqlbean是一款通过Java语法生成SQL语句的ORM插件，其理念是弱化在开发阶段对数据库的操作，无需先建表再开发，可直接编写实体类和业务代码，项目启动后自动创建表和维护表结构。内置大量常用方法，支持灵活的条件查询，无DAO层，在项目中几乎不需要编写SQL语句，帮助你快速进行业务功能开发，除了支持Mybatis也同时支持Spring Jdbc。
+###### SqlBean是一款通过Java语法生成SQL语句的ORM插件，其理念是弱化在开发阶段对数据库的操作，无需先建表再开发，可直接编写实体类和业务代码，项目启动后自动创建表和维护表结构。内置大量常用方法，支持灵活的条件查询，无DAO层，在项目中几乎不需要编写SQL语句，帮助你快速进行业务功能开发，除了支持Mybatis也同时支持Spring Jdbc。
 
 ###### 🚀特点: 多数据源, 动态Schema, 读写分离, 自动建表, 自动维护表结构, 联表查询, 乐观锁, 分页
 
@@ -10,9 +10,10 @@
 
 ###### 💿数据库: Mysql, MariaDB, Oracle, Sqlserver2008+, Postgresql, DB2, Derby, Sqlite, HSQL, H2
 
-###### Sqlbean For Android请移步这里👉 [gitee(推荐)](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")、 [github](https://github.com/Jovilam77/vonce-sqlbean-android "vonce-sqlbean-android")
+###### SqlBean For Android请移步这里👉 [gitee(推荐)](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")、 [github](https://github.com/Jovilam77/vonce-sqlbean-android "vonce-sqlbean-android")
 
-###### Sqlbean使用实例以及代码生成点击这里👉 [https://gitee.com/iJovi/sqlbean-example](https://gitee.com/iJovi/sqlbean-example "sqlbean-example")
+###### SuperCode代码生成项目👉 [https://gitee.com/iJovi/supercode](https://gitee.com/iJovi/supercode "supercode")
+###### SqlBean使用例子以及代码生成例子点击这里👉 [https://gitee.com/iJovi/sqlbean-example](https://gitee.com/iJovi/sqlbean-example "sqlbean-example")
 
 #### 快速开始
 
