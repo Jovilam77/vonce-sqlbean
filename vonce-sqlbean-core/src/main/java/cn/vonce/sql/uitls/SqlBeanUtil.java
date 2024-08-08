@@ -1460,19 +1460,8 @@ public class SqlBeanUtil {
      * @param field
      * @return Column
      */
-    public static Column getColumnByField(Field field) {
-        Table table = SqlBeanUtil.getTable(field.getDeclaringClass());
-        return new Column(table.getAlias(), SqlBeanUtil.getTableFieldName(field, SqlBeanUtil.getSqlTable(field.getDeclaringClass())), "");
-    }
-
-    /**
-     * 获取列字段对象
-     *
-     * @param field
-     * @return Column
-     */
     public static Column getColumnByField(Field field, Class<?> clazz) {
-        Table table = SqlBeanUtil.getTable(field.getDeclaringClass());
+        Table table = SqlBeanUtil.getTable(clazz);
         return new Column(table.getAlias(), SqlBeanUtil.getTableFieldName(field, SqlBeanUtil.getSqlTable(field.getDeclaringClass())), "");
     }
 
