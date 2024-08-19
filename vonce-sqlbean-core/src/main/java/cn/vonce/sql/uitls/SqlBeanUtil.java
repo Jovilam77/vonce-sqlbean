@@ -443,7 +443,18 @@ public class SqlBeanUtil {
             }
         }
         if (columnInfo.getLength() != null && !columnInfo.getLength().equals(toColumnInfo.getLength())) {
-            alterDifferenceList.add(AlterDifference.LENGTH);
+            //MySql8之后整数类型不支持设置长度
+            if (sqlBeanDB.getDbType() != DbType.MySQL
+                    || (sqlBeanDB.getDbType() == DbType.MySQL && sqlBeanDB.getDatabaseMajorVersion() < 8)
+                    || (sqlBeanDB.getDbType() == DbType.MySQL && sqlBeanDB.getDatabaseMajorVersion() >= 8
+                    && !columnInfo.getType().equalsIgnoreCase("tinyint")
+                    && !columnInfo.getType().equalsIgnoreCase("smallint")
+                    && !columnInfo.getType().equalsIgnoreCase("mediumint")
+                    && !columnInfo.getType().equalsIgnoreCase("int")
+                    && !columnInfo.getType().equalsIgnoreCase("bigint")
+            )) {
+                alterDifferenceList.add(AlterDifference.LENGTH);
+            }
         }
         if (columnInfo.getScale() != null && !columnInfo.getScale().equals(toColumnInfo.getScale())) {
             alterDifferenceList.add(AlterDifference.SCALE);
