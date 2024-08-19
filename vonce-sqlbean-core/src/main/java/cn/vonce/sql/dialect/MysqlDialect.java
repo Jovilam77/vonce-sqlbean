@@ -5,6 +5,7 @@ import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.AlterType;
+import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.JavaMapMySqlType;
 import cn.vonce.sql.enumerate.JdbcType;
 import cn.vonce.sql.exception.SqlBeanException;
@@ -67,10 +68,16 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
         sql.append("(CASE column_key WHEN 'PRI' THEN 1 ELSE 0 END) AS pk, ");
         sql.append("(CASE column_key WHEN 'MUL' THEN 1 ELSE 0 END) AS fk, ");
         sql.append("(CASE extra WHEN 'auto_increment' THEN 1 ELSE 0 END) AS auto_incr, ");
-        sql.append("(CASE WHEN data_type = 'bit' OR data_type = 'tinyint' OR data_type = 'smallint' OR data_type = 'mediumint' OR data_type = 'int' OR data_type = 'bigint' ");
-        sql.append("THEN REPLACE ( SUBSTRING( column_type, INSTR( column_type, '(' )+ 1 ), ')', '' ) ");
-        sql.append("WHEN data_type = 'float' OR data_type = 'double' OR data_type = 'decimal' ");
-        sql.append("THEN numeric_precision ELSE character_maximum_length END ) AS length, ");
+        //MySql8之后整数类型不支持设置长度
+        if (sqlBeanDB.getDbType() == DbType.MySQL && sqlBeanDB.getDatabaseMajorVersion() >= 8) {
+            sql.append("(CASE WHEN character_maximum_length != null ");
+            sql.append("THEN numeric_precision ELSE character_maximum_length END ) AS length, ");
+        } else {
+            sql.append("(CASE WHEN data_type = 'bit' OR data_type = 'tinyint' OR data_type = 'smallint' OR data_type = 'mediumint' OR data_type = 'int' OR data_type = 'bigint' ");
+            sql.append("THEN REPLACE ( SUBSTRING( column_type, INSTR( column_type, '(' )+ 1 ), ')', '' ) ");
+            sql.append("WHEN data_type = 'float' OR data_type = 'double' OR data_type = 'decimal' ");
+            sql.append("THEN numeric_precision ELSE character_maximum_length END ) AS length, ");
+        }
         sql.append("numeric_scale AS scale, ");
         sql.append("column_comment AS remarks ");
         sql.append("FROM information_schema.columns ");
