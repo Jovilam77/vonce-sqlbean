@@ -1,4 +1,4 @@
-package cn.vonce.sql.spring.provider;
+package cn.vonce.sql.java.provider;
 
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanDB;

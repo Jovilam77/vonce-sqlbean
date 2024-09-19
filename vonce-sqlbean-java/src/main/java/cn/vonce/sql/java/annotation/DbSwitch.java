@@ -1,6 +1,6 @@
-package cn.vonce.sql.spring.annotation;
+package cn.vonce.sql.java.annotation;
 
-import cn.vonce.sql.spring.enumerate.DbRole;
+import cn.vonce.sql.java.enumerate.DbRole;
 
 import java.lang.annotation.*;
 

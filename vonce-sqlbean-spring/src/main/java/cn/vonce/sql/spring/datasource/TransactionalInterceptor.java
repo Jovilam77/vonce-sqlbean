@@ -1,6 +1,6 @@
 package cn.vonce.sql.spring.datasource;
 
-import cn.vonce.sql.spring.annotation.DbTransactional;
+import cn.vonce.sql.java.annotation.DbTransactional;
 import cn.vonce.sql.uitls.IdBuilder;
 import cn.vonce.sql.uitls.StringUtil;
 import org.aopalliance.intercept.MethodInterceptor;

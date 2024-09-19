@@ -7,16 +7,17 @@ import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.Wrapper;
+import cn.vonce.sql.java.annotation.DbSwitch;
+import cn.vonce.sql.java.annotation.DbTransactional;
+import cn.vonce.sql.java.dao.MybatisSqlBeanDao;
+import cn.vonce.sql.java.enumerate.DbRole;
+import cn.vonce.sql.java.service.BaseSqlBeanServiceImpl;
 import cn.vonce.sql.page.PageHelper;
 import cn.vonce.sql.page.ResultData;
 import cn.vonce.sql.provider.SqlBeanProvider;
 import cn.vonce.sql.service.AdvancedDbManageService;
-import cn.vonce.sql.spring.annotation.DbSwitch;
-import cn.vonce.sql.spring.annotation.DbTransactional;
 import cn.vonce.sql.spring.config.UseMybatis;
-import cn.vonce.sql.spring.dao.MybatisSqlBeanDao;
 import cn.vonce.sql.service.SqlBeanService;
-import cn.vonce.sql.spring.enumerate.DbRole;
 import cn.vonce.sql.uitls.DateUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import org.apache.ibatis.session.SqlSession;
@@ -64,12 +65,12 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     }
 
     @Override
-    SqlBeanConfig getSqlBeanConfig() {
+    public SqlBeanConfig getSqlBeanConfig() {
         return sqlBeanConfig;
     }
 
     @Override
-    SqlBeanDB initDBInfo() {
+    public SqlBeanDB initDBInfo() {
         SqlBeanDB sqlBeanDB = new SqlBeanDB();
         if (!initDBInfo) {
             try {
@@ -86,7 +87,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     }
 
     @Override
-    Long getAutoIncrId() {
+    public Long getAutoIncrId() {
         if (getSqlBeanDB().getDbType() == DbType.MySQL || getSqlBeanDB().getDbType() == DbType.MariaDB) {
             return mybatisSqlBeanDao.lastInsertId();
         }

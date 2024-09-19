@@ -1,4 +1,4 @@
-package cn.vonce.sql.spring.service;
+package cn.vonce.sql.java.service;
 
 import cn.vonce.sql.annotation.SqlId;
 import cn.vonce.sql.bean.ColumnInfo;
@@ -30,9 +30,9 @@ public abstract class BaseSqlBeanServiceImpl {
 
     private SqlBeanDB sqlBeanDB;
 
-    abstract SqlBeanConfig getSqlBeanConfig();
+    protected abstract SqlBeanConfig getSqlBeanConfig();
 
-    abstract SqlBeanDB initDBInfo();
+    public abstract SqlBeanDB initDBInfo();
 
     public SqlBeanDB getSqlBeanDB() {
         if (sqlBeanDB == null) {
@@ -160,12 +160,7 @@ public abstract class BaseSqlBeanServiceImpl {
         sqlBeanDB.setDbType(DbType.getDbType(sqlBeanDB.getProductName()));
     }
 
-    /**
-     * 获取自增id
-     *
-     * @return
-     */
-    abstract Long getAutoIncrId();
+    public abstract Long getAutoIncrId();
 
     /**
      * 设置自增id

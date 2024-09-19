@@ -1,8 +1,8 @@
 package cn.vonce.sql.spring.datasource;
 
-import cn.vonce.sql.spring.annotation.DbSource;
-import cn.vonce.sql.spring.annotation.DbSwitch;
-import cn.vonce.sql.spring.enumerate.DbRole;
+import cn.vonce.sql.java.annotation.DbSource;
+import cn.vonce.sql.java.annotation.DbSwitch;
+import cn.vonce.sql.java.enumerate.DbRole;
 import cn.vonce.sql.uitls.StringUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;

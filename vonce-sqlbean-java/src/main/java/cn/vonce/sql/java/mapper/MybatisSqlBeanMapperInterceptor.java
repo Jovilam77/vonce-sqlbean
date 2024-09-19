@@ -1,4 +1,4 @@
-package cn.vonce.sql.spring.mapper;
+package cn.vonce.sql.java.mapper;
 
 import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.bean.TableInfo;

@@ -1,4 +1,4 @@
-package cn.vonce.sql.spring.processor;
+package cn.vonce.sql.java.processor;
 
 import cn.vonce.sql.processor.SqlConstantProcessor;
 
@@ -17,7 +17,7 @@ import java.util.Set;
  */
 @SupportedAnnotationTypes({"cn.vonce.sql.annotation.SqlTable"})
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-public class SpringSqlConstantProcessor extends SqlConstantProcessor {
+public class JavaSqlConstantProcessor extends SqlConstantProcessor {
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {

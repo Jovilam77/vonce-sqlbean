@@ -1,16 +1,14 @@
-package cn.vonce.sql.spring.dao;
+package cn.vonce.sql.java.dao;
 
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.helper.Wrapper;
-import cn.vonce.sql.spring.provider.MybatisSqlBeanProvider;
 import cn.vonce.sql.bean.Delete;
 import cn.vonce.sql.bean.Insert;
 import cn.vonce.sql.bean.Select;
 import cn.vonce.sql.bean.Update;
 import cn.vonce.sql.bean.*;
+import cn.vonce.sql.java.provider.MybatisSqlBeanProvider;
 import org.apache.ibatis.annotations.*;
-import org.springframework.stereotype.Repository;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +22,7 @@ import java.util.Map;
  * @email imjovi@qq.com
  * @date 2018年5月15日下午3:56:51
  */
-@Repository
+@Mapper
 public interface MybatisSqlBeanDao<T> {
 
     /**

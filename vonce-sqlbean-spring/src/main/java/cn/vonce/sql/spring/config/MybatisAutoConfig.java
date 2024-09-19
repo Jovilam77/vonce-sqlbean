@@ -1,6 +1,6 @@
 package cn.vonce.sql.spring.config;
 
-import cn.vonce.sql.spring.mapper.MybatisSqlBeanMapperInterceptor;
+import cn.vonce.sql.java.mapper.MybatisSqlBeanMapperInterceptor;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;

@@ -1,0 +1,2 @@
+org.springframework.context.ApplicationContextInitializer=\
+cn.vonce.sql.spring.config.AutoConfigSpring

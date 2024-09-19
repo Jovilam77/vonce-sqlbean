@@ -1,4 +1,4 @@
-package cn.vonce.sql.spring.annotation;
+package cn.vonce.sql.java.annotation;
 
 import java.lang.annotation.*;
 
