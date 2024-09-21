@@ -576,6 +576,9 @@ public class SqlBeanUtil {
      * @return
      */
     public static List<Field> getBeanAllField(Class<?> clazz) {
+        if (clazz ==null){
+            return Collections.emptyList();
+        }
         List<Field> fieldList = new ArrayList<>();
         Class<?> superClass = clazz.getSuperclass();
         do {

@@ -485,7 +485,7 @@ public class SqlBeanProvider {
     public static String updateByBeanSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String where, Column[] filterColumns) {
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
         update.filterFields(filterColumns);
-        update.where(where, null);
+        update.where(where);
         return SqlHelper.buildUpdateSql(update);
     }
 

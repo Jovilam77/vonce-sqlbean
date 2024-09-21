@@ -1,7 +1,5 @@
 package cn.vonce.sql.bean;
 
-import cn.vonce.sql.compile.annotation.AndroidCope;
-import cn.vonce.sql.compile.annotation.NotSupportAndroid;
 import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.define.SqlFun;
 import cn.vonce.sql.enumerate.JoinType;
@@ -24,7 +22,6 @@ import java.util.List;
  * @email imjovi@qq.com
  * @date 2017年8月18日上午9:00:19
  */
-@AndroidCope
 public class Select extends CommonCondition<Select> implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -181,7 +178,6 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param columnFun
      * @return
      */
-    @NotSupportAndroid
     public <T, R> Select column(ColumnFun<T, R> columnFun) {
         this.columnList.add(LambdaUtil.getColumn(columnFun));
         return this;
@@ -193,7 +189,6 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param columnFuns
      * @return
      */
-    @NotSupportAndroid
     public <T, R> Select column(ColumnFun<T, R>... columnFuns) {
         if (columnFuns != null && columnFuns.length > 0) {
             for (ColumnFun item : columnFuns) {
@@ -261,7 +256,6 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param columnAlias
      * @return
      */
-    @NotSupportAndroid
     public <T, R> Select column(ColumnFun<T, R> columnFun, String columnAlias) {
         Column column = LambdaUtil.getColumn(columnFun);
         column.setAlias(columnAlias);
@@ -490,7 +484,6 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param columnFun 列字段信息
      * @return
      */
-    @NotSupportAndroid
     public <T, R> Select groupBy(ColumnFun<T, R> columnFun) {
         groupByList.add(new Group(LambdaUtil.getColumn(columnFun)));
         return this;
@@ -551,7 +544,6 @@ public class Select extends CommonCondition<Select> implements Serializable {
      *
      * @param columnFun 列字段名
      */
-    @NotSupportAndroid
     public <T, R> Select orderByAsc(ColumnFun<T, R> columnFun) {
         return orderByAsc(LambdaUtil.getColumn(columnFun));
     }
@@ -571,7 +563,6 @@ public class Select extends CommonCondition<Select> implements Serializable {
      *
      * @param columnFun 列字段名
      */
-    @NotSupportAndroid
     public <T, R> Select orderByDesc(ColumnFun<T, R> columnFun) {
         return orderByDesc(LambdaUtil.getColumn(columnFun));
     }
@@ -619,7 +610,6 @@ public class Select extends CommonCondition<Select> implements Serializable {
      * @param sqlSort   排序方式
      * @return
      */
-    @NotSupportAndroid
     public <T, R> Select orderBy(ColumnFun<T, R> columnFun, SqlSort sqlSort) {
         return orderBy(LambdaUtil.getColumn(columnFun), sqlSort);
     }
@@ -736,7 +726,6 @@ public class Select extends CommonCondition<Select> implements Serializable {
      *
      * @param columnFuns
      */
-    @NotSupportAndroid
     public <T, R> Select filterFields(ColumnFun<T, R>... columnFuns) {
         if (columnFuns != null && columnFuns.length > 0) {
             for (ColumnFun<T, R> columnFun : columnFuns) {

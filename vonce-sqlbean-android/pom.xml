@@ -4,8 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>vonce-sqlbean-java</name>
-    <description>
+
+    <name>vonce-sqlbean-android</name>
+    <description>This is a tool that uses Java object-oriented thinking to write and generate Sql statements, and on this basis, it implements lightweight plug-in support for Android. A large number of commonly used Sql execution methods are built into the plug-in, the purpose is to improve development efficiency, reduce a large number of Sql statement writing, and let developers focus more on writing business code.
     </description>
     <url>www.vonce.cn</url>
     <licenses>
@@ -21,26 +22,27 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:git@github.com:Jovilam77/vonce-sqlbean.git</connection>
-        <developerConnection>scm:git:git@github.com:Jovilam77/vonce-sqlbean.git</developerConnection>
-        <url>git@github.com:Jovilam77/vonce-sqlbean.git</url>
+        <connection>scm:git:git@github.com:Jovilam77/vonce-sqlbean-android.git</connection>
+        <developerConnection>scm:git:git@github.com:Jovilam77/vonce-sqlbean-android.git</developerConnection>
+        <url>git@github.com:Jovilam77/vonce-sqlbean-android.git</url>
     </scm>
 
     <build>
         <plugins>
             <!--编译插件-->
-            <!--<plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
                 <configuration>
                     <compilerArgument>
                         -proc:none
                     </compilerArgument>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>8</source>
+                    <target>8</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
-            </plugin>-->
+            </plugin>
             <!--生产源码文件插件-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -103,22 +105,46 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>cn.vonce.sql</pattern>
+                                    <shadedPattern>cn.vonce.sql</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <!--oss需要对应到settings.xml下的service的id-->
+            <id>oss</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>oss</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <parent>
         <artifactId>vonce-sqlbean</artifactId>
         <groupId>cn.vonce</groupId>
         <version>1.7.0-beta1</version>
     </parent>
-    <artifactId>vonce-sqlbean-java</artifactId>
+    <artifactId>vonce-sqlbean-android</artifactId>
     <version>1.7.0-beta1</version>
     <packaging>jar</packaging>
 
@@ -128,19 +154,23 @@
             <groupId>cn.vonce</groupId>
             <artifactId>vonce-sqlbean-core</artifactId>
             <version>${vonce.sqlbean.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.esotericsoftware</groupId>
+                    <artifactId>reflectasm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.github.javaparser</groupId>
+                    <artifactId>javaparser-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <!-- mybatis -->
         <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <version>${mybatis.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>com.android.framework</groupId>
+            <artifactId>android</artifactId>
+            <version>${android.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
 </project>

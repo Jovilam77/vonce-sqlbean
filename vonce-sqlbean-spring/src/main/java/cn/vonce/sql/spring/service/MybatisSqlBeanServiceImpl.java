@@ -258,7 +258,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.SLAVE)
     @Override
     public int count() {
-        return mybatisSqlBeanDao.countBy(getSqlBeanDB(), clazz, null, null);
+        return mybatisSqlBeanDao.countBy(getSqlBeanDB(), clazz, null);
     }
 
     @DbSwitch(DbRole.MASTER)
