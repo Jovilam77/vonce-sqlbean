@@ -1,12 +1,12 @@
-package cn.vonce.sql.spring.datasource;
+package cn.vonce.sql.solon.datasource;
 
 import cn.vonce.sql.java.annotation.DbTransactional;
 import cn.vonce.sql.java.datasource.ConnectionContextHolder;
 import cn.vonce.sql.java.datasource.TransactionalContextHolder;
 import cn.vonce.sql.uitls.IdBuilder;
 import cn.vonce.sql.uitls.StringUtil;
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
+import org.noear.solon.core.aspect.Invocation;
+import org.noear.solon.core.aspect.MethodInterceptor;
 
 /**
  * 事务拦截器
@@ -18,17 +18,17 @@ import org.aopalliance.intercept.MethodInvocation;
 public class TransactionalInterceptor implements MethodInterceptor {
 
     @Override
-    public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-        DbTransactional dbTransactional = methodInvocation.getThis().getClass().getAnnotation(DbTransactional.class);
-        if (methodInvocation.getMethod().isAnnotationPresent(DbTransactional.class)) {
-            dbTransactional = methodInvocation.getMethod().getAnnotation(DbTransactional.class);
+    public Object doIntercept(Invocation inv) throws Throwable {
+        DbTransactional dbTransactional = inv.getMethodAnnotation(DbTransactional.class);
+        if (inv.method().getMethod().isAnnotationPresent(DbTransactional.class)) {
+            dbTransactional = inv.method().getMethod().getAnnotation(DbTransactional.class);
         }
         Object result;
         try {
             String xid = TransactionalContextHolder.getXid();
             //已经存在事务则加入事务并执行
             if (StringUtil.isNotBlank(xid)) {
-                result = methodInvocation.proceed();
+                result = inv.invoke();
                 return result;
             }
             //当前没有事务则创建事务
@@ -37,7 +37,7 @@ public class TransactionalInterceptor implements MethodInterceptor {
                     ConnectionContextHolder.setReadOnly(true);
                 }
                 TransactionalContextHolder.setXid(IdBuilder.uuid());
-                result = methodInvocation.proceed();
+                result = inv.invoke();
                 //移除事务id
                 TransactionalContextHolder.clearXid();
                 //提交或回滚事务

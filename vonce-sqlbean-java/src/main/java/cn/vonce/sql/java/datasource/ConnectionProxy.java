@@ -1,4 +1,4 @@
-package cn.vonce.sql.spring.datasource;
+package cn.vonce.sql.java.datasource;
 
 import cn.vonce.sql.uitls.StringUtil;
 

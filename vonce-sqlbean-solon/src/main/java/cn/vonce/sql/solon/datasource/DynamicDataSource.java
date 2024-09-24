@@ -1,11 +1,11 @@
-package cn.vonce.sql.spring.datasource;
+package cn.vonce.sql.solon.datasource;
 
 import cn.vonce.sql.java.datasource.ConnectionContextHolder;
 import cn.vonce.sql.java.datasource.ConnectionProxy;
 import cn.vonce.sql.java.datasource.DataSourceContextHolder;
 import cn.vonce.sql.java.datasource.TransactionalContextHolder;
 import cn.vonce.sql.uitls.StringUtil;
-import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
+import org.noear.solon.data.datasource.AbstractRoutingDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -21,7 +21,7 @@ import java.sql.SQLException;
 public class DynamicDataSource extends AbstractRoutingDataSource {
 
     @Override
-    protected Object determineCurrentLookupKey() {
+    public String determineCurrentKey() {
         return DataSourceContextHolder.getDataSource();
     }
 
@@ -30,7 +30,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
         String xid = TransactionalContextHolder.getXid();
         String ds = DataSourceContextHolder.getDataSource();
         if (StringUtil.isEmpty(xid)) {
-            return determineTargetDataSource().getConnection();
+            return determineCurrentTarget().getConnection();
         }
         return getConnectionProxy(ds, null, null);
     }
@@ -40,7 +40,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
         String xid = TransactionalContextHolder.getXid();
         String ds = DataSourceContextHolder.getDataSource();
         if (StringUtil.isEmpty(xid)) {
-            return determineTargetDataSource().getConnection(username, password);
+            return determineCurrentTarget().getConnection(username, password);
         }
         return getConnectionProxy(ds, username, password);
     }
@@ -53,9 +53,9 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
         if (connectionProxy == null) {
             Connection connection;
             if (StringUtil.isBlank(username) && StringUtil.isBlank(password)) {
-                connection = determineTargetDataSource().getConnection();
+                connection = determineCurrentTarget().getConnection();
             } else {
-                connection = determineTargetDataSource().getConnection(username, password);
+                connection = determineCurrentTarget().getConnection(username, password);
             }
             connectionProxy = new ConnectionProxy(ds, connection);
             ConnectionContextHolder.setConnection(ds, connectionProxy);

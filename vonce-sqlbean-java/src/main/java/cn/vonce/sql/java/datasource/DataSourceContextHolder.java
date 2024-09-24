@@ -1,4 +1,4 @@
-package cn.vonce.sql.spring.datasource;
+package cn.vonce.sql.java.datasource;
 
 /**
  * 数据持有者

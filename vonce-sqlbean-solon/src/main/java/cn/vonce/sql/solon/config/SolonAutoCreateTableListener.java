@@ -21,7 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @date 2024/8/20 12:10
  */
 @Component
-public class SolonAutoCreateTableListener extends BaseAutoCreateTableListener implements EventListener<AppLoadEndEvent> {
+public class SolonAutoCreateTableListener extends BaseAutoCreateTableListener implements  EventListener<AppLoadEndEvent> {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 

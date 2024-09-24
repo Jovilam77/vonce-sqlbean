@@ -18,7 +18,9 @@ import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.tools.Diagnostic;
+import javax.tools.FileObject;
 import javax.tools.JavaFileObject;
+import javax.tools.StandardLocation;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
@@ -102,19 +104,22 @@ public class SqlConstantProcessor extends AbstractProcessor {
             String tableName = element.getSimpleName().toString();
             //获取源码根目录
             URL url = getClass().getClassLoader().getResource("");
-            String sourceRoot = url.getPath().substring(1, url.getPath().lastIndexOf("/target/classes/")) + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator;
-            String javaFilePath = sourceRoot + ((PackageElement) element.getEnclosingElement()).getQualifiedName().toString().replace(".", File.separator) + File.separator + element.getSimpleName().toString() + ".java";
-            //获取编译单元
-            CompilationUnit compilationUnit = this.getCompilationUnit(javaFilePath);
+            CompilationUnit compilationUnit;
             TypeDeclaration typeDeclaration = null;
             List<FieldDeclaration> fieldDeclarationList = null;
-            if (compilationUnit != null && compilationUnit.getTypes() != null && compilationUnit.getTypes().size() > 0) {
-                NodeList<TypeDeclaration<?>> typeDeclarations = compilationUnit.getTypes();
-                typeDeclaration = typeDeclarations.get(0);
-            }
-            if (typeDeclaration != null) {
-                fieldDeclarationList = JavaParserUtil.getAllFieldDeclaration(sourceRoot, compilationUnit, typeDeclaration);
-                tableRemarks = JavaParserUtil.getCommentContent(typeDeclaration.getComment().get().getContent());
+            if (url != null) {
+                String sourceRoot = url.getPath().substring(1, url.getPath().lastIndexOf("/target/classes/")) + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator;
+                String javaFilePath = sourceRoot + ((PackageElement) element.getEnclosingElement()).getQualifiedName().toString().replace(".", File.separator) + File.separator + element.getSimpleName().toString() + ".java";
+                //获取编译单元
+                compilationUnit = this.getCompilationUnit(javaFilePath);
+                if (compilationUnit != null && compilationUnit.getTypes() != null && compilationUnit.getTypes().size() > 0) {
+                    NodeList<TypeDeclaration<?>> typeDeclarations = compilationUnit.getTypes();
+                    typeDeclaration = typeDeclarations.get(0);
+                }
+                if (typeDeclaration != null) {
+                    fieldDeclarationList = JavaParserUtil.getAllFieldDeclaration(sourceRoot, compilationUnit, typeDeclaration);
+                    tableRemarks = JavaParserUtil.getCommentContent(typeDeclaration.getComment().get().getContent());
+                }
             }
             if (sqlTable != null) {
                 schema = sqlTable.schema();

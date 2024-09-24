@@ -1,4 +1,4 @@
-package cn.vonce.sql.spring.datasource;
+package cn.vonce.sql.solon.datasource;
 
 import cn.vonce.sql.java.annotation.DbSource;
 import cn.vonce.sql.java.annotation.DbSwitch;
@@ -6,14 +6,8 @@ import cn.vonce.sql.java.datasource.DataSourceContextHolder;
 import cn.vonce.sql.java.datasource.TransactionalContextHolder;
 import cn.vonce.sql.java.enumerate.DbRole;
 import cn.vonce.sql.uitls.StringUtil;
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.stereotype.Repository;
-
+import org.noear.solon.core.aspect.Invocation;
+import org.noear.solon.core.aspect.MethodInterceptor;
 import java.lang.reflect.Method;
 import java.util.Random;
 
@@ -25,21 +19,15 @@ import java.util.Random;
  * @email imjovi@qq.com
  * @date 2020/10/29 21:24
  */
-@Aspect
-@Repository
-public class DataSourceAspect {
+public class DataSourceInterceptor implements MethodInterceptor {
 
-    @Pointcut("target(cn.vonce.sql.service.SqlBeanService)")
-    public void pointcut() {
-    }
-
-    @Before("pointcut()")
-    public void before(JoinPoint joinPoint) {
-        Class<?> clazz = joinPoint.getTarget().getClass();
+    @Override
+    public Object doIntercept(Invocation inv) throws Throwable {
+        Class<?> clazz = inv.target().getClass();
         String xid = TransactionalContextHolder.getXid();
         if (clazz.isAnnotationPresent(DbSource.class) && StringUtil.isBlank(xid)) {
-            String methodName = joinPoint.getSignature().getName();
-            Class[] parameterTypes = ((MethodSignature) joinPoint.getSignature()).getParameterTypes();
+            String methodName = inv.method().getMethod().getName();
+            Class[] parameterTypes = inv.method().getMethod().getParameterTypes();
             String dataSource = null;
             DbSource dbSource = clazz.getAnnotation(DbSource.class);
             try {
@@ -59,11 +47,9 @@ public class DataSourceAspect {
             }
             DataSourceContextHolder.setDataSource(dataSource);
         }
-    }
-
-    @After("pointcut()")
-    public void after(JoinPoint joinPoint) {
+        Object result = inv.invoke();
         DataSourceContextHolder.clearDataSource();
+        return result;
     }
 }
 
