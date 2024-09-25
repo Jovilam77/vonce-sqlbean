@@ -31,6 +31,7 @@ public class AutoConfigSolon implements Plugin {
             }
             context.beanMake(SolonAutoCreateTableListener.class);
             context.beanInterceptorAdd(DbSource.class, new DataSourceInterceptor());
+            context.beanInjectorAdd(EnableAutoConfigMultiDataSource.class, new AutoConfigMultiDataSource());
         });
 
     }

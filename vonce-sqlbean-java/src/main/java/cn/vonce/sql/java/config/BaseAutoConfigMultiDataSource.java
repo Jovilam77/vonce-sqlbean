@@ -2,14 +2,9 @@ package cn.vonce.sql.java.config;
 
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.sql.DataSource;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -20,9 +15,6 @@ import java.util.*;
  * @date 2024/9/24 16:53
  */
 public abstract class BaseAutoConfigMultiDataSource {
-
-
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected final static List<String> fieldList = new ArrayList<>();
     protected final static String MULTI_DATA_SOURCE_TYPE = "spring.datasource.type";
@@ -56,35 +48,6 @@ public abstract class BaseAutoConfigMultiDataSource {
         fieldList.add("poolPreparedStatements");
         fieldList.add("maxPoolPreparedStatementPerConnectionSize");
         fieldList.add("filters");
-    }
-
-    /**
-     * 获取多数据源名称
-     *
-     * @param multiDataSourceClass
-     * @return
-     */
-    public List<String> getDataSourceNameList(Class<?> multiDataSourceClass) {
-        Field[] fields = multiDataSourceClass.getFields();
-        if (fields == null || fields.length == 0) {
-            return null;
-        }
-        List<String> dataSourceNameList = new ArrayList<>();
-        for (int i = 0; i < fields.length; i++) {
-            if (!Modifier.isStatic(fields[i].getModifiers())) {
-                continue;
-            }
-            if (!Modifier.isFinal(fields[i].getModifiers())) {
-                continue;
-            }
-            try {
-                Object value = fields[i].get(null);
-                dataSourceNameList.add(value.toString());
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        return dataSourceNameList;
     }
 
     /**
@@ -130,19 +93,14 @@ public abstract class BaseAutoConfigMultiDataSource {
 
     public abstract String getProperty(String key);
 
-    public void config(Class<?> multiDataSourceClass, String defaultDataSource, RegisterAutoConfigMultiDataSourceBean register) {
-        List<String> dataSourceNameList = getDataSourceNameList(multiDataSourceClass);
-        if (dataSourceNameList == null || dataSourceNameList.isEmpty()) {
+    public void config(Set<String> dataSourceNameSet, String defaultDataSource, RegisterAutoConfigMultiDataSourceBean register) {
+        if (dataSourceNameSet == null || dataSourceNameSet.isEmpty()) {
             return;
-        }
-        //如果未设置默认数据源将默认设置第一个
-        if (StringUtil.isEmpty(defaultDataSource)) {
-            defaultDataSource = dataSourceNameList.get(0);
         }
         DataSource defaultTargetDataSource = null;
         Map<String, DataSource> dataSourceMap = new HashMap<>(8);
         Class<?> typeClass = getTypeClass(this.getProperty(MULTI_DATA_SOURCE_TYPE));
-        for (String dataSourceName : dataSourceNameList) {
+        for (String dataSourceName : dataSourceNameSet) {
             Map<String, Method> methodMap = getMethodMap(typeClass);
             DataSource dataSource = null;
             try {

@@ -4,6 +4,7 @@ import cn.vonce.sql.java.config.BaseAutoConfigMultiDataSource;
 import cn.vonce.sql.spring.annotation.EnableAutoConfigMultiDataSource;
 import cn.vonce.sql.spring.datasource.DynamicDataSource;
 import cn.vonce.sql.spring.datasource.TransactionalInterceptor;
+import cn.vonce.sql.uitls.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
@@ -14,8 +15,11 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.type.AnnotationMetadata;
+
 import java.util.*;
 
 /**
@@ -44,11 +48,40 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
             logger.warn("Expected StandardEnvironment, but found: {}", environment.getClass().getName());
             return;
         }
+        MutablePropertySources propertySources = environment.getPropertySources();
+        String defaultDataSource = null;
+        Set<String> dataSourceNameSet = new LinkedHashSet();
+        for (PropertySource propertySource : propertySources) {
+            String name = propertySource.getName();
+            if (propertySource.getName().indexOf("[") >= 0 && propertySource.getName().indexOf("]") >= 0) {
+                name = propertySource.getName().substring(propertySource.getName().indexOf("[") + 1, propertySource.getName().indexOf("]"));
+            }
+            if (name.indexOf("classpath:/") >= 0) {
+                name = name.substring(name.indexOf("/") + 1);
+            }
+            if (name.startsWith("application")) {
+                Object map = propertySource.getSource();
+                if (map instanceof Map) {
+                    for (Map.Entry<String, Object> entry : ((Map<String, Object>) map).entrySet()) {
+                        String key = entry.getKey();
+                        if (key.startsWith(MULTI_DATA_SOURCE_PREFIX)) {
+                            key = key.substring(key.indexOf(MULTI_DATA_SOURCE_PREFIX) + MULTI_DATA_SOURCE_PREFIX.length() + 1);
+                            key = key.substring(0, key.indexOf("."));
+                            dataSourceNameSet.add(key);
+                            if (defaultDataSource == null) {
+                                defaultDataSource = key;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         Map<String, Object> annotationAttributeMap = annotationMetadata.getAnnotationAttributes(EnableAutoConfigMultiDataSource.class.getName());
-        //取得注解中的属性
-        Class<?> multiDataSourceClass = (Class<?>) annotationAttributeMap.get("multiDataSource");
-        String defaultDataSource = (String) annotationAttributeMap.get("defaultDataSource");
-        super.config(multiDataSourceClass, defaultDataSource, (defaultTargetDataSource, dataSourceMap) -> {
+        String anonDefaultDataSource = (String) annotationAttributeMap.get("defaultDataSource");
+        if (anonDefaultDataSource != null && StringUtil.isNotBlank(anonDefaultDataSource)) {
+            defaultDataSource = anonDefaultDataSource;
+        }
+        super.config(dataSourceNameSet, defaultDataSource, (defaultTargetDataSource, dataSourceMap) -> {
             BeanDefinitionBuilder definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(DynamicDataSource.class);
             definitionBuilder.addPropertyValue("defaultTargetDataSource", defaultTargetDataSource);
             definitionBuilder.addPropertyValue("targetDataSources", dataSourceMap);
@@ -64,7 +97,7 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
 
     private BeanDefinition transactionalDefinition() {
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
-        pointcut.setExpression("@annotation(cn.vonce.sql.spring.annotation.DbTransactional)");
+        pointcut.setExpression("@annotation(cn.vonce.sql.java.annotation.DbTransactional)");
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(DefaultPointcutAdvisor.class);
         beanDefinitionBuilder.addPropertyValue("pointcut", pointcut);
         beanDefinitionBuilder.addPropertyValue("advice", new TransactionalInterceptor());

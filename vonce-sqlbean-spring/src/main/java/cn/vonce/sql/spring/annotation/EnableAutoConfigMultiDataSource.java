@@ -20,13 +20,6 @@ import java.lang.annotation.*;
 public @interface EnableAutoConfigMultiDataSource {
 
     /**
-     * 多数据源名称常量类
-     *
-     * @return
-     */
-    Class<?> multiDataSource();
-
-    /**
      * 默认数据源名称
      *
      * @return

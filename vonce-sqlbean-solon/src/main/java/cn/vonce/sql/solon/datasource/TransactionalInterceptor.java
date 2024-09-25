@@ -5,8 +5,8 @@ import cn.vonce.sql.java.datasource.ConnectionContextHolder;
 import cn.vonce.sql.java.datasource.TransactionalContextHolder;
 import cn.vonce.sql.uitls.IdBuilder;
 import cn.vonce.sql.uitls.StringUtil;
+import org.noear.solon.core.aspect.Interceptor;
 import org.noear.solon.core.aspect.Invocation;
-import org.noear.solon.core.aspect.MethodInterceptor;
 
 /**
  * 事务拦截器
@@ -15,7 +15,7 @@ import org.noear.solon.core.aspect.MethodInterceptor;
  * @email imjovi@qq.com
  * @date 2022/12/14 11:34
  */
-public class TransactionalInterceptor implements MethodInterceptor {
+public class TransactionalInterceptor implements Interceptor {
 
     @Override
     public Object doIntercept(Invocation inv) throws Throwable {

@@ -18,9 +18,7 @@ import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.tools.Diagnostic;
-import javax.tools.FileObject;
 import javax.tools.JavaFileObject;
-import javax.tools.StandardLocation;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
@@ -118,7 +116,9 @@ public class SqlConstantProcessor extends AbstractProcessor {
                 }
                 if (typeDeclaration != null) {
                     fieldDeclarationList = JavaParserUtil.getAllFieldDeclaration(sourceRoot, compilationUnit, typeDeclaration);
-                    tableRemarks = JavaParserUtil.getCommentContent(typeDeclaration.getComment().get().getContent());
+                    if (typeDeclaration.getComment().isPresent()) {
+                        tableRemarks = JavaParserUtil.getCommentContent(typeDeclaration.getComment().get().getContent());
+                    }
                 }
             }
             if (sqlTable != null) {

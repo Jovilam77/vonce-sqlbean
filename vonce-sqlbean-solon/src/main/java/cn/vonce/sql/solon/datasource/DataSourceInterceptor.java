@@ -6,8 +6,8 @@ import cn.vonce.sql.java.datasource.DataSourceContextHolder;
 import cn.vonce.sql.java.datasource.TransactionalContextHolder;
 import cn.vonce.sql.java.enumerate.DbRole;
 import cn.vonce.sql.uitls.StringUtil;
+import org.noear.solon.core.aspect.Interceptor;
 import org.noear.solon.core.aspect.Invocation;
-import org.noear.solon.core.aspect.MethodInterceptor;
 import java.lang.reflect.Method;
 import java.util.Random;
 
@@ -19,7 +19,7 @@ import java.util.Random;
  * @email imjovi@qq.com
  * @date 2020/10/29 21:24
  */
-public class DataSourceInterceptor implements MethodInterceptor {
+public class DataSourceInterceptor implements Interceptor {
 
     @Override
     public Object doIntercept(Invocation inv) throws Throwable {

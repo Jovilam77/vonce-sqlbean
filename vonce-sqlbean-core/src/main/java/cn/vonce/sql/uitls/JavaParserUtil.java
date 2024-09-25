@@ -5,6 +5,7 @@ import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
@@ -92,7 +93,11 @@ public class JavaParserUtil {
             }
         }
         if (StringUtil.isNotEmpty(superClassName) && !"Object".equals(superClassName)) {
-            String superClassPath = getSuperClassPath(sourceRoot, compilationUnit.getPackageDeclaration().get().getNameAsString(), superClassName, compilationUnit.getImports());
+            Optional<PackageDeclaration> packageDeclaration = compilationUnit.getPackageDeclaration();
+            if (!packageDeclaration.isPresent()) {
+                return fieldDeclarationList;
+            }
+            String superClassPath = getSuperClassPath(sourceRoot, packageDeclaration.get().getNameAsString(), superClassName, compilationUnit.getImports());
             try {
                 JavaParser javaParser = new JavaParser();
                 ParseResult<CompilationUnit> result = javaParser.parse(new File(sourceRoot + superClassPath));
