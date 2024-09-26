@@ -1,5 +1,8 @@
 package cn.vonce.sql.solon.annotation;
 
+import cn.vonce.sql.solon.config.AutoConfigMultiDataSource;
+import org.noear.solon.annotation.Import;
+
 import java.lang.annotation.*;
 
 /**
@@ -13,6 +16,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
+@Import(AutoConfigMultiDataSource.class)
 public @interface EnableAutoConfigMultiDataSource {
 
     /**

@@ -6,11 +6,9 @@ import cn.vonce.sql.solon.annotation.EnableAutoConfigMultiDataSource;
 import cn.vonce.sql.solon.datasource.DynamicDataSource;
 import cn.vonce.sql.solon.datasource.TransactionalInterceptor;
 import cn.vonce.sql.uitls.StringUtil;
-import org.noear.solon.core.AppContext;
-import org.noear.solon.core.BeanInjector;
-import org.noear.solon.core.BeanWrap;
-import org.noear.solon.core.VarHolder;
+import org.noear.solon.core.*;
 
+import javax.sql.DataSource;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
@@ -22,7 +20,7 @@ import java.util.*;
  * @email imjovi@qq.com
  * @date 2021/7/7 17:00
  */
-public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource implements BeanInjector {
+public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource implements BeanBuilder {
 
     private AppContext appContext;
 
@@ -32,16 +30,27 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
     }
 
     @Override
-    public void doInject(VarHolder vh, Annotation anno) {
-        this.appContext = vh.context();
+    public String getDataSourceType() {
+        return "solon.datasource.type";
+    }
+
+    @Override
+    public String getDataSourcePrefix() {
+        return "solon.datasource.sqlbean";
+    }
+
+    @Override
+    public void doBuild(Class clz, BeanWrap bw, Annotation anno) throws Throwable {
+        this.appContext = bw.context();
         EnableAutoConfigMultiDataSource enableAutoConfigMultiDataSource = (EnableAutoConfigMultiDataSource) anno;
         String defaultDataSource = null;
         Set<String> dataSourceNameSet = new LinkedHashSet();
+        String dataSourcePrefix = this.getDataSourcePrefix();
         for (Map.Entry<Object, Object> entry : appContext.cfg().entrySet()) {
             if (entry.getKey() instanceof String) {
                 String key = (String) entry.getKey();
-                if (key.startsWith(MULTI_DATA_SOURCE_PREFIX)) {
-                    key = key.substring(key.indexOf(MULTI_DATA_SOURCE_PREFIX));
+                if (key.startsWith(dataSourcePrefix)) {
+                    key = key.substring(key.indexOf(dataSourcePrefix) + dataSourcePrefix.length() + 1);
                     key = key.substring(0, key.indexOf("."));
                     dataSourceNameSet.add(key);
                     if (defaultDataSource == null) {
@@ -58,11 +67,11 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
             DynamicDataSource dynamicDataSource = new DynamicDataSource();
             dynamicDataSource.setDefaultTargetDataSource(defaultTargetDataSource);
             dynamicDataSource.setTargetDataSources(dataSourceMap);
-            vh.context().beanInject(dynamicDataSource);
-            BeanWrap beanWrap = vh.context().wrap("dynamicDataSource", new DynamicDataSource());
-            vh.context().putWrap("dynamicDataSource", beanWrap);
-            vh.context().beanInterceptorAdd(DbTransactional.class, new TransactionalInterceptor());
+            bw.context().beanInject(dynamicDataSource);
+            BeanWrap beanWrap = bw.context().wrap("dynamicDataSource", dynamicDataSource);
+            bw.context().putWrap(DataSource.class, beanWrap);
+            bw.context().beanInterceptorAdd(DbTransactional.class, new TransactionalInterceptor());
+            AutoConfigSolon.init(beanWrap);
         });
     }
-
 }

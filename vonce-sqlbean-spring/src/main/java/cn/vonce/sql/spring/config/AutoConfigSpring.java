@@ -17,7 +17,6 @@ public class AutoConfigSpring implements ApplicationContextInitializer<Configura
 
     @Override
     public void initialize(ConfigurableApplicationContext context) {
-//        context.getBeanFactory().registerSingleton("autoCreateTableListener", new AutoCreateTableListener());
         ((BeanDefinitionRegistry) context).registerBeanDefinition("autoCreateTableListener", new RootBeanDefinition(AutoCreateTableListener.class));
         ((BeanDefinitionRegistry) context).registerBeanDefinition("dataSourceAspect", new RootBeanDefinition(DataSourceAspect.class));
     }

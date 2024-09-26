@@ -2,6 +2,7 @@ package cn.vonce.sql.java.config;
 
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
+
 import javax.sql.DataSource;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -17,8 +18,6 @@ import java.util.*;
 public abstract class BaseAutoConfigMultiDataSource {
 
     protected final static List<String> fieldList = new ArrayList<>();
-    protected final static String MULTI_DATA_SOURCE_TYPE = "spring.datasource.type";
-    protected final static String MULTI_DATA_SOURCE_PREFIX = "spring.datasource.sqlbean";
     protected final static String DRUID_DATA_SOURCE_CLASS = "com.alibaba.druid.pool.DruidDataSource";
     protected final static Map<Class<?>, Map<String, Method>> classMethodMap = new WeakHashMap<>(8);
 
@@ -93,13 +92,18 @@ public abstract class BaseAutoConfigMultiDataSource {
 
     public abstract String getProperty(String key);
 
+    public abstract String getDataSourceType();
+
+    public abstract String getDataSourcePrefix();
+
     public void config(Set<String> dataSourceNameSet, String defaultDataSource, RegisterAutoConfigMultiDataSourceBean register) {
         if (dataSourceNameSet == null || dataSourceNameSet.isEmpty()) {
             return;
         }
         DataSource defaultTargetDataSource = null;
         Map<String, DataSource> dataSourceMap = new HashMap<>(8);
-        Class<?> typeClass = getTypeClass(this.getProperty(MULTI_DATA_SOURCE_TYPE));
+        Class<?> typeClass = getTypeClass(this.getProperty(this.getDataSourceType()));
+        String dataSourcePrefix = this.getDataSourcePrefix();
         for (String dataSourceName : dataSourceNameSet) {
             Map<String, Method> methodMap = getMethodMap(typeClass);
             DataSource dataSource = null;
@@ -111,9 +115,9 @@ public abstract class BaseAutoConfigMultiDataSource {
                 e.printStackTrace();
             }
             for (String fieldName : fieldList) {
-                String propertyValue = this.getProperty(MULTI_DATA_SOURCE_PREFIX + "." + dataSourceName + "." + fieldName);
+                String propertyValue = this.getProperty(dataSourcePrefix + "." + dataSourceName + "." + fieldName);
                 if (StringUtil.isBlank(propertyValue)) {
-                    propertyValue = this.getProperty(MULTI_DATA_SOURCE_PREFIX + "." + dataSourceName + "." + StringUtil.humpToHyphen(fieldName));
+                    propertyValue = this.getProperty(dataSourcePrefix + "." + dataSourceName + "." + StringUtil.humpToHyphen(fieldName));
                 }
                 if (StringUtil.isNotBlank(propertyValue)) {
                     try {

@@ -51,6 +51,7 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
         MutablePropertySources propertySources = environment.getPropertySources();
         String defaultDataSource = null;
         Set<String> dataSourceNameSet = new LinkedHashSet();
+        String dataSourcePrefix = this.getDataSourcePrefix();
         for (PropertySource propertySource : propertySources) {
             String name = propertySource.getName();
             if (propertySource.getName().indexOf("[") >= 0 && propertySource.getName().indexOf("]") >= 0) {
@@ -64,8 +65,8 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
                 if (map instanceof Map) {
                     for (Map.Entry<String, Object> entry : ((Map<String, Object>) map).entrySet()) {
                         String key = entry.getKey();
-                        if (key.startsWith(MULTI_DATA_SOURCE_PREFIX)) {
-                            key = key.substring(key.indexOf(MULTI_DATA_SOURCE_PREFIX) + MULTI_DATA_SOURCE_PREFIX.length() + 1);
+                        if (key.startsWith(dataSourcePrefix)) {
+                            key = key.substring(key.indexOf(dataSourcePrefix) + dataSourcePrefix.length() + 1);
                             key = key.substring(0, key.indexOf("."));
                             dataSourceNameSet.add(key);
                             if (defaultDataSource == null) {
@@ -95,9 +96,19 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
         return environment.getProperty(key);
     }
 
+    @Override
+    public String getDataSourceType() {
+        return "spring.datasource.type";
+    }
+
+    @Override
+    public String getDataSourcePrefix() {
+        return "spring.datasource.sqlbean";
+    }
+
     private BeanDefinition transactionalDefinition() {
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
-        pointcut.setExpression("@annotation(cn.vonce.sql.java.annotation.DbTransactional)");
+        pointcut.setExpression("@annotation(" + cn.vonce.sql.java.annotation.DbTransactional.class.getName() + ")");
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(DefaultPointcutAdvisor.class);
         beanDefinitionBuilder.addPropertyValue("pointcut", pointcut);
         beanDefinitionBuilder.addPropertyValue("advice", new TransactionalInterceptor());
