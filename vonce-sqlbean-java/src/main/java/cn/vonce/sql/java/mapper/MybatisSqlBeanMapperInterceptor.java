@@ -2,6 +2,7 @@ package cn.vonce.sql.java.mapper;
 
 import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.bean.TableInfo;
+import cn.vonce.sql.java.dao.MybatisSqlBeanDao;
 import cn.vonce.sql.mapper.ResultSetDelegate;
 import cn.vonce.sql.mapper.SqlBeanMapper;
 import cn.vonce.sql.uitls.ReflectUtil;
@@ -32,7 +33,6 @@ import java.util.*;
 public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements Interceptor {
 
     private Logger logger = LoggerFactory.getLogger(MybatisSqlBeanMapperInterceptor.class);
-    private static final String className = "cn.vonce.sql.spring.dao.MybatisSqlBeanDao";
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -43,7 +43,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
             // 利用反射获取参数对象
             ParameterHandler parameterHandler = ReflectUtil.getFieldValue(resultSetHandler, "parameterHandler");
             MappedStatement mappedStatement = ReflectUtil.getFieldValue(resultSetHandler, "mappedStatement");
-            if (mappedStatement.getId().startsWith(className)) {
+            if (mappedStatement.getId().startsWith(MybatisSqlBeanDao.class.getName())) {
                 Object parameterObj = parameterHandler.getParameterObject();
                 // 获取节点属性的集合
                 List<ResultMap> resultMaps = mappedStatement.getResultMaps();
