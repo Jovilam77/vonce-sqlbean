@@ -34,6 +34,7 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private StandardEnvironment environment;
+    private Map<String, Object> propertyMap;
 
     @Override
     public void setEnvironment(Environment environment) {
@@ -52,6 +53,7 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
         String defaultDataSource = null;
         Set<String> dataSourceNameSet = new LinkedHashSet();
         String dataSourcePrefix = this.getDataSourcePrefix();
+        this.propertyMap = new HashMap<>();
         for (PropertySource propertySource : propertySources) {
             String name = propertySource.getName();
             if (propertySource.getName().indexOf("[") >= 0 && propertySource.getName().indexOf("]") >= 0) {
@@ -72,6 +74,7 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
                             if (defaultDataSource == null) {
                                 defaultDataSource = key;
                             }
+                            this.propertyMap.put(entry.getKey(), entry.getValue());
                         }
                     }
                 }
@@ -89,6 +92,11 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
             beanDefinitionRegistry.registerBeanDefinition("dynamicDataSource", definitionBuilder.getBeanDefinition());
             beanDefinitionRegistry.registerBeanDefinition("sqlBeanTransactional", transactionalDefinition());
         });
+    }
+
+    @Override
+    public Map<String, Object> getPropertyMap() {
+        return this.propertyMap;
     }
 
     @Override

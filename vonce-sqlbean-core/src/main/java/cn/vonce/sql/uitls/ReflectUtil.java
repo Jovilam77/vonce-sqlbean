@@ -70,7 +70,7 @@ public abstract class ReflectUtil {
      * @param fieldName 目标属性
      * @return 目标字段
      */
-    private static Field getField(Object obj, String fieldName) {
+    public static Field getField(Object obj, String fieldName) {
         Field field = null;
         for (Class<?> clazz = obj.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
             try {

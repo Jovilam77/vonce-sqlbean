@@ -23,6 +23,12 @@ import java.util.*;
 public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource implements BeanBuilder {
 
     private AppContext appContext;
+    private Map<String, Object> propertyMap;
+
+    @Override
+    public Map<String, Object> getPropertyMap() {
+        return this.propertyMap;
+    }
 
     @Override
     public String getProperty(String key) {
@@ -46,6 +52,7 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
         String defaultDataSource = null;
         Set<String> dataSourceNameSet = new LinkedHashSet();
         String dataSourcePrefix = this.getDataSourcePrefix();
+        this.propertyMap = new HashMap<>();
         for (Map.Entry<Object, Object> entry : appContext.cfg().entrySet()) {
             if (entry.getKey() instanceof String) {
                 String key = (String) entry.getKey();
@@ -56,6 +63,7 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
                     if (defaultDataSource == null) {
                         defaultDataSource = key;
                     }
+                    this.propertyMap.put((String) entry.getKey(), entry.getValue());
                 }
             }
         }

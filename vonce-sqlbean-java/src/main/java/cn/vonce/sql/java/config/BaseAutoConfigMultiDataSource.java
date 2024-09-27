@@ -1,11 +1,12 @@
 package cn.vonce.sql.java.config;
 
+import cn.vonce.sql.exception.SqlBeanException;
+import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
 import javax.sql.DataSource;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -17,36 +18,16 @@ import java.util.*;
  */
 public abstract class BaseAutoConfigMultiDataSource {
 
-    protected final static List<String> fieldList = new ArrayList<>();
+    protected final static Map<String, String> fieldMap = new HashMap<>(8);
     protected final static String DRUID_DATA_SOURCE_CLASS = "com.alibaba.druid.pool.DruidDataSource";
-    protected final static Map<Class<?>, Map<String, Method>> classMethodMap = new WeakHashMap<>(8);
 
     static {
-        fieldList.add("driverClassName");
-        fieldList.add("url");
-        fieldList.add("username");
-        fieldList.add("password");
-        fieldList.add("initialSize");
-        fieldList.add("minIdle");
-        fieldList.add("maxIdle");
-        fieldList.add("maxActive");
-        fieldList.add("maxWait");
-        fieldList.add("timeBetweenEvictionRunsMillis");
-        fieldList.add("minEvictableIdleTimeMillis");
-        fieldList.add("validationQuery");
-        fieldList.add("testWhileIdle");
-        fieldList.add("testOnBorrow");
-        fieldList.add("testOnReturn");
-        fieldList.add("validationQueryTimeout");
-        fieldList.add("keepAlive");
-        fieldList.add("removeAbandoned");
-        fieldList.add("removeAbandonedTimeout");
-        fieldList.add("removeAbandonedTimeoutMillis");
-        fieldList.add("logAbandoned");
-        fieldList.add("connectionProperties");
-        fieldList.add("poolPreparedStatements");
-        fieldList.add("maxPoolPreparedStatementPerConnectionSize");
-        fieldList.add("filters");
+        fieldMap.put("jdbcUrl", "url");
+        fieldMap.put("url", "jdbcUrl");
+        fieldMap.put("driverClassName", "driverClass");
+        fieldMap.put("driverClass", "driverClassName");
+        fieldMap.put("minIdle", "minimumIdle");
+        fieldMap.put("minimumIdle", "minIdle");
     }
 
     /**
@@ -64,31 +45,12 @@ public abstract class BaseAutoConfigMultiDataSource {
                 typeClass = Class.forName(type);
             }
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            throw new SqlBeanException("未找到数据源类型：" + e.getMessage());
         }
         return typeClass;
     }
 
-    /**
-     * 获取连接类型中的set方法Map
-     *
-     * @param typeClass
-     * @return
-     */
-    public Map<String, Method> getMethodMap(Class<?> typeClass) {
-        Map<String, Method> methodMap = classMethodMap.get(typeClass);
-        if (methodMap == null) {
-            methodMap = new HashMap<>(16);
-            Method[] methods = typeClass.getMethods();
-            for (Method method : methods) {
-                if (method.getName().indexOf("set") == 0) {
-                    methodMap.put(method.getName(), method);
-                }
-            }
-            classMethodMap.put(typeClass, methodMap);
-        }
-        return methodMap;
-    }
+    public abstract Map<String, Object> getPropertyMap();
 
     public abstract String getProperty(String key);
 
@@ -105,7 +67,6 @@ public abstract class BaseAutoConfigMultiDataSource {
         Class<?> typeClass = getTypeClass(this.getProperty(this.getDataSourceType()));
         String dataSourcePrefix = this.getDataSourcePrefix();
         for (String dataSourceName : dataSourceNameSet) {
-            Map<String, Method> methodMap = getMethodMap(typeClass);
             DataSource dataSource = null;
             try {
                 dataSource = (DataSource) typeClass.newInstance();
@@ -114,21 +75,30 @@ public abstract class BaseAutoConfigMultiDataSource {
             } catch (InstantiationException e) {
                 e.printStackTrace();
             }
-            for (String fieldName : fieldList) {
-                String propertyValue = this.getProperty(dataSourcePrefix + "." + dataSourceName + "." + fieldName);
-                if (StringUtil.isBlank(propertyValue)) {
-                    propertyValue = this.getProperty(dataSourcePrefix + "." + dataSourceName + "." + StringUtil.humpToHyphen(fieldName));
-                }
-                if (StringUtil.isNotBlank(propertyValue)) {
-                    try {
-                        Method method = methodMap.get("set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1));
-                        if (method != null) {
-                            method.invoke(dataSource, SqlBeanUtil.getValueConvert(method.getParameterTypes()[0], propertyValue));
+            for (Map.Entry<String, Object> property : this.getPropertyMap().entrySet()) {
+                String prefix = dataSourcePrefix + "." + dataSourceName;
+                if (property.getKey().startsWith(prefix) && property.getKey().length() > prefix.length()) {
+                    String fieldName = property.getKey().substring(prefix.length() + 1);
+                    if (StringUtil.isBlank(fieldName)) {
+                        continue;
+                    }
+                    Field field = ReflectUtil.getField(dataSource, fieldName);
+                    if (field == null) {
+                        field = ReflectUtil.getField(dataSource, StringUtil.underlineToHump(fieldName));
+                    }
+                    if (field == null && fieldMap.containsKey(fieldName)) {
+                        field = ReflectUtil.getField(dataSource, fieldMap.get(fieldName));
+                    }
+                    if (field == null && fieldMap.containsKey(fieldName)) {
+                        field = ReflectUtil.getField(dataSource, fieldMap.get(StringUtil.underlineToHump(fieldName)));
+                    }
+                    if (field != null) {
+                        try {
+                            field.setAccessible(true);
+                            field.set(dataSource, SqlBeanUtil.getValueConvert(field.getType(), property.getValue()));
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
                         }
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
                     }
                 }
             }
@@ -138,8 +108,6 @@ public abstract class BaseAutoConfigMultiDataSource {
             dataSourceMap.put(dataSourceName, dataSource);
         }
         register.registerBean(defaultTargetDataSource, dataSourceMap);
-        classMethodMap.values().forEach(item -> item.clear());
-        classMethodMap.clear();
     }
 
 }
