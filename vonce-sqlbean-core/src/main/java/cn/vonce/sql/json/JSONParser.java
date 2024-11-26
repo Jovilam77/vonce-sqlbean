@@ -179,8 +179,12 @@ public class JSONParser {
             if (clazz != null) {
                 List<T> resultList = new ArrayList<>();
                 for (Object item : list) {
-                    JSONObject jsonObject = (JSONObject) item;
-                    resultList.add(BeanUtil.toBean(clazz, jsonObject));
+                    if (item instanceof JSONObject) {
+                        JSONObject jsonObject = (JSONObject) item;
+                        resultList.add(BeanUtil.toBean(clazz, jsonObject));
+                    } else {
+                        resultList.add((T) item);
+                    }
                 }
                 return resultList;
             }
