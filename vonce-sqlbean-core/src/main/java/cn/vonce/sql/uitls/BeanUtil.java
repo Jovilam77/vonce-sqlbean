@@ -46,7 +46,18 @@ public class BeanUtil {
                         }
                     }
                     try {
-                        descriptor.getWriteMethod().invoke(obj, value);
+                        if (descriptor.getPropertyType().isEnum()) {
+                            Object[] constants = descriptor.getPropertyType().getEnumConstants();
+                            for (Object constant : constants) {
+                                if (constant.toString().equals(value)) {
+                                    value = constant;
+                                    break;
+                                }
+                            }
+                            descriptor.getWriteMethod().invoke(obj, value);
+                        } else {
+                            descriptor.getWriteMethod().invoke(obj, value);
+                        }
                     } catch (Exception e) {
                         try {
                             value = SqlBeanUtil.getValueConvert(descriptor.getPropertyType(), value);
