@@ -4,12 +4,11 @@ import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.constant.SqlConstant;
-import cn.vonce.sql.define.ColumnFun;
-import cn.vonce.sql.define.JoinOn;
-import cn.vonce.sql.define.SqlEnum;
-import cn.vonce.sql.define.SqlFun;
+import cn.vonce.sql.define.*;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
+import cn.vonce.sql.json.JSONConvertImpl;
+import cn.vonce.sql.json.JSONConvert;
 
 import java.beans.Introspector;
 import java.io.*;
@@ -444,15 +443,7 @@ public class SqlBeanUtil {
         }
         if (columnInfo.getLength() != null && !columnInfo.getLength().equals(toColumnInfo.getLength())) {
             //MySql8之后整数类型不支持设置长度
-            if (sqlBeanDB.getDbType() != DbType.MySQL
-                    || (sqlBeanDB.getDbType() == DbType.MySQL && sqlBeanDB.getDatabaseMajorVersion() < 8)
-                    || (sqlBeanDB.getDbType() == DbType.MySQL && sqlBeanDB.getDatabaseMajorVersion() >= 8
-                    && !columnInfo.getType().equalsIgnoreCase("tinyint")
-                    && !columnInfo.getType().equalsIgnoreCase("smallint")
-                    && !columnInfo.getType().equalsIgnoreCase("mediumint")
-                    && !columnInfo.getType().equalsIgnoreCase("int")
-                    && !columnInfo.getType().equalsIgnoreCase("bigint")
-            )) {
+            if (sqlBeanDB.getDbType() != DbType.MySQL || (sqlBeanDB.getDbType() == DbType.MySQL && sqlBeanDB.getDatabaseMajorVersion() < 8) || (sqlBeanDB.getDbType() == DbType.MySQL && sqlBeanDB.getDatabaseMajorVersion() >= 8 && !columnInfo.getType().equalsIgnoreCase("tinyint") && !columnInfo.getType().equalsIgnoreCase("smallint") && !columnInfo.getType().equalsIgnoreCase("mediumint") && !columnInfo.getType().equalsIgnoreCase("int") && !columnInfo.getType().equalsIgnoreCase("bigint"))) {
                 alterDifferenceList.add(AlterDifference.LENGTH);
             }
         }
@@ -576,7 +567,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static List<Field> getBeanAllField(Class<?> clazz) {
-        if (clazz ==null){
+        if (clazz == null) {
             return Collections.emptyList();
         }
         List<Field> fieldList = new ArrayList<>();
@@ -642,7 +633,8 @@ public class SqlBeanUtil {
                 continue;
             }
             SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
-            if (sqlJoin != null && sqlJoin.isBean()) {
+            boolean isBean = !SqlBeanUtil.isBaseType(field.getType());
+            if (sqlJoin != null && isBean) {
                 Class<?> subBeanClazz = field.getType();
                 if (sqlJoin.from() != null && sqlJoin.from() != void.class) {
                     subBeanClazz = sqlJoin.from();
@@ -719,7 +711,8 @@ public class SqlBeanUtil {
             Class<?> subClazz = field.getType();
             Table table = null;
             //如果字段是bean
-            if (sqlJoin != null && sqlJoin.isBean()) {
+            boolean isBean = !SqlBeanUtil.isBaseType(field.getType());
+            if (sqlJoin != null && isBean) {
                 if (sqlJoin.from() != null && sqlJoin.from() != void.class) {
                     subClazz = sqlJoin.from();
                 }
@@ -752,14 +745,14 @@ public class SqlBeanUtil {
                 joinOn.on(condition);
                 join.on().setDataList(condition.getDataList());
             } else {
-                if (sqlJoin != null && !sqlJoin.isBean()) {
+                if (sqlJoin != null && !isBean) {
                     key = Md5Util.encode(sqlJoin.table().toLowerCase() + sqlJoin.tableKeyword().toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
                     if (joinFieldMap.containsKey(key)) {
                         continue;
                     }
                     select.addJoin(join);
                     join.on(join.getTableAlias(), sqlJoin.tableKeyword(), new RawValue(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
-                } else if (sqlJoin != null && sqlJoin.isBean()) {
+                } else if (sqlJoin != null && isBean) {
                     String tableKeyword = getTableFieldName(getIdField(subClazz), sqlTable);
                     key = Md5Util.encode(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
                     if (joinFieldMap.containsKey(key)) {
@@ -976,14 +969,14 @@ public class SqlBeanUtil {
             case TEXT:
             case NTEXT:
             case LONGTEXT:
-            case CLOB:
-            case NCLOB:
+                whatType = WhatType.STRING_TYPE;
+                break;
             case DATE:
             case TIME:
             case DATETIME:
             case DATETIME2:
             case TIMESTAMP:
-                whatType = WhatType.STRING_TYPE;
+                whatType = WhatType.DATE_TYPE;
                 break;
             case BIT:
                 whatType = WhatType.BOOL_TYPE;
@@ -1067,26 +1060,17 @@ public class SqlBeanUtil {
                 sqlValue = value.toString();
                 break;
             case BOOL_TYPE:
-                if (jdbcType != null) {
-                    sqlValue = (String) value;
+                DbType dbType = common.getSqlBeanDB().getDbType();
+                if (dbType == DbType.Postgresql) {
+                    sqlValue = Boolean.parseBoolean(value.toString()) == true ? "'1'" : "'0'";
+                } else if (dbType == DbType.H2 || dbType == DbType.Hsql) {
+                    sqlValue = Boolean.parseBoolean(value.toString()) == true ? "true" : "false";
                 } else {
-                    DbType dbType = common.getSqlBeanDB().getDbType();
-                    if (dbType == DbType.Postgresql) {
-                        sqlValue = Boolean.parseBoolean(value.toString()) == true ? "'1'" : "'0'";
-                    } else if (dbType == DbType.H2 || dbType == DbType.Hsql) {
-                        sqlValue = Boolean.parseBoolean(value.toString()) == true ? "true" : "false";
-                    } else {
-                        sqlValue = Boolean.parseBoolean(value.toString()) == true ? "1" : "0";
-                    }
+                    sqlValue = Boolean.parseBoolean(value.toString()) == true ? "1" : "0";
                 }
                 break;
             case DATE_TYPE:
-                String dateString;
-                if (jdbcType != null) {
-                    dateString = (String) value;
-                } else {
-                    dateString = DateUtil.unifyDateToString(value);
-                }
+                String dateString = DateUtil.unifyDateToString(value);
                 switch (common.getSqlBeanDB().getDbType()) {
                     case Oracle:
                         sqlValue = "to_timestamp(" + single_quotation_mark + dateString + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
@@ -1673,6 +1657,73 @@ public class SqlBeanUtil {
             System.out.println(e.getMessage());
         }
         return "";
+    }
+
+    /**
+     * 获取字段的JdbcType
+     *
+     * @param sqlBeanDB
+     * @param field
+     * @return
+     */
+    public static JdbcType getJdbcType(SqlBeanDB sqlBeanDB, Field field) {
+        SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
+        if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
+            return sqlColumn.type();
+        }
+        return sqlBeanDB.getDbType().getSqlDialect().getJdbcType(field);
+    }
+
+    /**
+     * 获取JSON字符串
+     *
+     * @param sqlJSON
+     * @param value
+     * @return
+     */
+    public static String getJSONValue(SqlJSON sqlJSON, Object value) {
+        JSONConvert jsonConvert = null;
+        if (sqlJSON != null && sqlJSON.convert() != JSONConvert.class && sqlJSON.convert() != JSONConvertImpl.class) {
+            try {
+                jsonConvert = sqlJSON.convert().getDeclaredConstructor().newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException | NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        } else {
+            jsonConvert = new JSONConvertImpl();
+        }
+        return jsonConvert.toJSONString(value);
+    }
+
+    /**
+     * 将JSON字符串转换为实体类
+     *
+     * @param convert
+     * @param json
+     * @param field
+     * @return
+     */
+    public static Object convertJSON(JSONConvert convert, String json, Field field) {
+        if (StringUtil.isEmpty(json)) {
+            return null;
+        }
+        if (json.startsWith("[") && json.endsWith("]")) {
+            Type genericType = field.getGenericType();
+            if (genericType instanceof ParameterizedType) {
+                ParameterizedType pt = (ParameterizedType) genericType;
+                for (Type typeArg : pt.getActualTypeArguments()) {
+                    return convert.parseArray(json, (Class) typeArg);
+                }
+            }
+            return convert.parse(json);
+        } else if (json.startsWith("{") && json.endsWith("}")) {
+            return convert.parseObject(json, field.getType());
+        }
+        return null;
     }
 
 

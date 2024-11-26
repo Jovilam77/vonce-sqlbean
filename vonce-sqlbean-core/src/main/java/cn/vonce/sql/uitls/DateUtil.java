@@ -269,7 +269,9 @@ public class DateUtil {
         if (date == null) {
             return null;
         }
-        if (date instanceof LocalDateTime) {
+        if (date instanceof String) {
+            return date.toString();
+        } else if (date instanceof LocalDateTime) {
             return ((LocalDateTime) date).format(FORMATTER_FULL);
         } else if (date instanceof LocalDate) {
             return ((LocalDate) date).format(DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.of("+8")));
@@ -406,7 +408,7 @@ public class DateUtil {
         calendar.setFirstDayOfWeek(Calendar.MONDAY);//以周一为首日
         if (date != null) {
             calendar.setTimeInMillis(date.getTime());
-        }else {
+        } else {
             calendar.setTimeInMillis(System.currentTimeMillis());//当前时间
         }
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);//周一

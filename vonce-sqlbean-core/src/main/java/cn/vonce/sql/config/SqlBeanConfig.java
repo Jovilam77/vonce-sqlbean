@@ -1,7 +1,9 @@
 package cn.vonce.sql.config;
 
+import cn.vonce.sql.enumerate.JsonType;
 import cn.vonce.sql.processor.DefaultUniqueIdProcessor;
 import cn.vonce.sql.processor.UniqueIdProcessor;
+
 import java.io.Serializable;
 
 /**
@@ -21,6 +23,7 @@ public class SqlBeanConfig implements Serializable {
     private Boolean toUpperCase;
     private UniqueIdProcessor uniqueIdProcessor;
     private Boolean autoCreate;
+    private JsonType jsonType;
 
     public Boolean getToUpperCase() {
         return toUpperCase;
@@ -55,6 +58,16 @@ public class SqlBeanConfig implements Serializable {
     public void setAutoCreate(boolean autoCreate) {
         if (this.autoCreate == null) {
             this.autoCreate = autoCreate;
+        }
+    }
+
+    public JsonType getJsonType() {
+        return jsonType;
+    }
+
+    public void setJsonType(JsonType jsonType) {
+        if (this.jsonType == null) {
+            this.jsonType = jsonType;
         }
     }
 

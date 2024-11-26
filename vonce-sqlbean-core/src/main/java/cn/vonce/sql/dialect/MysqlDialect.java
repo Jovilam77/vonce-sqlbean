@@ -1,5 +1,6 @@
 package cn.vonce.sql.dialect;
 
+import cn.vonce.sql.annotation.SqlJSON;
 import cn.vonce.sql.bean.Alter;
 import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanDB;
@@ -34,6 +35,10 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
                     return javaType;
                 }
             }
+        }
+        SqlJSON sqlJSON = field.getAnnotation(SqlJSON.class);
+        if (sqlJSON != null) {
+            return JavaMapMySqlType.JSON;
         }
         throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类不支持此字段类型：" + clazz.getSimpleName());
     }

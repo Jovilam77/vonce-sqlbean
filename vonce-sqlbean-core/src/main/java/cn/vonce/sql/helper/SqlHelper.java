@@ -475,6 +475,8 @@ public class SqlHelper {
                     }
                     SqlId sqlId = field.getAnnotation(SqlId.class);
                     SqlDefaultValue sqlDefaultValue = field.getAnnotation(SqlDefaultValue.class);
+                    SqlJSON sqlJSON = field.getAnnotation(SqlJSON.class);
+                    JdbcType jdbcType = SqlBeanUtil.getJdbcType(insert.getSqlBeanDB(), field);
                     if (sqlId != null) {
                         existId++;
                     }
@@ -494,28 +496,31 @@ public class SqlHelper {
                         continue;
                     }
                     Object value = ReflectUtil.instance().get(objectList.get(i).getClass(), objectList.get(i), field.getName());
+                    if (sqlJSON != null) {
+                        value = SqlBeanUtil.getJSONValue(sqlJSON, value);
+                    }
                     //如果此字段为id且需要生成唯一id
                     if (sqlId != null && sqlId.type() != IdType.AUTO && sqlId.type() != IdType.NORMAL) {
                         if (StringUtil.isEmpty(value)) {
                             value = insert.getSqlBeanDB().getSqlBeanConfig().getUniqueIdProcessor().uniqueId(sqlId.type());
                             ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), value);
                         }
-                        valueSql.append(SqlBeanUtil.getSqlValue(insert, value));
+                        valueSql.append(SqlBeanUtil.getSqlValue(insert, value, jdbcType));
                     } else if (field.isAnnotationPresent(SqlLogically.class) && value == null) {
                         //如果标识逻辑删除的字段为空则自动填充
                         Object defaultValue = SqlBeanUtil.assignInitialValue(SqlBeanUtil.getEntityClassFieldType(field));
-                        valueSql.append(SqlBeanUtil.getSqlValue(insert, defaultValue));
+                        valueSql.append(SqlBeanUtil.getSqlValue(insert, defaultValue, jdbcType));
                         ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), field.getType() == Boolean.class || field.getType() == boolean.class ? false : 0);
                     } else if (value == null && sqlDefaultValue != null && (sqlDefaultValue.with() == FillWith.INSERT || sqlDefaultValue.with() == FillWith.TOGETHER)) {
                         Object defaultValue = SqlBeanUtil.assignInitialValue(SqlBeanUtil.getEntityClassFieldType(field));
-                        valueSql.append(SqlBeanUtil.getSqlValue(insert, defaultValue));
+                        valueSql.append(SqlBeanUtil.getSqlValue(insert, defaultValue, jdbcType));
                         if (SqlEnum.class.isAssignableFrom(field.getType())) {
                             ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), SqlBeanUtil.matchEnum(field, defaultValue));
                         } else {
                             ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), defaultValue);
                         }
                     } else {
-                        valueSql.append(SqlBeanUtil.getSqlValue(insert, ReflectUtil.instance().get(objectList.get(i).getClass(), objectList.get(i), field.getName())));
+                        valueSql.append(SqlBeanUtil.getSqlValue(insert, value, jdbcType));
                     }
                     valueSql.append(SqlConstant.COMMA);
                 }
@@ -618,6 +623,10 @@ public class SqlHelper {
                 Object objectValue = ReflectUtil.instance().get(bean.getClass(), bean, field.getName());
                 SqlDefaultValue sqlDefaultValue = field.getAnnotation(SqlDefaultValue.class);
                 SqlVersion sqlVersion = field.getAnnotation(SqlVersion.class);
+                SqlJSON sqlJSON = field.getAnnotation(SqlJSON.class);
+                if (sqlJSON != null) {
+                    objectValue = SqlBeanUtil.getJSONValue(sqlJSON, objectValue);
+                }
                 //如果是只更新不为null的字段，那么该字段如果是null并且也不是乐观锁字段，也不是更新时填充默认值的字段则跳过
                 if (update.isNotNull() && objectValue == null && sqlVersion == null && (sqlDefaultValue == null || sqlDefaultValue.with() == FillWith.INSERT)) {
                     continue;

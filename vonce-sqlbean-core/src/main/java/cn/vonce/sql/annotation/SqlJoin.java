@@ -26,10 +26,11 @@ public @interface SqlJoin {
     String[] value() default "";
 
     /**
-     * 是否为一个实体类
+     * 是否为一个实体类(已不需要显性标识)
      *
      * @return
      */
+    @Deprecated
     boolean isBean() default false;
 
     /**

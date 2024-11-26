@@ -17,7 +17,8 @@ public enum JavaMapOracleType {
     VARCHAR2(new Class[]{String.class}),
     DATE(new Class[]{java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class, java.util.Date.class, java.time.LocalDateTime.class, java.time.LocalDate.class, java.time.LocalTime.class}),
     CLOB(new Class[]{java.sql.Clob.class}),
-    BLOB(new Class[]{java.sql.Blob.class, Object.class});
+    BLOB(new Class[]{java.sql.Blob.class, Object.class}),
+    JSON(new Class[]{});
 
 
     JavaMapOracleType(Class<?>[] classes) {

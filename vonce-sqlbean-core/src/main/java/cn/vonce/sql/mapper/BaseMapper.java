@@ -1,6 +1,5 @@
 package cn.vonce.sql.mapper;
 
-
 import cn.vonce.sql.annotation.SqlJoin;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.define.SqlEnum;
@@ -64,7 +63,8 @@ public abstract class BaseMapper<T> {
             SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
             String fieldName = field.getName();
             if (sqlJoin != null) {
-                if (sqlJoin.isBean()) {
+                boolean isBean = !SqlBeanUtil.isBaseType(field.getType());
+                if (isBean) {
                     Class<?> subClazz = field.getType();
                     Object subBean = ReflectUtil.instance().newObject(subClazz);
                     //获取表的别名，先是获取别名，获取不到就会获取表名
@@ -130,11 +130,11 @@ public abstract class BaseMapper<T> {
      *
      * @param obj
      * @param field
-     * @param fieldName
+     * @param columnName
      * @param resultSetDelegate
      */
-    public void setFieldValue(Object obj, Field field, String fieldName, ResultSetDelegate<T> resultSetDelegate) {
-        Object value = getValue(field.getType().getName(), fieldName, resultSetDelegate);
+    public void setFieldValue(Object obj, Field field, String columnName, ResultSetDelegate<T> resultSetDelegate) {
+        Object value = getValue(field, columnName, resultSetDelegate);
         if (value == null || value.equals("null")) {
             value = SqlBeanUtil.getDefaultValue(field.getType());
         }
@@ -148,12 +148,12 @@ public abstract class BaseMapper<T> {
     /**
      * 获取该字段对应的值
      *
-     * @param fieldType
-     * @param fieldName
+     * @param field
+     * @param columnName
      * @param resultSetDelegate
      * @return
      */
-    public abstract Object getValue(String fieldType, String fieldName, ResultSetDelegate<T> resultSetDelegate);
+    public abstract Object getValue(Field field, String columnName, ResultSetDelegate<T> resultSetDelegate);
 
     /**
      * 获取该字段对应的值
