@@ -228,7 +228,7 @@ public class JSONParser {
         } else if (obj instanceof Date || obj instanceof LocalDate || obj instanceof LocalDateTime || obj instanceof LocalTime) {
             return "\"" + DateUtil.unifyDateToString(obj) + "\"";
         } else if (obj instanceof Map) {
-            return mapToJSONString(BeanUtil.toMap(obj));
+            return mapToJSONString((Map<?, ?>) obj);
         } else if (obj instanceof Collection) {
             return collectionToJSONString((Collection<?>) obj);
         } else if (obj.getClass().isArray()) {
