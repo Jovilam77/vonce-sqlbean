@@ -6,9 +6,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 public class BeanUtil {
@@ -123,10 +120,17 @@ public class BeanUtil {
      */
     private static boolean isBean(Class<?> clazz) {
         return !(clazz.isPrimitive() || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
-                || Boolean.class.equals(clazz) || Character.class.equals(clazz) || Enum.class.isAssignableFrom(clazz) || Date.class.isAssignableFrom(clazz)
+                || Boolean.class.equals(clazz) || Character.class.equals(clazz) || Enum.class.isAssignableFrom(clazz)
                 || Calendar.class.isAssignableFrom(clazz) || Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
-                || BigDecimal.class.isAssignableFrom(clazz) || LocalDate.class.isAssignableFrom(clazz) || LocalDateTime.class.isAssignableFrom(clazz)
-                || LocalTime.class.isAssignableFrom(clazz));
+                || BigDecimal.class.isAssignableFrom(clazz) || isDate(clazz));
+    }
+
+    private static boolean isDate(Class<?> clazz) {
+        if (!SqlBeanUtil.isAndroidEnv()) {
+            return (Date.class.isAssignableFrom(clazz) || java.time.LocalDate.class.isAssignableFrom(clazz) || java.time.LocalDateTime.class.isAssignableFrom(clazz)
+                    || java.time.LocalTime.class.isAssignableFrom(clazz));
+        }
+        return (Date.class.isAssignableFrom(clazz));
     }
 
     /**

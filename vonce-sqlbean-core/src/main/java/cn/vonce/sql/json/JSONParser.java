@@ -2,11 +2,9 @@ package cn.vonce.sql.json;
 
 import cn.vonce.sql.uitls.BeanUtil;
 import cn.vonce.sql.uitls.DateUtil;
+import cn.vonce.sql.uitls.SqlBeanUtil;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 /**
@@ -225,7 +223,7 @@ public class JSONParser {
             return "\"" + escapeString(obj.toString()) + "\"";
         } else if (obj instanceof Number || obj instanceof Boolean || obj instanceof BigDecimal) {
             return obj.toString();
-        } else if (obj instanceof Date || obj instanceof LocalDate || obj instanceof LocalDateTime || obj instanceof LocalTime) {
+        } else if (isDate(obj)) {
             return "\"" + DateUtil.unifyDateToString(obj) + "\"";
         } else if (obj instanceof Map) {
             return mapToJSONString((Map<?, ?>) obj);
@@ -236,6 +234,13 @@ public class JSONParser {
         } else {
             return mapToJSONString(BeanUtil.toMap(obj));
         }
+    }
+
+    private static boolean isDate(Object obj) {
+        if (!SqlBeanUtil.isAndroidEnv()){
+            return (obj instanceof Date || obj instanceof java.time.LocalDate || obj instanceof java.time.LocalDateTime || obj instanceof java.time.LocalTime);
+        }
+        return (obj instanceof Date);
     }
 
     private static String mapToJSONString(Map<?, ?> map) {

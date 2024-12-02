@@ -16,15 +16,28 @@ import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 /**
  * SqlBean 工具类 Created by Jovi on 2018/6/17.
  */
 public class SqlBeanUtil {
+
+    // 是否是Android环境
+    private static boolean isAndroidEnv;
+
+    static {
+        try {
+            Class.forName("dalvik.system.BaseDexClassLoader");
+            isAndroidEnv = true;
+        } catch (Exception e) {
+            isAndroidEnv = false;
+        }
+    }
+
+    public static boolean isAndroidEnv() {
+        return isAndroidEnv;
+    }
 
     /**
      * 保存SqlTable缓存
@@ -945,8 +958,19 @@ public class SqlBeanUtil {
             return WhatType.BOOL_TYPE;
         } else if (type == short.class || type == Short.class || type == int.class || type == Integer.class || type == long.class || type == Long.class || type == float.class || type == Float.class || type == double.class || type == Double.class) {
             return WhatType.VALUE_TYPE;
-        } else if (type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class || type == LocalDate.class || type == LocalTime.class || type == LocalDateTime.class) {
-            return WhatType.DATE_TYPE;
+        }
+        return jdk8DateType(type);
+    }
+
+    private static WhatType jdk8DateType(Class<?> type) {
+        if (isAndroidEnv) {
+            if (type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class) {
+                return WhatType.DATE_TYPE;
+            }
+        } else {
+            if (type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class || type == java.time.LocalDate.class || type == java.time.LocalTime.class || type == java.time.LocalDateTime.class) {
+                return WhatType.DATE_TYPE;
+            }
         }
         return WhatType.OBJECT_TYPE;
     }
@@ -1008,8 +1032,21 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean isBaseType(Class<?> type) {
-        if (type == String.class || type == char.class || type == Character.class || type == boolean.class || type == Boolean.class || type == byte.class || type == Byte.class || type == short.class || type == Short.class || type == int.class || type == Integer.class || type == long.class || type == Long.class || type == float.class || type == Float.class || type == double.class || type == Double.class || type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class || type == LocalDate.class || type == LocalTime.class || type == LocalDateTime.class || type == BigDecimal.class) {
+        if (type == String.class || type == char.class || type == Character.class || type == boolean.class
+                || type == Boolean.class || type == byte.class || type == Byte.class || type == short.class
+                || type == Short.class || type == int.class || type == Integer.class || type == long.class
+                || type == Long.class || type == float.class || type == Float.class || type == double.class
+                || type == Double.class || type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class
+                || type == java.sql.Timestamp.class || type == java.sql.Time.class || type == BigDecimal.class
+                || jdk8IsBaseType(type)) {
             return true;
+        }
+        return false;
+    }
+
+    private static boolean jdk8IsBaseType(Class<?> type) {
+        if (!isAndroidEnv) {
+            return type == java.time.LocalDate.class || type == java.time.LocalTime.class || type == java.time.LocalDateTime.class;
         }
         return false;
     }
@@ -1177,8 +1214,14 @@ public class SqlBeanUtil {
         if (type == Date.class || type == java.sql.Timestamp.class) {
             return new Date();
         }
-        if (type == LocalDateTime.class) {
-            return LocalDateTime.now();
+        return jdk8UpdateVersion(type, value);
+    }
+
+    private static Object jdk8UpdateVersion(Class<?> type, Object value) {
+        if (!isAndroidEnv) {
+            if (type == java.time.LocalDateTime.class) {
+                return java.time.LocalDateTime.now();
+            }
         }
         return null;
     }
@@ -1190,8 +1233,15 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean versionEffectiveness(Class<?> type) {
-        if (type == int.class || type == Integer.class || type == long.class || type == Long.class || type == Date.class || type == java.sql.Timestamp.class || type == LocalDateTime.class) {
+        if (type == int.class || type == Integer.class || type == long.class || type == Long.class || type == Date.class || jdk8VersionEffectiveness(type)) {
             return true;
+        }
+        return false;
+    }
+
+    public static boolean jdk8VersionEffectiveness(Class<?> type) {
+        if (!isAndroidEnv) {
+            return type == java.time.LocalDateTime.class;
         }
         return false;
     }
@@ -1258,14 +1308,20 @@ public class SqlBeanUtil {
         if (type == BigDecimal.class) {
             return new BigDecimal(0);
         }
-        if (type == LocalDate.class) {
-            return LocalDate.now();
-        }
-        if (type == LocalTime.class) {
-            return LocalTime.now();
-        }
-        if (type == LocalDateTime.class) {
-            return LocalDateTime.now();
+        return jdk8AssignInitialValue(type);
+    }
+
+    private static Object jdk8AssignInitialValue(Class<?> type) {
+        if (!isAndroidEnv) {
+            if (type == java.time.LocalDate.class) {
+                return java.time.LocalDate.now();
+            }
+            if (type == java.time.LocalTime.class) {
+                return java.time.LocalTime.now();
+            }
+            if (type == java.time.LocalDateTime.class) {
+                return java.time.LocalDateTime.now();
+            }
         }
         return null;
     }
@@ -1345,16 +1401,24 @@ public class SqlBeanUtil {
         if (type == BigDecimal.class) {
             return new BigDecimal(value.toString());
         }
-        if (type == LocalDate.class) {
-            LocalDateTime localDateTime = DateUtil.strTimeToLocalDateTime(value.toString());
-            return localDateTime == null ? null : localDateTime.toLocalDate();
-        }
-        if (type == LocalTime.class) {
-            LocalDateTime localDateTime = DateUtil.strTimeToLocalDateTime(value.toString());
-            return localDateTime == null ? null : localDateTime.toLocalTime();
-        }
-        if (type == LocalDateTime.class) {
-            return DateUtil.strTimeToLocalDateTime(value.toString());
+        return jdk8DateValueConvert(type, value);
+    }
+
+    private static Object jdk8DateValueConvert(Class<?> type, Object value) {
+        try {
+            Class.forName("android.content.Context");
+        } catch (ClassNotFoundException e) {
+            if (type == java.time.LocalDate.class) {
+                java.time.LocalDateTime localDateTime = DateUtil.strTimeToLocalDateTime(value.toString());
+                return localDateTime == null ? null : localDateTime.toLocalDate();
+            }
+            if (type == java.time.LocalTime.class) {
+                java.time.LocalDateTime localDateTime = DateUtil.strTimeToLocalDateTime(value.toString());
+                return localDateTime == null ? null : localDateTime.toLocalTime();
+            }
+            if (type == java.time.LocalDateTime.class) {
+                return DateUtil.strTimeToLocalDateTime(value.toString());
+            }
         }
         return null;
     }
@@ -1725,6 +1789,5 @@ public class SqlBeanUtil {
         }
         return null;
     }
-
 
 }
