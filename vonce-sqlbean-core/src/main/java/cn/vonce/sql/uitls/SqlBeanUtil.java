@@ -1671,7 +1671,7 @@ public class SqlBeanUtil {
      * @return
      * @throws ClassNotFoundException
      */
-    public static Class getConstantClass(Class<?> clazz) {
+    public static Class<?> getConstantClass(Class<?> clazz) {
         String name = clazz.getName();
         String constantClassName = name.substring(0, name.indexOf(clazz.getSimpleName())) + "sql." + clazz.getSimpleName() + "$";
         try {
@@ -1688,15 +1688,13 @@ public class SqlBeanUtil {
      * @param constantClass
      * @return
      */
-    public static String getBeanRemarks(Class constantClass) {
+    public static String getBeanRemarks(Class<?> constantClass) {
         if (constantClass == null) {
             return "";
         }
         try {
             return (String) constantClass.getField("_remarks").get(null);
-        } catch (IllegalAccessException e) {
-            System.out.println(e.getMessage());
-        } catch (NoSuchFieldException e) {
+        } catch (IllegalAccessException | NoSuchFieldException e) {
             System.out.println(e.getMessage());
         }
         return "";

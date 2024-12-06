@@ -4,10 +4,6 @@ import cn.vonce.sql.annotation.SqlColumn;
 import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.uitls.JavaParserUtil;
 import cn.vonce.sql.uitls.StringUtil;
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseResult;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 
@@ -101,24 +97,18 @@ public class SqlConstantProcessor extends AbstractProcessor {
             String schema = "", tableAlias = "", tableRemarks = "";
             String tableName = element.getSimpleName().toString();
             //获取源码根目录
-            URL url = getClass().getClassLoader().getResource("");
-            CompilationUnit compilationUnit;
-            TypeDeclaration typeDeclaration = null;
             List<FieldDeclaration> fieldDeclarationList = null;
-            if (url != null) {
-                String sourceRoot = url.getPath().substring(1, url.getPath().lastIndexOf("/target/classes/")) + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator;
+            String classPath  = Objects.requireNonNull(getClass().getClassLoader().getResource("")).getPath();
+            if (StringUtil.isNotBlank(classPath)) {
+                classPath = classPath.replaceFirst("^/", ""); // 去掉前导的斜杠（在Windows上）
+                classPath = classPath.replaceAll("%20", " "); // 将URL编码的空格转回正常显示
+                String sourceRoot = classPath.substring(0, classPath.lastIndexOf("/target/classes/")) + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator;
                 String javaFilePath = sourceRoot + ((PackageElement) element.getEnclosingElement()).getQualifiedName().toString().replace(".", File.separator) + File.separator + element.getSimpleName().toString() + ".java";
-                //获取编译单元
-                compilationUnit = this.getCompilationUnit(javaFilePath);
-                if (compilationUnit != null && compilationUnit.getTypes() != null && compilationUnit.getTypes().size() > 0) {
-                    NodeList<TypeDeclaration<?>> typeDeclarations = compilationUnit.getTypes();
-                    typeDeclaration = typeDeclarations.get(0);
-                }
-                if (typeDeclaration != null) {
-                    fieldDeclarationList = JavaParserUtil.getAllFieldDeclaration(sourceRoot, compilationUnit, typeDeclaration);
-                    if (typeDeclaration.getComment().isPresent()) {
-                        tableRemarks = JavaParserUtil.getCommentContent(typeDeclaration.getComment().get().getContent());
-                    }
+                JavaParserUtil.Declaration declaration = JavaParserUtil.getFieldDeclarationList(sourceRoot, javaFilePath);
+                TypeDeclaration<?> typeDeclaration = declaration.getTypeDeclaration();
+                fieldDeclarationList = declaration.getFieldDeclarationList();
+                if (typeDeclaration != null && typeDeclaration.getComment().isPresent()) {
+                    tableRemarks = JavaParserUtil.getCommentContent(typeDeclaration.getComment().get().getContent());
                 }
             }
             if (sqlTable != null) {
@@ -165,16 +155,6 @@ public class SqlConstantProcessor extends AbstractProcessor {
             System.out.println("error:" + e.getMessage());
         }
         return code;
-    }
-
-    private CompilationUnit getCompilationUnit(String javaFilePath) throws FileNotFoundException {
-        JavaParser javaParser = new JavaParser();
-        ParseResult<CompilationUnit> result = javaParser.parse(new File(javaFilePath));
-        Optional<CompilationUnit> compilationUnitOptional = result.getResult();
-        if (compilationUnitOptional.isPresent()) {
-            return compilationUnitOptional.get();
-        }
-        return null;
     }
 
 }

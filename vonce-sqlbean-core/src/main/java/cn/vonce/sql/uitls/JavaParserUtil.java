@@ -12,12 +12,10 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
+import javax.lang.model.element.PackageElement;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Java解析工具
@@ -34,7 +32,7 @@ public class JavaParserUtil {
             return texts[0];
         }
         texts = Arrays.stream(texts).filter(text -> text.charAt(0) != '@').toArray(String[]::new);
-        StringBuffer content = new StringBuffer();
+        StringBuilder content = new StringBuilder();
         for (int i = 0; i < texts.length; i++) {
             String text = texts[i];
             content.append(text);
@@ -70,7 +68,7 @@ public class JavaParserUtil {
     }
 
     public static FieldDeclaration getFieldDeclaration(String fieldName, List<FieldDeclaration> fieldDeclarationList) {
-        if (StringUtil.isEmpty(fieldName) || fieldDeclarationList == null || fieldDeclarationList.size() == 0) {
+        if (StringUtil.isEmpty(fieldName) || fieldDeclarationList == null || fieldDeclarationList.isEmpty()) {
             return null;
         }
         for (FieldDeclaration fieldDeclaration : fieldDeclarationList) {
@@ -81,14 +79,13 @@ public class JavaParserUtil {
         return null;
     }
 
-    public static List<FieldDeclaration> getAllFieldDeclaration(String sourceRoot, CompilationUnit compilationUnit, TypeDeclaration typeDeclaration) {
-        List<FieldDeclaration> fieldDeclarationList = new ArrayList<>();
-        fieldDeclarationList.addAll(typeDeclaration.getFields());
+    public static List<FieldDeclaration> getAllFieldDeclaration(String sourceRoot, CompilationUnit compilationUnit, TypeDeclaration<?> typeDeclaration) {
+        List<FieldDeclaration> fieldDeclarationList = new ArrayList<>(typeDeclaration.getFields());
         String superClassName = null;
         List<ClassOrInterfaceDeclaration> classOrInterfaceDeclarationList = compilationUnit.findAll(ClassOrInterfaceDeclaration.class);
-        if (classOrInterfaceDeclarationList != null && classOrInterfaceDeclarationList.size() > 0) {
+        if (classOrInterfaceDeclarationList != null && !classOrInterfaceDeclarationList.isEmpty()) {
             NodeList<ClassOrInterfaceType> classOrInterfaceTypeNodeList = classOrInterfaceDeclarationList.get(0).getExtendedTypes();
-            if (classOrInterfaceTypeNodeList != null && classOrInterfaceTypeNodeList.size() > 0) {
+            if (classOrInterfaceTypeNodeList != null && !classOrInterfaceTypeNodeList.isEmpty()) {
                 superClassName = classOrInterfaceTypeNodeList.get(0).getNameAsString();
             }
         }
@@ -105,7 +102,7 @@ public class JavaParserUtil {
                     return null;
                 }
                 CompilationUnit superCompilationUnit = result.getResult().get();
-                fieldDeclarationList.addAll(getAllFieldDeclaration(sourceRoot, superCompilationUnit, superCompilationUnit.getTypes().get(0)));
+                fieldDeclarationList.addAll(Objects.requireNonNull(getAllFieldDeclaration(sourceRoot, superCompilationUnit, superCompilationUnit.getTypes().get(0))));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -115,7 +112,7 @@ public class JavaParserUtil {
 
     public static String getSuperClassPath(String sourceRoot, String packageName, String superClassName, List<ImportDeclaration> importDeclarationList) {
         if (superClassName != null) {
-            if (importDeclarationList != null && importDeclarationList.size() > 0) {
+            if (importDeclarationList != null && !importDeclarationList.isEmpty()) {
                 final List<String> importAsteriskList = new ArrayList<>();
                 for (ImportDeclaration importDeclaration : importDeclarationList) {
                     String fullName = importDeclaration.getNameAsString();
@@ -133,8 +130,8 @@ public class JavaParserUtil {
                 for (String asterisk : importAsteriskList) {
                     String packPath = asterisk.replace(".", File.separator);
                     File directory = new File(sourceRoot + packPath);
-                    if (directory != null && directory.exists() && directory.isDirectory()) {
-                        for (File file : directory.listFiles()) {
+                    if (directory.exists() && directory.isDirectory()) {
+                        for (File file : Objects.requireNonNull(directory.listFiles())) {
                             if (file.exists() && file.isFile() && file.getName().equals(superClassName + ".java")) {
                                 return packPath + File.separator + superClassName;
                             }
@@ -145,6 +142,44 @@ public class JavaParserUtil {
             return packageName.replace(".", File.separator) + File.separator + superClassName + ".java";
         }
         return null;
+    }
+
+    public static Declaration getFieldDeclarationList(String sourceRoot, String javaFilePath) throws FileNotFoundException {
+        List<FieldDeclaration> fieldDeclarationList = new ArrayList<>();
+        TypeDeclaration<?> typeDeclaration = null;
+        //获取编译单元
+        CompilationUnit compilationUnit = getCompilationUnit(javaFilePath);
+        if (compilationUnit != null && compilationUnit.getTypes() != null && !compilationUnit.getTypes().isEmpty()) {
+            NodeList<TypeDeclaration<?>> typeDeclarations = compilationUnit.getTypes();
+            typeDeclaration = typeDeclarations.get(0);
+        }
+        if (typeDeclaration != null) {
+            fieldDeclarationList = JavaParserUtil.getAllFieldDeclaration(sourceRoot, compilationUnit, typeDeclaration);
+        }
+        Declaration declaration = new Declaration();
+        declaration.typeDeclaration = typeDeclaration;
+        declaration.fieldDeclarationList = fieldDeclarationList;
+        return declaration;
+    }
+
+    private static CompilationUnit getCompilationUnit(String javaFilePath) throws FileNotFoundException {
+        JavaParser javaParser = new JavaParser();
+        ParseResult<CompilationUnit> result = javaParser.parse(new File(javaFilePath));
+        Optional<CompilationUnit> compilationUnitOptional = result.getResult();
+        return compilationUnitOptional.orElse(null);
+    }
+
+    public static class Declaration {
+        private TypeDeclaration<?> typeDeclaration;
+        private List<FieldDeclaration> fieldDeclarationList;
+
+        public TypeDeclaration<?> getTypeDeclaration() {
+            return typeDeclaration;
+        }
+
+        public List<FieldDeclaration> getFieldDeclarationList() {
+            return fieldDeclarationList;
+        }
     }
 
 }
