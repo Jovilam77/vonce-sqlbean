@@ -197,6 +197,15 @@ public class StringUtil {
     }
 
     /**
+     * 首字母转大写
+     * @param str
+     * @return
+     */
+    public static String firstToUpperCase(String str) {
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
+    /**
      * 获取指定字符串中括号内的内容，返回字符串数组
      *
      * @param content
