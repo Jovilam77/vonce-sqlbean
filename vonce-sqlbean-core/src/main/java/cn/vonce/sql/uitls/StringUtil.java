@@ -46,17 +46,15 @@ public class StringUtil {
         if (str instanceof CharSequence) {
             CharSequence cs = (CharSequence) str;
             int strLen;
-            if (cs != null && (strLen = cs.length()) != 0) {
+            if ((strLen = cs.length()) != 0) {
                 for (int i = 0; i < strLen; ++i) {
                     if (!Character.isWhitespace(cs.charAt(i))) {
                         return false;
                     }
                 }
 
-                return true;
-            } else {
-                return true;
             }
+            return true;
         }
         return false;
     }
