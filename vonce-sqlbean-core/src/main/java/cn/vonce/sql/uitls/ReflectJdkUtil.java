@@ -14,10 +14,10 @@ import java.util.WeakHashMap;
  * @email imjovi@qq.com
  * @date 2020/7/24 18:30
  */
-public class ReflectJdkUtil extends ReflectUtil {
+public class ReflectJdkUtil implements Reflect {
 
     private final Map<String, Method> methodMap = new WeakHashMap<>();
-    private final Map<Class<?>, Constructor> constructorMap = new WeakHashMap<>();
+    private final Map<Class<?>, Constructor<?>> constructorMap = new WeakHashMap<>();
     private static volatile ReflectJdkUtil reflectJdkUtil;
 
     private ReflectJdkUtil() {
@@ -37,24 +37,20 @@ public class ReflectJdkUtil extends ReflectUtil {
 
     @Override
     public Object newObject(Class<?> clazz) {
-        Constructor constructor = constructorMap.get(clazz);
-        Object object = null;
+        Constructor<?> constructor = constructorMap.get(clazz);
         if (constructor == null) {
             try {
                 constructor = clazz.getDeclaredConstructor();
-                object = constructor.newInstance();
                 constructorMap.put(clazz, constructor);
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
             }
         }
-        return object;
+        try {
+            return constructor.newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
