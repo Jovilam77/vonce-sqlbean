@@ -10,10 +10,10 @@ import java.util.WeakHashMap;
  * 反射工具栏 ASM
  * Created by Jovi on 2018/6/24.
  */
-public class ReflectAsmUtil extends ReflectUtil {
+public class ReflectAsmUtil implements Reflect {
 
     private final Map<Class<?>, MethodAccess> methodAccessMap = new WeakHashMap<>();
-    private final Map<Class<?>, ConstructorAccess> constructorAccessMap = new WeakHashMap<>();
+    private final Map<Class<?>, ConstructorAccess<?>> constructorAccessMap = new WeakHashMap<>();
     private static volatile ReflectAsmUtil reflectAsmUtil;
 
     public static ReflectAsmUtil instance() {

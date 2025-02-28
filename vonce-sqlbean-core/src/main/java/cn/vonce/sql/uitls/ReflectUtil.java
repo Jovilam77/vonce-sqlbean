@@ -12,30 +12,18 @@ import java.lang.reflect.Field;
  */
 public abstract class ReflectUtil {
 
-    public abstract Object newObject(Class<?> clazz);
+    private static Reflect reflect;
 
-    public abstract Object get(Class<?> clazz, Object instance, String name);
-
-    public abstract void set(Class<?> clazz, Object instance, String name, Object value);
-
-    public abstract Object invoke(Class<?> clazz, Object instance, String name);
-
-    public abstract Object invoke(Class<?> clazz, Object instance, String name, Object value);
-
-    public abstract Object invoke(Class<?> clazz, Object instance, String name, Class<?>[] parameterTypes, Object[] values);
-
-    private static ReflectUtil reflectUtil;
-
-    public static ReflectUtil instance() {
-        return reflectUtil;
+    public static Reflect instance() {
+        return reflect;
     }
 
     static {
         try {
             Class.forName("android.content.Context");
-            reflectUtil = ReflectJdkUtil.instance();
+            reflect = ReflectJdkUtil.instance();
         } catch (ClassNotFoundException e) {
-            reflectUtil = ReflectAsmUtil.instance();
+            reflect = ReflectAsmUtil.instance();
         }
     }
 
