@@ -194,6 +194,13 @@
             <version>${spring.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- mybatis -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>${mybatis.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis-spring</artifactId>
@@ -201,20 +208,16 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.noear</groupId>
-            <artifactId>solon</artifactId>
-            <version>${solon.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.noear</groupId>
-            <artifactId>mybatis-solon-plugin</artifactId>
-            <version>${solon.version}</version>
         </dependency>
     </dependencies>
 
