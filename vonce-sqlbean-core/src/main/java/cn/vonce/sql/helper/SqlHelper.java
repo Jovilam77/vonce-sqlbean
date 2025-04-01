@@ -624,7 +624,7 @@ public class SqlHelper {
                 SqlDefaultValue sqlDefaultValue = field.getAnnotation(SqlDefaultValue.class);
                 SqlVersion sqlVersion = field.getAnnotation(SqlVersion.class);
                 SqlJSON sqlJSON = field.getAnnotation(SqlJSON.class);
-                if (sqlJSON != null) {
+                if (sqlJSON != null && objectValue != null) {
                     objectValue = SqlBeanUtil.getJSONValue(sqlJSON, objectValue);
                 }
                 //如果是只更新不为null的字段，那么该字段如果是null并且也不是乐观锁字段，也不是更新时填充默认值的字段则跳过
