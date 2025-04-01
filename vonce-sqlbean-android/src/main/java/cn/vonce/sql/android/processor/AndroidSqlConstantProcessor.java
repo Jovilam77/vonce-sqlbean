@@ -7,6 +7,7 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.util.Set;
 
@@ -30,6 +31,16 @@ public class AndroidSqlConstantProcessor extends SqlConstantProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         return super.process(annotations, env);
+    }
+
+    @Override
+    public String getTableRemarks(Element element) {
+        return "";
+    }
+
+    @Override
+    public String getFieldRemarks(String sqlFieldName) {
+        return "";
     }
 
 }

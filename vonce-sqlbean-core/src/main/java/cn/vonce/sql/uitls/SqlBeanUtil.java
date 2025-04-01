@@ -1032,13 +1032,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean isBaseType(Class<?> type) {
-        if (type == String.class || type == char.class || type == Character.class || type == boolean.class
-                || type == Boolean.class || type == byte.class || type == Byte.class || type == short.class
-                || type == Short.class || type == int.class || type == Integer.class || type == long.class
-                || type == Long.class || type == float.class || type == Float.class || type == double.class
-                || type == Double.class || type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class
-                || type == java.sql.Timestamp.class || type == java.sql.Time.class || type == BigDecimal.class
-                || jdk8IsBaseType(type)) {
+        if (type == String.class || type == char.class || type == Character.class || type == boolean.class || type == Boolean.class || type == byte.class || type == Byte.class || type == short.class || type == Short.class || type == int.class || type == Integer.class || type == long.class || type == Long.class || type == float.class || type == Float.class || type == double.class || type == Double.class || type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class || type == BigDecimal.class || jdk8IsBaseType(type)) {
             return true;
         }
         return false;
@@ -1094,7 +1088,11 @@ public class SqlBeanUtil {
         }
         switch (whatType) {
             case VALUE_TYPE:
-                sqlValue = value.toString();
+                if (jdk8DateType(value.getClass()) == WhatType.DATE_TYPE) {
+                    sqlValue = DateUtil.unifyDateToTimestamp(value).toString();
+                } else {
+                    sqlValue = value.toString();
+                }
                 break;
             case BOOL_TYPE:
                 DbType dbType = common.getSqlBeanDB().getDbType();
@@ -1107,19 +1105,20 @@ public class SqlBeanUtil {
                 }
                 break;
             case DATE_TYPE:
-                String dateString = DateUtil.unifyDateToString(value);
                 switch (common.getSqlBeanDB().getDbType()) {
                     case Oracle:
-                        sqlValue = "to_timestamp(" + single_quotation_mark + dateString + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
+                        sqlValue = "to_timestamp(" + single_quotation_mark + DateUtil.unifyDateToString(value) + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
                         break;
                     default:
-                        sqlValue = single_quotation_mark + dateString + single_quotation_mark;
+                        sqlValue = single_quotation_mark + DateUtil.unifyDateToString(value) + single_quotation_mark;
                         break;
                 }
                 break;
             default:
                 if (value instanceof SqlEnum) {
                     sqlValue = ((SqlEnum) value).getCode().toString();
+                } else if (value instanceof Date) {
+                    sqlValue = single_quotation_mark + DateUtil.unifyDateToString(value) + single_quotation_mark;
                 } else {
                     sqlValue = single_quotation_mark + filterSQLInject(value.toString()) + single_quotation_mark;
                 }

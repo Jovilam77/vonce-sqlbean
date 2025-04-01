@@ -2,11 +2,7 @@ package cn.vonce.sql.processor;
 
 import cn.vonce.sql.annotation.SqlColumn;
 import cn.vonce.sql.annotation.SqlTable;
-import cn.vonce.sql.uitls.JavaParserUtil;
 import cn.vonce.sql.uitls.StringUtil;
-import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
-
 import javax.annotation.processing.*;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
@@ -16,7 +12,6 @@ import javax.lang.model.type.DeclaredType;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.*;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -27,7 +22,7 @@ import java.util.*;
  * @email imjovi@qq.com
  * @date 2020/2/26 14:21
  */
-public class SqlConstantProcessor extends AbstractProcessor {
+public abstract class SqlConstantProcessor extends AbstractProcessor {
     private Messager messager; //有点像Logger,用于输出信息
     private Filer filer; //可以获得Build Path，用于生成文件
     public static final String PREFIX = "$";
@@ -91,26 +86,16 @@ public class SqlConstantProcessor extends AbstractProcessor {
         return true;
     }
 
+    public abstract String getTableRemarks(Element element);
+
+    public abstract String getFieldRemarks(String sqlFieldName);
+
     private StringBuffer buildCode(Element element, List<Element> subElementList, SqlTable sqlTable, String packageName, String className) {
         StringBuffer code = new StringBuffer();
         try {
-            String schema = "", tableAlias = "", tableRemarks = "";
+            String schema = "", tableAlias = "";
+            String tableRemarks = getTableRemarks(element);
             String tableName = element.getSimpleName().toString();
-            //获取源码根目录
-            List<FieldDeclaration> fieldDeclarationList = null;
-            String classPath  = Objects.requireNonNull(getClass().getClassLoader().getResource("")).getPath();
-            if (StringUtil.isNotBlank(classPath)) {
-                classPath = classPath.replaceFirst("^/", ""); // 去掉前导的斜杠（在Windows上）
-                classPath = classPath.replaceAll("%20", " "); // 将URL编码的空格转回正常显示
-                String sourceRoot = classPath.substring(0, classPath.lastIndexOf("/target/classes/")) + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator;
-                String javaFilePath = sourceRoot + ((PackageElement) element.getEnclosingElement()).getQualifiedName().toString().replace(".", File.separator) + File.separator + element.getSimpleName().toString() + ".java";
-                JavaParserUtil.Declaration declaration = JavaParserUtil.getFieldDeclarationList(sourceRoot, javaFilePath);
-                TypeDeclaration<?> typeDeclaration = declaration.getTypeDeclaration();
-                fieldDeclarationList = declaration.getFieldDeclarationList();
-                if (typeDeclaration != null && typeDeclaration.getComment().isPresent()) {
-                    tableRemarks = JavaParserUtil.getCommentContent(typeDeclaration.getComment().get().getContent());
-                }
-            }
             if (sqlTable != null) {
                 schema = sqlTable.schema();
                 tableName = sqlTable.value();
@@ -138,7 +123,7 @@ public class SqlConstantProcessor extends AbstractProcessor {
                     continue;
                 }
                 String sqlFieldName = subElement.getSimpleName().toString();
-                String sqlFieldRemarks = JavaParserUtil.getFieldCommentContent(sqlFieldName, fieldDeclarationList);
+                String sqlFieldRemarks = this.getFieldRemarks(sqlFieldName);
                 if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.value())) {
                     sqlFieldName = sqlColumn.value();
                 } else {

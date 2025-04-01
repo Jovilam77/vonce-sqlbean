@@ -145,24 +145,16 @@ public class SqlBeanMapper<T> extends BaseMapper<Cursor> implements RowMapper<T>
                     value = cursor.getString(index);
                     break;
                 case "java.sql.Date":
-                    value = new java.sql.Date(cursor.getLong(index));
-                    break;
                 case "java.sql.Time":
-                    value = new java.sql.Time(cursor.getLong(index));
-                    break;
                 case "java.sql.Timestamp":
-                    value = new java.sql.Timestamp(cursor.getLong(index));
-                    break;
                 case "java.util.Date":
                     //先取得long类型，转String之后如果长度是10或13那么则为时间戳
                     long timestamp = cursor.getLong(index);
-                    if (timestamp != 0) {
-                        String stringTimestamp = timestamp + "";
-                        if (stringTimestamp.length() == 10 || stringTimestamp.length() == 13) {
-                            value = new java.util.Date(timestamp);
-                        } else {
-                            value = DateUtil.stringToDate(cursor.getString(index));
-                        }
+                    String stringTimestamp = timestamp + "";
+                    if (stringTimestamp.length() == 10 || stringTimestamp.length() == 13) {
+                        value = new java.util.Date(timestamp);
+                    } else {
+                        value = DateUtil.stringToDate(cursor.getString(index));
                     }
                     break;
                 case "java.math.BigDecimal":

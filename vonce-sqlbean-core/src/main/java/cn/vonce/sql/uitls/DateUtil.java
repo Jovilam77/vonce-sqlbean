@@ -14,9 +14,6 @@ import java.util.*;
 
 public class DateUtil {
 
-    public static final DateTimeFormatter FORMATTER_FULL = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("+8"));
-    public static final DateTimeFormatter DATE_STR = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.of("+8"));
-
     /**
      * 获取时间间隔(用于显示动态)
      *
@@ -159,6 +156,7 @@ public class DateUtil {
      * @return LocalDateTime
      */
     public static LocalDateTime strTimeToLocalDateTime(String dateTime) {
+        DateTimeFormatter FORMATTER_FULL = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("+8"));
         return LocalDateTime.parse(dateTime, FORMATTER_FULL);
     }
 
@@ -271,14 +269,15 @@ public class DateUtil {
         }
         if (date instanceof String) {
             return date.toString();
+        } else if (date instanceof Date || date instanceof java.sql.Date || date instanceof java.sql.Timestamp || date instanceof java.sql.Time) {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(date);
         } else if (date instanceof LocalDateTime) {
+            DateTimeFormatter FORMATTER_FULL = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneId.of("+8"));
             return ((LocalDateTime) date).format(FORMATTER_FULL);
         } else if (date instanceof LocalDate) {
             return ((LocalDate) date).format(DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.of("+8")));
         } else if (date instanceof LocalTime) {
             return ((LocalTime) date).format(DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.of("+8")));
-        } else if (date instanceof Date || date instanceof java.sql.Date || date instanceof java.sql.Timestamp || date instanceof java.sql.Time) {
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
         }
         return null;
     }
@@ -294,14 +293,40 @@ public class DateUtil {
         if (date == null) {
             return null;
         }
-        if (date instanceof LocalDateTime) {
-            return ((LocalDateTime) date).format(DateTimeFormatter.ofPattern(format).withZone(ZoneId.of("+8")));
+        if (date instanceof String) {
+            return date.toString();
+        } else if (date instanceof Date || date instanceof java.sql.Date || date instanceof java.sql.Timestamp || date instanceof java.sql.Time) {
+            return new SimpleDateFormat(format).format(date);
+        } else if (date instanceof LocalDateTime) {
+            DateTimeFormatter FORMATTER_FULL = DateTimeFormatter.ofPattern(format).withZone(ZoneId.of("+8"));
+            return ((LocalDateTime) date).format(FORMATTER_FULL);
         } else if (date instanceof LocalDate) {
             return ((LocalDate) date).format(DateTimeFormatter.ofPattern(format).withZone(ZoneId.of("+8")));
         } else if (date instanceof LocalTime) {
             return ((LocalTime) date).format(DateTimeFormatter.ofPattern(format).withZone(ZoneId.of("+8")));
-        } else if (date instanceof Date || date instanceof java.sql.Date || date instanceof java.sql.Timestamp || date instanceof java.sql.Time) {
-            return new SimpleDateFormat(format).format(date);
+        }
+        return null;
+    }
+
+    /**
+     * 日期转时间戳 支持Jdk8之前日期及Jdk8+的日期
+     *
+     * @param date
+     * @return
+     */
+    public static Long unifyDateToTimestamp(Object date) {
+        if (date == null) {
+            return null;
+        }
+        if (date instanceof Date || date instanceof java.sql.Date || date instanceof java.sql.Timestamp || date instanceof java.sql.Time) {
+            java.util.Date utilDate = (Date) date;
+            return utilDate.getTime();
+        } else if (date instanceof LocalDateTime) {
+            return ((LocalDateTime) date).toInstant(ZoneOffset.of("+8")).toEpochMilli();
+        } else if (date instanceof LocalDate) {
+            return ((LocalDate) date).atStartOfDay(ZoneOffset.of("+8")).toInstant().toEpochMilli();
+        } else if (date instanceof LocalTime) {
+            return ((LocalTime) date).atDate(LocalDate.now()).atZone(ZoneOffset.of("+8")).toInstant().toEpochMilli();
         }
         return null;
     }
@@ -355,6 +380,7 @@ public class DateUtil {
             dataCalendarDTO = new String[2];
             // 当前日期
             LocalDate localDate = calendarEndDay.minusDays(i);
+            DateTimeFormatter DATE_STR = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.of("+8"));
             dataCalendarDTO[0] = localDate.format(DATE_STR);
             // 周几
             dataCalendarDTO[1] = localDate.getDayOfWeek().getValue() + "";
