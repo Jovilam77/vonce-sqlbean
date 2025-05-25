@@ -35,9 +35,9 @@ public abstract class BaseAutoCreateTableListener {
     public void processSqlBeanServices() {
         List<SqlBeanService> beanServiceList = this.getBeansForType(SqlBeanService.class);
         //去除重复的
-        Map<Class<?>,SqlBeanService> beanServiceMap = new HashMap<>();
+        Map<Class<?>, SqlBeanService> beanServiceMap = new HashMap<>();
         for (SqlBeanService sqlBeanService : beanServiceList) {
-            beanServiceMap.put(sqlBeanService.getBeanClass(),sqlBeanService);
+            beanServiceMap.put(sqlBeanService.getBeanClass(), sqlBeanService);
         }
         if (beanServiceList != null && !beanServiceList.isEmpty()) {
             Map<String, SqlBeanService> schemaMap = new HashMap<>();
@@ -88,19 +88,23 @@ public abstract class BaseAutoCreateTableListener {
                                 break;
                             }
                         }
-                        //创建表
-                        if (!isExist && sqlTable.autoCreate()) {
-                            ((AdvancedDbManageService) sqlBeanService).createTable();
-                            logger.info("-----Table:[{}]不存在,已为你自动创建-----", (StringUtil.isNotEmpty(table.getSchema()) ? table.getSchema() + "." + table.getName() : table.getName()));
-                            continue;
-                        }
-                        //更新表结构
-                        if (isExist && sqlTable.autoAlter()) {
-                            try {
-                                ((AdvancedDbManageService) sqlBeanService).alter(table, ((AdvancedDbManageService) sqlBeanService).getColumnInfoList(table.getName()));
-                            } catch (Exception e) {
-                                logger.error("更新表结构出错：" + e.getMessage(), e);
+                        try {
+                            //创建表
+                            if (!isExist && sqlTable.autoCreate()) {
+                                ((AdvancedDbManageService) sqlBeanService).createTable();
+                                logger.info("-----Table:[{}]不存在,已为你自动创建-----", (StringUtil.isNotEmpty(table.getSchema()) ? table.getSchema() + "." + table.getName() : table.getName()));
+                                continue;
                             }
+                            //更新表结构
+                            if (isExist && sqlTable.autoAlter()) {
+                                try {
+                                    ((AdvancedDbManageService) sqlBeanService).alter(table, ((AdvancedDbManageService) sqlBeanService).getColumnInfoList(table.getName()));
+                                } catch (Exception e) {
+                                    logger.error("更新表结构出错：" + e.getMessage(), e);
+                                }
+                            }
+                        } catch (Exception e) {
+                            logger.error(e.getMessage(), e);
                         }
                     }
                 }
