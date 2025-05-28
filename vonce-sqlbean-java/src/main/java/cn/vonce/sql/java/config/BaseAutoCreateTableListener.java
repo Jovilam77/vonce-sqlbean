@@ -35,11 +35,14 @@ public abstract class BaseAutoCreateTableListener {
     public void processSqlBeanServices() {
         List<SqlBeanService> beanServiceList = this.getBeansForType(SqlBeanService.class);
         //去除重复的
-        Map<Class<?>, SqlBeanService> beanServiceMap = new HashMap<>();
-        for (SqlBeanService sqlBeanService : beanServiceList) {
-            beanServiceMap.put(sqlBeanService.getBeanClass(), sqlBeanService);
-        }
+        Map<Class<?>, SqlBeanService> beanServiceMap = null;
         if (beanServiceList != null && !beanServiceList.isEmpty()) {
+            beanServiceMap = new HashMap<>();
+            for (SqlBeanService sqlBeanService : beanServiceList) {
+                beanServiceMap.put(sqlBeanService.getBeanClass(), sqlBeanService);
+            }
+        }
+        if (beanServiceMap != null) {
             Map<String, SqlBeanService> schemaMap = new HashMap<>();
             for (SqlBeanService sqlBeanService : beanServiceMap.values()) {
                 Class<?> clazz = sqlBeanService.getBeanClass();
