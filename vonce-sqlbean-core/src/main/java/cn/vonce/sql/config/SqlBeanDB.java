@@ -3,6 +3,10 @@ package cn.vonce.sql.config;
 import cn.vonce.sql.enumerate.DbType;
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.Objects;
 
 /**
  * 数据库信息
@@ -160,6 +164,37 @@ public class SqlBeanDB implements Serializable {
         if (this.sqlBeanConfig == null) {
             this.sqlBeanConfig = sqlBeanConfig;
         }
+    }
+
+    public static SqlBeanDB build(SqlBeanConfig sqlBeanConfig, DatabaseMetaData metaData) throws SQLException {
+        SqlBeanDB sqlBeanDB = new SqlBeanDB();
+        sqlBeanDB.setProductName(metaData.getDatabaseProductName());
+        sqlBeanDB.setDatabaseMajorVersion(metaData.getDatabaseMajorVersion());
+        sqlBeanDB.setDatabaseMinorVersion(metaData.getDatabaseMinorVersion());
+        sqlBeanDB.setDatabaseProductVersion(metaData.getDatabaseProductVersion());
+        sqlBeanDB.setJdbcMajorVersion(metaData.getJDBCMajorVersion());
+        sqlBeanDB.setJdbcMinorVersion(metaData.getJDBCMinorVersion());
+        sqlBeanDB.setDriverMajorVersion(metaData.getDatabaseMajorVersion());
+        sqlBeanDB.setDriverMinorVersion(metaData.getDriverMinorVersion());
+        sqlBeanDB.setDriverVersion(metaData.getDriverVersion());
+        sqlBeanDB.setDriverName(metaData.getDriverName());
+        sqlBeanDB.setDbType(DbType.getDbType(sqlBeanDB.getProductName()));
+        //如果用户未进行配置
+        if (sqlBeanConfig == null) {
+            sqlBeanDB.setSqlBeanConfig(new SqlBeanConfig());
+            switch (Objects.requireNonNull(sqlBeanDB.getDbType())) {
+                case Oracle:
+                case DB2:
+                case Derby:
+                case Hsql:
+                case H2:
+                    sqlBeanDB.getSqlBeanConfig().setToUpperCase(true);
+                    break;
+            }
+        } else {
+            sqlBeanDB.setSqlBeanConfig(sqlBeanConfig);
+        }
+        return sqlBeanDB;
     }
 
     @Override

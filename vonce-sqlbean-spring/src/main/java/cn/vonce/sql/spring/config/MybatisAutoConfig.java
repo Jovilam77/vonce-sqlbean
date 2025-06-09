@@ -1,5 +1,7 @@
 package cn.vonce.sql.spring.config;
 
+import cn.vonce.sql.config.SqlBeanConfig;
+import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.java.mapper.MybatisSqlBeanMapperInterceptor;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -11,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -33,6 +37,10 @@ public class MybatisAutoConfig {
 
     @Autowired
     private BeanFactory beanFactory;
+
+    @Autowired(required = false)
+    private SqlBeanConfig sqlBeanConfig;
+
 
     @Bean
     @Conditional(ConditionalOnUseMybatis.class)
@@ -57,6 +65,32 @@ public class MybatisAutoConfig {
             }
         }
         return mybatisMapperInterceptor;
+    }
+
+    @Bean(name = "sqlBeanConfigForMybatis")
+    @Conditional(ConditionalOnUseMybatis.class)
+    public SqlBeanDB sqlBeanDB() {
+        try {
+            SqlSessionFactory sqlSessionFactory = null;
+            if (sqlSessionFactoryBean != null) {
+                sqlSessionFactory = sqlSessionFactoryBean.getObject();
+            } else {
+                try {
+                    sqlSessionFactory = beanFactory.getBean(SqlSessionFactory.class);
+                } catch (Exception e) {
+                    logger.info("MybatisAutoConfig：{}", e.getMessage());
+                }
+            }
+            Connection connection = sqlSessionFactory.getConfiguration().getEnvironment().getDataSource().getConnection();
+            SqlBeanDB sqlBeanDB = SqlBeanDB.build(sqlBeanConfig, connection.getMetaData());
+            connection.close();
+            return sqlBeanDB;
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 
 }

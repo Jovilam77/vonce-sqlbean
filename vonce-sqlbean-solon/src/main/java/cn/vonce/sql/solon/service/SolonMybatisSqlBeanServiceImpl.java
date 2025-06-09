@@ -1,7 +1,6 @@
 package cn.vonce.sql.solon.service;
 
 import cn.vonce.sql.bean.*;
-import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.enumerate.DbType;
@@ -19,17 +18,12 @@ import cn.vonce.sql.service.AdvancedDbManageService;
 import cn.vonce.sql.service.SqlBeanService;
 import cn.vonce.sql.uitls.DateUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
-import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.solon.annotation.Db;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.data.annotation.Tran;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -45,12 +39,8 @@ public class SolonMybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImp
     @Db
     private MybatisSqlBeanDao<T> mybatisSqlBeanDao;
 
-    @Inject(required = false)
-    private SqlBeanConfig sqlBeanConfig;
-    @Db
-    private SqlSessionFactory sqlSessionFactory;
-
-    private boolean initDBInfo;
+    @Inject
+    private SqlBeanDB sqlBeanDB;
 
     private Class<?> clazz;
 
@@ -61,25 +51,8 @@ public class SolonMybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImp
     }
 
     @Override
-    public SqlBeanConfig getSqlBeanConfig() {
-        return sqlBeanConfig;
-    }
-
-    @Override
-    public SqlBeanDB initDBInfo() {
-        SqlBeanDB sqlBeanDB = new SqlBeanDB();
-        if (!initDBInfo) {
-            try {
-                Connection connection = sqlSessionFactory.getConfiguration().getEnvironment().getDataSource().getConnection();
-                DatabaseMetaData metaData = connection.getMetaData();
-                super.sqlBeanDBFill(sqlBeanDB, metaData);
-                connection.close();
-                initDBInfo = true;
-            } catch (SQLException e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
-        return sqlBeanDB;
+    public SqlBeanDB getSqlBeanDB() {
+        return super.setSqlBeanDB(sqlBeanDB);
     }
 
     @Override

@@ -2,11 +2,13 @@ package cn.vonce.sql.java.service;
 
 import cn.vonce.sql.annotation.SqlId;
 import cn.vonce.sql.bean.ColumnInfo;
-import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.IdType;
 import cn.vonce.sql.enumerate.JdbcType;
+import cn.vonce.sql.java.datasource.ConnectionContextHolder;
+import cn.vonce.sql.java.datasource.ConnectionProxy;
+import cn.vonce.sql.java.datasource.DataSourceContextHolder;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
@@ -16,7 +18,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * SqlBeanServiceImpl 抽象类 获取配置通用实现
@@ -28,33 +29,17 @@ import java.util.Objects;
  */
 public abstract class BaseSqlBeanServiceImpl {
 
-    private SqlBeanDB sqlBeanDB;
 
-    protected abstract SqlBeanConfig getSqlBeanConfig();
+    public abstract SqlBeanDB getSqlBeanDB();
 
-    public abstract SqlBeanDB initDBInfo();
-
-    public SqlBeanDB getSqlBeanDB() {
-        if (sqlBeanDB == null) {
-            sqlBeanDB = initDBInfo();
-            sqlBeanDB.setSqlBeanConfig(getSqlBeanConfig());
-            //如果用户未进行配置
-            boolean isUserConfig = true;
-            if (sqlBeanDB.getSqlBeanConfig() == null) {
-                isUserConfig = false;
-                sqlBeanDB.setSqlBeanConfig(new SqlBeanConfig());
-            }
-            //如果用户未进行配置则对某些数据库进行设置
-            if (!isUserConfig) {
-                switch (Objects.requireNonNull(sqlBeanDB.getDbType())) {
-                    case Oracle:
-                    case DB2:
-                    case Derby:
-                    case Hsql:
-                    case H2:
-                        sqlBeanDB.getSqlBeanConfig().setToUpperCase(true);
-                        break;
-                }
+    protected SqlBeanDB setSqlBeanDB(SqlBeanDB sqlBeanDB) {
+        String currentDs = DataSourceContextHolder.getDataSource();
+        if (StringUtil.isNotBlank(currentDs)) {
+            ConnectionProxy connectionProxy = ConnectionContextHolder.getConnection(currentDs);
+            try {
+                return SqlBeanDB.build(sqlBeanDB.getSqlBeanConfig(), connectionProxy.getMetaData());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
         }
         return sqlBeanDB;
@@ -137,27 +122,6 @@ public abstract class BaseSqlBeanServiceImpl {
             }
         }
         return null;
-    }
-
-    /**
-     * 填充数据
-     *
-     * @param sqlBeanDB
-     * @param metaData
-     * @throws SQLException
-     */
-    public void sqlBeanDBFill(SqlBeanDB sqlBeanDB, DatabaseMetaData metaData) throws SQLException {
-        sqlBeanDB.setProductName(metaData.getDatabaseProductName());
-        sqlBeanDB.setDatabaseMajorVersion(metaData.getDatabaseMajorVersion());
-        sqlBeanDB.setDatabaseMinorVersion(metaData.getDatabaseMinorVersion());
-        sqlBeanDB.setDatabaseProductVersion(metaData.getDatabaseProductVersion());
-        sqlBeanDB.setJdbcMajorVersion(metaData.getJDBCMajorVersion());
-        sqlBeanDB.setJdbcMinorVersion(metaData.getJDBCMinorVersion());
-        sqlBeanDB.setDriverMajorVersion(metaData.getDatabaseMajorVersion());
-        sqlBeanDB.setDriverMinorVersion(metaData.getDriverMinorVersion());
-        sqlBeanDB.setDriverVersion(metaData.getDriverVersion());
-        sqlBeanDB.setDriverName(metaData.getDriverName());
-        sqlBeanDB.setDbType(DbType.getDbType(sqlBeanDB.getProductName()));
     }
 
     public abstract Long getAutoIncrId();

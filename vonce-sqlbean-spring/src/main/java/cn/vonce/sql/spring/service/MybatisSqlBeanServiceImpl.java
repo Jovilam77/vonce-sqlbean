@@ -1,7 +1,6 @@
 package cn.vonce.sql.spring.service;
 
 import cn.vonce.sql.bean.*;
-import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanDB;
 import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.enumerate.DbType;
@@ -20,16 +19,12 @@ import cn.vonce.sql.spring.config.UseMybatis;
 import cn.vonce.sql.service.SqlBeanService;
 import cn.vonce.sql.uitls.DateUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
-import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -50,40 +45,20 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Autowired
     private MybatisSqlBeanDao<T> mybatisSqlBeanDao;
 
-    @Autowired(required = false)
-    private SqlBeanConfig sqlBeanConfig;
+    private Class<?> clazz;
 
     @Autowired
-    private SqlSession sqlSession;
-
-    private boolean initDBInfo;
-
-    private Class<?> clazz;
+    @Qualifier("sqlBeanConfigForMybatis")
+    private SqlBeanDB sqlBeanDB;
 
     public MybatisSqlBeanServiceImpl() {
         clazz = SqlBeanUtil.getGenericType(this.getClass());
     }
 
-    @Override
-    public SqlBeanConfig getSqlBeanConfig() {
-        return sqlBeanConfig;
-    }
 
     @Override
-    public SqlBeanDB initDBInfo() {
-        SqlBeanDB sqlBeanDB = new SqlBeanDB();
-        if (!initDBInfo) {
-            try {
-                Connection connection = sqlSession.getConfiguration().getEnvironment().getDataSource().getConnection();
-                DatabaseMetaData metaData = connection.getMetaData();
-                super.sqlBeanDBFill(sqlBeanDB, metaData);
-                connection.close();
-                initDBInfo = true;
-            } catch (SQLException e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
-        return sqlBeanDB;
+    public SqlBeanDB getSqlBeanDB() {
+        return super.setSqlBeanDB(sqlBeanDB);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package cn.vonce.sql.spring.config;
 
+import org.springframework.context.annotation.Import;
+
 import java.lang.annotation.*;
 
 /**
@@ -13,6 +15,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@Import({SpringJdbcAutoConfig.class})
 public @interface UseSpringJdbc {
 
 
