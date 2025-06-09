@@ -75,8 +75,7 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
         sql.append("(CASE extra WHEN 'auto_increment' THEN 1 ELSE 0 END) AS auto_incr, ");
         //MySql8之后整数类型不支持设置长度
         if (sqlBeanDB.getDbType() == DbType.MySQL && sqlBeanDB.getDatabaseMajorVersion() >= 8) {
-            sql.append("(CASE WHEN character_maximum_length != null ");
-            sql.append("THEN numeric_precision ELSE character_maximum_length END ) AS length, ");
+            sql.append("COALESCE(character_maximum_length, numeric_precision) AS length, ");
         } else {
             sql.append("(CASE WHEN data_type = 'bit' OR data_type = 'tinyint' OR data_type = 'smallint' OR data_type = 'mediumint' OR data_type = 'int' OR data_type = 'bigint' ");
             sql.append("THEN REPLACE ( SUBSTRING( column_type, INSTR( column_type, '(' )+ 1 ), ')', '' ) ");
