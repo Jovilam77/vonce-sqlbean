@@ -13,18 +13,18 @@
    String deleteSql =  SqlHelper.buildDeleteSql(delete);
 ```
 
-#### 二. SqlBeanDB
+#### 二. sqlBeanMeta
 ```java
-    SqlBeanDB sqlBeanDB = new SqlBeanDB();
-    sqlBeanDB.setDbType(DbType.MySQL);
-    sqlBeanDB.setSqlBeanConfig(new SqlBeanConfig());
+    SqlBeanMeta sqlBeanMeta = new SqlBeanMeta();
+    sqlBeanMeta.setDbType(DbType.MySQL);
+    sqlBeanMeta.setSqlBeanConfig(new SqlBeanConfig());
 ```
 
 #### 三. Select查询对象
 ```java
     private static void select1(SqlBeanDB sqlBeanDB) {
         Select select = new Select();
-        select.setSqlBeanDB(sqlBeanDB);
+        select.setSqlBeanMeta(sqlBeanDB);
         select.setBeanClass(Essay.class);
         select.column(SqlEssay._all);
         select.column(SqlUser.headPortrait, "头像");
@@ -46,7 +46,7 @@
      */
     private static void select2(SqlBeanDB sqlBeanDB) {
         Select select2 = new Select();
-        select2.setSqlBeanDB(sqlBeanDB);
+        select2.setSqlBeanMeta(sqlBeanDB);
         select2.setBeanClass(Essay.class);
         select2.column(SqlEssay.id, "序号")
         .column(SqlEssay.content, "文章内容")
@@ -68,7 +68,7 @@
      */
     private static void select3(SqlBeanDB sqlBeanDB) {
         Select select3 = new Select();
-        select3.setSqlBeanDB(sqlBeanDB);
+        select3.setSqlBeanMeta(sqlBeanDB);
         select3.setBeanClass(Essay.class);
         select3.column(SqlEssay._all, "count")
         .column(SqlEssay.categoryId);
@@ -86,7 +86,7 @@
      */
     private static void select4(SqlBeanDB sqlBeanDB) {
         Select select4 = new Select();
-        select4.setSqlBeanDB(sqlBeanDB);
+        select4.setSqlBeanMeta(sqlBeanDB);
         select4.setBeanClass(Essay.class);
         select4.column(SqlUser._all);
         select4.setTable(SqlUser._tableName);
@@ -105,7 +105,7 @@
      */
     private static void select5(SqlBeanDB sqlBeanDB) {
         Select select5 = new Select();
-        select5.setSqlBeanDB(sqlBeanDB);
+        select5.setSqlBeanMeta(sqlBeanDB);
         select5.setBeanClass(Essay.class);
         select5.column(SqlUser._all);
         select5.setTable(SqlUser._tableName);
@@ -125,7 +125,7 @@
     private static void insert1(SqlBeanDB sqlBeanDB) {
         Insert insert = new Insert();
         insert.setBeanClass(User.class);
-        insert.setSqlBeanDB(sqlBeanDB);
+        insert.setSqlBeanMeta(sqlBeanDB);
         User user = new User();
         user.setId("10000");
         user.setUsername("10000");
@@ -144,7 +144,7 @@
      */
     private static void insert2(SqlBeanDB sqlBeanDB) {
         Insert insert = new Insert();
-        insert.setSqlBeanDB(sqlBeanDB);
+        insert.setSqlBeanMeta(sqlBeanDB);
         insert.setBeanClass(User.class);
         List<User> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -168,7 +168,7 @@
      */
     private static void insert3(SqlBeanDB sqlBeanDB) {
         Insert<User> insert = new Insert<>();
-        insert.setSqlBeanDB(sqlBeanDB);
+        insert.setSqlBeanMeta(sqlBeanDB);
         insert.setBeanClass(User.class);
         insert.column(User::getId, User::getGender, User::getNickname).values(1, 2, "Jovi").values(2, 1, "Vicky");
         System.out.println("---insert3---");
@@ -190,7 +190,7 @@
         user.setGender(1);
         Update update = new Update();
         update.setTable(User.class);
-        update.setSqlBeanDB(sqlBeanDB);
+        update.setSqlBeanMeta(sqlBeanDB);
         update.filterFields("username");//java字段名
         update.setUpdateBean(user);
         update.setUpdateNotNull(true);
@@ -207,7 +207,7 @@
     private static void update2(SqlBeanDB sqlBeanDB) {
         Update<User> update = new Update();
         update.setTable(User.class);
-        update.setSqlBeanDB(sqlBeanDB);
+        update.setSqlBeanMeta(sqlBeanDB);
         update.set(SqlUser.id, 1).
         set(SqlUser.nickname, "jovi").
         setAdd(SqlUser.integral$, SqlUser.integral$, SqlUser.integral$).
@@ -228,7 +228,7 @@
     private static void delete(SqlBeanDB sqlBeanDB) {
         Delete delete = new Delete();
         delete.setTable(User.class);
-        delete.setSqlBeanDB(sqlBeanDB);
+        delete.setSqlBeanMeta(sqlBeanDB);
         delete.where().gt(User::getId, 1).and().eq(User::getNickname, "jovi");
         System.out.println("---delete---");
         System.out.println(SqlHelper.buildDeleteSql(delete));

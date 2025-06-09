@@ -1,7 +1,7 @@
 package cn.vonce.sql.spring.service;
 
 import cn.vonce.sql.bean.*;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.exception.SqlBeanException;
@@ -50,15 +50,15 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @Autowired
     @Qualifier("sqlBeanDBForSpringJdbc")
-    private SqlBeanDB sqlBeanDB;
+    private SqlBeanMeta sqlBeanDB;
 
     public SpringJdbcSqlBeanServiceImpl() {
         clazz = SqlBeanUtil.getGenericType(this.getClass());
     }
 
     @Override
-    public SqlBeanDB getSqlBeanDB() {
-        return super.setSqlBeanDB(sqlBeanDB);
+    public SqlBeanMeta getSqlBeanMeta() {
+        return super.setSqlBeanMeta(sqlBeanDB);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (id == null) {
             return null;
         }
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectByIdSql(getSqlBeanDB(), clazz, null, id), new SpringJdbcSqlBeanMapper<T>(clazz, clazz)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectByIdSql(getSqlBeanMeta(), clazz, null, id), new SpringJdbcSqlBeanMapper<T>(clazz, clazz)));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -86,7 +86,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (id == null) {
             return null;
         }
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectByIdSql(getSqlBeanDB(), clazz, returnType, id), new SpringJdbcSqlBeanMapper<R>(clazz, returnType)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectByIdSql(getSqlBeanMeta(), clazz, returnType, id), new SpringJdbcSqlBeanMapper<R>(clazz, returnType)));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -95,7 +95,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (ids == null || ids.length == 0) {
             throw new SqlBeanException("selectByIds方法ids参数必须拥有一个值");
         }
-        return jdbcTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, null, ids), new SpringJdbcSqlBeanMapper<T>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanMeta(), clazz, null, ids), new SpringJdbcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -104,37 +104,37 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (ids == null || ids.length == 0) {
             throw new SqlBeanException("selectByIds方法ids参数必须拥有一个值");
         }
-        return jdbcTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanDB(), clazz, returnType, ids), new SpringJdbcSqlBeanMapper<R>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanMeta(), clazz, returnType, ids), new SpringJdbcSqlBeanMapper<R>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public T selectOne(Select select) {
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<T>(clazz, clazz)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, null, select), new SpringJdbcSqlBeanMapper<T>(clazz, clazz)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> R selectOne(Class<R> returnType, Select select) {
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, returnType, select), new SpringJdbcSqlBeanMapper<R>(clazz, returnType)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, returnType, select), new SpringJdbcSqlBeanMapper<R>(clazz, returnType)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public Map<String, Object> selectMap(Select select) {
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<Map<String, Object>>(clazz, Map.class)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, null, select), new SpringJdbcSqlBeanMapper<Map<String, Object>>(clazz, Map.class)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public T selectOneBy(String where, Object... args) {
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, null, null, where, args), new SpringJdbcSqlBeanMapper<T>(clazz, clazz)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanMeta(), clazz, null, null, where, args), new SpringJdbcSqlBeanMapper<T>(clazz, clazz)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> R selectOneBy(Class<R> returnType, String where, Object... args) {
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, returnType, null, where, args), new SpringJdbcSqlBeanMapper<>(clazz, returnType)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanMeta(), clazz, returnType, null, where, args), new SpringJdbcSqlBeanMapper<>(clazz, returnType)));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -142,7 +142,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public T selectOneBy(Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<>(clazz, clazz)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, null, select), new SpringJdbcSqlBeanMapper<>(clazz, clazz)));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -150,13 +150,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public <R> R selectOneBy(Class<R> returnType, Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
-        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, returnType, select), new SpringJdbcSqlBeanMapper<>(clazz, returnType)));
+        return singleResult(jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, returnType, select), new SpringJdbcSqlBeanMapper<>(clazz, returnType)));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> selectBy(Class<R> returnType, String where, Object... args) {
-        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, returnType, null, where, args), new SpringJdbcSqlBeanMapper<>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanMeta(), clazz, returnType, null, where, args), new SpringJdbcSqlBeanMapper<>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -164,13 +164,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public <R> List<R> selectBy(Class<R> returnType, Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
-        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, returnType, select), new SpringJdbcSqlBeanMapper<>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, returnType, select), new SpringJdbcSqlBeanMapper<>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> selectBy(Class<R> returnType, Paging paging, String where, Object... args) {
-        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, returnType, paging, where, args), new SpringJdbcSqlBeanMapper<>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanMeta(), clazz, returnType, paging, where, args), new SpringJdbcSqlBeanMapper<>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -180,13 +180,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         select.where(wrapper);
         select.page(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
-        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, returnType, select), new SpringJdbcSqlBeanMapper<>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, returnType, select), new SpringJdbcSqlBeanMapper<>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> selectBy(String where, Object... args) {
-        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, null, null, where, args), new SpringJdbcSqlBeanMapper<>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanMeta(), clazz, null, null, where, args), new SpringJdbcSqlBeanMapper<>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -194,13 +194,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public List<T> selectBy(Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
-        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, null, select), new SpringJdbcSqlBeanMapper<>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> selectBy(Paging paging, String where, Object... args) {
-        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanDB(), clazz, null, paging, where, args), new SpringJdbcSqlBeanMapper<>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanMeta(), clazz, null, paging, where, args), new SpringJdbcSqlBeanMapper<>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -210,13 +210,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         select.where(wrapper);
         select.page(paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());
         select.orderBy(paging.getOrders());
-        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, null, select), new SpringJdbcSqlBeanMapper<>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public int countBy(String where, Object... args) {
-        return jdbcTemplate.queryForObject(SqlBeanProvider.countBySql(getSqlBeanDB(), clazz, where, args), new SpringJdbcSqlBeanMapper<>(clazz, Integer.class));
+        return jdbcTemplate.queryForObject(SqlBeanProvider.countBySql(getSqlBeanMeta(), clazz, where, args), new SpringJdbcSqlBeanMapper<>(clazz, Integer.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -224,67 +224,67 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public int countBy(Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
-        return jdbcTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<>(clazz, Integer.class));
+        return jdbcTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanMeta(), clazz, null, select), new SpringJdbcSqlBeanMapper<>(clazz, Integer.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public int count() {
-        return jdbcTemplate.queryForObject(SqlBeanProvider.countBySql(getSqlBeanDB(), clazz, null, null), new SpringJdbcSqlBeanMapper<>(clazz, Integer.class));
+        return jdbcTemplate.queryForObject(SqlBeanProvider.countBySql(getSqlBeanMeta(), clazz, null, null), new SpringJdbcSqlBeanMapper<>(clazz, Integer.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> select() {
-        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, null, null), new SpringJdbcSqlBeanMapper<T>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanMeta(), clazz, null, null), new SpringJdbcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> select(Paging paging) {
-        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, null, paging), new SpringJdbcSqlBeanMapper<T>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanMeta(), clazz, null, paging), new SpringJdbcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> select(Class<R> returnType) {
-        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, returnType, null), new SpringJdbcSqlBeanMapper<R>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanMeta(), clazz, returnType, null), new SpringJdbcSqlBeanMapper<R>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> select(Class<R> returnType, Paging paging) {
-        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanDB(), clazz, returnType, paging), new SpringJdbcSqlBeanMapper<R>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanMeta(), clazz, returnType, paging), new SpringJdbcSqlBeanMapper<R>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<Map<String, Object>> selectMapList(Select select) {
-        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<Map<String, Object>>(clazz, Map.class));
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, null, select), new SpringJdbcSqlBeanMapper<Map<String, Object>>(clazz, Map.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> select(Class<R> returnType, Select select) {
-        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, returnType, select), new SpringJdbcSqlBeanMapper<R>(clazz, returnType));
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, returnType, select), new SpringJdbcSqlBeanMapper<R>(clazz, returnType));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> select(Select select) {
-        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<T>(clazz, clazz));
+        return jdbcTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, null, select), new SpringJdbcSqlBeanMapper<T>(clazz, clazz));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public int count(Select select) {
-        return jdbcTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanDB(), clazz, null, select), new SpringJdbcSqlBeanMapper<Integer>(clazz, Integer.class));
+        return jdbcTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanMeta(), clazz, null, select), new SpringJdbcSqlBeanMapper<Integer>(clazz, Integer.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public int count(Class<?> returnType, Select select) {
-        return jdbcTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanDB(), clazz, returnType, select), Integer.class);
+        return jdbcTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanMeta(), clazz, returnType, select), Integer.class);
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -323,13 +323,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (id == null || id.length == 0) {
             throw new SqlBeanException("deleteById方法id参数必须拥有一个值");
         }
-        return jdbcTemplate.update(SqlBeanProvider.deleteByIdSql(getSqlBeanDB(), clazz, id));
+        return jdbcTemplate.update(SqlBeanProvider.deleteByIdSql(getSqlBeanMeta(), clazz, id));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int deleteBy(String where, Object... args) {
-        return jdbcTemplate.update(SqlBeanProvider.deleteBySql(getSqlBeanDB(), clazz, where, args));
+        return jdbcTemplate.update(SqlBeanProvider.deleteBySql(getSqlBeanMeta(), clazz, where, args));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -337,19 +337,19 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public int deleteBy(Wrapper wrapper) {
         Delete delete = new Delete();
         delete.where(wrapper);
-        return jdbcTemplate.update(SqlBeanProvider.deleteSql(getSqlBeanDB(), clazz, delete, false));
+        return jdbcTemplate.update(SqlBeanProvider.deleteSql(getSqlBeanMeta(), clazz, delete, false));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int delete(Delete delete) {
-        return jdbcTemplate.update(SqlBeanProvider.deleteSql(getSqlBeanDB(), clazz, delete, false));
+        return jdbcTemplate.update(SqlBeanProvider.deleteSql(getSqlBeanMeta(), clazz, delete, false));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int delete(Delete delete, boolean ignore) {
-        return jdbcTemplate.update(SqlBeanProvider.deleteSql(getSqlBeanDB(), clazz, delete, ignore));
+        return jdbcTemplate.update(SqlBeanProvider.deleteSql(getSqlBeanMeta(), clazz, delete, ignore));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -358,91 +358,91 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (id == null || id.length == 0) {
             throw new SqlBeanException("logicallyDeleteById方法id参数必须拥有一个值");
         }
-        return jdbcTemplate.update(SqlBeanProvider.logicallyDeleteByIdSql(getSqlBeanDB(), clazz, id));
+        return jdbcTemplate.update(SqlBeanProvider.logicallyDeleteByIdSql(getSqlBeanMeta(), clazz, id));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int logicallyDeleteBy(String where, Object... args) {
-        return jdbcTemplate.update(SqlBeanProvider.logicallyDeleteBySql(getSqlBeanDB(), clazz, where, args));
+        return jdbcTemplate.update(SqlBeanProvider.logicallyDeleteBySql(getSqlBeanMeta(), clazz, where, args));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int logicallyDeleteBy(Wrapper wrapper) {
-        return jdbcTemplate.update(SqlBeanProvider.logicallyDeleteBySql(getSqlBeanDB(), clazz, wrapper));
+        return jdbcTemplate.update(SqlBeanProvider.logicallyDeleteBySql(getSqlBeanMeta(), clazz, wrapper));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int update(Update update) {
-        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), clazz, update, false));
+        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanMeta(), clazz, update, false));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int update(Update update, boolean ignore) {
-        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), clazz, update, ignore));
+        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanMeta(), clazz, update, ignore));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateById(T bean, ID id) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanDB(), clazz, bean, id, true, false, null));
+        return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanMeta(), clazz, bean, id, true, false, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, null));
+        return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanMeta(), clazz, bean, id, updateNotNull, optimisticLock, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBeanId(T bean) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanDB(), clazz, bean, true, false, null));
+        return jdbcTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanMeta(), clazz, bean, true, false, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, Column... filterColumns) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, filterColumns));
+        return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanMeta(), clazz, bean, id, updateNotNull, optimisticLock, filterColumns));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanDB(), clazz, bean, id, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns)));
+        return jdbcTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanMeta(), clazz, bean, id, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns)));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateBy(T bean, String where, Object... args) {
-        return jdbcTemplate.update(SqlBeanProvider.updateBySql(getSqlBeanDB(), clazz, bean, true, false, null, where, args));
+        return jdbcTemplate.update(SqlBeanProvider.updateBySql(getSqlBeanMeta(), clazz, bean, true, false, null, where, args));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, null));
+        return jdbcTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanMeta(), clazz, bean, updateNotNull, optimisticLock, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, Column... filterColumns) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, filterColumns));
+        return jdbcTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanMeta(), clazz, bean, updateNotNull, optimisticLock, filterColumns));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns)));
+        return jdbcTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanMeta(), clazz, bean, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns)));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, String where, Object... args) {
-        return jdbcTemplate.update(SqlBeanProvider.updateBySql(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, null, where, args));
+        return jdbcTemplate.update(SqlBeanProvider.updateBySql(getSqlBeanMeta(), clazz, bean, updateNotNull, optimisticLock, null, where, args));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -450,7 +450,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public int updateBy(T bean, Wrapper wrapper) {
         Update update = new Update();
         update.bean(bean).notNull(true).optimisticLock(false).where(wrapper);
-        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), clazz, update, false));
+        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanMeta(), clazz, update, false));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -458,13 +458,13 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper) {
         Update update = new Update();
         update.bean(bean).notNull(updateNotNull).optimisticLock(optimisticLock).where(wrapper);
-        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), clazz, update, false));
+        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanMeta(), clazz, update, false));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns, String where, Object... args) {
-        return jdbcTemplate.update(SqlBeanProvider.updateBySql(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, filterColumns, where, args));
+        return jdbcTemplate.update(SqlBeanProvider.updateBySql(getSqlBeanMeta(), clazz, bean, updateNotNull, optimisticLock, filterColumns, where, args));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -472,7 +472,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper, Column... filterColumns) {
         Update update = new Update();
         update.bean(bean).notNull(updateNotNull).optimisticLock(optimisticLock).filterFields(filterColumns).where(wrapper);
-        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanDB(), clazz, update, false));
+        return jdbcTemplate.update(SqlBeanProvider.updateSql(getSqlBeanMeta(), clazz, update, false));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -484,25 +484,25 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBean(T bean, String where) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByBeanSql(getSqlBeanDB(), clazz, bean, true, false, where, null));
+        return jdbcTemplate.update(SqlBeanProvider.updateByBeanSql(getSqlBeanMeta(), clazz, bean, true, false, where, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String where) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByBeanSql(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, where, null));
+        return jdbcTemplate.update(SqlBeanProvider.updateByBeanSql(getSqlBeanMeta(), clazz, bean, updateNotNull, optimisticLock, where, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String where, Column... filterColumns) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByBeanSql(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, where, filterColumns));
+        return jdbcTemplate.update(SqlBeanProvider.updateByBeanSql(getSqlBeanMeta(), clazz, bean, updateNotNull, optimisticLock, where, filterColumns));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String where, ColumnFun<T, R>... filterColumns) {
-        return jdbcTemplate.update(SqlBeanProvider.updateByBeanSql(getSqlBeanDB(), clazz, bean, updateNotNull, optimisticLock, where, SqlBeanUtil.funToColumn(filterColumns)));
+        return jdbcTemplate.update(SqlBeanProvider.updateByBeanSql(getSqlBeanMeta(), clazz, bean, updateNotNull, optimisticLock, where, SqlBeanUtil.funToColumn(filterColumns)));
     }
 
     @Transactional
@@ -513,7 +513,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (bean == null || bean.length == 0) {
             throw new SqlBeanException("insert方法bean参数必须拥有一个值");
         }
-        int count = jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), clazz, bean));
+        int count = jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanMeta(), clazz, bean));
         super.setAutoIncrId(clazz, Arrays.asList(bean));
         return count;
     }
@@ -526,7 +526,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
         if (beanList == null || beanList.size() == 0) {
             throw new SqlBeanException("insert方法beanList参数至少拥有一个值");
         }
-        int count = jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), clazz, beanList));
+        int count = jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanMeta(), clazz, beanList));
         super.setAutoIncrId(clazz, beanList);
         return count;
     }
@@ -536,7 +536,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int insert(Insert insert) {
-        int count = jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanDB(), clazz, insert));
+        int count = jdbcTemplate.update(SqlBeanProvider.insertBeanSql(getSqlBeanMeta(), clazz, insert));
         super.setAutoIncrId(clazz, insert.getBean());
         return count;
     }
@@ -545,92 +545,92 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @Override
     public String backup() {
         String targetTableName = SqlBeanUtil.getTable(clazz).getName() + "_" + DateUtil.dateToString(new Date(), "yyyyMMddHHmmssSSS");
-        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, null, null, targetTableName, null));
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanMeta(), clazz, null, null, targetTableName, null));
         return targetTableName;
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(String targetTableName) {
-        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, null, null, targetTableName, null));
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanMeta(), clazz, null, null, targetTableName, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(String targetSchema, String targetTableName) {
-        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, null, targetSchema, targetTableName, null));
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanMeta(), clazz, null, targetSchema, targetTableName, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(Wrapper wrapper, String targetSchema, String targetTableName) {
-        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, null));
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanMeta(), clazz, wrapper, targetSchema, targetTableName, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(Wrapper wrapper, String targetTableName, Column... columns) {
-        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, wrapper, null, targetTableName, columns));
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanMeta(), clazz, wrapper, null, targetTableName, columns));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public <R> void backup(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns) {
-        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, wrapper, null, targetTableName, SqlBeanUtil.funToColumn(columns)));
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanMeta(), clazz, wrapper, null, targetTableName, SqlBeanUtil.funToColumn(columns)));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void backup(Wrapper wrapper, String targetSchema, String targetTableName, Column... columns) {
-        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, columns));
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanMeta(), clazz, wrapper, targetSchema, targetTableName, columns));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public <R> void backup(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
-        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, SqlBeanUtil.funToColumn(columns)));
+        jdbcTemplate.update(SqlBeanProvider.backupSql(getSqlBeanMeta(), clazz, wrapper, targetSchema, targetTableName, SqlBeanUtil.funToColumn(columns)));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int copy(Wrapper wrapper, String targetTableName) {
-        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, wrapper, null, targetTableName, null));
+        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanMeta(), clazz, wrapper, null, targetTableName, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int copy(Wrapper wrapper, String targetSchema, String targetTableName) {
-        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, null));
+        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanMeta(), clazz, wrapper, targetSchema, targetTableName, null));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int copy(Wrapper wrapper, String targetTableName, Column... columns) {
-        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, wrapper, null, targetTableName, columns));
+        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanMeta(), clazz, wrapper, null, targetTableName, columns));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int copy(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns) {
-        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, wrapper, null, targetTableName, SqlBeanUtil.funToColumn(columns)));
+        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanMeta(), clazz, wrapper, null, targetTableName, SqlBeanUtil.funToColumn(columns)));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int copy(Wrapper wrapper, String targetSchema, String targetTableName, Column... columns) {
-        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, columns));
+        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanMeta(), clazz, wrapper, targetSchema, targetTableName, columns));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public <R> int copy(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
-        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanDB(), clazz, wrapper, targetSchema, targetTableName, SqlBeanUtil.funToColumn(columns)));
+        return jdbcTemplate.update(SqlBeanProvider.copySql(getSqlBeanMeta(), clazz, wrapper, targetSchema, targetTableName, SqlBeanUtil.funToColumn(columns)));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int alter(Table table, List<ColumnInfo> columnInfoList) {
-        List<String> sqlList = SqlBeanProvider.buildAlterSql(getSqlBeanDB(), clazz, columnInfoList);
+        List<String> sqlList = SqlBeanProvider.buildAlterSql(getSqlBeanMeta(), clazz, columnInfoList);
         int count = 0;
         if (sqlList != null && sqlList.size() > 0) {
             for (String sql : sqlList) {
@@ -651,7 +651,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int alter(List<Alter> alterList) {
-        List<String> sqlList = SqlBeanProvider.alterSql(getSqlBeanDB().getDbType(), alterList);
+        List<String> sqlList = SqlBeanProvider.alterSql(getSqlBeanMeta().getDbType(), alterList);
         int count = 0;
         if (sqlList != null && sqlList.size() > 0) {
             for (String sql : sqlList) {
@@ -664,47 +664,47 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int alterRemarks(String remarks) {
-        if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Derby) {
+        if (getSqlBeanMeta().getDbType() == DbType.SQLite || getSqlBeanMeta().getDbType() == DbType.Derby) {
             return 0;
         }
-        String sql = SqlBeanProvider.alterRemarksSql(getSqlBeanDB(), clazz, remarks);
+        String sql = SqlBeanProvider.alterRemarksSql(getSqlBeanMeta(), clazz, remarks);
         return jdbcTemplate.update(sql);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public List<String> getSchemas(String name) {
-        if (getSqlBeanDB().getDbType() == DbType.SQLite) {
+        if (getSqlBeanMeta().getDbType() == DbType.SQLite) {
             return null;
         }
-        String sql = SqlBeanProvider.databaseSql(getSqlBeanDB(), name);
+        String sql = SqlBeanProvider.databaseSql(getSqlBeanMeta(), name);
         return jdbcTemplate.query(sql, new SpringJdbcSqlBeanMapper<>(clazz, String.class));
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int createSchema(String name) {
-        if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Oracle) {
+        if (getSqlBeanMeta().getDbType() == DbType.SQLite || getSqlBeanMeta().getDbType() == DbType.Oracle) {
             return 0;
         }
-        String sql = SqlBeanProvider.createSchemaSql(getSqlBeanDB(), name);
+        String sql = SqlBeanProvider.createSchemaSql(getSqlBeanMeta(), name);
         return jdbcTemplate.update(sql);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public int dropSchema(String name) {
-        if (getSqlBeanDB().getDbType() == DbType.SQLite || getSqlBeanDB().getDbType() == DbType.Oracle) {
+        if (getSqlBeanMeta().getDbType() == DbType.SQLite || getSqlBeanMeta().getDbType() == DbType.Oracle) {
             return 0;
         }
-        String sql = SqlBeanProvider.dropSchemaSql(getSqlBeanDB(), name);
+        String sql = SqlBeanProvider.dropSchemaSql(getSqlBeanMeta(), name);
         return jdbcTemplate.update(sql);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void dropTable() {
-        SqlBeanDB sqlBeanDB = getSqlBeanDB();
+        SqlBeanMeta sqlBeanDB = getSqlBeanMeta();
         if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.Postgresql && sqlBeanDB.getDbType() != DbType.SQLServer && sqlBeanDB.getDbType() != DbType.H2) {
             List<TableInfo> nameList = jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(sqlBeanDB, SqlBeanUtil.getTable(clazz).getSchema(), SqlBeanUtil.getTable(clazz).getName()), TableInfo.class);
             if (nameList == null || nameList.isEmpty()) {
@@ -717,7 +717,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void createTable() {
-        jdbcTemplate.update(SqlBeanProvider.createTableSql(getSqlBeanDB(), clazz));
+        jdbcTemplate.update(SqlBeanProvider.createTableSql(getSqlBeanMeta(), clazz));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -742,7 +742,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<TableInfo> getTableList(String schema, String tableName) {
-        return jdbcTemplate.query(SqlBeanProvider.selectTableListSql(getSqlBeanDB(), schema, tableName), new SpringJdbcSqlBeanMapper<TableInfo>(TableInfo.class, TableInfo.class));
+        return jdbcTemplate.query(SqlBeanProvider.selectTableListSql(getSqlBeanMeta(), schema, tableName), new SpringJdbcSqlBeanMapper<TableInfo>(TableInfo.class, TableInfo.class));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -761,7 +761,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.SLAVE)
     @Override
     public List<ColumnInfo> getColumnInfoList(String schema, String tableName) {
-        List<ColumnInfo> columnInfoList = jdbcTemplate.query(SqlBeanProvider.selectColumnListSql(getSqlBeanDB(), schema, tableName), new SpringJdbcSqlBeanMapper<ColumnInfo>(ColumnInfo.class, ColumnInfo.class));
+        List<ColumnInfo> columnInfoList = jdbcTemplate.query(SqlBeanProvider.selectColumnListSql(getSqlBeanMeta(), schema, tableName), new SpringJdbcSqlBeanMapper<ColumnInfo>(ColumnInfo.class, ColumnInfo.class));
         super.handleColumnInfo(columnInfoList);
         return columnInfoList;
     }

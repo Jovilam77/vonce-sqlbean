@@ -2,7 +2,7 @@ package cn.vonce.sql.java.service;
 
 import cn.vonce.sql.annotation.SqlId;
 import cn.vonce.sql.bean.ColumnInfo;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.IdType;
 import cn.vonce.sql.enumerate.JdbcType;
@@ -14,7 +14,6 @@ import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
 import java.lang.reflect.Field;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
@@ -30,14 +29,14 @@ import java.util.List;
 public abstract class BaseSqlBeanServiceImpl {
 
 
-    public abstract SqlBeanDB getSqlBeanDB();
+    public abstract SqlBeanMeta getSqlBeanMeta();
 
-    protected SqlBeanDB setSqlBeanDB(SqlBeanDB sqlBeanDB) {
+    protected SqlBeanMeta setSqlBeanMeta(SqlBeanMeta sqlBeanDB) {
         String currentDs = DataSourceContextHolder.getDataSource();
         if (StringUtil.isNotBlank(currentDs)) {
             ConnectionProxy connectionProxy = ConnectionContextHolder.getConnection(currentDs);
             try {
-                return SqlBeanDB.build(sqlBeanDB.getSqlBeanConfig(), connectionProxy.getMetaData());
+                return SqlBeanMeta.build(sqlBeanDB.getSqlBeanConfig(), connectionProxy.getMetaData());
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -51,7 +50,7 @@ public abstract class BaseSqlBeanServiceImpl {
      * @param columnInfoList
      */
     public void handleColumnInfo(List<ColumnInfo> columnInfoList) {
-        DbType dbType = getSqlBeanDB().getDbType();
+        DbType dbType = getSqlBeanMeta().getDbType();
         if (dbType == DbType.Derby) {
             for (ColumnInfo info : columnInfoList) {
                 String[] values = info.getType().split(" ");
@@ -70,7 +69,7 @@ public abstract class BaseSqlBeanServiceImpl {
                 info.setDfltValue(processDefaultValue(info.getDfltValue()));
             }
         } else if (dbType == DbType.H2 || dbType == DbType.Postgresql) {
-            Boolean toUpperCase = getSqlBeanDB().getSqlBeanConfig().getToUpperCase();
+            Boolean toUpperCase = getSqlBeanMeta().getSqlBeanConfig().getToUpperCase();
             for (ColumnInfo info : columnInfoList) {
                 if ("CHARACTER VARYING".equalsIgnoreCase(info.getType())) {
                     info.setType(JdbcType.VARCHAR.getName(toUpperCase));

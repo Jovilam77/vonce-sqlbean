@@ -55,7 +55,7 @@ public abstract class BaseAutoCreateTableListener {
             for (Map.Entry<String, SqlBeanService> entry : schemaMap.entrySet()) {
                 //检查schema是否存在,不存在则创建（不支持sqlite和oracle）
                 if (StringUtil.isNotBlank(entry.getKey())) {
-                    if (entry.getValue().getSqlBeanDB().getDbType() == DbType.SQLite || entry.getValue().getSqlBeanDB().getDbType() == DbType.Oracle) {
+                    if (entry.getValue().getSqlBeanMeta().getDbType() == DbType.SQLite || entry.getValue().getSqlBeanMeta().getDbType() == DbType.Oracle) {
                         continue;
                     }
                     List<String> databases = ((AdvancedDbManageService) entry.getValue()).getSchemas(entry.getKey());

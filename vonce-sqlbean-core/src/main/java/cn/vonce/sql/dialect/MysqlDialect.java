@@ -3,7 +3,7 @@ package cn.vonce.sql.dialect;
 import cn.vonce.sql.annotation.SqlJSON;
 import cn.vonce.sql.bean.Alter;
 import cn.vonce.sql.bean.Table;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.AlterType;
 import cn.vonce.sql.enumerate.DbType;
@@ -49,7 +49,7 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
     }
 
     @Override
-    public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getTableListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT table_schema AS `schema`, table_name AS `name`, table_comment AS `remarks` ");
         sql.append("FROM information_schema.tables ");
@@ -66,7 +66,7 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
     }
 
     @Override
-    public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getColumnListSql(SqlBeanMeta sqlBeanDB, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT ordinal_position AS cid, column_name AS name, data_type AS type, ");
         sql.append("(CASE is_nullable WHEN 'NO' THEN 1 ELSE 0 END) AS notnull, column_default AS dflt_value, ");
@@ -165,7 +165,7 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
     }
 
     @Override
-    public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT schema_name as `name` FROM information_schema.schemata ");
         if (StringUtil.isNotEmpty(schemaName)) {
@@ -176,7 +176,7 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
     }
 
     @Override
-    public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getCreateSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("CREATE DATABASE IF NOT EXISTS ");
         sql.append(this.getSchemaName(sqlBeanDB, schemaName));
@@ -190,7 +190,7 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
     }
 
     @Override
-    public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getDropSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
         return "DROP DATABASE IF EXISTS " + this.getSchemaName(sqlBeanDB, schemaName);
     }
 

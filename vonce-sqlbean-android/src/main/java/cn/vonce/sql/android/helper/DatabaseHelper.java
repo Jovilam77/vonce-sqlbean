@@ -12,7 +12,7 @@ import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.Create;
 import cn.vonce.sql.bean.Table;
 import cn.vonce.sql.config.SqlBeanConfig;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.helper.SqlHelper;
 import cn.vonce.sql.uitls.SqlBeanUtil;
@@ -57,9 +57,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         List<String> classNames = PackageUtil.getClasses(context, clazz.getPackage().getName());
         try {
             Create create;
-            SqlBeanDB sqlBeanDB = new SqlBeanDB();
-            sqlBeanDB.setDbType(DbType.SQLite);
-            sqlBeanDB.setSqlBeanConfig(new SqlBeanConfig());
+            SqlBeanMeta sqlBeanMeta = new SqlBeanMeta();
+            sqlBeanMeta.setDbType(DbType.SQLite);
+            sqlBeanMeta.setSqlBeanConfig(new SqlBeanConfig());
             for (String className : classNames) {
                 Class<?> clazz = Class.forName(className);
                 Table table = SqlBeanUtil.getTable(clazz);
@@ -67,7 +67,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 if (StringUtil.isEmpty(table.getSchema()) || table.getSchema().equals(dbName)) {
                     if (sqlTable != null && sqlTable.autoCreate()) {
                         create = new Create();
-                        create.setSqlBeanDB(sqlBeanDB);
+                        create.setSqlBeanMeta(sqlBeanMeta);
                         create.setBeanClass(clazz);
                         create.setTable(clazz);
                         String sql = SqlHelper.buildCreateSql(create);

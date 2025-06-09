@@ -36,7 +36,7 @@ public class SqlHelper {
         Integer[] pageParam = null;
         String orderSql = orderBySql(select);
         //SQLServer2008 分页处理
-        if (select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
+        if (select.getSqlBeanMeta().getDbType() == DbType.SQLServer) {
             if (SqlBeanUtil.isUsePage(select)) {
                 pageParam = pageParam(select);
                 sqlSb.append(SqlConstant.SELECT);
@@ -48,7 +48,7 @@ public class SqlHelper {
         //标准Sql
         sqlSb.append(select.isDistinct() ? SqlConstant.SELECT_DISTINCT : SqlConstant.SELECT);
         //SqlServer 分页处理
-        if (select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
+        if (select.getSqlBeanMeta().getDbType() == DbType.SQLServer) {
             if (SqlBeanUtil.isUsePage(select)) {
                 sqlSb.append(SqlConstant.TOP);
                 sqlSb.append(pageParam[0]);
@@ -72,7 +72,7 @@ public class SqlHelper {
             sqlSb.append(orderSql);
         }
         //SQLServer2008 分页处理
-        if (select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
+        if (select.getSqlBeanMeta().getDbType() == DbType.SQLServer) {
             // 主要逻辑 结束
             if (SqlBeanUtil.isUsePage(select)) {
                 sqlSb.append(SqlConstant.END_BRACKET);
@@ -89,23 +89,23 @@ public class SqlHelper {
             sqlSb.append(SqlConstant.END_BRACKET + SqlConstant.AS + SqlConstant.T);
         }
         //MySQL,MariaDB,H2 分页处理
-        if (!select.isCount() && (select.getSqlBeanDB().getDbType() == DbType.MySQL || select.getSqlBeanDB().getDbType() == DbType.MariaDB || select.getSqlBeanDB().getDbType() == DbType.H2)) {
+        if (!select.isCount() && (select.getSqlBeanMeta().getDbType() == DbType.MySQL || select.getSqlBeanMeta().getDbType() == DbType.MariaDB || select.getSqlBeanMeta().getDbType() == DbType.H2)) {
             mysqlPageDispose(select, sqlSb);
         }
         //Postgresql,SQLite,Hsql 分页处理
-        else if (!select.isCount() && (select.getSqlBeanDB().getDbType() == DbType.Postgresql || select.getSqlBeanDB().getDbType() == DbType.SQLite || select.getSqlBeanDB().getDbType() == DbType.Hsql)) {
+        else if (!select.isCount() && (select.getSqlBeanMeta().getDbType() == DbType.Postgresql || select.getSqlBeanMeta().getDbType() == DbType.SQLite || select.getSqlBeanMeta().getDbType() == DbType.Hsql)) {
             PostgresqlPageDispose(select, sqlSb);
         }
         //Oracle 分页处理
-        else if (!select.isCount() && select.getSqlBeanDB().getDbType() == DbType.Oracle) {
+        else if (!select.isCount() && select.getSqlBeanMeta().getDbType() == DbType.Oracle) {
             oraclePageDispose(select, sqlSb);
         }
         //DB2 分页处理
-        else if (!select.isCount() && select.getSqlBeanDB().getDbType() == DbType.DB2) {
+        else if (!select.isCount() && select.getSqlBeanMeta().getDbType() == DbType.DB2) {
             db2PageDispose(select, sqlSb);
         }
         //Derby 分页处理
-        else if (!select.isCount() && select.getSqlBeanDB().getDbType() == DbType.Derby) {
+        else if (!select.isCount() && select.getSqlBeanMeta().getDbType() == DbType.Derby) {
             derbyPageDispose(select, sqlSb);
         }
         return sqlSb.toString();
@@ -122,7 +122,7 @@ public class SqlHelper {
         SqlBeanUtil.check(update);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlConstant.UPDATE);
-        if (update.getSqlBeanDB().getDbType() == DbType.H2 || update.getSqlBeanDB().getDbType() == DbType.Oracle) {
+        if (update.getSqlBeanMeta().getDbType() == DbType.H2 || update.getSqlBeanMeta().getDbType() == DbType.Oracle) {
             sqlSb.append(SqlBeanUtil.fromFullName(update.getTable().getSchema(), update.getTable().getName(), update.getTable().getAlias(), update));
         } else {
             sqlSb.append(SqlBeanUtil.getTableName(update.getTable(), update));
@@ -161,7 +161,7 @@ public class SqlHelper {
         SqlBeanUtil.check(delete);
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append(SqlConstant.DELETE_FROM);
-        if (delete.getSqlBeanDB().getDbType() == DbType.H2 || delete.getSqlBeanDB().getDbType() == DbType.Oracle) {
+        if (delete.getSqlBeanMeta().getDbType() == DbType.H2 || delete.getSqlBeanMeta().getDbType() == DbType.Oracle) {
             sqlSb.append(SqlBeanUtil.fromFullName(delete.getTable().getSchema(), delete.getTable().getName(), delete.getTable().getAlias(), delete));
         } else {
             sqlSb.append(SqlBeanUtil.getTableName(delete.getTable(), delete));
@@ -184,7 +184,7 @@ public class SqlHelper {
         sqlSb.append(SqlConstant.BEGIN_BRACKET);
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(create.getBeanClass());
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(create.getBeanClass());
-        DbType dbType = create.getSqlBeanDB().getDbType();
+        DbType dbType = create.getSqlBeanMeta().getDbType();
         Class constantClass = SqlBeanUtil.getConstantClass(create.getBeanClass());
         String remarks = sqlTable.remarks();
         //如果没有设置表注释，则从类上获取
@@ -196,7 +196,7 @@ public class SqlHelper {
                 continue;
             }
             SqlColumn sqlColumn = fieldList.get(i).getAnnotation(SqlColumn.class);
-            sqlSb.append(SqlBeanUtil.addColumn(create, SqlBeanUtil.buildColumnInfo(create.getSqlBeanDB(), fieldList.get(i), sqlTable, sqlColumn, constantClass), null));
+            sqlSb.append(SqlBeanUtil.addColumn(create, SqlBeanUtil.buildColumnInfo(create.getSqlBeanMeta(), fieldList.get(i), sqlTable, sqlColumn, constantClass), null));
             sqlSb.append(SqlConstant.COMMA);
         }
         Field idField = SqlBeanUtil.getIdField(create.getBeanClass());
@@ -237,7 +237,7 @@ public class SqlHelper {
         }
         StringBuffer backupSql = new StringBuffer();
         //非SQLServer、Postgresql数据库则使用：create table A as select * from B
-        if (DbType.SQLServer != backup.getSqlBeanDB().getDbType() && DbType.Postgresql != backup.getSqlBeanDB().getDbType()) {
+        if (DbType.SQLServer != backup.getSqlBeanMeta().getDbType() && DbType.Postgresql != backup.getSqlBeanMeta().getDbType()) {
             backupSql.append(SqlConstant.CREATE_TABLE);
             backupSql.append(SqlBeanUtil.getTableName(backup, targetSchema, backup.getTargetTableName()));
             backupSql.append(SqlConstant.SPACES);
@@ -254,14 +254,14 @@ public class SqlHelper {
             backupSql.append(SqlConstant.ALL);
         }
         //如果是SQLServer、Postgresql数据库则需要拼接INTO：select * into A from B
-        if (DbType.SQLServer == backup.getSqlBeanDB().getDbType() || DbType.Postgresql == backup.getSqlBeanDB().getDbType()) {
+        if (DbType.SQLServer == backup.getSqlBeanMeta().getDbType() || DbType.Postgresql == backup.getSqlBeanMeta().getDbType()) {
             backupSql.append(SqlConstant.INTO);
             backupSql.append(SqlBeanUtil.getTableName(backup, targetSchema, backup.getTargetTableName()));
         }
         backupSql.append(SqlConstant.FROM);
         backupSql.append(SqlBeanUtil.getTableName(backup.getTable(), backup));
         //如果是Derby数据库，仅支持创建表结构，其他数据库则可通过条件备份数据和是否需要数据
-        if (DbType.Derby == backup.getSqlBeanDB().getDbType()) {
+        if (DbType.Derby == backup.getSqlBeanMeta().getDbType()) {
             backupSql.append(" WITH NO DATA");
         } else {
             backupSql.append(whereSql(backup, null));
@@ -326,10 +326,10 @@ public class SqlHelper {
     public static String buildDrop(Drop drop) {
         StringBuffer dropSql = new StringBuffer();
         String tableName = SqlBeanUtil.getTableName(drop.getTable(), drop);
-        if (drop.getSqlBeanDB().getDbType() == DbType.MySQL || drop.getSqlBeanDB().getDbType() == DbType.MariaDB || drop.getSqlBeanDB().getDbType() == DbType.Postgresql || drop.getSqlBeanDB().getDbType() == DbType.H2) {
+        if (drop.getSqlBeanMeta().getDbType() == DbType.MySQL || drop.getSqlBeanMeta().getDbType() == DbType.MariaDB || drop.getSqlBeanMeta().getDbType() == DbType.Postgresql || drop.getSqlBeanMeta().getDbType() == DbType.H2) {
             dropSql.append("DROP TABLE IF EXISTS ");
             dropSql.append(tableName);
-        } else if (drop.getSqlBeanDB().getDbType() == DbType.MySQL) {
+        } else if (drop.getSqlBeanMeta().getDbType() == DbType.MySQL) {
             dropSql.append("IF OBJECT_ID(N'" + tableName + "', N'U') IS NOT NULL ");
             dropSql.append("DROP TABLE " + tableName + " ");
         } else {
@@ -449,7 +449,7 @@ public class SqlHelper {
         SqlTable sqlTable = SqlBeanUtil.getSqlTable(insert.getBeanClass());
         //获取bean的全部字段
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(insert.getBeanClass());
-        if (insert.getSqlBeanDB().getDbType() == DbType.Oracle) {
+        if (insert.getSqlBeanMeta().getDbType() == DbType.Oracle) {
             if (objectList != null && objectList.size() > 1) {
                 fieldAndValuesSql.append(SqlConstant.INSERT_ALL_INTO);
             } else {
@@ -476,7 +476,7 @@ public class SqlHelper {
                     SqlId sqlId = field.getAnnotation(SqlId.class);
                     SqlDefaultValue sqlDefaultValue = field.getAnnotation(SqlDefaultValue.class);
                     SqlJSON sqlJSON = field.getAnnotation(SqlJSON.class);
-                    JdbcType jdbcType = SqlBeanUtil.getJdbcType(insert.getSqlBeanDB(), field);
+                    JdbcType jdbcType = SqlBeanUtil.getJdbcType(insert.getSqlBeanMeta(), field);
                     if (sqlId != null) {
                         existId++;
                     }
@@ -502,7 +502,7 @@ public class SqlHelper {
                     //如果此字段为id且需要生成唯一id
                     if (sqlId != null && sqlId.type() != IdType.AUTO && sqlId.type() != IdType.NORMAL) {
                         if (StringUtil.isEmpty(value)) {
-                            value = insert.getSqlBeanDB().getSqlBeanConfig().getUniqueIdProcessor().uniqueId(sqlId.type());
+                            value = insert.getSqlBeanMeta().getSqlBeanConfig().getUniqueIdProcessor().uniqueId(sqlId.type());
                             ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), value);
                         }
                         valueSql.append(SqlBeanUtil.getSqlValue(insert, value, jdbcType));
@@ -568,7 +568,7 @@ public class SqlHelper {
                 valueSqlList.add(valueSql.toString());
             }
         }
-        if (insert.getSqlBeanDB().getDbType() == DbType.Oracle) {
+        if (insert.getSqlBeanMeta().getDbType() == DbType.Oracle) {
             for (int k = 0; k < valueSqlList.size(); k++) {
                 if (k > 0) {
                     fieldAndValuesSql.append(SqlConstant.INTO);
@@ -777,7 +777,7 @@ public class SqlHelper {
             }
             groupByAndOrderBySql.deleteCharAt(groupByAndOrderBySql.length() - SqlConstant.COMMA.length());
         } else {
-            if (SqlConstant.ORDER_BY.equals(type) && select.getSqlBeanDB().getDbType() == DbType.SQLServer && SqlBeanUtil.isUsePage(select) && !select.isCount()) {
+            if (SqlConstant.ORDER_BY.equals(type) && select.getSqlBeanMeta().getDbType() == DbType.SQLServer && SqlBeanUtil.isUsePage(select) && !select.isCount()) {
                 groupByAndOrderBySql.append(type);
                 String tableFieldFullName = SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), select.getPage().getIdName());
                 groupByAndOrderBySql.append(tableFieldFullName);
@@ -934,7 +934,7 @@ public class SqlHelper {
                 logicallyDeleteSql.append(SqlConstant.BEGIN_BRACKET);
                 logicallyDeleteSql.append(SqlBeanUtil.getTableFieldFullName(common, common.getTable().getAlias(), SqlBeanUtil.getTableFieldName(logicallyDeleteField, sqlTable)));
                 logicallyDeleteSql.append(SqlConstant.EQUAL_TO);
-                DbType dbType = common.getSqlBeanDB().getDbType();
+                DbType dbType = common.getSqlBeanMeta().getDbType();
                 if (dbType == DbType.Postgresql) {
                     logicallyDeleteSql.append("'0'");
                 } else if (dbType == DbType.H2 || dbType == DbType.Hsql) {
@@ -1209,14 +1209,14 @@ public class SqlHelper {
         }
         Integer[] param;
         //SQLServer2008
-        if (DbType.SQLServer == select.getSqlBeanDB().getDbType()) {
+        if (DbType.SQLServer == select.getSqlBeanMeta().getDbType()) {
             int pagenum = select.getPage().getStartByZero() ? select.getPage().getPagenum() + 1 : select.getPage().getPagenum() == 0 ? select.getPage().getPagenum() + 1 : select.getPage().getPagenum();
             int top = pagenum * select.getPage().getPagesize();
             int begin = top - select.getPage().getPagesize();
             param = new Integer[]{top, begin};
         }
         //Oracle,DB2
-        else if (DbType.Oracle == select.getSqlBeanDB().getDbType() || DbType.DB2 == select.getSqlBeanDB().getDbType()) {
+        else if (DbType.Oracle == select.getSqlBeanMeta().getDbType() || DbType.DB2 == select.getSqlBeanMeta().getDbType()) {
             //startIndex = (当前页 * 每页显示的数量)，例如：(0 * 10)
             //endIndex = (当前页 * 每页显示的数量) + 每页显示的数量，例如：10 = (0 * 10) + 10
             //那么如果startIndex=0，endIndex=10，就是查询第0到10条数据

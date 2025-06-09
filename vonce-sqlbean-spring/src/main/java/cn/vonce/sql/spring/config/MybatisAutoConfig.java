@@ -1,7 +1,7 @@
 package cn.vonce.sql.spring.config;
 
 import cn.vonce.sql.config.SqlBeanConfig;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.java.mapper.MybatisSqlBeanMapperInterceptor;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -69,7 +69,7 @@ public class MybatisAutoConfig {
 
     @Bean(name = "sqlBeanConfigForMybatis")
     @Conditional(ConditionalOnUseMybatis.class)
-    public SqlBeanDB sqlBeanDB() {
+    public SqlBeanMeta sqlBeanDB() {
         try {
             SqlSessionFactory sqlSessionFactory = null;
             if (sqlSessionFactoryBean != null) {
@@ -82,7 +82,7 @@ public class MybatisAutoConfig {
                 }
             }
             Connection connection = sqlSessionFactory.getConfiguration().getEnvironment().getDataSource().getConnection();
-            SqlBeanDB sqlBeanDB = SqlBeanDB.build(sqlBeanConfig, connection.getMetaData());
+            SqlBeanMeta sqlBeanDB = SqlBeanMeta.build(sqlBeanConfig, connection.getMetaData());
             connection.close();
             return sqlBeanDB;
         } catch (SQLException e) {

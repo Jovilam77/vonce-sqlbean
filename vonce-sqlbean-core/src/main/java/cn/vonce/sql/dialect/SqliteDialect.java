@@ -2,7 +2,7 @@ package cn.vonce.sql.dialect;
 
 import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.*;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.AlterType;
 import cn.vonce.sql.enumerate.JavaMapSqliteType;
@@ -44,7 +44,7 @@ public class SqliteDialect implements SqlDialect<JavaMapSqliteType> {
     }
 
     @Override
-    public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getTableListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT name ");
         sql.append("FROM sqlite_master ");
@@ -56,7 +56,7 @@ public class SqliteDialect implements SqlDialect<JavaMapSqliteType> {
     }
 
     @Override
-    public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getColumnListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("pragma table_info('");
         sql.append(tableName);
@@ -67,7 +67,7 @@ public class SqliteDialect implements SqlDialect<JavaMapSqliteType> {
     @Override
     public List<String> alterTable(List<Alter> alterList) {
         List<String> sqlList = new ArrayList<>();
-        SqlBeanDB sqlBeanDB = alterList.get(0).getSqlBeanDB();
+        SqlBeanMeta sqlBeanMeta = alterList.get(0).getSqlBeanMeta();
         Table table = alterList.get(0).getTable();
         Class<?> beanClass = alterList.get(0).getBeanClass();
         SqlTable sqlTable = beanClass.getAnnotation(SqlTable.class);
@@ -86,7 +86,7 @@ public class SqliteDialect implements SqlDialect<JavaMapSqliteType> {
         sqlList.add(alterTableSql.toString());
         //创建表
         Create create = new Create();
-        create.setSqlBeanDB(sqlBeanDB);
+        create.setSqlBeanMeta(sqlBeanMeta);
         create.setBeanClass(beanClass);
         create.setTable(beanClass);
         sqlList.add(SqlHelper.buildCreateSql(create));
@@ -128,7 +128,7 @@ public class SqliteDialect implements SqlDialect<JavaMapSqliteType> {
             targetColumnList.add(targetColumn);
         }
         Copy copy = new Copy();
-        copy.setSqlBeanDB(sqlBeanDB);
+        copy.setSqlBeanMeta(sqlBeanMeta);
         copy.setBeanClass(beanClass);
         copy.setTable(beanClass);
         copy.setColumns(columnList.toArray(new Column[]{}));
@@ -144,17 +144,17 @@ public class SqliteDialect implements SqlDialect<JavaMapSqliteType> {
     }
 
     @Override
-    public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
         return null;
     }
 
     @Override
-    public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getCreateSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
         return null;
     }
 
     @Override
-    public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getDropSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
         return null;
     }
 

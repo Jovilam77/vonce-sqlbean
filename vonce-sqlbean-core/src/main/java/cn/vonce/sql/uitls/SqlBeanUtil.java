@@ -2,7 +2,7 @@ package cn.vonce.sql.uitls;
 
 import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.bean.*;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.define.*;
 import cn.vonce.sql.enumerate.*;
@@ -369,7 +369,7 @@ public class SqlBeanUtil {
      * @param field
      * @return
      */
-    public static ColumnInfo buildColumnInfo(SqlBeanDB sqlBeanDB, Field field) {
+    public static ColumnInfo buildColumnInfo(SqlBeanMeta sqlBeanDB, Field field) {
         return buildColumnInfo(sqlBeanDB, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class), field.getDeclaringClass());
     }
 
@@ -383,7 +383,7 @@ public class SqlBeanUtil {
      * @param constantClass
      * @return
      */
-    public static ColumnInfo buildColumnInfo(SqlBeanDB sqlBeanDB, Field field, SqlTable sqlTable, SqlColumn sqlColumn, Class constantClass) {
+    public static ColumnInfo buildColumnInfo(SqlBeanMeta sqlBeanDB, Field field, SqlTable sqlTable, SqlColumn sqlColumn, Class constantClass) {
         String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
         ColumnInfo columnInfo = new ColumnInfo();
         columnInfo.setName(SqlBeanUtil.isToUpperCase(sqlBeanDB) ? columnName.toUpperCase() : columnName);
@@ -435,7 +435,7 @@ public class SqlBeanUtil {
      * @param toColumnInfo
      * @return
      */
-    public static List<AlterDifference> columnInfoCompare(SqlBeanDB sqlBeanDB, ColumnInfo columnInfo, ColumnInfo toColumnInfo) {
+    public static List<AlterDifference> columnInfoCompare(SqlBeanMeta sqlBeanDB, ColumnInfo columnInfo, ColumnInfo toColumnInfo) {
         List<AlterDifference> alterDifferenceList = new ArrayList<>();
         if (!columnInfo.getPk().equals(toColumnInfo.getPk())) {
             alterDifferenceList.add(AlterDifference.PK);
@@ -1095,7 +1095,7 @@ public class SqlBeanUtil {
                 }
                 break;
             case BOOL_TYPE:
-                DbType dbType = common.getSqlBeanDB().getDbType();
+                DbType dbType = common.getSqlBeanMeta().getDbType();
                 if (dbType == DbType.Postgresql) {
                     sqlValue = Boolean.parseBoolean(value.toString()) == true ? "'1'" : "'0'";
                 } else if (dbType == DbType.H2 || dbType == DbType.Hsql) {
@@ -1105,7 +1105,7 @@ public class SqlBeanUtil {
                 }
                 break;
             case DATE_TYPE:
-                switch (common.getSqlBeanDB().getDbType()) {
+                switch (common.getSqlBeanMeta().getDbType()) {
                     case Oracle:
                         sqlValue = "to_timestamp(" + single_quotation_mark + DateUtil.unifyDateToString(value) + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
                         break;
@@ -1158,7 +1158,7 @@ public class SqlBeanUtil {
      */
     public static String getEscape(Common common) {
         String escape = SqlConstant.DOUBLE_ESCAPE_CHARACTER;
-        DbType dbType = common.getSqlBeanDB().getDbType();
+        DbType dbType = common.getSqlBeanMeta().getDbType();
         if (dbType == DbType.MySQL || dbType == DbType.MariaDB) {
             escape = SqlConstant.SINGLE_ESCAPE_CHARACTER;
         }
@@ -1172,7 +1172,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean isToUpperCase(Common common) {
-        if (common.getSqlBeanDB().getSqlBeanConfig().getToUpperCase() != null && common.getSqlBeanDB().getSqlBeanConfig().getToUpperCase()) {
+        if (common.getSqlBeanMeta().getSqlBeanConfig().getToUpperCase() != null && common.getSqlBeanMeta().getSqlBeanConfig().getToUpperCase()) {
             return true;
         }
         return false;
@@ -1184,7 +1184,7 @@ public class SqlBeanUtil {
      * @param sqlBeanDB
      * @return
      */
-    public static boolean isToUpperCase(SqlBeanDB sqlBeanDB) {
+    public static boolean isToUpperCase(SqlBeanMeta sqlBeanDB) {
         if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) {
             return true;
         }
@@ -1447,7 +1447,7 @@ public class SqlBeanUtil {
         }
         //是否自增
         if (columnInfo.getAutoIncr() != null && columnInfo.getAutoIncr()) {
-            if (common.getSqlBeanDB().getDbType() == DbType.MySQL || common.getSqlBeanDB().getDbType() == DbType.MariaDB) {
+            if (common.getSqlBeanMeta().getDbType() == DbType.MySQL || common.getSqlBeanMeta().getDbType() == DbType.MariaDB) {
                 sql.append(SqlConstant.SPACES);
                 sql.append(SqlConstant.AUTO_INCREMENT);
             }
@@ -1471,7 +1471,7 @@ public class SqlBeanUtil {
             }
         }
         //如果是Mysql或MariaDB
-        if (common.getSqlBeanDB().getDbType() == DbType.MySQL || common.getSqlBeanDB().getDbType() == DbType.MariaDB) {
+        if (common.getSqlBeanMeta().getDbType() == DbType.MySQL || common.getSqlBeanMeta().getDbType() == DbType.MariaDB) {
             //存在备注
             if (StringUtil.isNotBlank(columnInfo.getRemarks())) {
                 sql.append(SqlConstant.SPACES);
@@ -1511,8 +1511,8 @@ public class SqlBeanUtil {
      * 检查
      */
     public static void check(Common common) {
-        isNull(common.getSqlBeanDB(), "请设置sqlBeanConfig");
-        isNull(common.getSqlBeanDB().getDbType(), "请设置sqlBeanConfig -> dbType");
+        isNull(common.getSqlBeanMeta(), "请设置sqlBeanConfig");
+        isNull(common.getSqlBeanMeta().getDbType(), "请设置sqlBeanConfig -> dbType");
     }
 
     /**
@@ -1727,7 +1727,7 @@ public class SqlBeanUtil {
      * @param field
      * @return
      */
-    public static JdbcType getJdbcType(SqlBeanDB sqlBeanDB, Field field) {
+    public static JdbcType getJdbcType(SqlBeanMeta sqlBeanDB, Field field) {
         SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
             return sqlColumn.type();

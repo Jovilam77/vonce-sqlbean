@@ -1,7 +1,7 @@
 package cn.vonce.sql.dialect;
 
 import cn.vonce.sql.bean.Alter;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.enumerate.JdbcType;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 
@@ -36,22 +36,22 @@ public interface SqlDialect<T> {
     /**
      * 查询表信息sql
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param schema
      * @param tableName
      * @return
      */
-    String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName);
+    String getTableListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName);
 
     /**
      * 查询列信息sql
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param schema
      * @param tableName
      * @return
      */
-    String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName);
+    String getColumnListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName);
 
     /**
      * 更改表结构sql
@@ -74,11 +74,11 @@ public interface SqlDialect<T> {
     /**
      * 获取模式列表sql
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param schemaName
      * @return
      */
-    String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName);
+    String getSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName);
 
     /**
      * 创建模式sql
@@ -87,7 +87,7 @@ public interface SqlDialect<T> {
      * @param schemaName
      * @return
      */
-    String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName);
+    String getCreateSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName);
 
     /**
      * 删除模式sql
@@ -96,7 +96,7 @@ public interface SqlDialect<T> {
      * @param schemaName
      * @return
      */
-    String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName);
+    String getDropSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName);
 
     /**
      * 获取schema名称
@@ -105,7 +105,7 @@ public interface SqlDialect<T> {
      * @param schemaName
      * @return
      */
-    default String getSchemaName(SqlBeanDB sqlBeanDB, String schemaName) {
+    default String getSchemaName(SqlBeanMeta sqlBeanDB, String schemaName) {
         return (SqlBeanUtil.isToUpperCase(sqlBeanDB) ? schemaName.toUpperCase() : schemaName);
     }
 

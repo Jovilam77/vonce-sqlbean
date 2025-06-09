@@ -3,7 +3,6 @@ package cn.vonce.sql.config;
 import cn.vonce.sql.enumerate.DbType;
 
 import java.io.Serializable;
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Objects;
@@ -15,7 +14,7 @@ import java.util.Objects;
  * @version 1.0
  * @email imjovi@qq.com
  */
-public class SqlBeanDB implements Serializable {
+public class SqlBeanMeta implements Serializable {
 
     /**
      * 数据库类型
@@ -166,35 +165,35 @@ public class SqlBeanDB implements Serializable {
         }
     }
 
-    public static SqlBeanDB build(SqlBeanConfig sqlBeanConfig, DatabaseMetaData metaData) throws SQLException {
-        SqlBeanDB sqlBeanDB = new SqlBeanDB();
-        sqlBeanDB.setProductName(metaData.getDatabaseProductName());
-        sqlBeanDB.setDatabaseMajorVersion(metaData.getDatabaseMajorVersion());
-        sqlBeanDB.setDatabaseMinorVersion(metaData.getDatabaseMinorVersion());
-        sqlBeanDB.setDatabaseProductVersion(metaData.getDatabaseProductVersion());
-        sqlBeanDB.setJdbcMajorVersion(metaData.getJDBCMajorVersion());
-        sqlBeanDB.setJdbcMinorVersion(metaData.getJDBCMinorVersion());
-        sqlBeanDB.setDriverMajorVersion(metaData.getDatabaseMajorVersion());
-        sqlBeanDB.setDriverMinorVersion(metaData.getDriverMinorVersion());
-        sqlBeanDB.setDriverVersion(metaData.getDriverVersion());
-        sqlBeanDB.setDriverName(metaData.getDriverName());
-        sqlBeanDB.setDbType(DbType.getDbType(sqlBeanDB.getProductName()));
+    public static SqlBeanMeta build(SqlBeanConfig sqlBeanConfig, DatabaseMetaData metaData) throws SQLException {
+        SqlBeanMeta sqlBeanMeta = new SqlBeanMeta();
+        sqlBeanMeta.setProductName(metaData.getDatabaseProductName());
+        sqlBeanMeta.setDatabaseMajorVersion(metaData.getDatabaseMajorVersion());
+        sqlBeanMeta.setDatabaseMinorVersion(metaData.getDatabaseMinorVersion());
+        sqlBeanMeta.setDatabaseProductVersion(metaData.getDatabaseProductVersion());
+        sqlBeanMeta.setJdbcMajorVersion(metaData.getJDBCMajorVersion());
+        sqlBeanMeta.setJdbcMinorVersion(metaData.getJDBCMinorVersion());
+        sqlBeanMeta.setDriverMajorVersion(metaData.getDatabaseMajorVersion());
+        sqlBeanMeta.setDriverMinorVersion(metaData.getDriverMinorVersion());
+        sqlBeanMeta.setDriverVersion(metaData.getDriverVersion());
+        sqlBeanMeta.setDriverName(metaData.getDriverName());
+        sqlBeanMeta.setDbType(DbType.getDbType(sqlBeanMeta.getProductName()));
         //如果用户未进行配置
         if (sqlBeanConfig == null) {
-            sqlBeanDB.setSqlBeanConfig(new SqlBeanConfig());
-            switch (Objects.requireNonNull(sqlBeanDB.getDbType())) {
+            sqlBeanMeta.setSqlBeanConfig(new SqlBeanConfig());
+            switch (Objects.requireNonNull(sqlBeanMeta.getDbType())) {
                 case Oracle:
                 case DB2:
                 case Derby:
                 case Hsql:
                 case H2:
-                    sqlBeanDB.getSqlBeanConfig().setToUpperCase(true);
+                    sqlBeanMeta.getSqlBeanConfig().setToUpperCase(true);
                     break;
             }
         } else {
-            sqlBeanDB.setSqlBeanConfig(sqlBeanConfig);
+            sqlBeanMeta.setSqlBeanConfig(sqlBeanConfig);
         }
-        return sqlBeanDB;
+        return sqlBeanMeta;
     }
 
     @Override

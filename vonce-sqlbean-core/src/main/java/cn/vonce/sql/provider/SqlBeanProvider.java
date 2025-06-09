@@ -3,7 +3,7 @@ package cn.vonce.sql.provider;
 import cn.vonce.sql.annotation.SqlColumn;
 import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.*;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.SqlHelper;
@@ -31,13 +31,13 @@ public class SqlBeanProvider {
     /**
      * 根据id条件查询
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param clazz
      * @param returnType
      * @param id
      * @return
      */
-    public static String selectByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Class<?> returnType, Object id) {
+    public static String selectByIdSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Class<?> returnType, Object id) {
         return selectByIdsSql(sqlBeanDB, clazz, returnType, new Object[]{id});
     }
 
@@ -50,7 +50,7 @@ public class SqlBeanProvider {
      * @param ids
      * @return
      */
-    public static String selectByIdsSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Class<?> returnType, Object... ids) {
+    public static String selectByIdsSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Class<?> returnType, Object... ids) {
         //如果returnType类与clazz的SqlTable一致，说明这两个对象指向的都是同一张表，那么returnType则继承于clazz并包装了额外的属性
         if (returnType != null && SqlBeanUtil.sqlTableIsConsistent(clazz, returnType)) {
             clazz = returnType;
@@ -84,7 +84,7 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public static String selectBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, Class<?> returnType, Paging paging, String where, Object... args) {
+    public static String selectBySql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Class<?> returnType, Paging paging, String where, Object... args) {
         //如果returnType类与clazz的SqlTable一致，说明这两个对象指向的都是同一张表，那么returnType则继承于clazz并包装了额外的属性
         if (returnType != null && SqlBeanUtil.sqlTableIsConsistent(clazz, returnType)) {
             clazz = returnType;
@@ -104,7 +104,7 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public static String countBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
+    public static String countBySql(SqlBeanMeta sqlBeanDB, Class<?> clazz, String where, Object[] args) {
         Select select = newSelect(sqlBeanDB, clazz, true);
         select.where(where, args);
         return SqlHelper.buildSelectSql(select);
@@ -119,7 +119,7 @@ public class SqlBeanProvider {
      * @param paging
      * @return
      */
-    public static String selectAllSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Class<?> returnType, Paging paging) {
+    public static String selectAllSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Class<?> returnType, Paging paging) {
         //如果returnType类与clazz的SqlTable一致，说明这两个对象指向的都是同一张表，那么returnType则继承于clazz并包装了额外的属性
         if (returnType != null && SqlBeanUtil.sqlTableIsConsistent(clazz, returnType)) {
             clazz = returnType;
@@ -138,18 +138,18 @@ public class SqlBeanProvider {
      * @param select
      * @return
      */
-    public static String selectSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Class<?> returnType, Select select) {
+    public static String selectSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Class<?> returnType, Select select) {
         //如果returnType类与clazz的SqlTable一致，说明这两个对象指向的都是同一张表，那么returnType则继承于clazz并包装了额外的属性
         if (returnType != null && SqlBeanUtil.sqlTableIsConsistent(clazz, returnType)) {
             clazz = returnType;
         }
-        if (select.getSqlBeanDB() == null) {
-            select.setSqlBeanDB(sqlBeanDB);
+        if (select.getSqlBeanMeta() == null) {
+            select.setSqlBeanMeta(sqlBeanDB);
         }
         try {
             SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
             select.setColumnList(SqlBeanUtil.getSelectColumns(clazz, select.getFilterColumns(), select.getColumnList()));
-            if (select.getPage() != null && select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
+            if (select.getPage() != null && select.getSqlBeanMeta().getDbType() == DbType.SQLServer) {
                 select.getPage().setIdName(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz), sqlTable));
             }
         } catch (SqlBeanException e) {
@@ -168,13 +168,13 @@ public class SqlBeanProvider {
      * @param select
      * @return
      */
-    public static String countSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Class<?> returnType, Select select) {
+    public static String countSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Class<?> returnType, Select select) {
         //如果returnType类与clazz的SqlTable一致，说明这两个对象指向的都是同一张表，那么returnType则继承于clazz并包装了额外的属性
         if (returnType != null && SqlBeanUtil.sqlTableIsConsistent(clazz, returnType)) {
             clazz = returnType;
         }
-        if (select.getSqlBeanDB() == null) {
-            select.setSqlBeanDB(sqlBeanDB);
+        if (select.getSqlBeanMeta() == null) {
+            select.setSqlBeanMeta(sqlBeanDB);
         }
         select.count(true);
         return setSelectAndBuild(clazz, select);
@@ -187,7 +187,7 @@ public class SqlBeanProvider {
      * @param id
      * @return
      */
-    public static String deleteByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object id) {
+    public static String deleteByIdSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Object id) {
         //如果是逻辑删除那么将Delete对象转为Update对象
         if (SqlBeanUtil.checkLogically(clazz)) {
             return logicallyDeleteByIdSql(sqlBeanDB, clazz, id);
@@ -201,7 +201,7 @@ public class SqlBeanProvider {
             }
         }
         Delete delete = new Delete();
-        delete.setSqlBeanDB(sqlBeanDB);
+        delete.setSqlBeanMeta(sqlBeanDB);
         delete.setTable(clazz);
         delete.setBeanClass(clazz);
         setSchema(delete, clazz);
@@ -225,13 +225,13 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public static String deleteBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
+    public static String deleteBySql(SqlBeanMeta sqlBeanDB, Class<?> clazz, String where, Object[] args) {
         //如果是逻辑删除那么将Delete对象转为Update对象
         if (SqlBeanUtil.checkLogically(clazz)) {
             return logicallyDeleteBySql(sqlBeanDB, clazz, where, args);
         }
         Delete delete = new Delete();
-        delete.setSqlBeanDB(sqlBeanDB);
+        delete.setSqlBeanMeta(sqlBeanDB);
         delete.setTable(clazz);
         delete.where(where, args);
         setSchema(delete, clazz);
@@ -246,11 +246,11 @@ public class SqlBeanProvider {
      * @param ignore
      * @return
      */
-    public static String deleteSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Delete delete, boolean ignore) {
+    public static String deleteSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Delete delete, boolean ignore) {
         //如果是逻辑删除那么将Delete对象转为Update对象
         if (delete.isLogicallyDelete() && SqlBeanUtil.checkLogically(clazz)) {
             Update<Object> update = new Update();
-            update.setSqlBeanDB(sqlBeanDB);
+            update.setSqlBeanMeta(sqlBeanDB);
             update.setTable(clazz);
             update.bean(newLogicallyDeleteBean(clazz));
             update.where(delete.getWhereWrapper());
@@ -258,8 +258,8 @@ public class SqlBeanProvider {
             update.where().setDataList(delete.where().getDataList());
             return updateSql(sqlBeanDB, clazz, update, ignore);
         }
-        if (delete.getSqlBeanDB() == null) {
-            delete.setSqlBeanDB(sqlBeanDB);
+        if (delete.getSqlBeanMeta() == null) {
+            delete.setSqlBeanMeta(sqlBeanDB);
         }
         if (delete.getTable().isNotSet()) {
             delete.setTable(clazz);
@@ -287,10 +287,10 @@ public class SqlBeanProvider {
      * @param id
      * @return
      */
-    public static String logicallyDeleteByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object id) {
+    public static String logicallyDeleteByIdSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Object id) {
         Update update = new Update();
         try {
-            update.setSqlBeanDB(sqlBeanDB);
+            update.setSqlBeanMeta(sqlBeanDB);
             update.setTable(clazz);
             update.bean(newLogicallyDeleteBean(clazz));
             Field idField = SqlBeanUtil.getIdField(clazz);
@@ -312,10 +312,10 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public static String logicallyDeleteBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, String where, Object[] args) {
+    public static String logicallyDeleteBySql(SqlBeanMeta sqlBeanDB, Class<?> clazz, String where, Object[] args) {
         Update update = new Update();
         try {
-            update.setSqlBeanDB(sqlBeanDB);
+            update.setSqlBeanMeta(sqlBeanDB);
             update.setTable(clazz);
             update.bean(newLogicallyDeleteBean(clazz));
             update.where(where, args);
@@ -334,10 +334,10 @@ public class SqlBeanProvider {
      * @param wrapper
      * @return
      */
-    public static String logicallyDeleteBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, Wrapper wrapper) {
+    public static String logicallyDeleteBySql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Wrapper wrapper) {
         Update update = new Update();
         try {
-            update.setSqlBeanDB(sqlBeanDB);
+            update.setSqlBeanMeta(sqlBeanDB);
             update.setTable(clazz);
             update.bean(newLogicallyDeleteBean(clazz));
             update.where(wrapper);
@@ -358,9 +358,9 @@ public class SqlBeanProvider {
      * @param ignore
      * @return
      */
-    public static String updateSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Update update, boolean ignore) {
-        if (update.getSqlBeanDB() == null) {
-            update.setSqlBeanDB(sqlBeanDB);
+    public static String updateSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Update update, boolean ignore) {
+        if (update.getSqlBeanMeta() == null) {
+            update.setSqlBeanMeta(sqlBeanDB);
         }
         if (update.getTable().isNotSet()) {
             update.setTable(clazz);
@@ -392,7 +392,7 @@ public class SqlBeanProvider {
      * @param filterColumns
      * @return
      */
-    public static String updateByIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, Object id, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns) {
+    public static String updateByIdSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Object bean, Object id, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns) {
         if (StringUtil.isEmpty(id)) {
             try {
                 throw new SqlBeanException("updateByIdSql id不能为空");
@@ -426,7 +426,7 @@ public class SqlBeanProvider {
      * @param filterColumns
      * @return
      */
-    public static String updateByBeanIdSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns) {
+    public static String updateByBeanIdSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns) {
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
         update.filterFields(filterColumns);
         Field idField;
@@ -463,7 +463,7 @@ public class SqlBeanProvider {
      * @param args
      * @return
      */
-    public static String updateBySql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns, String where, Object[] args) {
+    public static String updateBySql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, Column[] filterColumns, String where, Object[] args) {
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
         update.filterFields(filterColumns);
         update.where(where, args);
@@ -482,7 +482,7 @@ public class SqlBeanProvider {
      * @param filterColumns
      * @return
      */
-    public static String updateByBeanSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String where, Column[] filterColumns) {
+    public static String updateByBeanSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock, String where, Column[] filterColumns) {
         Update update = newUpdate(sqlBeanDB, clazz, bean, updateNotNull, optimisticLock);
         update.filterFields(filterColumns);
         update.where(where);
@@ -495,9 +495,9 @@ public class SqlBeanProvider {
      * @param bean
      * @return
      */
-    public static String insertBeanSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean) {
+    public static String insertBeanSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Object bean) {
         Insert insert = new Insert();
-        insert.setSqlBeanDB(sqlBeanDB);
+        insert.setSqlBeanMeta(sqlBeanDB);
         insert.setTable(clazz);
         insert.setBeanClass(clazz);
         insert.setBean(SqlBeanUtil.getObjectArray(bean));
@@ -513,9 +513,9 @@ public class SqlBeanProvider {
      * @param insert
      * @return
      */
-    public static String insertSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Insert insert) {
-        if (insert.getSqlBeanDB() == null) {
-            insert.setSqlBeanDB(sqlBeanDB);
+    public static String insertSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Insert insert) {
+        if (insert.getSqlBeanMeta() == null) {
+            insert.setSqlBeanMeta(sqlBeanDB);
         }
         if (insert.getTable().isNotSet()) {
             insert.setTable(clazz);
@@ -534,9 +534,9 @@ public class SqlBeanProvider {
      * @param clazz
      * @return
      */
-    public static String dropTableSql(SqlBeanDB sqlBeanDB, Class<?> clazz) {
+    public static String dropTableSql(SqlBeanMeta sqlBeanDB, Class<?> clazz) {
         Drop drop = new Drop();
-        drop.setSqlBeanDB(sqlBeanDB);
+        drop.setSqlBeanMeta(sqlBeanDB);
         drop.setTable(clazz);
         setSchema(drop, clazz);
         return SqlHelper.buildDrop(drop);
@@ -549,9 +549,9 @@ public class SqlBeanProvider {
      * @param clazz
      * @return
      */
-    public static String createTableSql(SqlBeanDB sqlBeanDB, Class<?> clazz) {
+    public static String createTableSql(SqlBeanMeta sqlBeanDB, Class<?> clazz) {
         Create create = new Create();
-        create.setSqlBeanDB(sqlBeanDB);
+        create.setSqlBeanMeta(sqlBeanDB);
         create.setTable(clazz);
         create.setBeanClass(clazz);
         setSchema(create, clazz);
@@ -566,7 +566,7 @@ public class SqlBeanProvider {
      * @param name
      * @return
      */
-    public static String selectTableListSql(SqlBeanDB sqlBeanDB, String schema, String name) {
+    public static String selectTableListSql(SqlBeanMeta sqlBeanDB, String schema, String name) {
         if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase() && StringUtil.isNotEmpty(name)) {
             name = name.toUpperCase();
         }
@@ -581,7 +581,7 @@ public class SqlBeanProvider {
      * @param name
      * @return
      */
-    public static String selectColumnListSql(SqlBeanDB sqlBeanDB, String schema, String name) {
+    public static String selectColumnListSql(SqlBeanMeta sqlBeanDB, String schema, String name) {
         if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase() && StringUtil.isNotEmpty(name)) {
             name = name.toUpperCase();
         }
@@ -598,9 +598,9 @@ public class SqlBeanProvider {
      * @param columns
      * @return
      */
-    public static String backupSql(SqlBeanDB sqlBeanDB, Class<?> clazz, Wrapper wrapper, String targetSchema, String targetTableName, Column[] columns) {
+    public static String backupSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Wrapper wrapper, String targetSchema, String targetTableName, Column[] columns) {
         Backup backup = new Backup();
-        backup.setSqlBeanDB(sqlBeanDB);
+        backup.setSqlBeanMeta(sqlBeanDB);
         backup.setTable(clazz);
         backup.setColumns(columns);
         backup.setTargetSchema(targetSchema);
@@ -620,9 +620,9 @@ public class SqlBeanProvider {
      * @param columns
      * @return
      */
-    public static String copySql(SqlBeanDB sqlBeanDB, Class<?> clazz, Wrapper wrapper, String targetSchema, String targetTableName, Column[] columns) {
+    public static String copySql(SqlBeanMeta sqlBeanDB, Class<?> clazz, Wrapper wrapper, String targetSchema, String targetTableName, Column[] columns) {
         Copy copy = new Copy();
-        copy.setSqlBeanDB(sqlBeanDB);
+        copy.setSqlBeanMeta(sqlBeanDB);
         copy.setTable(clazz);
         copy.setColumns(columns);
         copy.setTargetSchema(targetSchema);
@@ -648,7 +648,7 @@ public class SqlBeanProvider {
      * @param columnInfoList
      * @return
      */
-    public static List<String> buildAlterSql(SqlBeanDB sqlBeanDB, Class<?> clazz, List<ColumnInfo> columnInfoList) {
+    public static List<String> buildAlterSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, List<ColumnInfo> columnInfoList) {
         SqlTable sqlTable = clazz.getAnnotation(SqlTable.class);
         List<Field> fieldList = SqlBeanUtil.getBeanAllField(clazz);
         fieldList = fieldList.stream().filter(item -> !SqlBeanUtil.isIgnore(item)).collect(Collectors.toList());
@@ -662,10 +662,10 @@ public class SqlBeanProvider {
             //如果该字段不设置自动同步表结构，则不会处理
             SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
             Alter alter = new Alter();
-            alter.setSqlBeanDB(sqlBeanDB);
+            alter.setSqlBeanMeta(sqlBeanDB);
             alter.setTable(clazz);
             String oldName = sqlColumn == null ? "" : (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) ? sqlColumn.oldName().toUpperCase() : sqlColumn.oldName();
-            ColumnInfo columnInfo = SqlBeanUtil.buildColumnInfo(alter.getSqlBeanDB(), field, sqlTable, sqlColumn, constantClass);
+            ColumnInfo columnInfo = SqlBeanUtil.buildColumnInfo(alter.getSqlBeanMeta(), field, sqlTable, sqlColumn, constantClass);
             boolean exist = false;
 
             //优先比较字段改名的
@@ -753,9 +753,9 @@ public class SqlBeanProvider {
      * @param remarks
      * @return
      */
-    public static String alterRemarksSql(SqlBeanDB sqlBeanDB, Class<?> clazz, String remarks) {
+    public static String alterRemarksSql(SqlBeanMeta sqlBeanDB, Class<?> clazz, String remarks) {
         Alter alter = new Alter();
-        alter.setSqlBeanDB(sqlBeanDB);
+        alter.setSqlBeanMeta(sqlBeanDB);
         alter.setTable(clazz);
         ColumnInfo columnInfo = new ColumnInfo();
         columnInfo.setRemarks(remarks);
@@ -771,7 +771,7 @@ public class SqlBeanProvider {
      * @param schemaName
      * @return
      */
-    public static String databaseSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public static String databaseSql(SqlBeanMeta sqlBeanDB, String schemaName) {
         return sqlBeanDB.getDbType().getSqlDialect().getSchemaSql(sqlBeanDB, schemaName);
     }
 
@@ -782,7 +782,7 @@ public class SqlBeanProvider {
      * @param schemaName
      * @return
      */
-    public static String createSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public static String createSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
         return sqlBeanDB.getDbType().getSqlDialect().getCreateSchemaSql(sqlBeanDB, schemaName);
     }
 
@@ -793,7 +793,7 @@ public class SqlBeanProvider {
      * @param schemaName
      * @return
      */
-    public static String dropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public static String dropSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
         return sqlBeanDB.getDbType().getSqlDialect().getDropSchemaSql(sqlBeanDB, schemaName);
     }
 
@@ -805,9 +805,9 @@ public class SqlBeanProvider {
      * @return
      * @throws SqlBeanException
      */
-    private static Select newSelect(SqlBeanDB sqlBeanDB, Class<?> clazz, boolean isCount) {
+    private static Select newSelect(SqlBeanMeta sqlBeanDB, Class<?> clazz, boolean isCount) {
         Select select = new Select();
-        select.setSqlBeanDB(sqlBeanDB);
+        select.setSqlBeanMeta(sqlBeanDB);
         select.setTable(clazz);
         select.setBeanClass(clazz);
         select.count(isCount);
@@ -888,9 +888,9 @@ public class SqlBeanProvider {
      * @return
      * @throws SqlBeanException
      */
-    private static Update newUpdate(SqlBeanDB sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock) {
+    private static Update newUpdate(SqlBeanMeta sqlBeanDB, Class<?> clazz, Object bean, boolean updateNotNull, boolean optimisticLock) {
         Update update = new Update();
-        update.setSqlBeanDB(sqlBeanDB);
+        update.setSqlBeanMeta(sqlBeanDB);
         update.setTable(clazz);
         update.setBeanClass(clazz);
         update.bean(bean).notNull(updateNotNull).optimisticLock(optimisticLock);
@@ -907,7 +907,7 @@ public class SqlBeanProvider {
      */
     private static void setPaging(Select select, Paging paging, Class<?> clazz) {
         if (paging != null) {
-            if (select.getSqlBeanDB().getDbType() == DbType.SQLServer) {
+            if (select.getSqlBeanMeta().getDbType() == DbType.SQLServer) {
                 try {
                     SqlTable sqlTable = SqlBeanUtil.getSqlTable(clazz);
                     select.page(SqlBeanUtil.getTableFieldName(SqlBeanUtil.getIdField(clazz), sqlTable), paging.getPagenum(), paging.getPagesize(), paging.getStartByZero());

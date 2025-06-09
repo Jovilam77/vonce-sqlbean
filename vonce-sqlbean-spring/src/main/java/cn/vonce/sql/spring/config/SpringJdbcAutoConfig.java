@@ -1,7 +1,7 @@
 package cn.vonce.sql.spring.config;
 
 import cn.vonce.sql.config.SqlBeanConfig;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +30,10 @@ public class SpringJdbcAutoConfig {
     private SqlBeanConfig sqlBeanConfig;
 
     @Bean(name = "sqlBeanDBForSpringJdbc")
-    public SqlBeanDB sqlBeanDB() {
+    public SqlBeanMeta sqlBeanDB() {
         try {
             Connection connection = jdbcTemplate.getDataSource().getConnection();
-            SqlBeanDB sqlBeanDB = SqlBeanDB.build(sqlBeanConfig, connection.getMetaData());
+            SqlBeanMeta sqlBeanDB = SqlBeanMeta.build(sqlBeanConfig, connection.getMetaData());
             connection.close();
             return sqlBeanDB;
         } catch (SQLException e) {
