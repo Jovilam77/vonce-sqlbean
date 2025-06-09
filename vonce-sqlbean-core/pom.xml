@@ -129,10 +129,10 @@
     <parent>
         <artifactId>vonce-sqlbean</artifactId>
         <groupId>cn.vonce</groupId>
-        <version>1.7.0-beta4</version>
+        <version>1.7.0-beta5</version>
     </parent>
     <artifactId>vonce-sqlbean-core</artifactId>
-    <version>1.7.0-beta4</version>
+    <version>1.7.0-beta5</version>
     <packaging>jar</packaging>
 
     <dependencies>
