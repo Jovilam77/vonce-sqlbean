@@ -143,10 +143,10 @@
     <parent>
         <artifactId>vonce-sqlbean</artifactId>
         <groupId>cn.vonce</groupId>
-        <version>1.7.0-beta3</version>
+        <version>1.7.0-beta4</version>
     </parent>
     <artifactId>vonce-sqlbean-android</artifactId>
-    <version>1.7.0-beta3</version>
+    <version>1.7.0-beta4</version>
     <packaging>jar</packaging>
 
     <dependencies>
