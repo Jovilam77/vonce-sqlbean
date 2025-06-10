@@ -1097,11 +1097,11 @@ public class SqlBeanUtil {
             case BOOL_TYPE:
                 DbType dbType = common.getSqlBeanMeta().getDbType();
                 if (dbType == DbType.Postgresql) {
-                    sqlValue = Boolean.parseBoolean(value.toString()) == true ? "'1'" : "'0'";
+                    sqlValue = Boolean.parseBoolean(value.toString()) ? "'1'" : "'0'";
                 } else if (dbType == DbType.H2 || dbType == DbType.Hsql) {
-                    sqlValue = Boolean.parseBoolean(value.toString()) == true ? "true" : "false";
+                    sqlValue = Boolean.parseBoolean(value.toString()) ? "true" : "false";
                 } else {
-                    sqlValue = Boolean.parseBoolean(value.toString()) == true ? "1" : "0";
+                    sqlValue = Boolean.parseBoolean(value.toString()) ? "1" : "0";
                 }
                 break;
             case DATE_TYPE:
@@ -1756,6 +1756,9 @@ public class SqlBeanUtil {
             }
         } else {
             jsonConvert = new JSONConvertImpl();
+        }
+        if (value == null) {
+            return null;
         }
         return jsonConvert.toJSONString(value);
     }
