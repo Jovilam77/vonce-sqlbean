@@ -512,13 +512,8 @@ public class SqlHelper {
                         valueSql.append(SqlBeanUtil.getSqlValue(insert, defaultValue, jdbcType));
                         ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), field.getType() == Boolean.class || field.getType() == boolean.class ? false : 0);
                     } else if (value == null && sqlDefaultValue != null && (sqlDefaultValue.with() == FillWith.INSERT || sqlDefaultValue.with() == FillWith.TOGETHER)) {
-                        Object defaultValue = SqlBeanUtil.assignInitialValue(SqlBeanUtil.getEntityClassFieldType(field));
+                        Object defaultValue = SqlHelper.setDefaultValue(objectList.get(i).getClass(), objectList.get(i), field);
                         valueSql.append(SqlBeanUtil.getSqlValue(insert, defaultValue, jdbcType));
-                        if (SqlEnum.class.isAssignableFrom(field.getType())) {
-                            ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), SqlBeanUtil.matchEnum(field, defaultValue));
-                        } else {
-                            ReflectUtil.instance().set(objectList.get(i).getClass(), objectList.get(i), field.getName(), defaultValue);
-                        }
                     } else {
                         valueSql.append(SqlBeanUtil.getSqlValue(insert, value, jdbcType));
                     }
@@ -649,14 +644,8 @@ public class SqlHelper {
                     Object o = SqlBeanUtil.updateVersion(field.getType(), objectValue);
                     setSql.append(SqlBeanUtil.getSqlValue(update, o));
                 } else if (objectValue == null && sqlDefaultValue != null && (sqlDefaultValue.with() == FillWith.UPDATE || sqlDefaultValue.with() == FillWith.TOGETHER)) {
-                    Object defaultValue = SqlBeanUtil.assignInitialValue(SqlBeanUtil.getEntityClassFieldType(field));
+                    Object defaultValue = SqlHelper.setDefaultValue(bean.getClass(), bean, field);
                     setSql.append(SqlBeanUtil.getSqlValue(update, defaultValue));
-                    if (SqlEnum.class.isAssignableFrom(field.getType())) {
-                        ReflectUtil.instance().set(bean.getClass(), bean, field.getName(), SqlBeanUtil.matchEnum(field, defaultValue));
-                    } else {
-                        ReflectUtil.instance().set(bean.getClass(), bean, field.getName(), defaultValue);
-                    }
-
                 } else {
                     setSql.append(SqlBeanUtil.getSqlValue(update, objectValue));
                 }
@@ -695,6 +684,31 @@ public class SqlHelper {
             }
         }
         return setSql.toString();
+    }
+
+    /**
+     * 设置默认值
+     *
+     * @param clazz
+     * @param bean
+     * @param field
+     * @return
+     */
+    private static Object setDefaultValue(Class<?> clazz, Object bean, Field field) {
+        Object defaultValue = SqlBeanUtil.assignInitialValue(SqlBeanUtil.getEntityClassFieldType(field));
+        if (SqlEnum.class.isAssignableFrom(field.getType())) {
+            //优先根据泛型类型的默认值来匹配，匹配不到则获取第一个枚举
+            SqlEnum sqlEnum = SqlBeanUtil.matchEnum(field, defaultValue);
+            if (sqlEnum == null) {
+                SqlEnum[] sqlEnums = (SqlEnum[]) field.getType().getEnumConstants();
+                sqlEnum = sqlEnums[0];
+                defaultValue = sqlEnum.getCode();
+            }
+            ReflectUtil.instance().set(clazz, bean, field.getName(), sqlEnum);
+        } else {
+            ReflectUtil.instance().set(clazz, bean, field.getName(), defaultValue);
+        }
+        return defaultValue;
     }
 
     /**
