@@ -49,8 +49,8 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     private Class<?> clazz;
 
     @Autowired
-    @Qualifier("sqlBeanDBForSpringJdbc")
-    private SqlBeanMeta sqlBeanDB;
+    @Qualifier("sqlBeanMetaForSpringJdbc")
+    private SqlBeanMeta sqlBeanMeta;
 
     public SpringJdbcSqlBeanServiceImpl() {
         clazz = SqlBeanUtil.getGenericType(this.getClass());
@@ -58,7 +58,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
 
     @Override
     public SqlBeanMeta getSqlBeanMeta() {
-        return super.setSqlBeanMeta(sqlBeanDB);
+        return super.setSqlBeanMeta(sqlBeanMeta);
     }
 
     @Override
@@ -704,14 +704,14 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @DbSwitch(DbRole.MASTER)
     @Override
     public void dropTable() {
-        SqlBeanMeta sqlBeanDB = getSqlBeanMeta();
-        if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.Postgresql && sqlBeanDB.getDbType() != DbType.SQLServer && sqlBeanDB.getDbType() != DbType.H2) {
-            List<TableInfo> nameList = jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(sqlBeanDB, SqlBeanUtil.getTable(clazz).getSchema(), SqlBeanUtil.getTable(clazz).getName()), TableInfo.class);
+        SqlBeanMeta sqlBeanMeta = getSqlBeanMeta();
+        if (sqlBeanMeta.getDbType() != DbType.MySQL && sqlBeanMeta.getDbType() != DbType.MariaDB && sqlBeanMeta.getDbType() != DbType.Postgresql && sqlBeanMeta.getDbType() != DbType.SQLServer && sqlBeanMeta.getDbType() != DbType.H2) {
+            List<TableInfo> nameList = jdbcTemplate.queryForList(SqlBeanProvider.selectTableListSql(sqlBeanMeta, SqlBeanUtil.getTable(clazz).getSchema(), SqlBeanUtil.getTable(clazz).getName()), TableInfo.class);
             if (nameList == null || nameList.isEmpty()) {
                 return;
             }
         }
-        jdbcTemplate.update(SqlBeanProvider.dropTableSql(sqlBeanDB, clazz));
+        jdbcTemplate.update(SqlBeanProvider.dropTableSql(sqlBeanMeta, clazz));
     }
 
     @DbSwitch(DbRole.MASTER)

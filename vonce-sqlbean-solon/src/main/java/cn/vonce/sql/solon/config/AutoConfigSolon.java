@@ -44,9 +44,9 @@ public class AutoConfigSolon implements Plugin {
         try {
             Connection connection = mybatisAdapter.getConfiguration().getEnvironment().getDataSource().getConnection();
             SqlBeanConfig sqlBeanConfig = bw.context().getBean(SqlBeanConfig.class);
-            SqlBeanMeta sqlBeanDB = SqlBeanMeta.build(sqlBeanConfig, connection.getMetaData());
+            SqlBeanMeta sqlBeanMeta = SqlBeanMeta.build(sqlBeanConfig, connection.getMetaData());
             connection.close();
-            bw.context().beanInject(sqlBeanDB);
+            bw.context().beanInject(sqlBeanMeta);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

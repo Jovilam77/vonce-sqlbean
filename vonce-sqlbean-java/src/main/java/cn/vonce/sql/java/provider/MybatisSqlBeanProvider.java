@@ -78,7 +78,7 @@ public class MybatisSqlBeanProvider {
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return SqlBeanProvider.countBySql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
+        return SqlBeanProvider.countBySql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
     }
 
     /**
@@ -96,7 +96,7 @@ public class MybatisSqlBeanProvider {
         if (map.containsKey("returnType")) {
             returnType = (Class<?>) map.get("returnType");
         }
-        return SqlBeanProvider.selectAllSql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), returnType, paging);
+        return SqlBeanProvider.selectAllSql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), returnType, paging);
     }
 
     /**
@@ -110,7 +110,7 @@ public class MybatisSqlBeanProvider {
         if (map.containsKey("returnType")) {
             returnType = (Class<?>) map.get("returnType");
         }
-        return SqlBeanProvider.selectSql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), returnType, (Select) map.get("select"));
+        return SqlBeanProvider.selectSql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), returnType, (Select) map.get("select"));
     }
 
     /**
@@ -124,7 +124,7 @@ public class MybatisSqlBeanProvider {
         if (map.containsKey("returnType")) {
             returnType = (Class<?>) map.get("returnType");
         }
-        return SqlBeanProvider.countSql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), returnType, (Select) map.get("select"));
+        return SqlBeanProvider.countSql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), returnType, (Select) map.get("select"));
     }
 
     /**
@@ -134,7 +134,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String deleteById(Map<String, Object> map) {
-        return SqlBeanProvider.deleteByIdSql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("id"));
+        return SqlBeanProvider.deleteByIdSql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), map.get("id"));
     }
 
     /**
@@ -148,7 +148,7 @@ public class MybatisSqlBeanProvider {
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return SqlBeanProvider.deleteBySql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
+        return SqlBeanProvider.deleteBySql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
     }
 
     /**
@@ -158,7 +158,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String delete(Map<String, Object> map) {
-        return SqlBeanProvider.deleteSql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Delete) map.get("delete"), (boolean) map.get("ignore"));
+        return SqlBeanProvider.deleteSql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), (Delete) map.get("delete"), (boolean) map.get("ignore"));
     }
 
     /**
@@ -168,7 +168,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String logicallyDeleteById(Map<String, Object> map) {
-        return SqlBeanProvider.logicallyDeleteByIdSql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("id"));
+        return SqlBeanProvider.logicallyDeleteByIdSql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), map.get("id"));
     }
 
     /**
@@ -182,7 +182,7 @@ public class MybatisSqlBeanProvider {
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return SqlBeanProvider.logicallyDeleteBySql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
+        return SqlBeanProvider.logicallyDeleteBySql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), (String) map.get("where"), args);
     }
 
     /**
@@ -192,7 +192,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String logicallyDeleteByWrapper(Map<String, Object> map) {
-        return SqlBeanProvider.logicallyDeleteBySql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Wrapper) map.get("wrapper"));
+        return SqlBeanProvider.logicallyDeleteBySql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), (Wrapper) map.get("wrapper"));
     }
 
     /**
@@ -202,7 +202,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String update(Map<String, Object> map) {
-        return SqlBeanProvider.updateSql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Update) map.get("update"), (boolean) map.get("ignore"));
+        return SqlBeanProvider.updateSql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), (Update) map.get("update"), (boolean) map.get("ignore"));
     }
 
     /**
@@ -212,7 +212,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String updateById(Map<String, Object> map) {
-        return SqlBeanProvider.updateByIdSql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), map.get("id"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (Column[]) map.get("filterColumns"));
+        return SqlBeanProvider.updateByIdSql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), map.get("bean"), map.get("id"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (Column[]) map.get("filterColumns"));
     }
 
     /**
@@ -222,7 +222,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String updateByBeanId(Map<String, Object> map) {
-        return SqlBeanProvider.updateByBeanIdSql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (Column[]) map.get("filterColumns"));
+        return SqlBeanProvider.updateByBeanIdSql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (Column[]) map.get("filterColumns"));
     }
 
     /**
@@ -236,7 +236,7 @@ public class MybatisSqlBeanProvider {
         if (map.containsKey("args")) {
             args = (Object[]) map.get("args");
         }
-        return SqlBeanProvider.updateBySql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (Column[]) map.get("filterColumns"), (String) map.get("where"), args);
+        return SqlBeanProvider.updateBySql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (Column[]) map.get("filterColumns"), (String) map.get("where"), args);
     }
 
     /**
@@ -246,7 +246,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String updateByBean(Map<String, Object> map) {
-        return SqlBeanProvider.updateByBeanSql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (String) map.get("where"), (Column[]) map.get("filterColumns"));
+        return SqlBeanProvider.updateByBeanSql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), map.get("bean"), (boolean) map.get("updateNotNull"), (boolean) map.get("optimisticLock"), (String) map.get("where"), (Column[]) map.get("filterColumns"));
     }
 
     /**
@@ -256,7 +256,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String insertBean(Map<String, Object> map) {
-        return SqlBeanProvider.insertBeanSql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), map.get("beanList"));
+        return SqlBeanProvider.insertBeanSql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), map.get("beanList"));
     }
 
     /**
@@ -266,7 +266,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String insert(Map<String, Object> map) {
-        return SqlBeanProvider.insertSql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Insert) map.get("insert"));
+        return SqlBeanProvider.insertSql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), (Insert) map.get("insert"));
     }
 
     /**
@@ -276,7 +276,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String drop(Map<String, Object> map) {
-        return SqlBeanProvider.dropTableSql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"));
+        return SqlBeanProvider.dropTableSql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"));
     }
 
     /**
@@ -286,7 +286,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String create(Map<String, Object> map) {
-        return SqlBeanProvider.createTableSql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"));
+        return SqlBeanProvider.createTableSql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"));
     }
 
     /**
@@ -296,7 +296,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String selectTableList(Map<String, Object> map) {
-        return SqlBeanProvider.selectTableListSql((SqlBeanMeta) map.get("sqlBeanDB"), (String) map.get("schema"), (String) map.get("name"));
+        return SqlBeanProvider.selectTableListSql((SqlBeanMeta) map.get("sqlBeanMeta"), (String) map.get("schema"), (String) map.get("name"));
     }
 
     /**
@@ -306,7 +306,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String selectColumnInfoList(Map<String, Object> map) {
-        return SqlBeanProvider.selectColumnListSql((SqlBeanMeta) map.get("sqlBeanDB"), (String) map.get("schema"), (String) map.get("name"));
+        return SqlBeanProvider.selectColumnListSql((SqlBeanMeta) map.get("sqlBeanMeta"), (String) map.get("schema"), (String) map.get("name"));
     }
 
     /**
@@ -316,7 +316,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String backup(Map<String, Object> map) {
-        return SqlBeanProvider.backupSql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Wrapper) map.get("wrapper"), (String) map.get("targetSchema"), (String) map.get("targetTableName"), (Column[]) map.get("columns"));
+        return SqlBeanProvider.backupSql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), (Wrapper) map.get("wrapper"), (String) map.get("targetSchema"), (String) map.get("targetTableName"), (Column[]) map.get("columns"));
     }
 
     /**
@@ -326,7 +326,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String copy(Map<String, Object> map) {
-        return SqlBeanProvider.copySql((SqlBeanMeta) map.get("sqlBeanDB"), (Class<?>) map.get("clazz"), (Wrapper) map.get("wrapper"), (String) map.get("targetSchema"), (String) map.get("targetTableName"), (Column[]) map.get("columns"));
+        return SqlBeanProvider.copySql((SqlBeanMeta) map.get("sqlBeanMeta"), (Class<?>) map.get("clazz"), (Wrapper) map.get("wrapper"), (String) map.get("targetSchema"), (String) map.get("targetTableName"), (Column[]) map.get("columns"));
     }
 
     /**
@@ -355,7 +355,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String databases(Map<String, Object> map) {
-        return SqlBeanProvider.databaseSql((SqlBeanMeta) map.get("sqlBeanDB"), (String) map.get("name"));
+        return SqlBeanProvider.databaseSql((SqlBeanMeta) map.get("sqlBeanMeta"), (String) map.get("name"));
     }
 
     /**
@@ -365,7 +365,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String createSchema(Map<String, Object> map) {
-        return SqlBeanProvider.createSchemaSql((SqlBeanMeta) map.get("sqlBeanDB"), (String) map.get("name"));
+        return SqlBeanProvider.createSchemaSql((SqlBeanMeta) map.get("sqlBeanMeta"), (String) map.get("name"));
     }
 
     /**
@@ -375,7 +375,7 @@ public class MybatisSqlBeanProvider {
      * @return
      */
     public String dropSchema(Map<String, Object> map) {
-        return SqlBeanProvider.dropSchemaSql((SqlBeanMeta) map.get("sqlBeanDB"), (String) map.get("name"));
+        return SqlBeanProvider.dropSchemaSql((SqlBeanMeta) map.get("sqlBeanMeta"), (String) map.get("name"));
     }
 
 }

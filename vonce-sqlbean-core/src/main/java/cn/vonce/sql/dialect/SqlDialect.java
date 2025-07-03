@@ -83,30 +83,30 @@ public interface SqlDialect<T> {
     /**
      * 创建模式sql
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param schemaName
      * @return
      */
-    String getCreateSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName);
+    String getCreateSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName);
 
     /**
      * 删除模式sql
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param schemaName
      * @return
      */
-    String getDropSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName);
+    String getDropSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName);
 
     /**
      * 获取schema名称
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param schemaName
      * @return
      */
-    default String getSchemaName(SqlBeanMeta sqlBeanDB, String schemaName) {
-        return (SqlBeanUtil.isToUpperCase(sqlBeanDB) ? schemaName.toUpperCase() : schemaName);
+    default String getSchemaName(SqlBeanMeta sqlBeanMeta, String schemaName) {
+        return (SqlBeanUtil.isToUpperCase(sqlBeanMeta) ? schemaName.toUpperCase() : schemaName);
     }
 
 }

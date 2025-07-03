@@ -31,17 +31,17 @@ public abstract class BaseSqlBeanServiceImpl {
 
     public abstract SqlBeanMeta getSqlBeanMeta();
 
-    protected SqlBeanMeta setSqlBeanMeta(SqlBeanMeta sqlBeanDB) {
+    protected SqlBeanMeta setSqlBeanMeta(SqlBeanMeta sqlBeanMeta) {
         String currentDs = DataSourceContextHolder.getDataSource();
         if (StringUtil.isNotBlank(currentDs)) {
             ConnectionProxy connectionProxy = ConnectionContextHolder.getConnection(currentDs);
             try {
-                return SqlBeanMeta.build(sqlBeanDB.getSqlBeanConfig(), connectionProxy.getMetaData());
+                return SqlBeanMeta.build(sqlBeanMeta.getSqlBeanConfig(), connectionProxy.getMetaData());
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         }
-        return sqlBeanDB;
+        return sqlBeanMeta;
     }
 
     /**

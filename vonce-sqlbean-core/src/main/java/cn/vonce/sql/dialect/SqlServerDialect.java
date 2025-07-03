@@ -252,34 +252,34 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
     }
 
     @Override
-    public String getSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
+    public String getSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT name FROM sys.schemas ");
         if (StringUtil.isNotEmpty(schemaName)) {
             sql.append("WHERE name = ");
-            sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanMeta, schemaName) + "'");
         }
         return sql.toString();
     }
 
     @Override
-    public String getCreateSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
+    public String getCreateSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("IF NOT EXISTS (SELECT name FROM sys.schemas WHERE name = N'");
-        sql.append(this.getSchemaName(sqlBeanDB, schemaName));
+        sql.append(this.getSchemaName(sqlBeanMeta, schemaName));
         sql.append("') BEGIN EXEC ('CREATE SCHEMA [");
-        sql.append(this.getSchemaName(sqlBeanDB, schemaName));
+        sql.append(this.getSchemaName(sqlBeanMeta, schemaName));
         sql.append("]'); END");
         return sql.toString();
     }
 
     @Override
-    public String getDropSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
+    public String getDropSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("IF EXISTS (SELECT name FROM sys.schemas WHERE name = N'");
-        sql.append(this.getSchemaName(sqlBeanDB, schemaName));
+        sql.append(this.getSchemaName(sqlBeanMeta, schemaName));
         sql.append("') BEGIN EXEC ('DROP SCHEMA [");
-        sql.append(this.getSchemaName(sqlBeanDB, schemaName));
+        sql.append(this.getSchemaName(sqlBeanMeta, schemaName));
         sql.append("]'); END");
         return sql.toString();
     }

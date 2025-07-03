@@ -40,7 +40,7 @@ public class SolonMybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImp
     private MybatisSqlBeanDao<T> mybatisSqlBeanDao;
 
     @Inject
-    private SqlBeanMeta sqlBeanDB;
+    private SqlBeanMeta sqlBeanMeta;
 
     private Class<?> clazz;
 
@@ -52,7 +52,7 @@ public class SolonMybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImp
 
     @Override
     public SqlBeanMeta getSqlBeanMeta() {
-        return super.setSqlBeanMeta(sqlBeanDB);
+        return super.setSqlBeanMeta(sqlBeanMeta);
     }
 
     @Override
@@ -699,14 +699,14 @@ public class SolonMybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImp
     @DbSwitch(DbRole.MASTER)
     @Override
     public void dropTable() {
-        SqlBeanMeta sqlBeanDB = getSqlBeanMeta();
-        if (sqlBeanDB.getDbType() != DbType.MySQL && sqlBeanDB.getDbType() != DbType.MariaDB && sqlBeanDB.getDbType() != DbType.Postgresql && sqlBeanDB.getDbType() != DbType.SQLServer && sqlBeanDB.getDbType() != DbType.H2) {
+        SqlBeanMeta sqlBeanMate = getSqlBeanMeta();
+        if (sqlBeanMate.getDbType() != DbType.MySQL && sqlBeanMate.getDbType() != DbType.MariaDB && sqlBeanMate.getDbType() != DbType.Postgresql && sqlBeanMate.getDbType() != DbType.SQLServer && sqlBeanMate.getDbType() != DbType.H2) {
             List<TableInfo> nameList = mybatisSqlBeanDao.selectTableList(getSqlBeanMeta(), SqlBeanUtil.getTable(clazz).getSchema(), SqlBeanUtil.getTable(clazz).getName());
             if (nameList == null || nameList.isEmpty()) {
                 return;
             }
         }
-        mybatisSqlBeanDao.drop(sqlBeanDB, clazz);
+        mybatisSqlBeanDao.drop(sqlBeanMate, clazz);
     }
 
     @DbSwitch(DbRole.MASTER)

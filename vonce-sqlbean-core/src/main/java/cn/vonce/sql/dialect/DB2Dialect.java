@@ -279,13 +279,13 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
     }
 
     @Override
-    public String getCreateSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
-        return "CREATE DATABASE " + this.getSchemaName(sqlBeanDB, schemaName);
+    public String getCreateSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
+        return "CREATE DATABASE " + this.getSchemaName(sqlBeanMeta, schemaName);
     }
 
     @Override
-    public String getDropSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
-        return "DROP DATABASE " + this.getSchemaName(sqlBeanDB, schemaName);
+    public String getDropSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
+        return "DROP DATABASE " + this.getSchemaName(sqlBeanMeta, schemaName);
     }
 
 }

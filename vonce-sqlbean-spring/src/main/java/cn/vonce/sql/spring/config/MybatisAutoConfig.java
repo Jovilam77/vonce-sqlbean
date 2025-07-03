@@ -69,7 +69,7 @@ public class MybatisAutoConfig {
 
     @Bean(name = "sqlBeanConfigForMybatis")
     @Conditional(ConditionalOnUseMybatis.class)
-    public SqlBeanMeta sqlBeanDB() {
+    public SqlBeanMeta sqlBeanMeta() {
         try {
             SqlSessionFactory sqlSessionFactory = null;
             if (sqlSessionFactoryBean != null) {
@@ -82,9 +82,9 @@ public class MybatisAutoConfig {
                 }
             }
             Connection connection = sqlSessionFactory.getConfiguration().getEnvironment().getDataSource().getConnection();
-            SqlBeanMeta sqlBeanDB = SqlBeanMeta.build(sqlBeanConfig, connection.getMetaData());
+            SqlBeanMeta sqlBeanMeta = SqlBeanMeta.build(sqlBeanConfig, connection.getMetaData());
             connection.close();
-            return sqlBeanDB;
+            return sqlBeanMeta;
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         } catch (Exception e) {

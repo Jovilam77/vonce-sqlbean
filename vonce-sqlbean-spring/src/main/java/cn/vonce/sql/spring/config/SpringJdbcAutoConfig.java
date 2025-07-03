@@ -29,13 +29,13 @@ public class SpringJdbcAutoConfig {
     @Autowired(required = false)
     private SqlBeanConfig sqlBeanConfig;
 
-    @Bean(name = "sqlBeanDBForSpringJdbc")
-    public SqlBeanMeta sqlBeanDB() {
+    @Bean(name = "sqlBeanMetaForSpringJdbc")
+    public SqlBeanMeta sqlBeanMeta() {
         try {
             Connection connection = jdbcTemplate.getDataSource().getConnection();
-            SqlBeanMeta sqlBeanDB = SqlBeanMeta.build(sqlBeanConfig, connection.getMetaData());
+            SqlBeanMeta sqlBeanMeta = SqlBeanMeta.build(sqlBeanConfig, connection.getMetaData());
             connection.close();
-            return sqlBeanDB;
+            return sqlBeanMeta;
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         } catch (Exception e) {

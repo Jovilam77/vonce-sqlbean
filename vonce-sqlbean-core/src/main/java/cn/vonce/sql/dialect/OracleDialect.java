@@ -66,7 +66,7 @@ public class OracleDialect implements SqlDialect<JavaMapOracleType> {
     }
 
     @Override
-    public String getColumnListSql(SqlBeanMeta sqlBeanDB, String schema, String tableName) {
+    public String getColumnListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT col.column_id AS cid, col.column_name AS name, col.data_type AS type, ");
         sql.append("(CASE col.nullable WHEN 'N' THEN '1' ELSE '0' END) AS notnull, col.data_default AS dflt_value, ");
@@ -242,23 +242,23 @@ public class OracleDialect implements SqlDialect<JavaMapOracleType> {
     }
 
     @Override
-    public String getSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
+    public String getSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT USERNAME AS \"name\" FROM ALL_USERS ");
         if (StringUtil.isNotEmpty(schemaName)) {
             sql.append("WHERE USERNAME = ");
-            sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanMeta, schemaName) + "'");
         }
         return sql.toString();
     }
 
     @Override
-    public String getCreateSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
+    public String getCreateSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         return null;
     }
 
     @Override
-    public String getDropSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
+    public String getDropSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         return null;
     }
 

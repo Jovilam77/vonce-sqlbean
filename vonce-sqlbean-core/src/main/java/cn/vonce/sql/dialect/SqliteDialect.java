@@ -144,17 +144,17 @@ public class SqliteDialect implements SqlDialect<JavaMapSqliteType> {
     }
 
     @Override
-    public String getSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
+    public String getSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         return null;
     }
 
     @Override
-    public String getCreateSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
+    public String getCreateSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         return null;
     }
 
     @Override
-    public String getDropSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
+    public String getDropSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         return null;
     }
 

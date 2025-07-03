@@ -222,13 +222,13 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
     }
 
     @Override
-    public String getCreateSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
-        return "CREATE SCHEMA AUTHORIZATION " + this.getSchemaName(sqlBeanDB, schemaName);
+    public String getCreateSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
+        return "CREATE SCHEMA AUTHORIZATION " + this.getSchemaName(sqlBeanMeta, schemaName);
     }
 
     @Override
-    public String getDropSchemaSql(SqlBeanMeta sqlBeanDB, String schemaName) {
-        return "DROP SCHEMA " + this.getSchemaName(sqlBeanDB, schemaName) + " RESTRICT";
+    public String getDropSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
+        return "DROP SCHEMA " + this.getSchemaName(sqlBeanMeta, schemaName) + " RESTRICT";
     }
 
 }

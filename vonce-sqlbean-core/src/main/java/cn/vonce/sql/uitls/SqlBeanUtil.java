@@ -365,28 +365,28 @@ public class SqlBeanUtil {
     /**
      * 获取列信息
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param field
      * @return
      */
-    public static ColumnInfo buildColumnInfo(SqlBeanMeta sqlBeanDB, Field field) {
-        return buildColumnInfo(sqlBeanDB, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class), field.getDeclaringClass());
+    public static ColumnInfo buildColumnInfo(SqlBeanMeta sqlBeanMeta, Field field) {
+        return buildColumnInfo(sqlBeanMeta, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class), field.getDeclaringClass());
     }
 
     /**
      * 获取列信息
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param field
      * @param sqlTable
      * @param sqlColumn
      * @param constantClass
      * @return
      */
-    public static ColumnInfo buildColumnInfo(SqlBeanMeta sqlBeanDB, Field field, SqlTable sqlTable, SqlColumn sqlColumn, Class constantClass) {
+    public static ColumnInfo buildColumnInfo(SqlBeanMeta sqlBeanMeta, Field field, SqlTable sqlTable, SqlColumn sqlColumn, Class constantClass) {
         String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
         ColumnInfo columnInfo = new ColumnInfo();
-        columnInfo.setName(SqlBeanUtil.isToUpperCase(sqlBeanDB) ? columnName.toUpperCase() : columnName);
+        columnInfo.setName(SqlBeanUtil.isToUpperCase(sqlBeanMeta) ? columnName.toUpperCase() : columnName);
         //是否主键 是否自增
         SqlId sqlId = field.getAnnotation(SqlId.class);
         columnInfo.setPk(sqlId != null);
@@ -395,7 +395,7 @@ public class SqlBeanUtil {
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
             jdbcType = sqlColumn.type();
         } else {
-            jdbcType = sqlBeanDB.getDbType().getSqlDialect().getJdbcType(field);
+            jdbcType = sqlBeanMeta.getDbType().getSqlDialect().getJdbcType(field);
         }
         columnInfo.setType(jdbcType.name());
         if (sqlColumn != null) {
@@ -430,12 +430,12 @@ public class SqlBeanUtil {
     /**
      * 比较两个字段信息是否一致
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param columnInfo
      * @param toColumnInfo
      * @return
      */
-    public static List<AlterDifference> columnInfoCompare(SqlBeanMeta sqlBeanDB, ColumnInfo columnInfo, ColumnInfo toColumnInfo) {
+    public static List<AlterDifference> columnInfoCompare(SqlBeanMeta sqlBeanMeta, ColumnInfo columnInfo, ColumnInfo toColumnInfo) {
         List<AlterDifference> alterDifferenceList = new ArrayList<>();
         if (!columnInfo.getPk().equals(toColumnInfo.getPk())) {
             alterDifferenceList.add(AlterDifference.PK);
@@ -449,26 +449,26 @@ public class SqlBeanUtil {
         if (columnInfo.getNotnull() != null && !columnInfo.getNotnull().equals(toColumnInfo.getNotnull())) {
             alterDifferenceList.add(AlterDifference.NOT_NULL);
         }
-        if (sqlBeanDB.getDbType() != DbType.SQLServer) {
+        if (sqlBeanMeta.getDbType() != DbType.SQLServer) {
             if ((columnInfo.getDfltValue() == null && columnInfo.getDfltValue() != toColumnInfo.getDfltValue()) || (columnInfo.getDfltValue() != null /*&& toColumnInfo.getDfltValue() != null*/ && !columnInfo.getDfltValue().equals(toColumnInfo.getDfltValue()))) {
                 alterDifferenceList.add(AlterDifference.DFLT_VALUE);
             }
         }
         if (columnInfo.getLength() != null && !columnInfo.getLength().equals(toColumnInfo.getLength())) {
             //MySql8之后整数类型不支持设置长度
-            if (sqlBeanDB.getDbType() != DbType.MySQL || (sqlBeanDB.getDbType() == DbType.MySQL && sqlBeanDB.getDatabaseMajorVersion() < 8) || (sqlBeanDB.getDbType() == DbType.MySQL && sqlBeanDB.getDatabaseMajorVersion() >= 8 && !columnInfo.getType().equalsIgnoreCase("tinyint") && !columnInfo.getType().equalsIgnoreCase("smallint") && !columnInfo.getType().equalsIgnoreCase("mediumint") && !columnInfo.getType().equalsIgnoreCase("int") && !columnInfo.getType().equalsIgnoreCase("bigint"))) {
+            if (sqlBeanMeta.getDbType() != DbType.MySQL || (sqlBeanMeta.getDbType() == DbType.MySQL && sqlBeanMeta.getDatabaseMajorVersion() < 8) || (sqlBeanMeta.getDbType() == DbType.MySQL && sqlBeanMeta.getDatabaseMajorVersion() >= 8 && !columnInfo.getType().equalsIgnoreCase("tinyint") && !columnInfo.getType().equalsIgnoreCase("smallint") && !columnInfo.getType().equalsIgnoreCase("mediumint") && !columnInfo.getType().equalsIgnoreCase("int") && !columnInfo.getType().equalsIgnoreCase("bigint"))) {
                 alterDifferenceList.add(AlterDifference.LENGTH);
             }
         }
         if (columnInfo.getScale() != null && !columnInfo.getScale().equals(toColumnInfo.getScale())) {
             alterDifferenceList.add(AlterDifference.SCALE);
         }
-        if (sqlBeanDB.getDbType() != DbType.SQLite && sqlBeanDB.getDbType() != DbType.Derby) {
+        if (sqlBeanMeta.getDbType() != DbType.SQLite && sqlBeanMeta.getDbType() != DbType.Derby) {
             if (StringUtil.isNotBlank(columnInfo.getRemarks()) && !columnInfo.getRemarks().equals(toColumnInfo.getRemarks())) {
                 alterDifferenceList.add(AlterDifference.REMARKS);
             }
         }
-        if (sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) {
+        if (sqlBeanMeta.getDbType() == DbType.MySQL || sqlBeanMeta.getDbType() == DbType.MariaDB) {
             if (!columnInfo.getAutoIncr().equals(toColumnInfo.getAutoIncr())) {
                 alterDifferenceList.add(AlterDifference.AUTO_INCR);
             }
@@ -1181,11 +1181,11 @@ public class SqlBeanUtil {
     /**
      * 是否需要转大写
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @return
      */
-    public static boolean isToUpperCase(SqlBeanMeta sqlBeanDB) {
-        if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) {
+    public static boolean isToUpperCase(SqlBeanMeta sqlBeanMeta) {
+        if (sqlBeanMeta.getSqlBeanConfig().getToUpperCase() != null && sqlBeanMeta.getSqlBeanConfig().getToUpperCase()) {
             return true;
         }
         return false;
@@ -1723,16 +1723,16 @@ public class SqlBeanUtil {
     /**
      * 获取字段的JdbcType
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param field
      * @return
      */
-    public static JdbcType getJdbcType(SqlBeanMeta sqlBeanDB, Field field) {
+    public static JdbcType getJdbcType(SqlBeanMeta sqlBeanMeta, Field field) {
         SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
             return sqlColumn.type();
         }
-        return sqlBeanDB.getDbType().getSqlDialect().getJdbcType(field);
+        return sqlBeanMeta.getDbType().getSqlDialect().getJdbcType(field);
     }
 
     /**

@@ -198,7 +198,7 @@ public class SqlBeanMeta implements Serializable {
 
     @Override
     public String toString() {
-        return "SqlBeanDB{" +
+        return "SqlBeanMeta{" +
                 "dbType=" + dbType +
                 ", productName='" + productName + '\'' +
                 ", databaseMajorVersion=" + databaseMajorVersion +
