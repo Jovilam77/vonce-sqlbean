@@ -27,6 +27,16 @@
         <url>git@github.com:Jovilam77/vonce-sqlbean.git</url>
     </scm>
 
+    <!-- 版本信息 -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <vonce.sqlbean.version>1.7.0-beta6</vonce.sqlbean.version>
+        <log4j.version>1.2.17</log4j.version>
+        <slf4j.version>1.7.36</slf4j.version>
+        <mybatis.version>3.4.0</mybatis.version>
+        <mybatis.spring.version>1.3.2</mybatis.spring.version>
+    </properties>
+
     <build>
         <plugins>
             <!--编译插件-->
@@ -79,7 +89,7 @@
                 </executions>
             </plugin>
             <!--gpg加密插件-->
-            <plugin>
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>3.1.0</version>
@@ -92,7 +102,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
@@ -106,11 +116,7 @@
         </plugins>
     </build>
 
-    <parent>
-        <artifactId>vonce-sqlbean</artifactId>
-        <groupId>cn.vonce</groupId>
-        <version>1.7.0-beta6</version>
-    </parent>
+    <groupId>cn.vonce</groupId>
     <artifactId>vonce-sqlbean-java</artifactId>
     <version>1.7.0-beta6</version>
     <packaging>jar</packaging>

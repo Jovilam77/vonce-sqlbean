@@ -26,6 +26,12 @@
         <url>git@github.com:Jovilam77/vonce-sqlbean.git</url>
     </scm>
 
+    <!-- 版本信息 -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <com.esotericsoftware.version>1.11.9</com.esotericsoftware.version>
+    </properties>
+
     <build>
         <plugins>
             <!--生产源码文件插件-->
@@ -64,7 +70,7 @@
                 </executions>
             </plugin>
             <!--gpg加密插件-->
-            <plugin>
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>3.1.0</version>
@@ -77,7 +83,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
@@ -100,11 +106,7 @@
         </plugins>
     </build>
 
-    <parent>
-        <artifactId>vonce-sqlbean</artifactId>
-        <groupId>cn.vonce</groupId>
-        <version>1.7.0-beta6</version>
-    </parent>
+    <groupId>cn.vonce</groupId>
     <artifactId>vonce-sqlbean-core</artifactId>
     <version>1.7.0-beta6</version>
     <packaging>jar</packaging>
