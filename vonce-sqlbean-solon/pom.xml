@@ -5,7 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <name>vonce-sqlbean-solon</name>
-    <description>
+    <description>This is a tool that uses java object-oriented idea to write and generate SQL statements. On this basis,
+        it also implements lightweight plug-in support similar to JPA for mybatis and spring JDBC. A large number of
+        common SQL execution methods are built in plug-ins to improve development efficiency, reduce a large number of
+        SQL statement writing, and make developers focus on business code writing.
     </description>
     <url>www.vonce.cn</url>
     <licenses>
@@ -28,19 +31,6 @@
 
     <build>
         <plugins>
-            <!--编译插件-->
-            <!--<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <compilerArgument>
-                        -proc:none
-                    </compilerArgument>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>-->
             <!--生产源码文件插件-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -77,7 +67,7 @@
                 </executions>
             </plugin>
             <!--gpg加密插件-->
-            <!--<plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>3.1.0</version>
@@ -90,16 +80,15 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>-->
+            </plugin>
             <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.13</version>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.8.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <serverId>oss</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
                 </configuration>
             </plugin>
             <plugin>
