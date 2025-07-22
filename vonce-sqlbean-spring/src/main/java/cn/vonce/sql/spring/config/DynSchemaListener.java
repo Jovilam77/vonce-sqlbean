@@ -1,8 +1,6 @@
 package cn.vonce.sql.spring.config;
 
 import cn.vonce.sql.config.SqlBeanConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -20,8 +18,6 @@ import java.util.*;
  */
 @Component
 public abstract class DynSchemaListener implements ApplicationListener<ContextRefreshedEvent> {
-
-    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired(required = false)
     private SqlBeanConfig sqlBeanConfig;

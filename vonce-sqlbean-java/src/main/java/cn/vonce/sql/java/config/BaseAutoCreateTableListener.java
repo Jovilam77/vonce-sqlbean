@@ -9,10 +9,9 @@ import cn.vonce.sql.service.DbManageService;
 import cn.vonce.sql.service.SqlBeanService;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * 自动创建表监听 基础类
@@ -24,7 +23,7 @@ import java.util.*;
  */
 public abstract class BaseAutoCreateTableListener {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     public abstract <T> T getBean(String name);
 
@@ -61,7 +60,7 @@ public abstract class BaseAutoCreateTableListener {
                     List<String> databases = ((AdvancedDbManageService) entry.getValue()).getSchemas(entry.getKey());
                     if (databases == null || databases.isEmpty()) {
                         ((AdvancedDbManageService) entry.getValue()).createSchema(entry.getKey());
-                        logger.info("-----Schema:[{}]不存在,已为你自动创建-----", entry.getKey());
+                        logger.info(String.format("-----Schema:[%s]不存在,已为你自动创建-----", entry.getKey()));
                     }
                 }
                 List<TableInfo> tableList = ((DbManageService) entry.getValue()).getTableList();
@@ -91,23 +90,23 @@ public abstract class BaseAutoCreateTableListener {
                                 break;
                             }
                         }
-                        try {
-                            //创建表
-                            if (!isExist && sqlTable.autoCreate()) {
+                        //创建表
+                        if (!isExist && sqlTable.autoCreate()) {
+                            try {
                                 ((AdvancedDbManageService) sqlBeanService).createTable();
-                                logger.info("-----Table:[{}]不存在,已为你自动创建-----", (StringUtil.isNotEmpty(table.getSchema()) ? table.getSchema() + "." + table.getName() : table.getName()));
+                                logger.info(String.format("-----Table:[%s]不存在,已为你自动创建-----", (StringUtil.isNotEmpty(table.getSchema()) ? table.getSchema() + "." + table.getName() : table.getName())));
                                 continue;
+                            } catch (Exception e) {
+                                logger.warning(String.format("创建表结构出错：" + e.getMessage()));
                             }
-                            //更新表结构
-                            if (isExist && sqlTable.autoAlter()) {
-                                try {
-                                    ((AdvancedDbManageService) sqlBeanService).alter(table, ((AdvancedDbManageService) sqlBeanService).getColumnInfoList(table.getName()));
-                                } catch (Exception e) {
-                                    logger.error("更新表结构出错：" + e.getMessage(), e);
-                                }
+                        }
+                        //更新表结构
+                        if (isExist && sqlTable.autoAlter()) {
+                            try {
+                                ((AdvancedDbManageService) sqlBeanService).alter(table, ((AdvancedDbManageService) sqlBeanService).getColumnInfoList(table.getName()));
+                            } catch (Exception e) {
+                                logger.warning(String.format("更新表结构出错：" + e.getMessage()));
                             }
-                        } catch (Exception e) {
-                            logger.error(e.getMessage(), e);
                         }
                     }
                 }

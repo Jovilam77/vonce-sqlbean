@@ -5,9 +5,6 @@ import cn.vonce.sql.java.config.BaseAutoCreateTableListener;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.core.event.AppLoadEndEvent;
 import org.noear.solon.core.event.EventListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -22,8 +19,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @Component
 public class SolonAutoCreateTableListener extends BaseAutoCreateTableListener implements  EventListener<AppLoadEndEvent> {
-
-    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private AppLoadEndEvent appLoadEndEvent;
 

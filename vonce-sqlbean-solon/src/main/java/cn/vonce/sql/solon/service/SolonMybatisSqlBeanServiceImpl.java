@@ -22,8 +22,6 @@ import org.apache.ibatis.solon.annotation.Db;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.data.annotation.Tran;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
@@ -33,8 +31,6 @@ import java.util.*;
  */
 @Component
 public class SolonMybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl implements SqlBeanService<T, ID>, AdvancedDbManageService<T> {
-
-    private Logger logger = LoggerFactory.getLogger(SolonMybatisSqlBeanServiceImpl.class);
 
     @Db
     private MybatisSqlBeanDao<T> mybatisSqlBeanDao;

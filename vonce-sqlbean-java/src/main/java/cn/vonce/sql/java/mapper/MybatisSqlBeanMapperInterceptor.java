@@ -13,13 +13,12 @@ import org.apache.ibatis.executor.resultset.ResultSetHandler;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.plugin.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * Mybatis 结果映射拦截器
@@ -32,7 +31,7 @@ import java.util.*;
 @Intercepts(@Signature(method = "handleResultSets", type = ResultSetHandler.class, args = {Statement.class}))
 public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements Interceptor {
 
-    private Logger logger = LoggerFactory.getLogger(MybatisSqlBeanMapperInterceptor.class);
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -139,7 +138,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
                     resultList.add(super.mapHandleResultSet(resultSetDelegate));
                 }
             } catch (SQLException e) {
-                logger.error("map对象映射异常SQLException，{}", e.getMessage());
+                logger.severe(String.format("map对象映射异常SQLException, %s", e.getMessage()));
             } finally {
                 // 关闭result set
                 closeResultSet(resultSetDelegate);
@@ -166,7 +165,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
                     resultList.add(value);
                 }
             } catch (SQLException e) {
-                logger.error("基础对象映射异常SQLException，{}", e.getMessage());
+                logger.severe(String.format("基础对象映射异常SQLException, %s", e.getMessage()));
             } finally {
                 // 关闭result set
                 closeResultSet(resultSetDelegate);
@@ -186,7 +185,7 @@ public class MybatisSqlBeanMapperInterceptor extends SqlBeanMapper implements In
                 resultSetDelegate.getDelegate().close();
             }
         } catch (SQLException e) {
-            logger.error("关闭 result set异常,{}", e.getMessage());
+            logger.severe(String.format("关闭 result set异常, %s", e.getMessage()));
         }
     }
 

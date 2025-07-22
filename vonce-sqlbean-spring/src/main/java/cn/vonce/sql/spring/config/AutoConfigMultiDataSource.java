@@ -5,8 +5,6 @@ import cn.vonce.sql.spring.annotation.EnableAutoConfigMultiDataSource;
 import cn.vonce.sql.spring.datasource.DynamicDataSource;
 import cn.vonce.sql.spring.datasource.TransactionalInterceptor;
 import cn.vonce.sql.uitls.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -21,6 +19,7 @@ import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.type.AnnotationMetadata;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * 自动配置多数据源
@@ -32,7 +31,7 @@ import java.util.*;
  */
 public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource implements ImportBeanDefinitionRegistrar, EnvironmentAware {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
     private StandardEnvironment environment;
     private Map<String, Object> propertyMap;
 
@@ -46,7 +45,7 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
         if (!(environment instanceof StandardEnvironment)) {
-            logger.warn("Expected StandardEnvironment, but found: {}", environment.getClass().getName());
+            logger.warning(String.format("Expected StandardEnvironment, but found: %s", environment.getClass().getName()));
             return;
         }
         MutablePropertySources propertySources = environment.getPropertySources();

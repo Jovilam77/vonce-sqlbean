@@ -2,14 +2,13 @@ package cn.vonce.sql.spring.config;
 
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanMeta;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.logging.Logger;
 
 /**
  * SpringJdbc自动配置
@@ -21,7 +20,7 @@ import java.sql.SQLException;
  */
 public class SpringJdbcAutoConfig {
 
-    private Logger logger = LoggerFactory.getLogger(SpringJdbcAutoConfig.class);
+    private final java.util.logging.Logger logger = Logger.getLogger(this.getClass().getName());
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -37,9 +36,7 @@ public class SpringJdbcAutoConfig {
             connection.close();
             return sqlBeanMeta;
         } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            logger.warning(String.format("sqlBeanMeta：%s", e.getMessage()));
         }
         return null;
     }

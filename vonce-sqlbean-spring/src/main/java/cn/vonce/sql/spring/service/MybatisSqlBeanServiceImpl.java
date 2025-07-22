@@ -19,8 +19,6 @@ import cn.vonce.sql.spring.config.UseMybatis;
 import cn.vonce.sql.service.SqlBeanService;
 import cn.vonce.sql.uitls.DateUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -39,8 +37,6 @@ import java.util.*;
 @UseMybatis
 @Service
 public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl implements SqlBeanService<T, ID>, AdvancedDbManageService<T> {
-
-    private Logger logger = LoggerFactory.getLogger(MybatisSqlBeanServiceImpl.class);
 
     @Autowired
     private MybatisSqlBeanDao<T> mybatisSqlBeanDao;

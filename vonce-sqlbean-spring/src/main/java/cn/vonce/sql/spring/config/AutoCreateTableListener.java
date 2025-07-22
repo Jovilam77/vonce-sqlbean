@@ -2,8 +2,6 @@ package cn.vonce.sql.spring.config;
 
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.java.config.BaseAutoCreateTableListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
@@ -25,8 +23,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @Component
 public class AutoCreateTableListener extends BaseAutoCreateTableListener implements ApplicationListener<ContextRefreshedEvent> {
-
-    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private ContextRefreshedEvent contextRefreshedEvent;
 
