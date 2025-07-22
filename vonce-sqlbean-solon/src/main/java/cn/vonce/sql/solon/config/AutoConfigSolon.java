@@ -46,7 +46,8 @@ public class AutoConfigSolon implements Plugin {
             SqlBeanConfig sqlBeanConfig = bw.context().getBean(SqlBeanConfig.class);
             SqlBeanMeta sqlBeanMeta = SqlBeanMeta.build(sqlBeanConfig, connection.getMetaData());
             connection.close();
-            bw.context().beanInject(sqlBeanMeta);
+            BeanWrap beanWrap = bw.context().wrap("sqlBeanMeta", sqlBeanMeta);
+            bw.context().putWrap(SqlBeanMeta.class, beanWrap);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

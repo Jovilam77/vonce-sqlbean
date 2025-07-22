@@ -17,12 +17,14 @@ import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * SqlBean 工具类 Created by Jovi on 2018/6/17.
  */
 public class SqlBeanUtil {
 
+    private static final Logger logger = Logger.getLogger(SqlBeanUtil.class.getName());
     // 是否是Android环境
     private static boolean isAndroidEnv;
 
@@ -1676,7 +1678,7 @@ public class SqlBeanUtil {
         try {
             return Class.forName(constantClassName);
         } catch (ClassNotFoundException e) {
-            System.out.println(e.getMessage());
+            logger.warning("ClassNotFoundException [" + e.getMessage() + "]");
         }
         return null;
     }
@@ -1693,8 +1695,10 @@ public class SqlBeanUtil {
         }
         try {
             return (String) constantClass.getField("_remarks").get(null);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            System.out.println(e.getMessage());
+        } catch (NoSuchFieldException e) {
+            logger.warning("NoSuchFieldException [" + e.getMessage() + "]");
+        } catch (IllegalAccessException e) {
+            logger.warning("IllegalAccessException [" + e.getMessage() + "]");
         }
         return "";
     }
@@ -1713,9 +1717,9 @@ public class SqlBeanUtil {
         try {
             return ((Column) constantClass.getField(fieldName + "$").get(null)).getRemarks();
         } catch (IllegalAccessException e) {
-            System.out.println(e.getMessage());
+            logger.warning("IllegalAccessException [" + e.getMessage() + "]");
         } catch (NoSuchFieldException e) {
-            System.out.println(e.getMessage());
+            logger.warning("NoSuchFieldException [" + e.getMessage() + "]");
         }
         return "";
     }

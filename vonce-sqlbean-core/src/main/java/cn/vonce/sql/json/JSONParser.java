@@ -326,21 +326,4 @@ public class JSONParser {
         return sb.toString();
     }
 
-
-    public static void main(String[] args) {
-//        String json = "{ \"name\": \"John\", \"age\": 30, \"isStudent\": false, \"grades\": [90, 85.5, \"A\"], \"address\": {\"city\": \"New York\", \"zip\": \"10001\"} }";
-//        String json = "[1,2,3]";
-        String json2 = "{\"resultcode\":\"200\",\"reason\":\"成功的返回\",\"result\":{\"company\":\"顺丰\",\"com\":\"sf\",\"no\":\"575677355677\",\"list\":[{\"datetime\":\"2013-06-25 10:44:05\",\"remark\":\"已收件\",\"zone\":\"台州市\"},{\"datetime\":\"2013-06-25 11:05:21\",\"remark\":\"快件在台州,准备送往下一站台州集散中心\",\"zone\":\"台州市\"}],\"status\":1 },\"error_code\":0 }";
-        String json3 = "[{\"datetime\":\"2013-06-25 10:44:05\",\"zone\":\"台州市\",\"remark\":\"已收件\"},{\"datetime\":\"2013-06-25 11:05:21\",\"zone\":\"台州市\",\"remark\":\"快件在台州,准备送往下一站台州集散中心\"}]";
-        try {
-            Object result = parse(json3);
-            System.out.println(result);
-            System.out.println(result.getClass());
-            JSONObject jsonObject = parseObject(json2);
-            System.out.println(jsonObject.toJSONString(jsonObject));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 }

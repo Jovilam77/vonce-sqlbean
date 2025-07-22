@@ -13,6 +13,7 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.*;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * 生成表字段常量处理器
@@ -23,6 +24,7 @@ import java.util.*;
  * @date 2020/2/26 14:21
  */
 public abstract class SqlConstantProcessor extends AbstractProcessor {
+    private final Logger logger = Logger.getLogger(SqlConstantProcessor.class.getName());
     private Messager messager; //有点像Logger,用于输出信息
     private Filer filer; //可以获得Build Path，用于生成文件
     public static final String PREFIX = "$";
@@ -137,7 +139,7 @@ public abstract class SqlConstantProcessor extends AbstractProcessor {
 
             code.append("\n}");
         } catch (Exception e) {
-            System.out.println("error:" + e.getMessage());
+            logger.warning("error [" + e.getMessage() + "]");
         }
         return code;
     }

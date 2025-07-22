@@ -75,7 +75,6 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
             DynamicDataSource dynamicDataSource = new DynamicDataSource();
             dynamicDataSource.setDefaultTargetDataSource(defaultTargetDataSource);
             dynamicDataSource.setTargetDataSources(dataSourceMap);
-            bw.context().beanInject(dynamicDataSource);
             BeanWrap beanWrap = bw.context().wrap("dynamicDataSource", dynamicDataSource);
             bw.context().putWrap(DataSource.class, beanWrap);
             bw.context().beanInterceptorAdd(DbTransactional.class, new TransactionalInterceptor());
