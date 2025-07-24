@@ -30,7 +30,7 @@
     <!-- 版本信息 -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <vonce.sqlbean.version>1.7.0-beta8</vonce.sqlbean.version>
+        <vonce.sqlbean.version>1.7.0-beta9</vonce.sqlbean.version>
         <mybatis.version>3.4.0</mybatis.version>
         <mybatis.spring.version>1.3.2</mybatis.spring.version>
     </properties>
@@ -116,7 +116,7 @@
 
     <groupId>cn.vonce</groupId>
     <artifactId>vonce-sqlbean-java</artifactId>
-    <version>1.7.0-beta8</version>
+    <version>1.7.0-beta9</version>
     <packaging>jar</packaging>
 
     <dependencies>
