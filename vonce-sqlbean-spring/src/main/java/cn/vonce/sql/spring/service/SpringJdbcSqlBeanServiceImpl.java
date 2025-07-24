@@ -42,14 +42,14 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private Class<?> clazz;
+    private final Class<?> clazz;
 
     @Autowired
     @Qualifier("sqlBeanMetaForSpringJdbc")
     private SqlBeanMeta sqlBeanMeta;
 
     public SpringJdbcSqlBeanServiceImpl() {
-        clazz = SqlBeanUtil.getGenericType(this.getClass());
+        clazz = SqlBeanUtil.getGenericTypeBySuperclass(this.getClass()).get(0);
     }
 
     @Override

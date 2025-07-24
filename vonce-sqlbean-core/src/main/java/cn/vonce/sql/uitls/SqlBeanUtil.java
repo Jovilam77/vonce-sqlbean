@@ -727,7 +727,7 @@ public class SqlBeanUtil {
             Table table = null;
             //如果字段是bean
             boolean isBean = !SqlBeanUtil.isBaseType(field.getType());
-            if (sqlJoin != null && isBean) {
+            if (isBean) {
                 if (sqlJoin.from() != null && sqlJoin.from() != void.class) {
                     subClazz = sqlJoin.from();
                 }
@@ -760,14 +760,14 @@ public class SqlBeanUtil {
                 joinOn.on(condition);
                 join.on().setDataList(condition.getDataList());
             } else {
-                if (sqlJoin != null && !isBean) {
+                if (!isBean) {
                     key = Md5Util.encode(sqlJoin.table().toLowerCase() + sqlJoin.tableKeyword().toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
                     if (joinFieldMap.containsKey(key)) {
                         continue;
                     }
                     select.addJoin(join);
                     join.on(join.getTableAlias(), sqlJoin.tableKeyword(), new RawValue(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
-                } else if (sqlJoin != null && isBean) {
+                } else {
                     String tableKeyword = getTableFieldName(getIdField(subClazz), sqlTable);
                     key = Md5Util.encode(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
                     if (joinFieldMap.containsKey(key)) {
@@ -821,8 +821,8 @@ public class SqlBeanUtil {
                     objects = new Object[]{args[index]};
                 }
                 if (objects != null) {
-                    for (int i = 0; i < objects.length; i++) {
-                        value.append(getActualValue(common, objects[i]));
+                    for (Object object : objects) {
+                        value.append(getActualValue(common, object));
                         value.append(SqlConstant.COMMA);
                     }
                     value.delete(value.length() - SqlConstant.COMMA.length(), value.length());
@@ -1107,18 +1107,15 @@ public class SqlBeanUtil {
                 }
                 break;
             case DATE_TYPE:
-                switch (common.getSqlBeanMeta().getDbType()) {
-                    case Oracle:
-                        sqlValue = "to_timestamp(" + single_quotation_mark + DateUtil.unifyDateToString(value) + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
-                        break;
-                    default:
-                        sqlValue = single_quotation_mark + DateUtil.unifyDateToString(value) + single_quotation_mark;
-                        break;
+                if (Objects.requireNonNull(common.getSqlBeanMeta().getDbType()) == DbType.Oracle) {
+                    sqlValue = "to_timestamp(" + single_quotation_mark + DateUtil.unifyDateToString(value) + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
+                } else {
+                    sqlValue = single_quotation_mark + DateUtil.unifyDateToString(value) + single_quotation_mark;
                 }
                 break;
             default:
-                if (value instanceof SqlEnum) {
-                    sqlValue = ((SqlEnum) value).getCode().toString();
+                if (value instanceof SqlEnum<?>) {
+                    sqlValue = ((SqlEnum<?>) value).getCode().toString();
                 } else if (value instanceof Date) {
                     sqlValue = single_quotation_mark + DateUtil.unifyDateToString(value) + single_quotation_mark;
                 } else {
@@ -1411,11 +1408,11 @@ public class SqlBeanUtil {
         } catch (ClassNotFoundException e) {
             if (type == java.time.LocalDate.class) {
                 java.time.LocalDateTime localDateTime = DateUtil.strTimeToLocalDateTime(value.toString());
-                return localDateTime == null ? null : localDateTime.toLocalDate();
+                return localDateTime.toLocalDate();
             }
             if (type == java.time.LocalTime.class) {
                 java.time.LocalDateTime localDateTime = DateUtil.strTimeToLocalDateTime(value.toString());
-                return localDateTime == null ? null : localDateTime.toLocalTime();
+                return localDateTime.toLocalTime();
             }
             if (type == java.time.LocalDateTime.class) {
                 return DateUtil.strTimeToLocalDateTime(value.toString());
@@ -1598,12 +1595,19 @@ public class SqlBeanUtil {
      * @param clazz
      * @return
      */
-    public static Class<?> getGenericType(Class<?> clazz) {
+    public static List<Class<?>> getGenericTypeBySuperclass(Class<?> clazz) {
         Type[] typeArray = new Type[]{clazz.getGenericSuperclass()};
-        if (typeArray == null || typeArray.length == 0) {
-            typeArray = clazz.getGenericInterfaces();
-        }
         return getGenericType(typeArray);
+    }
+
+    /**
+     * 获取泛型类型
+     *
+     * @param clazz
+     * @return
+     */
+    public static List<Class<?>> getGenericTypeByInterfaces(Class<?> clazz) {
+        return getGenericType(clazz.getGenericInterfaces());
     }
 
     /**
@@ -1612,19 +1616,21 @@ public class SqlBeanUtil {
      * @param typeArray
      * @return
      */
-    public static Class<?> getGenericType(Type[] typeArray) {
-        Class<?> clazz = null;
+    public static List<Class<?>> getGenericType(Type[] typeArray) {
+        List<Class<?>> classes = new ArrayList<>();
         for (Type type : typeArray) {
             if (type instanceof ParameterizedType) {
-                Class<?> trueTypeClass = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
-                try {
-                    clazz = SqlBeanUtil.class.getClassLoader().loadClass(trueTypeClass.getName());
-                    break;
-                } catch (ClassNotFoundException e) {
+                Type[] types = ((ParameterizedType) type).getActualTypeArguments();
+                for (Type t : types) {
+                    Class<?> trueTypeClass = (Class<?>) t;
+                    try {
+                        classes.add(SqlBeanUtil.class.getClassLoader().loadClass(trueTypeClass.getName()));
+                    } catch (ClassNotFoundException ignored) {
+                    }
                 }
             }
         }
-        return clazz;
+        return classes;
     }
 
     /**
@@ -1637,7 +1643,7 @@ public class SqlBeanUtil {
         Class<?> clazz = field.getType();
         if (clazz.isEnum() && SqlEnum.class.isAssignableFrom(clazz)) {
             Type[] typeArray = clazz.getGenericInterfaces();
-            clazz = SqlBeanUtil.getGenericType(typeArray);
+            clazz = SqlBeanUtil.getGenericType(typeArray).get(0);
             if (clazz == null) {
                 throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类中的枚举类字段：" + field.getType().getSimpleName() + "在实现SqlEnum接口时必须指定泛型类型");
             }
@@ -1655,9 +1661,9 @@ public class SqlBeanUtil {
      * @param value
      * @return
      */
-    public static SqlEnum matchEnum(Field field, Object value) {
-        SqlEnum[] sqlEnums = (SqlEnum[]) field.getType().getEnumConstants();
-        for (SqlEnum item : sqlEnums) {
+    public static SqlEnum<?> matchEnum(Field field, Object value) {
+        SqlEnum<?>[] sqlEnums = (SqlEnum<?>[]) field.getType().getEnumConstants();
+        for (SqlEnum<?> item : sqlEnums) {
             if (item.getCode().equals(value)) {
                 return item;
             }

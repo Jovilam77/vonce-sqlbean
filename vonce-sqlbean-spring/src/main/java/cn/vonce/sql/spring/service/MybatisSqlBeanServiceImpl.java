@@ -41,14 +41,14 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Autowired
     private MybatisSqlBeanDao<T> mybatisSqlBeanDao;
 
-    private Class<?> clazz;
+    private final Class<?> clazz;
 
     @Autowired
     @Qualifier("sqlBeanConfigForMybatis")
     private SqlBeanMeta sqlBeanMeta;
 
     public MybatisSqlBeanServiceImpl() {
-        clazz = SqlBeanUtil.getGenericType(this.getClass());
+        clazz = SqlBeanUtil.getGenericTypeBySuperclass(this.getClass()).get(0);
     }
 
 

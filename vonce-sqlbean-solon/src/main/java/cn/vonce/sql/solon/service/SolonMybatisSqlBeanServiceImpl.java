@@ -38,12 +38,10 @@ public class SolonMybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImp
     @Inject
     private SqlBeanMeta sqlBeanMeta;
 
-    private Class<?> clazz;
+    private final Class<?> clazz;
 
     public SolonMybatisSqlBeanServiceImpl() {
-        if (clazz == null) {
-            clazz = SqlBeanUtil.getGenericType(this.getClass());
-        }
+        clazz = SqlBeanUtil.getGenericTypeBySuperclass(this.getClass()).get(0);
     }
 
     @Override
