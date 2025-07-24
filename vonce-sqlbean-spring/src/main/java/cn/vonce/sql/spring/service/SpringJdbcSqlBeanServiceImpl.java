@@ -49,7 +49,12 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl 
     private SqlBeanMeta sqlBeanMeta;
 
     public SpringJdbcSqlBeanServiceImpl() {
-        clazz = SqlBeanUtil.getGenericTypeBySuperclass(this.getClass()).get(0);
+        List<Class<?>> classes = SqlBeanUtil.getGenericTypeBySuperclass(this.getClass());
+        if (!classes.isEmpty()) {
+            this.clazz = classes.get(0);
+        } else {
+            this.clazz = null;
+        }
     }
 
     @Override

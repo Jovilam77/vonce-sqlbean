@@ -48,7 +48,12 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     private SqlBeanMeta sqlBeanMeta;
 
     public MybatisSqlBeanServiceImpl() {
-        clazz = SqlBeanUtil.getGenericTypeBySuperclass(this.getClass()).get(0);
+        List<Class<?>> classes = SqlBeanUtil.getGenericTypeBySuperclass(this.getClass());
+        if (!classes.isEmpty()) {
+            this.clazz = classes.get(0);
+        } else {
+            this.clazz = null;
+        }
     }
 
 

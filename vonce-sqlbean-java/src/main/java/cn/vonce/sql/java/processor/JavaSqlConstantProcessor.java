@@ -2,7 +2,6 @@ package cn.vonce.sql.java.processor;
 
 import cn.vonce.sql.processor.SqlConstantProcessor;
 import cn.vonce.sql.uitls.JavaParserUtil;
-import cn.vonce.sql.uitls.StringUtil;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 
@@ -42,17 +41,27 @@ public class JavaSqlConstantProcessor extends SqlConstantProcessor {
     @Override
     public String getTableRemarks(Element element) {
         try {
-            String classPath = new File("").getAbsolutePath();
-            if (StringUtil.isNotBlank(classPath)) {
-                String sourceRoot = classPath + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator;
-                String javaFilePath = sourceRoot + ((PackageElement) element.getEnclosingElement()).getQualifiedName().toString().replace(".", File.separator) + File.separator + element.getSimpleName().toString() + ".java";
-                if (new File(javaFilePath).exists()) {
-                    JavaParserUtil.Declaration declaration = JavaParserUtil.getFieldDeclarationList(sourceRoot, javaFilePath);
-                    TypeDeclaration<?> typeDeclaration = declaration.getTypeDeclaration();
-                    fieldDeclarationList = declaration.getFieldDeclarationList();
-                    if (typeDeclaration != null && typeDeclaration.getComment().isPresent()) {
-                        return JavaParserUtil.getCommentContent(typeDeclaration.getComment().get().getContent());
-                    }
+            //获取当前模块路径
+            String path = getClass().getClassLoader().getResource("").getFile();
+            if (new File(path).exists()) {
+                // 将URL编码的空格转回正常显示
+                path = path.replaceAll("%20", " ").substring(0, path.lastIndexOf("/target/classes/"));
+                //判断是否为Windows系统
+                if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+                    // 去掉前导的斜杠（在Windows上）
+                    path = path.replaceFirst("^/", "").replace("/", "\\");
+                }
+            } else {
+                path = new File("").getAbsolutePath();
+            }
+            String sourceRoot = path + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator;
+            String javaFilePath = sourceRoot + ((PackageElement) element.getEnclosingElement()).getQualifiedName().toString().replace(".", File.separator) + File.separator + element.getSimpleName().toString() + ".java";
+            if (new File(javaFilePath).exists()) {
+                JavaParserUtil.Declaration declaration = JavaParserUtil.getFieldDeclarationList(sourceRoot, javaFilePath);
+                TypeDeclaration<?> typeDeclaration = declaration.getTypeDeclaration();
+                fieldDeclarationList = declaration.getFieldDeclarationList();
+                if (typeDeclaration != null && typeDeclaration.getComment().isPresent()) {
+                    return JavaParserUtil.getCommentContent(typeDeclaration.getComment().get().getContent());
                 }
             }
         } catch (Exception e) {

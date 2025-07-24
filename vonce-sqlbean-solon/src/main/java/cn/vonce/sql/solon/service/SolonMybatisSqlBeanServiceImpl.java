@@ -22,6 +22,7 @@ import org.apache.ibatis.solon.annotation.Db;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.data.annotation.Tran;
+
 import java.util.*;
 
 /**
@@ -41,7 +42,12 @@ public class SolonMybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImp
     private final Class<?> clazz;
 
     public SolonMybatisSqlBeanServiceImpl() {
-        clazz = SqlBeanUtil.getGenericTypeBySuperclass(this.getClass()).get(0);
+        List<Class<?>> classes = SqlBeanUtil.getGenericTypeBySuperclass(this.getClass());
+        if (!classes.isEmpty()) {
+            this.clazz = classes.get(0);
+        } else {
+            this.clazz = null;
+        }
     }
 
     @Override
