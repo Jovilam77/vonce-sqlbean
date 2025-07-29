@@ -862,12 +862,23 @@ public class SqlHelper {
     private static String simpleConditionHandle(Common common, List<ConditionData> conditionDataList) {
         StringBuffer conditionSql = new StringBuffer();
         for (int i = 0; i < conditionDataList.size(); i++) {
-            ConditionInfo conditionInfo = (ConditionInfo) conditionDataList.get(i).getItem();
-            // 遍历sql逻辑处理
-            if (i != 0 && i < conditionDataList.size()) {
+            Object itemData = conditionDataList.get(i).getItem();
+            if (itemData instanceof ConditionInfo) {
+                ConditionInfo conditionInfo = (ConditionInfo) itemData;
+                // 遍历sql逻辑处理
+                if (i != 0 && i < conditionDataList.size()) {
+                    conditionSql.append(getLogic(conditionDataList.get(i).getSqlLogic()));
+                }
+                conditionSql.append(valueOperator(common, conditionInfo));
+            } else {
                 conditionSql.append(getLogic(conditionDataList.get(i).getSqlLogic()));
+                List<ConditionData> dataList = (List<ConditionData>) itemData;
+                if (!dataList.isEmpty()) {
+                    conditionSql.append(SqlConstant.BEGIN_BRACKET);
+                    conditionSql.append(simpleConditionHandle(common, dataList));
+                    conditionSql.append(SqlConstant.END_BRACKET);
+                }
             }
-            conditionSql.append(valueOperator(common, conditionInfo));
         }
         return conditionSql.toString();
     }

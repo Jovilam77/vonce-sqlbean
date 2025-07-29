@@ -26,17 +26,17 @@
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
-		<version>1.7.0-beta9</version>
+		<version>1.7.0-beta10</version>
 	</dependency>
 ###### Solon项目
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-solon</artifactId>
-		<version>1.7.0-beta9</version>
+		<version>1.7.0-beta10</version>
 	</dependency>
 ###### Android项目（[详细使用](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")）
-	implementation 'cn.vonce:vonce-sqlbean-android:1.7.0-beta9'
-    annotationProcessor 'cn.vonce:vonce-sqlbean-android:1.7.0-beta9'
+	implementation 'cn.vonce:vonce-sqlbean-android:1.7.0-beta10'
+    annotationProcessor 'cn.vonce:vonce-sqlbean-android:1.7.0-beta10'
 ##### 2.标注实体类
 
 ```java
@@ -147,13 +147,13 @@ public class UserController {
         user = userService.selectOneBy(Wrapper.where(eq(User::getId, 1001)));
 
         //sql语义化查询《20岁且是女性的用户根据创建时间倒序，获取前10条》
-        list = userService.select(new Select().column(User::getId, User::getUserName, User::getMobilePhone).where().eq(User::getAge, 22).and().eq(User::getGender, 0).back().orderByDesc(User::getCreateTime).page(0, 10));
+        list = userService.select(new Select().column(User::getId, User::getUserName, User::getMobilePhone).where().eq(User::getAge, 20).and().eq(User::getGender, 0).back().orderByDesc(User::getCreateTime).page(0, 10));
 
-        //联表查询《20岁且是女性的用户根据创建时间倒序，查询前10条用户的信息和地址》
+        //联表查询《广州或深圳的18岁的女性用户，根据创建时间倒序，查询前10条用户的信息和地址》
         Select select = new Select();
         select.column(User::getId, User::getUserName, User::getMobilePhone, UserAddress::getProvince, UserAddress::getCity, UserAddress::getArea, UserAddress::getDetails);
         select.innerJoin(UserAddress.class).on().eq(UserAddress::getId, User::getId);
-        select.where().gt(User::getAge, 22).and().eq(User::getGender, 0);
+        select.where().eq(User::getAge, 18).and().eq(User::getGender, 0).and(condition -> condition.eq(UserAddress::getCity, "广州").or().eq(UserAddress::getCity, "深圳"));
         select.orderByDesc(User::getCreateTime);
         select.page(0, 10);
 

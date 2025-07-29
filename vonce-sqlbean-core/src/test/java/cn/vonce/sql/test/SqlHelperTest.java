@@ -81,7 +81,9 @@ public class SqlHelperTest {
         select.column(User::getNickname, "昵称");
         select.setTable(Essay.class);
         select.innerJoin(User.class).on(User::getId, Essay::getUserId);
-        select.where().eq(Essay::getClass, "1111");
+        select.where().eq(Essay::getUserId, "1111").or(condition -> condition.eq(User::getNickname, "vicky").and(condition1 -> {
+            condition1.eq(User::getHeadPortrait, "2222").or().eq(User::getHeadPortrait, "3333");
+        }));
         //value 直接输入字符串 会当作字符串处理，sql中会带''，如果希望不被做处理则使用Original
         select.where().eq(SqlFun.date_format(Essay::getCreationTime, "%Y-%m-%d"), SqlFun.date_format(SqlFun.now(), "%Y-%m-%d"));
         select.orderByDesc(Essay::getId);
@@ -124,7 +126,7 @@ public class SqlHelperTest {
         select3.column(SqlFun.count(Essay::getId), "count")
                 .column(Essay::getCategoryId);
         select3.setTable(Essay.class);
-        SqlBeanUtil.setJoin(select3,EssayUnion.class);
+        SqlBeanUtil.setJoin(select3, EssayUnion.class);
         select3.groupBy(Essay::getCategoryId);
         select3.having().eq("count", 5);
         System.out.println("---select3---");
