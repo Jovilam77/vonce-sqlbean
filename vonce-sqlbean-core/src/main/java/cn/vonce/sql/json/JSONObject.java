@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
 
+import cn.vonce.sql.uitls.BeanUtil;
+
 /**
  * JSONObject
  *
@@ -350,6 +352,10 @@ public class JSONObject extends JSONParser implements Map<String, Object>, Clone
             return null;
         }
         return value instanceof JSONArray ? (JSONArray) value : null;
+    }
+
+    public <T> T toJavaBean(Class<T> clazz) {
+        return BeanUtil.toBean(clazz, this);
     }
 
 }

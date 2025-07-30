@@ -1,5 +1,7 @@
 package cn.vonce.sql.json;
 
+import cn.vonce.sql.uitls.BeanUtil;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -147,6 +149,22 @@ public class JSONArray extends JSONParser implements List<Object>, Cloneable, Ra
     @Override
     public String toString() {
         return this.list.toString();
+    }
+
+    public <T> List<T> toJavaList(Class<T> clazz) {
+        if (clazz != null) {
+            List<T> resultList = new ArrayList<>();
+            for (Object item : this) {
+                if (item instanceof JSONObject) {
+                    JSONObject jsonObject = (JSONObject) item;
+                    resultList.add(BeanUtil.toBean(clazz, jsonObject));
+                } else {
+                    resultList.add((T) item);
+                }
+            }
+            return resultList;
+        }
+        return null;
     }
 
 }
