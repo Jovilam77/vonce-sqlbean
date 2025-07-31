@@ -168,7 +168,7 @@ public class JSONArray extends JSONParser implements List<Object>, Cloneable, Ra
     }
 
     public static JSONArray parseArray(Object obj) {
-        return JSONArray.parseArray(JSONParser.toJSONString(obj));
+        return JSONParser.parseArray(JSONParser.toJSONString(obj));
     }
 
 }

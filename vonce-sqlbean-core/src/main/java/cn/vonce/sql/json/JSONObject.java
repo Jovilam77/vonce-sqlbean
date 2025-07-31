@@ -359,7 +359,7 @@ public class JSONObject extends JSONParser implements Map<String, Object>, Clone
     }
 
     public static JSONObject parseObject(Object obj) {
-        return JSONObject.parseObject(JSONParser.toJSONString(obj));
+        return JSONParser.parseObject(JSONParser.toJSONString(obj));
     }
 
 }
