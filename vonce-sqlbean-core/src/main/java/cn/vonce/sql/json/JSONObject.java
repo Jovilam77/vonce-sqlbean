@@ -358,4 +358,8 @@ public class JSONObject extends JSONParser implements Map<String, Object>, Clone
         return BeanUtil.toBean(clazz, this);
     }
 
+    public static JSONObject parseObject(Object obj) {
+        return JSONObject.parseObject(JSONParser.toJSONString(obj));
+    }
+
 }
