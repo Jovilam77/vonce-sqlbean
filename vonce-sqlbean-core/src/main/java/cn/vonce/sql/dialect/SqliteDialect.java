@@ -1,5 +1,6 @@
 package cn.vonce.sql.dialect;
 
+import cn.vonce.sql.annotation.SqlJSON;
 import cn.vonce.sql.annotation.SqlTable;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanMeta;
@@ -35,7 +36,11 @@ public class SqliteDialect implements SqlDialect<JavaMapSqliteType> {
                 }
             }
         }
-        throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类不支持此字段类型：" + clazz.getSimpleName());
+        SqlJSON sqlJSON = field.getAnnotation(SqlJSON.class);
+        if (sqlJSON != null) {
+            return JavaMapSqliteType.TEXT;
+        }
+        throw new SqlBeanException(field.getDeclaringClass().getName() + "，实体类不支持此字段类型：" + clazz.getSimpleName());
     }
 
     @Override

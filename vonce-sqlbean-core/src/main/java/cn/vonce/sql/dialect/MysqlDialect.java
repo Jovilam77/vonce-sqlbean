@@ -40,7 +40,7 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
         if (sqlJSON != null) {
             return JavaMapMySqlType.JSON;
         }
-        throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类不支持此字段类型：" + clazz.getSimpleName());
+        throw new SqlBeanException(field.getDeclaringClass().getName() + "，实体类不支持此字段类型：" + clazz.getSimpleName());
     }
 
     @Override

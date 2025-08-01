@@ -41,7 +41,7 @@ public class PostgresqlDialect implements SqlDialect<JavaMapPostgresqlType> {
         if (sqlJSON != null) {
             return JavaMapPostgresqlType.JSON;
         }
-        throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类不支持此字段类型：" + clazz.getSimpleName());
+        throw new SqlBeanException(field.getDeclaringClass().getName() + "，实体类不支持此字段类型：" + clazz.getSimpleName());
     }
 
     @Override

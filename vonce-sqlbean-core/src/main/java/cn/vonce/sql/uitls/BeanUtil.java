@@ -1,10 +1,6 @@
 package cn.vonce.sql.uitls;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -26,50 +22,66 @@ public class BeanUtil {
         try {
             // 创建 JavaBean 对象
             T obj = clazz.getDeclaredConstructor().newInstance();
-            BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
 
-            for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors()) {
-                String propertyName = descriptor.getName();
-                if (map.containsKey(propertyName)) {
-                    Object value = map.get(propertyName);
+            // 获取所有字段（包括私有字段）
+            List<Field> fields = getAllFields(clazz);
+
+            for (Field field : fields) {
+                String fieldName = field.getName();
+                if (map.containsKey(fieldName)) {
+                    Object value = map.get(fieldName);
                     if (value != null) {
-                        Class<?> propertyType = descriptor.getPropertyType();
-                        if (value instanceof Map) {
-                            // 处理嵌套的 Bean
-                            value = toBean(propertyType, (Map<String, Object>) value);
-                        } else if (isListOfBean(propertyType, descriptor)) {
-                            // 处理 List<Bean>
-                            value = toBeanList((List<Map<String, Object>>) value, getListGenericType(descriptor));
+                        Class<?> fieldType = field.getType();
+
+                        // 处理嵌套的 Bean
+                        if (value instanceof Map && isBean(fieldType)) {
+                            value = toBean(fieldType, (Map<String, Object>) value);
+                        }
+                        // 处理 List<Bean>
+                        else if (List.class.isAssignableFrom(fieldType) && value instanceof List) {
+                            Type genericType = field.getGenericType();
+                            if (genericType instanceof ParameterizedType) {
+                                ParameterizedType parameterizedType = (ParameterizedType) genericType;
+                                Type actualType = parameterizedType.getActualTypeArguments()[0];
+
+                                if (actualType instanceof Class && isBean((Class<?>) actualType)) {
+                                    value = toBeanList((List<Map<String, Object>>) value, (Class<?>) actualType);
+                                }
+                            }
                         }
                     }
+
+                    // 设置字段值
                     try {
-                        if (descriptor.getPropertyType().isEnum()) {
-                            Object[] constants = descriptor.getPropertyType().getEnumConstants();
+                        // 处理枚举类型
+                        if (field.getType().isEnum() && value != null) {
+                            Object[] constants = field.getType().getEnumConstants();
                             for (Object constant : constants) {
-                                if (constant.toString().equals(value)) {
+                                if (constant.toString().equals(value.toString())) {
                                     value = constant;
                                     break;
                                 }
                             }
-                            descriptor.getWriteMethod().invoke(obj, value);
-                        } else {
-                            descriptor.getWriteMethod().invoke(obj, value);
                         }
+
+                        // 尝试直接设置字段值
+                        field.setAccessible(true);
+                        field.set(obj, convertValue(field.getType(), value));
                     } catch (Exception e) {
                         try {
-                            value = SqlBeanUtil.getValueConvert(descriptor.getPropertyType(), value);
-                            descriptor.getWriteMethod().invoke(obj, value);
+                            // 尝试通过setter方法设置值
+                            String setterName = "set" + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+                            Method setter = clazz.getMethod(setterName, field.getType());
+                            setter.invoke(obj, convertValue(field.getType(), value));
                         } catch (Exception ex) {
-                            System.err.println("Failed to set property: " + propertyName + " - " + ex.getMessage());
+                            System.err.println("Failed to set property: " + fieldName + " - " + ex.getMessage());
                         }
                     }
                 }
             }
             return obj;
-        } catch (IntrospectionException e) {
-            throw new RuntimeException("Failed to analyze bean properties: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to instantiate JavaBean: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to instantiate or populate JavaBean: " + e.getMessage(), e);
         }
     }
 
@@ -85,34 +97,84 @@ public class BeanUtil {
         }
 
         Map<String, Object> resultMap = new HashMap<>();
-        try {
-            BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
+        Class<?> clazz = bean.getClass();
 
-            for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors()) {
-                String propertyName = descriptor.getName();
-                if (!"class".equals(propertyName)) {
-                    try {
-                        Object value = descriptor.getReadMethod().invoke(bean);
-                        if (value != null) {
-                            if (isBean(value.getClass())) {
-                                // 处理嵌套的 Bean
-                                value = toMap(value);
-                            } else if (value instanceof List<?>) {
-                                // 处理 List<Bean>
-                                value = toMapList((List<?>) value);
-                            }
-                        }
-                        resultMap.put(propertyName, value);
-                    } catch (Exception e) {
-                        System.err.println("Failed to read property: " + propertyName + " - " + e.getMessage());
+        // 获取所有字段（包括私有字段）
+        List<Field> fields = getAllFields(clazz);
+
+        for (Field field : fields) {
+            String fieldName = field.getName();
+            if ("class".equals(fieldName)) {
+                continue;
+            }
+
+            try {
+                // 获取字段值
+                field.setAccessible(true);
+                Object value = field.get(bean);
+
+                if (value != null) {
+                    // 处理嵌套的 Bean
+                    if (isBean(value.getClass())) {
+                        value = toMap(value);
+                    }
+                    // 处理 List<Bean>
+                    else if (value instanceof List<?>) {
+                        value = toMapList((List<?>) value);
                     }
                 }
+
+                resultMap.put(fieldName, value);
+            } catch (Exception e) {
+                try {
+                    // 尝试通过getter方法获取值
+                    String getterName = getGetterName(field);
+                    Method getter = clazz.getMethod(getterName);
+                    Object value = getter.invoke(bean);
+
+                    if (value != null) {
+                        if (isBean(value.getClass())) {
+                            value = toMap(value);
+                        } else if (value instanceof List<?>) {
+                            value = toMapList((List<?>) value);
+                        }
+                    }
+
+                    resultMap.put(fieldName, value);
+                } catch (Exception ex) {
+                    System.err.println("Failed to read property: " + fieldName + " - " + ex.getMessage());
+                }
             }
-        } catch (IntrospectionException e) {
-            throw new RuntimeException("Failed to analyze bean properties: " + e.getMessage(), e);
         }
 
         return resultMap;
+    }
+
+    /**
+     * 获取类的所有字段（包括父类的字段）
+     */
+    private static List<Field> getAllFields(Class<?> clazz) {
+        List<Field> fields = new ArrayList<>();
+        Class<?> currentClass = clazz;
+
+        while (currentClass != null && currentClass != Object.class) {
+            fields.addAll(Arrays.asList(currentClass.getDeclaredFields()));
+            currentClass = currentClass.getSuperclass();
+        }
+
+        return fields;
+    }
+
+    /**
+     * 获取getter方法名
+     */
+    private static String getGetterName(Field field) {
+        String fieldName = field.getName();
+        if (field.getType() == boolean.class) {
+            return "is" + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+        } else {
+            return "get" + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+        }
     }
 
     /**
@@ -121,41 +183,24 @@ public class BeanUtil {
     private static boolean isBean(Class<?> clazz) {
         return !(clazz.isPrimitive() || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
                 || Boolean.class.equals(clazz) || Character.class.equals(clazz) || Enum.class.isAssignableFrom(clazz)
-                || Calendar.class.isAssignableFrom(clazz) || Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
-                || BigDecimal.class.isAssignableFrom(clazz) || isDate(clazz));
+                || Calendar.class.isAssignableFrom(clazz) || Collection.class.isAssignableFrom(clazz)
+                || Map.class.isAssignableFrom(clazz) || BigDecimal.class.isAssignableFrom(clazz)
+                || isDate(clazz));
     }
 
     private static boolean isDate(Class<?> clazz) {
         if (!SqlBeanUtil.isAndroidEnv()) {
-            return (Date.class.isAssignableFrom(clazz) || java.time.LocalDate.class.isAssignableFrom(clazz) || java.time.LocalDateTime.class.isAssignableFrom(clazz)
+            return (Date.class.isAssignableFrom(clazz) || java.time.LocalDate.class.isAssignableFrom(clazz)
+                    || java.time.LocalDateTime.class.isAssignableFrom(clazz)
                     || java.time.LocalTime.class.isAssignableFrom(clazz));
         }
         return (Date.class.isAssignableFrom(clazz));
     }
 
     /**
-     * 判断是否是 List<Bean>
-     */
-    private static boolean isListOfBean(Class<?> clazz, PropertyDescriptor descriptor) {
-        if (List.class.isAssignableFrom(clazz)) {
-            ParameterizedType type = (ParameterizedType) descriptor.getReadMethod().getGenericReturnType();
-            Class<?> genericType = (Class<?>) type.getActualTypeArguments()[0];
-            return isBean(genericType);
-        }
-        return false;
-    }
-
-    /**
-     * 获取 List 的泛型类型
-     */
-    private static Class<?> getListGenericType(PropertyDescriptor descriptor) {
-        ParameterizedType type = (ParameterizedType) descriptor.getReadMethod().getGenericReturnType();
-        return (Class<?>) type.getActualTypeArguments()[0];
-    }
-
-    /**
      * 将 Map List 转化为 Bean List
      */
+    @SuppressWarnings("unchecked")
     private static <T> List<T> toBeanList(List<Map<String, Object>> mapList, Class<T> clazz) {
         List<T> beanList = new ArrayList<>();
         if (mapList != null) {
@@ -177,5 +222,27 @@ public class BeanUtil {
             }
         }
         return mapList;
+    }
+
+    /**
+     * 转换值为目标类型
+     */
+    private static Object convertValue(Class<?> targetType, Object value) {
+        if (value == null) {
+            return null;
+        }
+
+        // 如果类型已经匹配，直接返回
+        if (targetType.isInstance(value)) {
+            return value;
+        }
+
+        // 使用SqlBeanUtil进行类型转换
+        try {
+            return SqlBeanUtil.getValueConvert(targetType, value);
+        } catch (Exception e) {
+            System.err.println("Failed to convert value " + value + " to type " + targetType.getName() + ": " + e.getMessage());
+            return value;
+        }
     }
 }
