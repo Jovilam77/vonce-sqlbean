@@ -108,7 +108,7 @@
 
     <groupId>cn.vonce</groupId>
     <artifactId>vonce-sqlbean-core</artifactId>
-    <version>1.7.0-beta10</version>
+    <version>1.7.0-beta11</version>
     <packaging>jar</packaging>
 
     <dependencies>

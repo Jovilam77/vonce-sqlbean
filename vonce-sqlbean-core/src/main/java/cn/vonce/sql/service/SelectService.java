@@ -2,6 +2,7 @@ package cn.vonce.sql.service;
 
 import cn.vonce.sql.bean.Paging;
 import cn.vonce.sql.bean.Select;
+import cn.vonce.sql.define.ConditionHandle;
 import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.page.PageHelper;
 import cn.vonce.sql.page.PagingService;
@@ -110,12 +111,30 @@ public interface SelectService<T, ID> extends PagingService {
     /**
      * 根据条件查询
      *
+     * @param cond Lambda条件
+     * @return
+     */
+    T selectOneBy(ConditionHandle<T> cond);
+
+    /**
+     * 根据条件查询
+     *
      * @param returnType 指定返回到类型
      * @param where      条件包装器
      * @param <R>
      * @return
      */
     <R> R selectOneBy(Class<R> returnType, Wrapper where);
+
+    /**
+     * 根据条件查询
+     *
+     * @param returnType 指定返回到类型
+     * @param cond       Lambda条件
+     * @param <R>
+     * @return
+     */
+    <R> R selectOneBy(Class<R> returnType, ConditionHandle<T> cond);
 
     /**
      * 根据条件查询
@@ -137,6 +156,14 @@ public interface SelectService<T, ID> extends PagingService {
     /**
      * 根据条件查询
      *
+     * @param cond Lambda条件
+     * @return
+     */
+    List<T> selectBy(ConditionHandle<T> cond);
+
+    /**
+     * 根据条件查询
+     *
      * @param paging 分页对象
      * @param where  查询条件
      * @param args   条件参数
@@ -152,6 +179,15 @@ public interface SelectService<T, ID> extends PagingService {
      * @return
      */
     List<T> selectBy(Paging paging, Wrapper where);
+
+    /**
+     * 根据条件查询
+     *
+     * @param paging 分页对象
+     * @param cond   Lambda条件
+     * @return
+     */
+    List<T> selectBy(Paging paging, ConditionHandle<T> cond);
 
     /**
      * 根据条件查询(可指定返回类型、查询的表)
@@ -177,6 +213,16 @@ public interface SelectService<T, ID> extends PagingService {
      * 根据条件查询(可指定返回类型、查询的表)
      *
      * @param returnType 指定返回到类型
+     * @param cond       Lambda条件
+     * @param <R>
+     * @return
+     */
+    <R> List<R> selectBy(Class<R> returnType, ConditionHandle<T> cond);
+
+    /**
+     * 根据条件查询(可指定返回类型、查询的表)
+     *
+     * @param returnType 指定返回到类型
      * @param paging     分页对象
      * @param where      查询条件
      * @param args       条件参数
@@ -196,6 +242,17 @@ public interface SelectService<T, ID> extends PagingService {
     <R> List<R> selectBy(Class<R> returnType, Paging paging, Wrapper where);
 
     /**
+     * 根据条件查询(可指定返回类型、查询的表)
+     *
+     * @param returnType 指定返回到类型
+     * @param paging     分页对象
+     * @param cond       Lambda条件
+     * @param <R>
+     * @return
+     */
+    <R> List<R> selectBy(Class<R> returnType, Paging paging, ConditionHandle<T> cond);
+
+    /**
      * 根据条件查询统计
      *
      * @param where 查询条件
@@ -211,6 +268,14 @@ public interface SelectService<T, ID> extends PagingService {
      * @return
      */
     int countBy(Wrapper where);
+
+    /**
+     * 根据条件查询统计
+     *
+     * @param cond Lambda条件
+     * @return
+     */
+    int countBy(ConditionHandle<T> cond);
 
     /**
      * 统计全部

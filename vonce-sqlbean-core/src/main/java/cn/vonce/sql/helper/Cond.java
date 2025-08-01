@@ -970,4 +970,8 @@ public class Cond extends ConditionInfo {
         super(null, column, value, sqlOperator);
     }
 
+    public Cond(ConditionInfo conditionInfo) {
+        super(conditionInfo.getSqlLogic(), conditionInfo.getColumn(), conditionInfo.getValue(), conditionInfo.getSqlOperator());
+    }
+
 }

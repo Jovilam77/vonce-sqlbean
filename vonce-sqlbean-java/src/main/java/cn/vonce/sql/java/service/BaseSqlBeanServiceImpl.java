@@ -2,10 +2,14 @@ package cn.vonce.sql.java.service;
 
 import cn.vonce.sql.annotation.SqlId;
 import cn.vonce.sql.bean.ColumnInfo;
+import cn.vonce.sql.bean.CommonCondition;
+import cn.vonce.sql.bean.Condition;
 import cn.vonce.sql.config.SqlBeanMeta;
+import cn.vonce.sql.define.ConditionHandle;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.IdType;
 import cn.vonce.sql.enumerate.JdbcType;
+import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.java.datasource.ConnectionContextHolder;
 import cn.vonce.sql.java.datasource.ConnectionProxy;
 import cn.vonce.sql.java.datasource.DataSourceContextHolder;
@@ -26,7 +30,7 @@ import java.util.List;
  * @version 1.0
  * @email imjovi@qq.com
  */
-public abstract class BaseSqlBeanServiceImpl {
+public abstract class BaseSqlBeanServiceImpl<T> {
 
 
     public abstract SqlBeanMeta getSqlBeanMeta();
@@ -153,6 +157,18 @@ public abstract class BaseSqlBeanServiceImpl {
                 i++;
             }
         }
+    }
+
+    protected void conditionHandle(CommonCondition<?> condition, ConditionHandle<T> cond) {
+        Condition<T> result = new Condition<>();
+        cond.handle(result);
+        condition.where().getDataList().addAll(result.getDataList());
+    }
+
+    protected Wrapper conditionHandle(ConditionHandle<T> cond) {
+        Condition<T> result = new Condition<>();
+        cond.handle(result);
+        return SqlBeanUtil.conditionDataToWrapper(result.getDataList());
     }
 
 }

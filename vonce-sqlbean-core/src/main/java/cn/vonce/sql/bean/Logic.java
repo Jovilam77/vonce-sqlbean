@@ -38,7 +38,7 @@ public class Logic<Action> implements Serializable {
      * @return
      */
     public Logic<Action> and(ConditionHandle<Action> cond) {
-        Condition<Action> result = new Condition<>(condition.getAction());
+        Condition<Action> result = new Condition<>();
         cond.handle(result);
         condition.getDataList().add(new ConditionData(SqlLogic.AND, result.getDataList()));
         return this;

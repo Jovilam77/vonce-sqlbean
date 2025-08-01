@@ -26,17 +26,17 @@
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
-		<version>1.7.0-beta10</version>
+		<version>1.7.0-beta11</version>
 	</dependency>
 ###### Solon项目
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-solon</artifactId>
-		<version>1.7.0-beta10</version>
+		<version>1.7.0-beta11</version>
 	</dependency>
 ###### Android项目（[详细使用](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")）
-	implementation 'cn.vonce:vonce-sqlbean-android:1.7.0-beta10'
-    annotationProcessor 'cn.vonce:vonce-sqlbean-android:1.7.0-beta10'
+	implementation 'cn.vonce:vonce-sqlbean-android:1.7.0-beta11'
+    annotationProcessor 'cn.vonce:vonce-sqlbean-android:1.7.0-beta11'
 ##### 2.标注实体类
 
 ```java

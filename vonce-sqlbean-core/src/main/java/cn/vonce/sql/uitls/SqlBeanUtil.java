@@ -7,6 +7,8 @@ import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.define.*;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
+import cn.vonce.sql.helper.Cond;
+import cn.vonce.sql.helper.Wrapper;
 import cn.vonce.sql.json.JSONConvertImpl;
 import cn.vonce.sql.json.JSONConvert;
 
@@ -1798,6 +1800,30 @@ public class SqlBeanUtil {
             return convert.parseObject(json, field.getType());
         }
         return null;
+    }
+
+    /**
+     * 将条件转换为Wrapper
+     *
+     * @param dataList
+     * @return
+     */
+    public static Wrapper conditionDataToWrapper(List<ConditionData> dataList) {
+        Wrapper wrapper = new Wrapper();
+        for (ConditionData data : dataList) {
+            Object itemData = data.getItem();
+            if (itemData instanceof ConditionInfo) {
+                ConditionInfo conditionInfo = (ConditionInfo) itemData;
+                conditionInfo.setSqlLogic(data.getSqlLogic());
+                wrapper.and(new Cond(conditionInfo));
+            } else {
+                List<ConditionData> subDataList = (List<ConditionData>) itemData;
+                if (!dataList.isEmpty()) {
+                    wrapper.and(conditionDataToWrapper(subDataList));
+                }
+            }
+        }
+        return wrapper;
     }
 
 }

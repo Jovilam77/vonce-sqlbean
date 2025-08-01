@@ -7,6 +7,7 @@ import cn.vonce.sql.android.mapper.SqlBeanMapper;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanMeta;
+import cn.vonce.sql.define.ConditionHandle;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.Wrapper;
@@ -331,6 +332,11 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
     }
 
     @Override
+    public T selectOneBy(ConditionHandle<T> cond) {
+        return this.selectOneBy(this.conditionHandle(cond));
+    }
+
+    @Override
     public <R> R selectOneBy(Class<R> returnType, Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
@@ -340,6 +346,11 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
             Log.e("sqlbean", e.getMessage(), e);
             return null;
         }
+    }
+
+    @Override
+    public <R> R selectOneBy(Class<R> returnType, ConditionHandle<T> cond) {
+        return this.selectOneBy(returnType, this.conditionHandle(cond));
     }
 
     @Override
@@ -362,6 +373,11 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
             Log.e("sqlbean", e.getMessage(), e);
             return null;
         }
+    }
+
+    @Override
+    public <R> List<R> selectBy(Class<R> returnType, ConditionHandle<T> cond) {
+        return this.selectBy(returnType, this.conditionHandle(cond));
     }
 
     @Override
@@ -389,6 +405,11 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
     }
 
     @Override
+    public <R> List<R> selectBy(Class<R> returnType, Paging paging, ConditionHandle<T> cond) {
+        return this.selectBy(returnType, paging, this.conditionHandle(cond));
+    }
+
+    @Override
     public List<T> selectBy(String where, Object... args) {
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanMeta(), clazz, null, null, where, args), new SqlBeanMapper<T>(clazz, clazz));
@@ -403,6 +424,11 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         Select select = new Select();
         select.where(where);
         return sqliteTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, null, select), new SqlBeanMapper<T>(clazz, clazz));
+    }
+
+    @Override
+    public List<T> selectBy(ConditionHandle<T> cond) {
+        return this.selectBy(this.conditionHandle(cond));
     }
 
     @Override
@@ -425,6 +451,11 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
     }
 
     @Override
+    public List<T> selectBy(Paging paging, ConditionHandle<T> cond) {
+        return this.selectBy(paging, this.conditionHandle(cond));
+    }
+
+    @Override
     public int countBy(String where, Object... args) {
         return sqliteTemplate.queryForObject(SqlBeanProvider.countBySql(getSqlBeanMeta(), clazz, where, args), new SqlBeanMapper<Integer>(clazz, Integer.class));
     }
@@ -434,6 +465,11 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         Select select = new Select();
         select.where(where);
         return sqliteTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanMeta(), null, clazz, select), new SqlBeanMapper<>(clazz, Integer.class));
+    }
+
+    @Override
+    public int countBy(ConditionHandle<T> cond) {
+        return this.countBy(this.conditionHandle(cond));
     }
 
     @Override
@@ -570,6 +606,11 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
     }
 
     @Override
+    public int deleteBy(ConditionHandle<T> cond) {
+        return this.deleteBy(this.conditionHandle(cond));
+    }
+
+    @Override
     public int delete(Delete delete) {
         return sqliteTemplate.update(SqlBeanProvider.deleteSql(getSqlBeanMeta(), clazz, delete, false));
     }
@@ -598,12 +639,17 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
     }
 
     @Override
-    public int update(Update update) {
+    public int logicallyDeleteBy(ConditionHandle<T> cond) {
+        return this.logicallyDeleteBy(this.conditionHandle(cond));
+    }
+
+    @Override
+    public int update(Update<T> update) {
         return sqliteTemplate.update(SqlBeanProvider.updateSql(getSqlBeanMeta(), clazz, update, false));
     }
 
     @Override
-    public int update(Update update, boolean ignore) {
+    public int update(Update<T> update, boolean ignore) {
         return sqliteTemplate.update(SqlBeanProvider.updateSql(getSqlBeanMeta(), clazz, update, ignore));
     }
 
@@ -659,14 +705,14 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
 
     @Override
     public int updateBy(T bean, Wrapper wrapper) {
-        Update update = new Update();
+        Update<T> update = new Update<>();
         update.bean(bean).notNull(true).optimisticLock(false).where(wrapper);
         return sqliteTemplate.update(SqlBeanProvider.updateSql(getSqlBeanMeta(), clazz, update, false));
     }
 
     @Override
     public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper) {
-        Update update = new Update();
+        Update<T> update = new Update<>();
         update.bean(bean).notNull(updateNotNull).optimisticLock(optimisticLock).where(wrapper);
         return sqliteTemplate.update(SqlBeanProvider.updateSql(getSqlBeanMeta(), clazz, update, false));
     }
@@ -678,7 +724,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
 
     @Override
     public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper, Column... filterColumns) {
-        Update update = new Update();
+        Update<T> update = new Update<>();
         update.bean(bean).notNull(updateNotNull).optimisticLock(optimisticLock).filterFields(filterColumns).where(wrapper);
         return sqliteTemplate.update(SqlBeanProvider.updateSql(getSqlBeanMeta(), clazz, update, false));
     }
@@ -725,8 +771,20 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
     }
 
     @Override
-    public int insert(Insert insert) {
+    public int insert(Insert<T> insert) {
         return sqliteTemplate.insert(SqlBeanProvider.insertBeanSql(getSqlBeanMeta(), clazz, insert));
+    }
+
+    protected void conditionHandle(CommonCondition<?> condition, ConditionHandle<T> cond) {
+        Condition<T> result = new Condition<>();
+        cond.handle(result);
+        condition.where().getDataList().addAll(result.getDataList());
+    }
+
+    protected Wrapper conditionHandle(ConditionHandle<T> cond) {
+        Condition<T> result = new Condition<>();
+        cond.handle(result);
+        return SqlBeanUtil.conditionDataToWrapper(result.getDataList());
     }
 
 }

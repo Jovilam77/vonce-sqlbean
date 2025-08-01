@@ -3,6 +3,7 @@ package cn.vonce.sql.spring.service;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.define.ColumnFun;
+import cn.vonce.sql.define.ConditionHandle;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.exception.SqlBeanException;
 import cn.vonce.sql.helper.Wrapper;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.*;
 
 /**
@@ -36,7 +38,7 @@ import java.util.*;
  */
 @UseMybatis
 @Service
-public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl implements SqlBeanService<T, ID>, AdvancedDbManageService<T> {
+public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl<T> implements SqlBeanService<T, ID>, AdvancedDbManageService<T> {
 
     @Autowired
     private MybatisSqlBeanDao<T> mybatisSqlBeanDao;
@@ -151,10 +153,22 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.SLAVE)
     @Override
+    public T selectOneBy(ConditionHandle<T> cond) {
+        return this.selectOneBy(super.conditionHandle(cond));
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
     public <R> R selectOneBy(Class<R> returnType, Wrapper wrapper) {
         Select select = new Select();
         select.where(wrapper);
         return mybatisSqlBeanDao.selectOneO(getSqlBeanMeta(), clazz, returnType, select);
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public <R> R selectOneBy(Class<R> returnType, ConditionHandle<T> cond) {
+        return this.selectOneBy(returnType, super.conditionHandle(cond));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -169,6 +183,12 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         Select select = new Select();
         select.where(wrapper);
         return mybatisSqlBeanDao.selectO(getSqlBeanMeta(), clazz, returnType, select);
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public <R> List<R> selectBy(Class<R> returnType, ConditionHandle<T> cond) {
+        return this.selectBy(returnType, super.conditionHandle(cond));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -189,6 +209,12 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.SLAVE)
     @Override
+    public <R> List<R> selectBy(Class<R> returnType, Paging paging, ConditionHandle<T> cond) {
+        return this.selectBy(returnType, paging, super.conditionHandle(cond));
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
     public List<T> selectBy(String where, Object... args) {
         return mybatisSqlBeanDao.selectBy(getSqlBeanMeta(), clazz, null, where, args);
     }
@@ -199,6 +225,12 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         Select select = new Select();
         select.where(wrapper);
         return mybatisSqlBeanDao.select(getSqlBeanMeta(), clazz, select);
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public List<T> selectBy(ConditionHandle<T> cond) {
+        return selectBy(super.conditionHandle(cond));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -219,6 +251,12 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.SLAVE)
     @Override
+    public List<T> selectBy(Paging paging, ConditionHandle<T> cond) {
+        return selectBy(paging, super.conditionHandle(cond));
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
     public int countBy(String where, Object... args) {
         return mybatisSqlBeanDao.countBy(getSqlBeanMeta(), clazz, where, args);
     }
@@ -229,6 +267,12 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
         Select select = new Select();
         select.where(wrapper);
         return mybatisSqlBeanDao.count(getSqlBeanMeta(), clazz, null, select);
+    }
+
+    @DbSwitch(DbRole.SLAVE)
+    @Override
+    public int countBy(ConditionHandle<T> cond) {
+        return countBy(super.conditionHandle(cond));
     }
 
     @DbSwitch(DbRole.SLAVE)
@@ -346,6 +390,12 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public int deleteBy(ConditionHandle<T> cond) {
+        return this.deleteBy(super.conditionHandle(cond));
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public int delete(Delete delete) {
         return mybatisSqlBeanDao.delete(getSqlBeanMeta(), clazz, delete, false);
     }
@@ -375,6 +425,12 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @Override
     public int logicallyDeleteBy(Wrapper wrapper) {
         return mybatisSqlBeanDao.logicallyDeleteByWrapper(getSqlBeanMeta(), clazz, wrapper);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int logicallyDeleteBy(ConditionHandle<T> cond) {
+        return this.logicallyDeleteBy(super.conditionHandle(cond));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -452,17 +508,29 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateBy(T bean, Wrapper wrapper) {
-        Update update = new Update();
+        Update<T> update = new Update<>();
         update.bean(bean).notNull(true).optimisticLock(false).where(wrapper);
         return mybatisSqlBeanDao.update(getSqlBeanMeta(), clazz, update, false);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public int updateBy(T bean, ConditionHandle<T> cond) {
+        return this.updateBy(bean, super.conditionHandle(cond));
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper) {
-        Update update = new Update();
+        Update<T> update = new Update<>();
         update.bean(bean).notNull(updateNotNull).optimisticLock(optimisticLock).where(wrapper);
         return mybatisSqlBeanDao.update(getSqlBeanMeta(), clazz, update, false);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, ConditionHandle<T> cond) {
+        return this.updateBy(bean, updateNotNull, optimisticLock, super.conditionHandle(cond));
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -474,15 +542,27 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
     @DbSwitch(DbRole.MASTER)
     @Override
     public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper, Column... filterColumns) {
-        Update update = new Update();
+        Update<T> update = new Update<>();
         update.bean(bean).notNull(updateNotNull).optimisticLock(optimisticLock).filterFields(filterColumns).where(wrapper);
         return mybatisSqlBeanDao.update(getSqlBeanMeta(), clazz, update, false);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, ConditionHandle<T> cond, Column... filterColumns) {
+        return this.updateBy(bean, updateNotNull, optimisticLock, super.conditionHandle(cond), filterColumns);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper, ColumnFun<T, R>... filterColumns) {
         return this.updateBy(bean, updateNotNull, optimisticLock, wrapper, SqlBeanUtil.funToColumn(filterColumns));
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, ConditionHandle<T> cond, ColumnFun<T, R>... filterColumns) {
+        return this.updateBy(bean, updateNotNull, optimisticLock, super.conditionHandle(cond), filterColumns);
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -574,8 +654,20 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public void backup(ConditionHandle<T> cond, String targetSchema, String targetTableName) {
+        this.backup(super.conditionHandle(cond), targetSchema, targetTableName);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public void backup(Wrapper wrapper, String targetTableName, Column... columns) {
         mybatisSqlBeanDao.backup(getSqlBeanMeta(), clazz, wrapper, null, targetTableName, columns);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public void backup(ConditionHandle<T> cond, String targetTableName, Column... columns) {
+        this.backup(super.conditionHandle(cond), targetTableName, columns);
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -586,8 +678,20 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public <R> void backup(ConditionHandle<T> cond, String targetTableName, ColumnFun<T, R>... columns) {
+        this.backup(super.conditionHandle(cond), targetTableName, columns);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public void backup(Wrapper wrapper, String targetSchema, String targetTableName, Column... columns) {
         mybatisSqlBeanDao.backup(getSqlBeanMeta(), clazz, wrapper, targetSchema, targetTableName, columns);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public void backup(ConditionHandle<T> cond, String targetSchema, String targetTableName, Column... columns) {
+        this.backup(super.conditionHandle(cond), targetSchema, targetTableName, columns);
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -598,8 +702,20 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public <R> void backup(ConditionHandle<T> cond, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
+        this.backup(super.conditionHandle(cond), targetSchema, targetTableName, columns);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public int copy(Wrapper wrapper, String targetTableName) {
         return mybatisSqlBeanDao.copy(getSqlBeanMeta(), clazz, wrapper, null, targetTableName, null);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int copy(ConditionHandle<T> cond, String targetTableName) {
+        return this.copy(super.conditionHandle(cond), targetTableName);
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -610,8 +726,20 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public int copy(ConditionHandle<T> cond, String targetSchema, String targetTableName) {
+        return this.copy(super.conditionHandle(cond), targetSchema, targetTableName);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public int copy(Wrapper wrapper, String targetTableName, Column... columns) {
         return mybatisSqlBeanDao.copy(getSqlBeanMeta(), clazz, wrapper, null, targetTableName, columns);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public int copy(ConditionHandle<T> cond, String targetTableName, Column... columns) {
+        return this.copy(super.conditionHandle(cond), targetTableName, columns);
     }
 
     @DbSwitch(DbRole.MASTER)
@@ -622,14 +750,32 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl imp
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public <R> int copy(ConditionHandle<T> cond, String targetTableName, ColumnFun<T, R>... columns) {
+        return this.copy(super.conditionHandle(cond), targetTableName, columns);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public int copy(Wrapper wrapper, String targetSchema, String targetTableName, Column... columns) {
         return mybatisSqlBeanDao.copy(getSqlBeanMeta(), clazz, wrapper, targetSchema, targetTableName, columns);
     }
 
     @DbSwitch(DbRole.MASTER)
     @Override
+    public int copy(ConditionHandle<T> cond, String targetSchema, String targetTableName, Column... columns) {
+        return this.copy(super.conditionHandle(cond), targetSchema, targetTableName, columns);
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
     public <R> int copy(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
         return mybatisSqlBeanDao.copy(getSqlBeanMeta(), clazz, wrapper, targetSchema, targetTableName, SqlBeanUtil.funToColumn(columns));
+    }
+
+    @DbSwitch(DbRole.MASTER)
+    @Override
+    public <R> int copy(ConditionHandle<T> cond, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
+        return this.copy(super.conditionHandle(cond), targetSchema, targetTableName, columns);
     }
 
     @DbSwitch(DbRole.MASTER)
