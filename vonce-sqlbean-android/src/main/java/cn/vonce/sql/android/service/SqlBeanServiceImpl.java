@@ -7,6 +7,7 @@ import cn.vonce.sql.android.mapper.SqlBeanMapper;
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanMeta;
+import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.define.ConditionHandle;
 import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.exception.SqlBeanException;
@@ -140,28 +141,58 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
     }
 
     @Override
+    public void backup(ConditionHandle<T> cond, String targetSchema, String targetTableName) {
+        this.backup(this.conditionHandle(cond), targetSchema, targetTableName);
+    }
+
+    @Override
     public void backup(Wrapper wrapper, String targetTableName, Column... columns) {
         sqliteTemplate.update(SqlBeanProvider.backupSql(getSqlBeanMeta(), clazz, wrapper, null, targetTableName, columns));
     }
 
-//    @Override
-//    public <R> void backup(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns) {
-//        sqliteTemplate.update(SqlBeanProvider.backupSql(getSqlBeanMeta(), clazz, wrapper, null, targetTableName, SqlBeanUtil.funToColumn(columns)));
-//    }
+    @Override
+    public void backup(ConditionHandle<T> cond, String targetTableName, Column... columns) {
+        this.backup(this.conditionHandle(cond), targetTableName, columns);
+    }
+
+    @Override
+    public <R> void backup(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns) {
+        sqliteTemplate.update(SqlBeanProvider.backupSql(getSqlBeanMeta(), clazz, wrapper, null, targetTableName, SqlBeanUtil.funToColumn(columns)));
+    }
+
+    @Override
+    public <R> void backup(ConditionHandle<T> cond, String targetTableName, ColumnFun<T, R>... columns) {
+        this.backup(this.conditionHandle(cond), targetTableName, columns);
+    }
 
     @Override
     public void backup(Wrapper wrapper, String targetSchema, String targetTableName, Column... columns) {
         sqliteTemplate.update(SqlBeanProvider.backupSql(getSqlBeanMeta(), clazz, wrapper, targetSchema, targetTableName, columns));
     }
 
-//    @Override
-//    public <R> void backup(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
-//        sqliteTemplate.update(SqlBeanProvider.backupSql(getSqlBeanMeta(), clazz, wrapper, targetSchema, targetTableName, SqlBeanUtil.funToColumn(columns)));
-//    }
+    @Override
+    public void backup(ConditionHandle<T> cond, String targetSchema, String targetTableName, Column... columns) {
+        this.backup(this.conditionHandle(cond), targetSchema, targetTableName, columns);
+    }
+
+    @Override
+    public <R> void backup(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
+        sqliteTemplate.update(SqlBeanProvider.backupSql(getSqlBeanMeta(), clazz, wrapper, targetSchema, targetTableName, SqlBeanUtil.funToColumn(columns)));
+    }
+
+    @Override
+    public <R> void backup(ConditionHandle<T> cond, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
+        this.backup(this.conditionHandle(cond), targetSchema, targetTableName, columns);
+    }
 
     @Override
     public int copy(Wrapper wrapper, String targetTableName) {
         return sqliteTemplate.update(SqlBeanProvider.copySql(getSqlBeanMeta(), clazz, wrapper, null, targetTableName, null));
+    }
+
+    @Override
+    public int copy(ConditionHandle<T> cond, String targetTableName) {
+        return this.copy(this.conditionHandle(cond), targetTableName);
     }
 
     @Override
@@ -170,24 +201,49 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
     }
 
     @Override
+    public int copy(ConditionHandle<T> cond, String targetSchema, String targetTableName) {
+        return this.copy(this.conditionHandle(cond), targetSchema, targetTableName);
+    }
+
+    @Override
     public int copy(Wrapper wrapper, String targetTableName, Column... columns) {
         return sqliteTemplate.update(SqlBeanProvider.copySql(getSqlBeanMeta(), clazz, wrapper, null, targetTableName, columns));
     }
 
-//    @Override
-//    public <R> int copy(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns) {
-//        return sqliteTemplate.update(SqlBeanProvider.copySql(getSqlBeanMeta(), clazz, wrapper, null, targetTableName, SqlBeanUtil.funToColumn(columns)));
-//    }
+    @Override
+    public int copy(ConditionHandle<T> cond, String targetTableName, Column... columns) {
+        return this.copy(this.conditionHandle(cond), targetTableName, columns);
+    }
+
+    @Override
+    public <R> int copy(Wrapper wrapper, String targetTableName, ColumnFun<T, R>... columns) {
+        return sqliteTemplate.update(SqlBeanProvider.copySql(getSqlBeanMeta(), clazz, wrapper, null, targetTableName, SqlBeanUtil.funToColumn(columns)));
+    }
+
+    @Override
+    public <R> int copy(ConditionHandle<T> cond, String targetTableName, ColumnFun<T, R>... columns) {
+        return this.copy(this.conditionHandle(cond), targetTableName, columns);
+    }
 
     @Override
     public int copy(Wrapper wrapper, String targetSchema, String targetTableName, Column[] columns) {
         return sqliteTemplate.update(SqlBeanProvider.copySql(getSqlBeanMeta(), clazz, wrapper, targetSchema, targetTableName, columns));
     }
 
-//    @Override
-//    public <R> int copy(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
-//        return sqliteTemplate.update(SqlBeanProvider.copySql(getSqlBeanMeta(), clazz, wrapper, targetSchema, targetTableName, SqlBeanUtil.funToColumn(columns)));
-//    }
+    @Override
+    public int copy(ConditionHandle<T> cond, String targetSchema, String targetTableName, Column... columns) {
+        return this.copy(this.conditionHandle(cond), targetSchema, targetTableName, columns);
+    }
+
+    @Override
+    public <R> int copy(Wrapper wrapper, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
+        return sqliteTemplate.update(SqlBeanProvider.copySql(getSqlBeanMeta(), clazz, wrapper, targetSchema, targetTableName, SqlBeanUtil.funToColumn(columns)));
+    }
+
+    @Override
+    public <R> int copy(ConditionHandle<T> cond, String targetSchema, String targetTableName, ColumnFun<T, R>... columns) {
+        return this.copy(this.conditionHandle(cond), targetSchema, targetTableName, columns);
+    }
 
     @Override
     public int alter(Table table, List<ColumnInfo> columnInfoList) {
@@ -673,10 +729,10 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         return sqliteTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanMeta(), clazz, bean, id, updateNotNull, optimisticLock, filterColumns));
     }
 
-//    @Override
-//    public <R> int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns) {
-//        return sqliteTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanMeta(), clazz, bean, id, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns)));
-//    }
+    @Override
+    public <R> int updateById(T bean, ID id, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns) {
+        return sqliteTemplate.update(SqlBeanProvider.updateByIdSql(getSqlBeanMeta(), clazz, bean, id, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns)));
+    }
 
     @Override
     public int updateBy(T bean, String where, Object... args) {
@@ -693,10 +749,10 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         return sqliteTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanMeta(), clazz, bean, updateNotNull, optimisticLock, filterColumns));
     }
 
-//    @Override
-//    public <R> int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns) {
-//        return sqliteTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanMeta(), clazz, bean, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns)));
-//    }
+    @Override
+    public <R> int updateByBeanId(T bean, boolean updateNotNull, boolean optimisticLock, ColumnFun<T, R>... filterColumns) {
+        return sqliteTemplate.update(SqlBeanProvider.updateByBeanIdSql(getSqlBeanMeta(), clazz, bean, updateNotNull, optimisticLock, SqlBeanUtil.funToColumn(filterColumns)));
+    }
 
     @Override
     public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, String where, Object... args) {
@@ -711,10 +767,20 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
     }
 
     @Override
+    public int updateBy(T bean, ConditionHandle<T> cond) {
+        return this.updateBy(bean, this.conditionHandle(cond));
+    }
+
+    @Override
     public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper) {
         Update<T> update = new Update<>();
         update.bean(bean).notNull(updateNotNull).optimisticLock(optimisticLock).where(wrapper);
         return sqliteTemplate.update(SqlBeanProvider.updateSql(getSqlBeanMeta(), clazz, update, false));
+    }
+
+    @Override
+    public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, ConditionHandle<T> cond) {
+        return this.updateBy(bean, this.conditionHandle(cond));
     }
 
     @Override
@@ -729,10 +795,20 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         return sqliteTemplate.update(SqlBeanProvider.updateSql(getSqlBeanMeta(), clazz, update, false));
     }
 
-//    @Override
-//    public <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper, ColumnFun<T, R>... filterColumns) {
-//        return this.updateBy(bean, updateNotNull, optimisticLock, wrapper, SqlBeanUtil.funToColumn(filterColumns));
-//    }
+    @Override
+    public int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, ConditionHandle<T> cond, Column... filterColumns) {
+        return this.updateBy(bean, updateNotNull, optimisticLock, this.conditionHandle(cond), filterColumns);
+    }
+
+    @Override
+    public <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper, ColumnFun<T, R>... filterColumns) {
+        return this.updateBy(bean, updateNotNull, optimisticLock, wrapper, SqlBeanUtil.funToColumn(filterColumns));
+    }
+
+    @Override
+    public <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, ConditionHandle<T> cond, ColumnFun<T, R>... filterColumns) {
+        return this.updateBy(bean, updateNotNull, optimisticLock, this.conditionHandle(cond), filterColumns);
+    }
 
     @Override
     public int updateByBean(T bean, String where) {
@@ -749,10 +825,10 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         return sqliteTemplate.update(SqlBeanProvider.updateByBeanSql(getSqlBeanMeta(), clazz, bean, updateNotNull, optimisticLock, where, filterColumns));
     }
 
-//    @Override
-//    public <R> int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String where, ColumnFun<T, R>[] filterColumns) {
-//        return sqliteTemplate.update(SqlBeanProvider.updateByBeanSql(getSqlBeanMeta(), clazz, bean, updateNotNull, optimisticLock, where, SqlBeanUtil.funToColumn(filterColumns)));
-//    }
+    @Override
+    public <R> int updateByBean(T bean, boolean updateNotNull, boolean optimisticLock, String where, ColumnFun<T, R>[] filterColumns) {
+        return sqliteTemplate.update(SqlBeanProvider.updateByBeanSql(getSqlBeanMeta(), clazz, bean, updateNotNull, optimisticLock, where, SqlBeanUtil.funToColumn(filterColumns)));
+    }
 
     @Override
     public int insert(T... bean) {
