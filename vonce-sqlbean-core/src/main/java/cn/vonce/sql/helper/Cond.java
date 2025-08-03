@@ -69,7 +69,7 @@ public class Cond extends ConditionInfo {
      * @return
      */
     public static <T, K, R> Cond eq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.EQUAL_TO, value);
+        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.EQUAL_TO, LambdaUtil.getColumn(value));
     }
 
     /**
@@ -125,7 +125,7 @@ public class Cond extends ConditionInfo {
      * @return
      */
     public static <T, K, R> Cond notEq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.NOT_EQUAL_TO, value);
+        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.NOT_EQUAL_TO, LambdaUtil.getColumn(value));
     }
 
     /**
@@ -181,7 +181,7 @@ public class Cond extends ConditionInfo {
      * @return
      */
     public static <T, K, R> Cond lt(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.LESS_THAN, value);
+        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.LESS_THAN, LambdaUtil.getColumn(value));
     }
 
     /**
@@ -237,7 +237,7 @@ public class Cond extends ConditionInfo {
      * @return
      */
     public static <T, K, R> Cond gt(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.GREATER_THAN, value);
+        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.GREATER_THAN, LambdaUtil.getColumn(value));
     }
 
     /**
@@ -293,7 +293,7 @@ public class Cond extends ConditionInfo {
      * @return
      */
     public static <T, K, R> Cond ltEq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.LESS_THAN_OR_EQUAL_TO, value);
+        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.LESS_THAN_OR_EQUAL_TO, LambdaUtil.getColumn(value));
     }
 
     /**
@@ -349,7 +349,7 @@ public class Cond extends ConditionInfo {
      * @return
      */
     public static <T, K, R> Cond gtEq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.GREAT_THAN_OR_EQUAL_TO, value);
+        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.GREAT_THAN_OR_EQUAL_TO, LambdaUtil.getColumn(value));
     }
 
     /**
@@ -676,7 +676,7 @@ public class Cond extends ConditionInfo {
      * @return
      */
     public static <T, K, R> Cond is(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.IS, value);
+        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.IS, LambdaUtil.getColumn(value));
     }
 
     /**
@@ -733,7 +733,7 @@ public class Cond extends ConditionInfo {
      * @return
      */
     public static <T, K, R> Cond isNot(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.IS_NOT, value);
+        return new Cond(LambdaUtil.getColumn(columnFun), SqlOperator.IS_NOT, LambdaUtil.getColumn(value));
     }
 
     /**

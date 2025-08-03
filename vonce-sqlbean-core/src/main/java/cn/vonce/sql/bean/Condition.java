@@ -4,7 +4,6 @@ import cn.vonce.sql.define.ColumnFun;
 import cn.vonce.sql.enumerate.SqlLogic;
 import cn.vonce.sql.enumerate.SqlOperator;
 import cn.vonce.sql.uitls.LambdaUtil;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,7 +105,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> eq(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.EQUAL_TO, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.EQUAL_TO, value)));
         return logic;
     }
 
@@ -118,7 +117,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, K, R> Logic<Action> eq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.EQUAL_TO, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.EQUAL_TO, LambdaUtil.getColumn(value))));
         return logic;
     }
 
@@ -167,7 +166,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> notEq(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_EQUAL_TO, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.NOT_EQUAL_TO, value)));
         return logic;
     }
 
@@ -179,7 +178,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, K, R> Logic<Action> notEq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_EQUAL_TO, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.NOT_EQUAL_TO, value)));
         return logic;
     }
 
@@ -228,7 +227,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> lt(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LESS_THAN, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.LESS_THAN, value)));
         return logic;
     }
 
@@ -240,7 +239,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, K, R> Logic<Action> lt(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LESS_THAN, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.LESS_THAN, value)));
         return logic;
     }
 
@@ -289,7 +288,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> gt(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.GREATER_THAN, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.GREATER_THAN, value)));
         return logic;
     }
 
@@ -301,7 +300,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, K, R> Logic<Action> gt(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.GREATER_THAN, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.GREATER_THAN, value)));
         return logic;
     }
 
@@ -351,7 +350,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> ltEq(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LESS_THAN_OR_EQUAL_TO, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.LESS_THAN_OR_EQUAL_TO, value)));
         return logic;
     }
 
@@ -363,7 +362,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, K, R> Logic<Action> ltEq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LESS_THAN_OR_EQUAL_TO, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.LESS_THAN_OR_EQUAL_TO, value)));
         return logic;
     }
 
@@ -412,7 +411,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> gtEq(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.GREAT_THAN_OR_EQUAL_TO, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.GREAT_THAN_OR_EQUAL_TO, value)));
         return logic;
     }
 
@@ -424,7 +423,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, K, R> Logic<Action> gtEq(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.GREAT_THAN_OR_EQUAL_TO, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.GREAT_THAN_OR_EQUAL_TO, value)));
         return logic;
     }
 
@@ -474,7 +473,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> like(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LIKE, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.LIKE, value)));
         return logic;
     }
 
@@ -524,7 +523,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> likeL(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LIKE_L, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.LIKE_L, value)));
         return logic;
     }
 
@@ -574,7 +573,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> likeR(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.LIKE_R, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.LIKE_R, value)));
         return logic;
     }
 
@@ -623,7 +622,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> notLike(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_LIKE, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.NOT_LIKE, value)));
         return logic;
     }
 
@@ -672,7 +671,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> notLikeL(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_LIKE_L, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.NOT_LIKE_L, value)));
         return logic;
     }
 
@@ -721,7 +720,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> notLikeR(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_LIKE_R, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.NOT_LIKE_R, value)));
         return logic;
     }
 
@@ -770,7 +769,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> is(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.IS, value)));
         return logic;
     }
 
@@ -782,7 +781,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, K, R> Logic<Action> is(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.IS, value)));
         return logic;
     }
 
@@ -832,7 +831,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> isNot(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS_NOT, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.IS_NOT, value)));
         return logic;
     }
 
@@ -844,7 +843,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, K, R> Logic<Action> isNot(ColumnFun<T, R> columnFun, ColumnFun<K, R> value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS_NOT, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.IS_NOT, value)));
         return logic;
     }
 
@@ -889,7 +888,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> isNull(ColumnFun<T, R> columnFun) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS_NULL, null)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.IS_NULL, null)));
         return logic;
     }
 
@@ -934,7 +933,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> isNotNull(ColumnFun<T, R> columnFun) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IS_NOT_NULL, null)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.IS_NOT_NULL, null)));
         return logic;
     }
 
@@ -983,7 +982,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> in(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.IN, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.IN, value)));
         return logic;
     }
 
@@ -1032,7 +1031,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> notIn(ColumnFun<T, R> columnFun, Object value) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.NOT_IN, value)));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.NOT_IN, value)));
         return logic;
     }
 
@@ -1085,7 +1084,7 @@ public class Condition<Action> implements Serializable {
      * @return
      */
     public <T, R> Logic<Action> between(ColumnFun<T, R> columnFun, Object value1, Object value2) {
-        dataList.add(new ConditionData(sqlLogic, newConditionInfo(columnFun, SqlOperator.BETWEEN, new Object[]{value1, value2})));
+        dataList.add(new ConditionData(sqlLogic, newConditionInfo(LambdaUtil.getColumn(columnFun), SqlOperator.BETWEEN, new Object[]{value1, value2})));
         return logic;
     }
 
@@ -1095,10 +1094,6 @@ public class Condition<Action> implements Serializable {
 
     private ConditionInfo newConditionInfo(Column column, SqlOperator sqlOperator, Object value) {
         return new ConditionInfo(null, column, value, sqlOperator);
-    }
-
-    private <T, R> ConditionInfo newConditionInfo(ColumnFun<T, R> columnFun, SqlOperator sqlOperator, Object value) {
-        return new ConditionInfo(null, LambdaUtil.getColumn(columnFun), value, sqlOperator);
     }
 
 }
