@@ -32,7 +32,7 @@ import java.util.*;
  * @date 2024/8/9 15:03
  */
 @Component
-public class SolonMybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl<T> implements SqlBeanService<T, ID>, AdvancedDbManageService<T> {
+public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl<T> implements SqlBeanService<T, ID>, AdvancedDbManageService<T> {
 
     @Db
     private MybatisSqlBeanDao<T> mybatisSqlBeanDao;
@@ -42,7 +42,7 @@ public class SolonMybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImp
 
     private final Class<?> clazz;
 
-    public SolonMybatisSqlBeanServiceImpl() {
+    public MybatisSqlBeanServiceImpl() {
         List<Class<?>> classes = SqlBeanUtil.getGenericTypeBySuperclass(this.getClass());
         if (!classes.isEmpty()) {
             this.clazz = classes.get(0);
