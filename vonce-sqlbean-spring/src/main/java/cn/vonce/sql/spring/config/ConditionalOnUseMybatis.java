@@ -1,6 +1,6 @@
 package cn.vonce.sql.spring.config;
 
-import cn.vonce.sql.spring.mapper.MybatisSqlBeanMapperInterceptor;
+import cn.vonce.sql.java.mapper.MybatisSqlBeanMapperInterceptor;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;

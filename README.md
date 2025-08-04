@@ -6,7 +6,11 @@
 
 ###### 🚀特点: 多数据源, 动态Schema, 读写分离, 自动建表, 自动维护表结构, 联表查询, 乐观锁, 分页
 
-###### 💻环境: JDK8+, Mybatis3.2.4+, (Spring MVC 4.1.2+, Spring Boot 1.x, Spring Boot 2.x)
+###### 💻Spring环境: JDK8+, Mybatis3.2.4+, (Spring MVC 4.1.2+, Spring Boot 1.x, Spring Boot 2.x)
+
+###### 💻Solon环境: JDK8+, Mybatis3.2.4+, Solon2.6+
+
+###### 📱Android环境: JDK8+, Android 8.0
 
 ###### 💿数据库: Mysql, MariaDB, Oracle, Sqlserver2008+, Postgresql, DB2, Derby, Sqlite, HSQL, H2
 
@@ -15,17 +19,25 @@
 ###### SuperCode代码生成项目👉 [https://gitee.com/iJovi/supercode](https://gitee.com/iJovi/supercode "supercode")
 ###### SqlBean使用例子以及代码生成例子点击这里👉 [https://gitee.com/iJovi/sqlbean-example](https://gitee.com/iJovi/sqlbean-example "sqlbean-example")
 
-#### 快速开始
+### 快速开始
 
-###### 1.引入Maven依赖
-
+##### 1.引入Maven依赖
+###### Spring项目
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
-		<version>1.6.5</version>
+		<version>1.7.0-beta12</version>
 	</dependency>
-
-###### 2.标注实体类
+###### Solon项目
+	<dependency>
+		<groupId>cn.vonce</groupId>
+		<artifactId>vonce-sqlbean-solon</artifactId>
+		<version>1.7.0-beta12</version>
+	</dependency>
+###### Android项目（[详细使用](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")）
+	implementation 'cn.vonce:vonce-sqlbean-android:1.7.0-beta12'
+    annotationProcessor 'cn.vonce:vonce-sqlbean-android:1.7.0-beta12'
+##### 2.标注实体类
 
 ```java
 @Data
@@ -91,7 +103,7 @@ public class User extends BaseEntity {
 }
 ```
 
-###### 3.无需Dao层，Service层接口只需继承SqlBeanService<实体类, id类型>
+##### 3.无需Dao层，Service层接口只需继承SqlBeanService<实体类, id类型>
 
 ```java
 public interface UserService extends SqlBeanService<User, Long> {
@@ -100,7 +112,7 @@ public interface UserService extends SqlBeanService<User, Long> {
 }
 ```
 
-###### 4.Service实现类只需继承MybatisSqlBeanServiceImpl<实体类, id类型>和实现你的Service接口
+##### 4.Service实现类只需继承MybatisSqlBeanServiceImpl<实体类, id类型>和实现你的Service接口
 
 ```java
 //使用Spring Jdbc的话将继承的父类改成SpringJdbcSqlBeanServiceImpl即可
@@ -110,7 +122,7 @@ public class UserServiceImpl extends MybatisSqlBeanServiceImpl<User, Long> imple
 }
 ```
 
-###### 5.Controller层
+##### 5.Controller层
 
 ```java
 
@@ -135,13 +147,13 @@ public class UserController {
         user = userService.selectOneBy(Wrapper.where(eq(User::getId, 1001)));
 
         //sql语义化查询《20岁且是女性的用户根据创建时间倒序，获取前10条》
-        list = userService.select(new Select().column(User::getId, User::getUserName, User::getMobilePhone).where().eq(User::getAge, 22).and().eq(User::getGender, 0).back().orderByDesc(User::getCreateTime).page(0, 10));
+        list = userService.select(new Select().column(User::getId, User::getUserName, User::getMobilePhone).where().eq(User::getAge, 20).and().eq(User::getGender, 0).back().orderByDesc(User::getCreateTime).page(0, 10));
 
-        //联表查询《20岁且是女性的用户根据创建时间倒序，查询前10条用户的信息和地址》
+        //联表查询《广州或深圳的18岁的女性用户，根据创建时间倒序，查询前10条用户的信息和地址》
         Select select = new Select();
         select.column(User::getId, User::getUserName, User::getMobilePhone, UserAddress::getProvince, UserAddress::getCity, UserAddress::getArea, UserAddress::getDetails);
         select.innerJoin(UserAddress.class).on().eq(UserAddress::getId, User::getId);
-        select.where().gt(User::getAge, 22).and().eq(User::getGender, 0);
+        select.where().eq(User::getAge, 18).and().eq(User::getGender, 0).and(condition -> condition.eq(UserAddress::getCity, "广州").or().eq(UserAddress::getCity, "深圳"));
         select.orderByDesc(User::getCreateTime);
         select.page(0, 10);
 

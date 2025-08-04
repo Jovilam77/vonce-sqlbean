@@ -13,11 +13,29 @@ import java.util.List;
  */
 public class ResultData<T> implements Serializable {
 
+    /**
+     * 分页数据
+     */
     private List<T> data;
+    /**
+     * 当前页码
+     */
     private Integer pagenum;
+    /**
+     * 每页显示条数
+     */
     private Integer pagesize;
+    /**
+     * 总记录数
+     */
     private Integer totalRecords;
+    /**
+     * 总页数
+     */
     private Integer totalPage;
+    /**
+     * 时间戳
+     */
     private String timestamp;
 
     public List<T> getData() {

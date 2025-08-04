@@ -2,6 +2,7 @@ package cn.vonce.sql.uitls;
 
 import cn.vonce.sql.bean.Column;
 import cn.vonce.sql.define.ColumnFun;
+import cn.vonce.sql.exception.SqlBeanException;
 
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +26,9 @@ public class LambdaUtil {
      * @return
      */
     public static <T, R> Column getColumn(ColumnFun<T, R> column) {
+        if (SqlBeanUtil.isAndroidEnv()){
+            throw new SqlBeanException("android环境下暂时不支持Lambda表达式获取列字段对象");
+        }
         SerializedLambda lambda = null;
         try {
             Method method = column.getClass().getDeclaredMethod("writeReplace");

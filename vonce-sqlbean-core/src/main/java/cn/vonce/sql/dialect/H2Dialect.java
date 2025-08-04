@@ -1,9 +1,10 @@
 package cn.vonce.sql.dialect;
 
+import cn.vonce.sql.annotation.SqlJSON;
 import cn.vonce.sql.bean.Alter;
 import cn.vonce.sql.bean.Common;
 import cn.vonce.sql.bean.Table;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.AlterType;
 import cn.vonce.sql.enumerate.JavaMapH2Type;
@@ -35,7 +36,11 @@ public class H2Dialect implements SqlDialect<JavaMapH2Type> {
                 }
             }
         }
-        throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类不支持此字段类型：" + clazz.getSimpleName());
+        SqlJSON sqlJSON = field.getAnnotation(SqlJSON.class);
+        if (sqlJSON != null) {
+            return JavaMapH2Type.VARCHAR;
+        }
+        throw new SqlBeanException(field.getDeclaringClass().getName() + "，实体类不支持此字段类型：" + clazz.getSimpleName());
     }
 
     @Override
@@ -46,13 +51,13 @@ public class H2Dialect implements SqlDialect<JavaMapH2Type> {
     /**
      * 获取表数据列表的SQL
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param schema
      * @param tableName
      * @return
      */
     @Override
-    public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getTableListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT TABLE_SCHEMA AS schema,TABLE_NAME AS name,REMARKS AS remarks ");
         sql.append("FROM information_schema.tables ");
@@ -72,16 +77,16 @@ public class H2Dialect implements SqlDialect<JavaMapH2Type> {
     /**
      * 获取列数据列表的SQL
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param tableName
      * @return
      */
     @Override
-    public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getColumnListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT cl.ORDINAL_POSITION AS cid, ");
         sql.append("cl.COLUMN_NAME AS name, ");
-        if (sqlBeanDB.getDatabaseMajorVersion() == 1) {
+        if (sqlBeanMeta.getDatabaseMajorVersion() == 1) {
             sql.append("cl.TYPE_NAME AS type, ");
         } else {
             sql.append("cl.DATA_TYPE AS type, ");
@@ -251,24 +256,24 @@ public class H2Dialect implements SqlDialect<JavaMapH2Type> {
      * @return
      */
     @Override
-    public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT SCHEMA_NAME as \"name\" FROM INFORMATION_SCHEMA.SCHEMATA ");
         if (StringUtil.isNotEmpty(schemaName)) {
             sql.append("WHERE SCHEMA_NAME = ");
-            sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanMeta, schemaName) + "'");
         }
         return sql.toString();
     }
 
     @Override
-    public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
-        return "CREATE SCHEMA IF NOT EXISTS " + this.getSchemaName(sqlBeanDB, schemaName);
+    public String getCreateSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
+        return "CREATE SCHEMA IF NOT EXISTS " + this.getSchemaName(sqlBeanMeta, schemaName);
     }
 
     @Override
-    public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
-        return "DROP SCHEMA IF EXISTS " + this.getSchemaName(sqlBeanDB, schemaName);
+    public String getDropSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
+        return "DROP SCHEMA IF EXISTS " + this.getSchemaName(sqlBeanMeta, schemaName);
     }
 
 }

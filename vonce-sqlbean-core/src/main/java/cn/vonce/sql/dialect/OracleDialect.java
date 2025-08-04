@@ -1,10 +1,11 @@
 package cn.vonce.sql.dialect;
 
+import cn.vonce.sql.annotation.SqlJSON;
 import cn.vonce.sql.bean.Alter;
 import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.bean.Common;
 import cn.vonce.sql.bean.Table;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.AlterDifference;
 import cn.vonce.sql.enumerate.AlterType;
@@ -37,7 +38,11 @@ public class OracleDialect implements SqlDialect<JavaMapOracleType> {
                 }
             }
         }
-        throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类不支持此字段类型：" + clazz.getSimpleName());
+        SqlJSON sqlJSON = field.getAnnotation(SqlJSON.class);
+        if (sqlJSON != null) {
+            return JavaMapOracleType.JSON;
+        }
+        throw new SqlBeanException(field.getDeclaringClass().getName() + "，实体类不支持此字段类型：" + clazz.getSimpleName());
     }
 
     @Override
@@ -46,7 +51,7 @@ public class OracleDialect implements SqlDialect<JavaMapOracleType> {
     }
 
     @Override
-    public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getTableListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT t.table_name AS \"name\", c.comments AS \"remarks\" ");
         sql.append("FROM user_tables t ");
@@ -54,14 +59,14 @@ public class OracleDialect implements SqlDialect<JavaMapOracleType> {
         sql.append("ON c.table_name = t.table_name");
         if (StringUtil.isNotEmpty(tableName)) {
             sql.append(" AND t.table_name = '");
-            sql.append((sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) ? tableName.toUpperCase() : tableName);
+            sql.append((sqlBeanMeta.getSqlBeanConfig().getToUpperCase() != null && sqlBeanMeta.getSqlBeanConfig().getToUpperCase()) ? tableName.toUpperCase() : tableName);
             sql.append("'");
         }
         return sql.toString();
     }
 
     @Override
-    public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getColumnListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT col.column_id AS cid, col.column_name AS name, col.data_type AS type, ");
         sql.append("(CASE col.nullable WHEN 'N' THEN '1' ELSE '0' END) AS notnull, col.data_default AS dflt_value, ");
@@ -237,23 +242,23 @@ public class OracleDialect implements SqlDialect<JavaMapOracleType> {
     }
 
     @Override
-    public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT USERNAME AS \"name\" FROM ALL_USERS ");
         if (StringUtil.isNotEmpty(schemaName)) {
             sql.append("WHERE USERNAME = ");
-            sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanMeta, schemaName) + "'");
         }
         return sql.toString();
     }
 
     @Override
-    public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getCreateSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         return null;
     }
 
     @Override
-    public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getDropSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         return null;
     }
 

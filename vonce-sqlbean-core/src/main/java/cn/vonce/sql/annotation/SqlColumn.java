@@ -10,7 +10,7 @@ import java.lang.annotation.*;
  * @author Jovi
  * @version 1.0
  * @email imjovi@qq.com
- * @date 2018年2月8日下午2:55:04
+ * @Time 2018年2月8日下午2:55:04
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

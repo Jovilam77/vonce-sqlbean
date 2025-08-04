@@ -1,10 +1,11 @@
 package cn.vonce.sql.dialect;
 
+import cn.vonce.sql.annotation.SqlJSON;
 import cn.vonce.sql.bean.Alter;
 import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.bean.Common;
 import cn.vonce.sql.bean.Table;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.AlterDifference;
 import cn.vonce.sql.enumerate.AlterType;
@@ -37,7 +38,11 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
                 }
             }
         }
-        throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类不支持此字段类型：" + clazz.getSimpleName());
+        SqlJSON sqlJSON = field.getAnnotation(SqlJSON.class);
+        if (sqlJSON != null) {
+            return JavaMapDB2Type.VARCHAR;
+        }
+        throw new SqlBeanException(field.getDeclaringClass().getName() + "，实体类不支持此字段类型：" + clazz.getSimpleName());
     }
 
     @Override
@@ -46,7 +51,7 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
     }
 
     @Override
-    public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getTableListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT name, remarks ");
         sql.append("FROM sysibm.systables ");
@@ -64,7 +69,7 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
     }
 
     @Override
-    public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getColumnListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT col.column_id AS cid, col.column_name AS name, col.data_type AS type, ");
         sql.append("(CASE col.nullable WHEN 'N' THEN '1' ELSE '0' END) AS notnull, col.data_default AS dflt_value, ");
@@ -268,24 +273,24 @@ public class DB2Dialect implements SqlDialect<JavaMapDB2Type> {
     }
 
     @Override
-    public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT DATABASENAME as \"name\" FROM SYSIBM.SYSDATABASES ");
         if (StringUtil.isNotEmpty(schemaName)) {
             sql.append("WHERE DATABASENAME = ");
-            sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanMeta, schemaName) + "'");
         }
         return sql.toString();
     }
 
     @Override
-    public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
-        return "CREATE DATABASE " + this.getSchemaName(sqlBeanDB, schemaName);
+    public String getCreateSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
+        return "CREATE DATABASE " + this.getSchemaName(sqlBeanMeta, schemaName);
     }
 
     @Override
-    public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
-        return "DROP DATABASE " + this.getSchemaName(sqlBeanDB, schemaName);
+    public String getDropSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
+        return "DROP DATABASE " + this.getSchemaName(sqlBeanMeta, schemaName);
     }
 
 }

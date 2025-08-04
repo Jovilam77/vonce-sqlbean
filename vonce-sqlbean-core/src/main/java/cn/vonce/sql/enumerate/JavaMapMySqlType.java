@@ -26,7 +26,8 @@ public enum JavaMapMySqlType {
     TIMESTAMP(new Class[]{java.sql.Timestamp.class}),
     DATETIME(new Class[]{java.util.Date.class, java.time.LocalDateTime.class}),
     CLOB(new Class[]{java.sql.Clob.class}),
-    BLOB(new Class[]{java.sql.Blob.class, Object.class});
+    BLOB(new Class[]{java.sql.Blob.class, Object.class}),
+    JSON(new Class[]{});
 
 
     JavaMapMySqlType(Class<?>[] classes) {

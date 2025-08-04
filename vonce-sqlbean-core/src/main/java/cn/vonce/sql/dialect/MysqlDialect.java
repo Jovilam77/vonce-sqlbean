@@ -1,8 +1,9 @@
 package cn.vonce.sql.dialect;
 
+import cn.vonce.sql.annotation.SqlJSON;
 import cn.vonce.sql.bean.Alter;
 import cn.vonce.sql.bean.Table;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.AlterType;
 import cn.vonce.sql.enumerate.DbType;
@@ -35,7 +36,11 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
                 }
             }
         }
-        throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类不支持此字段类型：" + clazz.getSimpleName());
+        SqlJSON sqlJSON = field.getAnnotation(SqlJSON.class);
+        if (sqlJSON != null) {
+            return JavaMapMySqlType.JSON;
+        }
+        throw new SqlBeanException(field.getDeclaringClass().getName() + "，实体类不支持此字段类型：" + clazz.getSimpleName());
     }
 
     @Override
@@ -44,7 +49,7 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
     }
 
     @Override
-    public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getTableListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT table_schema AS `schema`, table_name AS `name`, table_comment AS `remarks` ");
         sql.append("FROM information_schema.tables ");
@@ -61,7 +66,7 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
     }
 
     @Override
-    public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getColumnListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT ordinal_position AS cid, column_name AS name, data_type AS type, ");
         sql.append("(CASE is_nullable WHEN 'NO' THEN 1 ELSE 0 END) AS notnull, column_default AS dflt_value, ");
@@ -69,7 +74,7 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
         sql.append("(CASE column_key WHEN 'MUL' THEN 1 ELSE 0 END) AS fk, ");
         sql.append("(CASE extra WHEN 'auto_increment' THEN 1 ELSE 0 END) AS auto_incr, ");
         //MySql8之后整数类型不支持设置长度
-        if (sqlBeanDB.getDbType() == DbType.MySQL && sqlBeanDB.getDatabaseMajorVersion() >= 8) {
+        if (sqlBeanMeta.getDbType() == DbType.MySQL && sqlBeanMeta.getDatabaseMajorVersion() >= 8) {
             sql.append("COALESCE(character_maximum_length, numeric_precision) AS length, ");
         } else {
             sql.append("(CASE WHEN data_type = 'bit' OR data_type = 'tinyint' OR data_type = 'smallint' OR data_type = 'mediumint' OR data_type = 'int' OR data_type = 'bigint' ");
@@ -160,23 +165,23 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
     }
 
     @Override
-    public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT schema_name as `name` FROM information_schema.schemata ");
         if (StringUtil.isNotEmpty(schemaName)) {
             sql.append("WHERE schema_name = ");
-            sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanMeta, schemaName) + "'");
         }
         return sql.toString();
     }
 
     @Override
-    public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getCreateSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("CREATE DATABASE IF NOT EXISTS ");
-        sql.append(this.getSchemaName(sqlBeanDB, schemaName));
+        sql.append(this.getSchemaName(sqlBeanMeta, schemaName));
         sql.append(" CHARACTER SET ");
-        if (sqlBeanDB.getDatabaseMajorVersion() > 5 || (sqlBeanDB.getDatabaseMajorVersion() == 5 && sqlBeanDB.getDatabaseMinorVersion() > 3)) {
+        if (sqlBeanMeta.getDatabaseMajorVersion() > 5 || (sqlBeanMeta.getDatabaseMajorVersion() == 5 && sqlBeanMeta.getDatabaseMinorVersion() > 3)) {
             sql.append("utf8mb4 COLLATE utf8mb4_general_ci");
         } else {
             sql.append("utf8 COLLATE utf8_general_ci");
@@ -185,8 +190,8 @@ public class MysqlDialect implements SqlDialect<JavaMapMySqlType> {
     }
 
     @Override
-    public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
-        return "DROP DATABASE IF EXISTS " + this.getSchemaName(sqlBeanDB, schemaName);
+    public String getDropSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
+        return "DROP DATABASE IF EXISTS " + this.getSchemaName(sqlBeanMeta, schemaName);
     }
 
 }

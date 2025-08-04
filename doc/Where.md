@@ -1,8 +1,8 @@
-#### 一. Where条件
+#### 一. Where链式条件
 ```java
-//SQL: where id = 1 or id = 2
+//SQL: where user.age = 18 and user.gender = 0 and (userAddress.city = '广州' or userAddress.city = '深圳')
 Select select = new Select();
-select.where().eq("id", 1).or().eq("id", 2);
+select.where().eq(User::getAge, 18).and().eq(User::getGender, 0).and(condition -> condition.eq(UserAddress::getCity, "广州").or().eq(UserAddress::getCity, "深圳"));
 ```
 
 #### 二. Where条件表达式
@@ -20,7 +20,7 @@ select.where("& > ? AND & = ?", User$.status, 10, User$.type, 1);//建议采用�
 
 ```
 
-#### 三. Where条件包装器（推荐使用）
+#### 三. Where条件包装器（拼接条件推荐使用）
 ```java
 //SQL: where id = 1 and content = '222'
 Select select = new Select();

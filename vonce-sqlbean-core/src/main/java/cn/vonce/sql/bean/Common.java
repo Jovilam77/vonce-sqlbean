@@ -1,6 +1,6 @@
 package cn.vonce.sql.bean;
 
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 
 import java.io.Serializable;
@@ -24,7 +24,7 @@ public class Common implements Serializable {
     /**
      * 数据库相关配置
      */
-    private SqlBeanDB sqlBeanDB = null;
+    private SqlBeanMeta sqlBeanMeta = null;
     /**
      * 表信息
      */
@@ -38,12 +38,12 @@ public class Common implements Serializable {
         this.beanClass = beanClass;
     }
 
-    public SqlBeanDB getSqlBeanDB() {
-        return sqlBeanDB;
+    public SqlBeanMeta getSqlBeanMeta() {
+        return sqlBeanMeta;
     }
 
-    public void setSqlBeanDB(SqlBeanDB sqlBeanDB) {
-        this.sqlBeanDB = sqlBeanDB;
+    public void setSqlBeanMeta(SqlBeanMeta sqlBeanMeta) {
+        this.sqlBeanMeta = sqlBeanMeta;
     }
 
     /**

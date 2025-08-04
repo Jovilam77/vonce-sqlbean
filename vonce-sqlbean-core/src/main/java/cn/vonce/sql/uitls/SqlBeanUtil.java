@@ -2,14 +2,15 @@ package cn.vonce.sql.uitls;
 
 import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.bean.*;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.constant.SqlConstant;
-import cn.vonce.sql.define.ColumnFun;
-import cn.vonce.sql.define.JoinOn;
-import cn.vonce.sql.define.SqlEnum;
-import cn.vonce.sql.define.SqlFun;
+import cn.vonce.sql.define.*;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.exception.SqlBeanException;
+import cn.vonce.sql.helper.Cond;
+import cn.vonce.sql.helper.Wrapper;
+import cn.vonce.sql.json.JSONConvertImpl;
+import cn.vonce.sql.json.JSONConvert;
 
 import java.beans.Introspector;
 import java.io.*;
@@ -17,15 +18,30 @@ import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * SqlBean 工具类 Created by Jovi on 2018/6/17.
  */
 public class SqlBeanUtil {
+
+    private static final Logger logger = Logger.getLogger(SqlBeanUtil.class.getName());
+    // 是否是Android环境
+    private static boolean isAndroidEnv;
+
+    static {
+        try {
+            Class.forName("dalvik.system.BaseDexClassLoader");
+            isAndroidEnv = true;
+        } catch (Exception e) {
+            isAndroidEnv = false;
+        }
+    }
+
+    public static boolean isAndroidEnv() {
+        return isAndroidEnv;
+    }
 
     /**
      * 保存SqlTable缓存
@@ -353,27 +369,28 @@ public class SqlBeanUtil {
     /**
      * 获取列信息
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param field
      * @return
      */
-    public static ColumnInfo buildColumnInfo(SqlBeanDB sqlBeanDB, Field field) {
-        return buildColumnInfo(sqlBeanDB, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class));
+    public static ColumnInfo buildColumnInfo(SqlBeanMeta sqlBeanMeta, Field field) {
+        return buildColumnInfo(sqlBeanMeta, field, field.getDeclaringClass().getAnnotation(SqlTable.class), field.getAnnotation(SqlColumn.class), field.getDeclaringClass());
     }
 
     /**
      * 获取列信息
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param field
      * @param sqlTable
      * @param sqlColumn
+     * @param constantClass
      * @return
      */
-    public static ColumnInfo buildColumnInfo(SqlBeanDB sqlBeanDB, Field field, SqlTable sqlTable, SqlColumn sqlColumn) {
+    public static ColumnInfo buildColumnInfo(SqlBeanMeta sqlBeanMeta, Field field, SqlTable sqlTable, SqlColumn sqlColumn, Class constantClass) {
         String columnName = SqlBeanUtil.getTableFieldName(field, sqlTable);
         ColumnInfo columnInfo = new ColumnInfo();
-        columnInfo.setName(SqlBeanUtil.isToUpperCase(sqlBeanDB) ? columnName.toUpperCase() : columnName);
+        columnInfo.setName(SqlBeanUtil.isToUpperCase(sqlBeanMeta) ? columnName.toUpperCase() : columnName);
         //是否主键 是否自增
         SqlId sqlId = field.getAnnotation(SqlId.class);
         columnInfo.setPk(sqlId != null);
@@ -382,7 +399,7 @@ public class SqlBeanUtil {
         if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
             jdbcType = sqlColumn.type();
         } else {
-            jdbcType = sqlBeanDB.getDbType().getSqlDialect().getJdbcType(field);
+            jdbcType = sqlBeanMeta.getDbType().getSqlDialect().getJdbcType(field);
         }
         columnInfo.setType(jdbcType.name());
         if (sqlColumn != null) {
@@ -409,7 +426,7 @@ public class SqlBeanUtil {
         if (sqlColumn != null && StringUtil.isNotEmpty(sqlColumn.remarks())) {
             columnInfo.setRemarks(sqlColumn.remarks());
         } else {
-            columnInfo.setRemarks("");
+            columnInfo.setRemarks(SqlBeanUtil.getFiledRemarks(constantClass, columnInfo.getName()));
         }
         return columnInfo;
     }
@@ -417,12 +434,12 @@ public class SqlBeanUtil {
     /**
      * 比较两个字段信息是否一致
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param columnInfo
      * @param toColumnInfo
      * @return
      */
-    public static List<AlterDifference> columnInfoCompare(SqlBeanDB sqlBeanDB, ColumnInfo columnInfo, ColumnInfo toColumnInfo) {
+    public static List<AlterDifference> columnInfoCompare(SqlBeanMeta sqlBeanMeta, ColumnInfo columnInfo, ColumnInfo toColumnInfo) {
         List<AlterDifference> alterDifferenceList = new ArrayList<>();
         if (!columnInfo.getPk().equals(toColumnInfo.getPk())) {
             alterDifferenceList.add(AlterDifference.PK);
@@ -436,34 +453,26 @@ public class SqlBeanUtil {
         if (columnInfo.getNotnull() != null && !columnInfo.getNotnull().equals(toColumnInfo.getNotnull())) {
             alterDifferenceList.add(AlterDifference.NOT_NULL);
         }
-        if (sqlBeanDB.getDbType() != DbType.SQLServer) {
+        if (sqlBeanMeta.getDbType() != DbType.SQLServer) {
             if ((columnInfo.getDfltValue() == null && columnInfo.getDfltValue() != toColumnInfo.getDfltValue()) || (columnInfo.getDfltValue() != null /*&& toColumnInfo.getDfltValue() != null*/ && !columnInfo.getDfltValue().equals(toColumnInfo.getDfltValue()))) {
                 alterDifferenceList.add(AlterDifference.DFLT_VALUE);
             }
         }
         if (columnInfo.getLength() != null && !columnInfo.getLength().equals(toColumnInfo.getLength())) {
             //MySql8之后整数类型不支持设置长度
-            if (sqlBeanDB.getDbType() != DbType.MySQL
-                    || (sqlBeanDB.getDbType() == DbType.MySQL && sqlBeanDB.getDatabaseMajorVersion() < 8)
-                    || (sqlBeanDB.getDbType() == DbType.MySQL && sqlBeanDB.getDatabaseMajorVersion() >= 8
-                    && !columnInfo.getType().equalsIgnoreCase("tinyint")
-                    && !columnInfo.getType().equalsIgnoreCase("smallint")
-                    && !columnInfo.getType().equalsIgnoreCase("mediumint")
-                    && !columnInfo.getType().equalsIgnoreCase("int")
-                    && !columnInfo.getType().equalsIgnoreCase("bigint")
-            )) {
+            if (sqlBeanMeta.getDbType() != DbType.MySQL || (sqlBeanMeta.getDbType() == DbType.MySQL && sqlBeanMeta.getDatabaseMajorVersion() < 8) || (sqlBeanMeta.getDbType() == DbType.MySQL && sqlBeanMeta.getDatabaseMajorVersion() >= 8 && !columnInfo.getType().equalsIgnoreCase("tinyint") && !columnInfo.getType().equalsIgnoreCase("smallint") && !columnInfo.getType().equalsIgnoreCase("mediumint") && !columnInfo.getType().equalsIgnoreCase("int") && !columnInfo.getType().equalsIgnoreCase("bigint"))) {
                 alterDifferenceList.add(AlterDifference.LENGTH);
             }
         }
         if (columnInfo.getScale() != null && !columnInfo.getScale().equals(toColumnInfo.getScale())) {
             alterDifferenceList.add(AlterDifference.SCALE);
         }
-        if (sqlBeanDB.getDbType() != DbType.SQLite && sqlBeanDB.getDbType() != DbType.Derby) {
+        if (sqlBeanMeta.getDbType() != DbType.SQLite && sqlBeanMeta.getDbType() != DbType.Derby) {
             if (StringUtil.isNotBlank(columnInfo.getRemarks()) && !columnInfo.getRemarks().equals(toColumnInfo.getRemarks())) {
                 alterDifferenceList.add(AlterDifference.REMARKS);
             }
         }
-        if (sqlBeanDB.getDbType() == DbType.MySQL || sqlBeanDB.getDbType() == DbType.MariaDB) {
+        if (sqlBeanMeta.getDbType() == DbType.MySQL || sqlBeanMeta.getDbType() == DbType.MariaDB) {
             if (!columnInfo.getAutoIncr().equals(toColumnInfo.getAutoIncr())) {
                 alterDifferenceList.add(AlterDifference.AUTO_INCR);
             }
@@ -575,6 +584,9 @@ public class SqlBeanUtil {
      * @return
      */
     public static List<Field> getBeanAllField(Class<?> clazz) {
+        if (clazz == null) {
+            return Collections.emptyList();
+        }
         List<Field> fieldList = new ArrayList<>();
         Class<?> superClass = clazz.getSuperclass();
         do {
@@ -638,7 +650,8 @@ public class SqlBeanUtil {
                 continue;
             }
             SqlJoin sqlJoin = field.getAnnotation(SqlJoin.class);
-            if (sqlJoin != null && sqlJoin.isBean()) {
+            boolean isBean = !SqlBeanUtil.isBaseType(field.getType());
+            if (sqlJoin != null && isBean) {
                 Class<?> subBeanClazz = field.getType();
                 if (sqlJoin.from() != null && sqlJoin.from() != void.class) {
                     subBeanClazz = sqlJoin.from();
@@ -715,7 +728,8 @@ public class SqlBeanUtil {
             Class<?> subClazz = field.getType();
             Table table = null;
             //如果字段是bean
-            if (sqlJoin != null && sqlJoin.isBean()) {
+            boolean isBean = !SqlBeanUtil.isBaseType(field.getType());
+            if (isBean) {
                 if (sqlJoin.from() != null && sqlJoin.from() != void.class) {
                     subClazz = sqlJoin.from();
                 }
@@ -748,14 +762,14 @@ public class SqlBeanUtil {
                 joinOn.on(condition);
                 join.on().setDataList(condition.getDataList());
             } else {
-                if (sqlJoin != null && !sqlJoin.isBean()) {
+                if (!isBean) {
                     key = Md5Util.encode(sqlJoin.table().toLowerCase() + sqlJoin.tableKeyword().toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
                     if (joinFieldMap.containsKey(key)) {
                         continue;
                     }
                     select.addJoin(join);
                     join.on(join.getTableAlias(), sqlJoin.tableKeyword(), new RawValue(SqlBeanUtil.getTableFieldFullName(select, select.getTable().getAlias(), sqlJoin.mainKeyword())));
-                } else if (sqlJoin != null && sqlJoin.isBean()) {
+                } else {
                     String tableKeyword = getTableFieldName(getIdField(subClazz), sqlTable);
                     key = Md5Util.encode(join.getTableName().toLowerCase() + tableKeyword.toLowerCase() + sqlJoin.mainKeyword().toLowerCase());
                     if (joinFieldMap.containsKey(key)) {
@@ -809,8 +823,8 @@ public class SqlBeanUtil {
                     objects = new Object[]{args[index]};
                 }
                 if (objects != null) {
-                    for (int i = 0; i < objects.length; i++) {
-                        value.append(getActualValue(common, objects[i]));
+                    for (Object object : objects) {
+                        value.append(getActualValue(common, object));
                         value.append(SqlConstant.COMMA);
                     }
                     value.delete(value.length() - SqlConstant.COMMA.length(), value.length());
@@ -948,8 +962,19 @@ public class SqlBeanUtil {
             return WhatType.BOOL_TYPE;
         } else if (type == short.class || type == Short.class || type == int.class || type == Integer.class || type == long.class || type == Long.class || type == float.class || type == Float.class || type == double.class || type == Double.class) {
             return WhatType.VALUE_TYPE;
-        } else if (type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class || type == LocalDate.class || type == LocalTime.class || type == LocalDateTime.class) {
-            return WhatType.DATE_TYPE;
+        }
+        return jdk8DateType(type);
+    }
+
+    private static WhatType jdk8DateType(Class<?> type) {
+        if (isAndroidEnv) {
+            if (type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class) {
+                return WhatType.DATE_TYPE;
+            }
+        } else {
+            if (type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class || type == java.time.LocalDate.class || type == java.time.LocalTime.class || type == java.time.LocalDateTime.class) {
+                return WhatType.DATE_TYPE;
+            }
         }
         return WhatType.OBJECT_TYPE;
     }
@@ -972,14 +997,14 @@ public class SqlBeanUtil {
             case TEXT:
             case NTEXT:
             case LONGTEXT:
-            case CLOB:
-            case NCLOB:
+                whatType = WhatType.STRING_TYPE;
+                break;
             case DATE:
             case TIME:
             case DATETIME:
             case DATETIME2:
             case TIMESTAMP:
-                whatType = WhatType.STRING_TYPE;
+                whatType = WhatType.DATE_TYPE;
                 break;
             case BIT:
                 whatType = WhatType.BOOL_TYPE;
@@ -1011,8 +1036,15 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean isBaseType(Class<?> type) {
-        if (type == String.class || type == char.class || type == Character.class || type == boolean.class || type == Boolean.class || type == byte.class || type == Byte.class || type == short.class || type == Short.class || type == int.class || type == Integer.class || type == long.class || type == Long.class || type == float.class || type == Float.class || type == double.class || type == Double.class || type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class || type == LocalDate.class || type == LocalTime.class || type == LocalDateTime.class || type == BigDecimal.class) {
+        if (type == String.class || type == char.class || type == Character.class || type == boolean.class || type == Boolean.class || type == byte.class || type == Byte.class || type == short.class || type == Short.class || type == int.class || type == Integer.class || type == long.class || type == Long.class || type == float.class || type == Float.class || type == double.class || type == Double.class || type == Date.class || type == java.sql.Date.class || type == java.sql.Timestamp.class || type == java.sql.Timestamp.class || type == java.sql.Time.class || type == BigDecimal.class || jdk8IsBaseType(type)) {
             return true;
+        }
+        return false;
+    }
+
+    private static boolean jdk8IsBaseType(Class<?> type) {
+        if (!isAndroidEnv) {
+            return type == java.time.LocalDate.class || type == java.time.LocalTime.class || type == java.time.LocalDateTime.class;
         }
         return false;
     }
@@ -1060,41 +1092,34 @@ public class SqlBeanUtil {
         }
         switch (whatType) {
             case VALUE_TYPE:
-                sqlValue = value.toString();
+                if (jdk8DateType(value.getClass()) == WhatType.DATE_TYPE) {
+                    sqlValue = DateUtil.unifyDateToTimestamp(value).toString();
+                } else {
+                    sqlValue = value.toString();
+                }
                 break;
             case BOOL_TYPE:
-                if (jdbcType != null) {
-                    sqlValue = (String) value;
+                DbType dbType = common.getSqlBeanMeta().getDbType();
+                if (dbType == DbType.Postgresql) {
+                    sqlValue = Boolean.parseBoolean(value.toString()) ? "'1'" : "'0'";
+                } else if (dbType == DbType.H2 || dbType == DbType.Hsql) {
+                    sqlValue = Boolean.parseBoolean(value.toString()) ? "true" : "false";
                 } else {
-                    DbType dbType = common.getSqlBeanDB().getDbType();
-                    if (dbType == DbType.Postgresql) {
-                        sqlValue = Boolean.parseBoolean(value.toString()) == true ? "'1'" : "'0'";
-                    } else if (dbType == DbType.H2 || dbType == DbType.Hsql) {
-                        sqlValue = Boolean.parseBoolean(value.toString()) == true ? "true" : "false";
-                    } else {
-                        sqlValue = Boolean.parseBoolean(value.toString()) == true ? "1" : "0";
-                    }
+                    sqlValue = Boolean.parseBoolean(value.toString()) ? "1" : "0";
                 }
                 break;
             case DATE_TYPE:
-                String dateString;
-                if (jdbcType != null) {
-                    dateString = (String) value;
+                if (Objects.requireNonNull(common.getSqlBeanMeta().getDbType()) == DbType.Oracle) {
+                    sqlValue = "to_timestamp(" + single_quotation_mark + DateUtil.unifyDateToString(value) + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
                 } else {
-                    dateString = DateUtil.unifyDateToString(value);
-                }
-                switch (common.getSqlBeanDB().getDbType()) {
-                    case Oracle:
-                        sqlValue = "to_timestamp(" + single_quotation_mark + dateString + single_quotation_mark + ", 'syyyy-mm-dd hh24:mi:ss.ff')";
-                        break;
-                    default:
-                        sqlValue = single_quotation_mark + dateString + single_quotation_mark;
-                        break;
+                    sqlValue = single_quotation_mark + DateUtil.unifyDateToString(value) + single_quotation_mark;
                 }
                 break;
             default:
-                if (value instanceof SqlEnum) {
-                    sqlValue = ((SqlEnum) value).getCode().toString();
+                if (value instanceof SqlEnum<?>) {
+                    sqlValue = ((SqlEnum<?>) value).getCode().toString();
+                } else if (value instanceof Date) {
+                    sqlValue = single_quotation_mark + DateUtil.unifyDateToString(value) + single_quotation_mark;
                 } else {
                     sqlValue = single_quotation_mark + filterSQLInject(value.toString()) + single_quotation_mark;
                 }
@@ -1134,7 +1159,7 @@ public class SqlBeanUtil {
      */
     public static String getEscape(Common common) {
         String escape = SqlConstant.DOUBLE_ESCAPE_CHARACTER;
-        DbType dbType = common.getSqlBeanDB().getDbType();
+        DbType dbType = common.getSqlBeanMeta().getDbType();
         if (dbType == DbType.MySQL || dbType == DbType.MariaDB) {
             escape = SqlConstant.SINGLE_ESCAPE_CHARACTER;
         }
@@ -1148,7 +1173,7 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean isToUpperCase(Common common) {
-        if (common.getSqlBeanDB().getSqlBeanConfig().getToUpperCase() != null && common.getSqlBeanDB().getSqlBeanConfig().getToUpperCase()) {
+        if (common.getSqlBeanMeta().getSqlBeanConfig().getToUpperCase() != null && common.getSqlBeanMeta().getSqlBeanConfig().getToUpperCase()) {
             return true;
         }
         return false;
@@ -1157,11 +1182,11 @@ public class SqlBeanUtil {
     /**
      * 是否需要转大写
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @return
      */
-    public static boolean isToUpperCase(SqlBeanDB sqlBeanDB) {
-        if (sqlBeanDB.getSqlBeanConfig().getToUpperCase() != null && sqlBeanDB.getSqlBeanConfig().getToUpperCase()) {
+    public static boolean isToUpperCase(SqlBeanMeta sqlBeanMeta) {
+        if (sqlBeanMeta.getSqlBeanConfig().getToUpperCase() != null && sqlBeanMeta.getSqlBeanConfig().getToUpperCase()) {
             return true;
         }
         return false;
@@ -1189,8 +1214,14 @@ public class SqlBeanUtil {
         if (type == Date.class || type == java.sql.Timestamp.class) {
             return new Date();
         }
-        if (type == LocalDateTime.class) {
-            return LocalDateTime.now();
+        return jdk8UpdateVersion(type, value);
+    }
+
+    private static Object jdk8UpdateVersion(Class<?> type, Object value) {
+        if (!isAndroidEnv) {
+            if (type == java.time.LocalDateTime.class) {
+                return java.time.LocalDateTime.now();
+            }
         }
         return null;
     }
@@ -1202,8 +1233,15 @@ public class SqlBeanUtil {
      * @return
      */
     public static boolean versionEffectiveness(Class<?> type) {
-        if (type == int.class || type == Integer.class || type == long.class || type == Long.class || type == Date.class || type == java.sql.Timestamp.class || type == LocalDateTime.class) {
+        if (type == int.class || type == Integer.class || type == long.class || type == Long.class || type == Date.class || jdk8VersionEffectiveness(type)) {
             return true;
+        }
+        return false;
+    }
+
+    public static boolean jdk8VersionEffectiveness(Class<?> type) {
+        if (!isAndroidEnv) {
+            return type == java.time.LocalDateTime.class;
         }
         return false;
     }
@@ -1270,14 +1308,20 @@ public class SqlBeanUtil {
         if (type == BigDecimal.class) {
             return new BigDecimal(0);
         }
-        if (type == LocalDate.class) {
-            return LocalDate.now();
-        }
-        if (type == LocalTime.class) {
-            return LocalTime.now();
-        }
-        if (type == LocalDateTime.class) {
-            return LocalDateTime.now();
+        return jdk8AssignInitialValue(type);
+    }
+
+    private static Object jdk8AssignInitialValue(Class<?> type) {
+        if (!isAndroidEnv) {
+            if (type == java.time.LocalDate.class) {
+                return java.time.LocalDate.now();
+            }
+            if (type == java.time.LocalTime.class) {
+                return java.time.LocalTime.now();
+            }
+            if (type == java.time.LocalDateTime.class) {
+                return java.time.LocalDateTime.now();
+            }
         }
         return null;
     }
@@ -1357,16 +1401,24 @@ public class SqlBeanUtil {
         if (type == BigDecimal.class) {
             return new BigDecimal(value.toString());
         }
-        if (type == LocalDate.class) {
-            LocalDateTime localDateTime = DateUtil.strTimeToLocalDateTime(value.toString());
-            return localDateTime == null ? null : localDateTime.toLocalDate();
-        }
-        if (type == LocalTime.class) {
-            LocalDateTime localDateTime = DateUtil.strTimeToLocalDateTime(value.toString());
-            return localDateTime == null ? null : localDateTime.toLocalTime();
-        }
-        if (type == LocalDateTime.class) {
-            return DateUtil.strTimeToLocalDateTime(value.toString());
+        return jdk8DateValueConvert(type, value);
+    }
+
+    private static Object jdk8DateValueConvert(Class<?> type, Object value) {
+        try {
+            Class.forName("android.content.Context");
+        } catch (ClassNotFoundException e) {
+            if (type == java.time.LocalDate.class) {
+                java.time.LocalDateTime localDateTime = DateUtil.strTimeToLocalDateTime(value.toString());
+                return localDateTime.toLocalDate();
+            }
+            if (type == java.time.LocalTime.class) {
+                java.time.LocalDateTime localDateTime = DateUtil.strTimeToLocalDateTime(value.toString());
+                return localDateTime.toLocalTime();
+            }
+            if (type == java.time.LocalDateTime.class) {
+                return DateUtil.strTimeToLocalDateTime(value.toString());
+            }
         }
         return null;
     }
@@ -1396,7 +1448,7 @@ public class SqlBeanUtil {
         }
         //是否自增
         if (columnInfo.getAutoIncr() != null && columnInfo.getAutoIncr()) {
-            if (common.getSqlBeanDB().getDbType() == DbType.MySQL || common.getSqlBeanDB().getDbType() == DbType.MariaDB) {
+            if (common.getSqlBeanMeta().getDbType() == DbType.MySQL || common.getSqlBeanMeta().getDbType() == DbType.MariaDB) {
                 sql.append(SqlConstant.SPACES);
                 sql.append(SqlConstant.AUTO_INCREMENT);
             }
@@ -1420,7 +1472,7 @@ public class SqlBeanUtil {
             }
         }
         //如果是Mysql或MariaDB
-        if (common.getSqlBeanDB().getDbType() == DbType.MySQL || common.getSqlBeanDB().getDbType() == DbType.MariaDB) {
+        if (common.getSqlBeanMeta().getDbType() == DbType.MySQL || common.getSqlBeanMeta().getDbType() == DbType.MariaDB) {
             //存在备注
             if (StringUtil.isNotBlank(columnInfo.getRemarks())) {
                 sql.append(SqlConstant.SPACES);
@@ -1460,8 +1512,8 @@ public class SqlBeanUtil {
      * 检查
      */
     public static void check(Common common) {
-        isNull(common.getSqlBeanDB(), "请设置sqlBeanConfig");
-        isNull(common.getSqlBeanDB().getDbType(), "请设置sqlBeanConfig -> dbType");
+        isNull(common.getSqlBeanMeta(), "请设置sqlBeanConfig");
+        isNull(common.getSqlBeanMeta().getDbType(), "请设置sqlBeanConfig -> dbType");
     }
 
     /**
@@ -1545,12 +1597,19 @@ public class SqlBeanUtil {
      * @param clazz
      * @return
      */
-    public static Class<?> getGenericType(Class<?> clazz) {
+    public static List<Class<?>> getGenericTypeBySuperclass(Class<?> clazz) {
         Type[] typeArray = new Type[]{clazz.getGenericSuperclass()};
-        if (typeArray == null || typeArray.length == 0) {
-            typeArray = clazz.getGenericInterfaces();
-        }
         return getGenericType(typeArray);
+    }
+
+    /**
+     * 获取泛型类型
+     *
+     * @param clazz
+     * @return
+     */
+    public static List<Class<?>> getGenericTypeByInterfaces(Class<?> clazz) {
+        return getGenericType(clazz.getGenericInterfaces());
     }
 
     /**
@@ -1559,19 +1618,21 @@ public class SqlBeanUtil {
      * @param typeArray
      * @return
      */
-    public static Class<?> getGenericType(Type[] typeArray) {
-        Class<?> clazz = null;
+    public static List<Class<?>> getGenericType(Type[] typeArray) {
+        List<Class<?>> classes = new ArrayList<>();
         for (Type type : typeArray) {
             if (type instanceof ParameterizedType) {
-                Class<?> trueTypeClass = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
-                try {
-                    clazz = SqlBeanUtil.class.getClassLoader().loadClass(trueTypeClass.getName());
-                    break;
-                } catch (ClassNotFoundException e) {
+                Type[] types = ((ParameterizedType) type).getActualTypeArguments();
+                for (Type t : types) {
+                    Class<?> trueTypeClass = (Class<?>) t;
+                    try {
+                        classes.add(SqlBeanUtil.class.getClassLoader().loadClass(trueTypeClass.getName()));
+                    } catch (ClassNotFoundException ignored) {
+                    }
                 }
             }
         }
-        return clazz;
+        return classes;
     }
 
     /**
@@ -1584,7 +1645,7 @@ public class SqlBeanUtil {
         Class<?> clazz = field.getType();
         if (clazz.isEnum() && SqlEnum.class.isAssignableFrom(clazz)) {
             Type[] typeArray = clazz.getGenericInterfaces();
-            clazz = SqlBeanUtil.getGenericType(typeArray);
+            clazz = SqlBeanUtil.getGenericType(typeArray).get(0);
             if (clazz == null) {
                 throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类中的枚举类字段：" + field.getType().getSimpleName() + "在实现SqlEnum接口时必须指定泛型类型");
             }
@@ -1602,14 +1663,167 @@ public class SqlBeanUtil {
      * @param value
      * @return
      */
-    public static SqlEnum matchEnum(Field field, Object value) {
-        SqlEnum[] sqlEnums = (SqlEnum[]) field.getType().getEnumConstants();
-        for (SqlEnum item : sqlEnums) {
+    public static SqlEnum<?> matchEnum(Field field, Object value) {
+        SqlEnum<?>[] sqlEnums = (SqlEnum<?>[]) field.getType().getEnumConstants();
+        for (SqlEnum<?> item : sqlEnums) {
             if (item.getCode().equals(value)) {
                 return item;
             }
         }
         return null;
+    }
+
+    /**
+     * 获得实体类对应的常量类
+     *
+     * @param clazz
+     * @return
+     * @throws ClassNotFoundException
+     */
+    public static Class<?> getConstantClass(Class<?> clazz) {
+        String name = clazz.getName();
+        String constantClassName = name.substring(0, name.indexOf(clazz.getSimpleName())) + "sql." + clazz.getSimpleName() + "$";
+        try {
+            return Class.forName(constantClassName);
+        } catch (ClassNotFoundException e) {
+            logger.warning("ClassNotFoundException [" + e.getMessage() + "]");
+        }
+        return null;
+    }
+
+    /**
+     * 获取实体类常量类中的备注
+     *
+     * @param constantClass
+     * @return
+     */
+    public static String getBeanRemarks(Class<?> constantClass) {
+        if (constantClass == null) {
+            return "";
+        }
+        try {
+            return (String) constantClass.getField("_remarks").get(null);
+        } catch (NoSuchFieldException e) {
+            logger.warning("NoSuchFieldException [" + e.getMessage() + "]");
+        } catch (IllegalAccessException e) {
+            logger.warning("IllegalAccessException [" + e.getMessage() + "]");
+        }
+        return "";
+    }
+
+    /**
+     * 获取实体类常量类中的字段备注
+     *
+     * @param constantClass
+     * @param fieldName
+     * @return
+     */
+    public static String getFiledRemarks(Class<?> constantClass, String fieldName) {
+        if (constantClass == null || StringUtil.isEmpty(fieldName)) {
+            return "";
+        }
+        try {
+            return ((Column) constantClass.getField(fieldName + "$").get(null)).getRemarks();
+        } catch (IllegalAccessException e) {
+            logger.warning("IllegalAccessException [" + e.getMessage() + "]");
+        } catch (NoSuchFieldException e) {
+            logger.warning("NoSuchFieldException [" + e.getMessage() + "]");
+        }
+        return "";
+    }
+
+    /**
+     * 获取字段的JdbcType
+     *
+     * @param sqlBeanMeta
+     * @param field
+     * @return
+     */
+    public static JdbcType getJdbcType(SqlBeanMeta sqlBeanMeta, Field field) {
+        SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
+        if (sqlColumn != null && sqlColumn.type() != JdbcType.NOTHING) {
+            return sqlColumn.type();
+        }
+        return sqlBeanMeta.getDbType().getSqlDialect().getJdbcType(field);
+    }
+
+    /**
+     * 获取JSON字符串
+     *
+     * @param sqlJSON
+     * @param value
+     * @return
+     */
+    public static String getJSONValue(SqlJSON sqlJSON, Object value) {
+        JSONConvert jsonConvert = null;
+        if (sqlJSON != null && sqlJSON.convert() != JSONConvert.class && sqlJSON.convert() != JSONConvertImpl.class) {
+            try {
+                jsonConvert = sqlJSON.convert().getDeclaredConstructor().newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException | NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        } else {
+            jsonConvert = new JSONConvertImpl();
+        }
+        if (value == null) {
+            return null;
+        }
+        return jsonConvert.toJSONString(value);
+    }
+
+    /**
+     * 将JSON字符串转换为实体类
+     *
+     * @param convert
+     * @param json
+     * @param field
+     * @return
+     */
+    public static Object convertJSON(JSONConvert convert, String json, Field field) {
+        if (StringUtil.isEmpty(json)) {
+            return null;
+        }
+        if (json.startsWith("[") && json.endsWith("]")) {
+            Type genericType = field.getGenericType();
+            if (genericType instanceof ParameterizedType) {
+                ParameterizedType pt = (ParameterizedType) genericType;
+                for (Type typeArg : pt.getActualTypeArguments()) {
+                    return convert.parseArray(json, (Class) typeArg);
+                }
+            }
+            return convert.parse(json);
+        } else if (json.startsWith("{") && json.endsWith("}")) {
+            return convert.parseObject(json, field.getType());
+        }
+        return null;
+    }
+
+    /**
+     * 将条件转换为Wrapper
+     *
+     * @param dataList
+     * @return
+     */
+    public static Wrapper conditionDataToWrapper(List<ConditionData> dataList) {
+        Wrapper wrapper = new Wrapper();
+        for (ConditionData data : dataList) {
+            Object itemData = data.getItem();
+            if (itemData instanceof ConditionInfo) {
+                ConditionInfo conditionInfo = (ConditionInfo) itemData;
+                conditionInfo.setSqlLogic(data.getSqlLogic());
+                wrapper.and(new Cond(conditionInfo));
+            } else {
+                List<ConditionData> subDataList = (List<ConditionData>) itemData;
+                if (!dataList.isEmpty()) {
+                    wrapper.and(conditionDataToWrapper(subDataList));
+                }
+            }
+        }
+        return wrapper;
     }
 
 }

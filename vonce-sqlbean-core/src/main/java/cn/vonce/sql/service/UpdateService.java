@@ -3,6 +3,7 @@ package cn.vonce.sql.service;
 import cn.vonce.sql.bean.Column;
 import cn.vonce.sql.bean.Update;
 import cn.vonce.sql.define.ColumnFun;
+import cn.vonce.sql.define.ConditionHandle;
 import cn.vonce.sql.helper.Wrapper;
 
 /**
@@ -134,6 +135,15 @@ public interface UpdateService<T, ID> {
     /**
      * 根据条件更新
      *
+     * @param bean 更新的bean实体
+     * @param cond Lambda条件
+     * @return
+     */
+    int updateBy(T bean, ConditionHandle<T> cond);
+
+    /**
+     * 根据条件更新
+     *
      * @param bean           更新的bean实体
      * @param updateNotNull  是否仅更新不为null的字段
      * @param optimisticLock 是否使用乐观锁
@@ -148,7 +158,19 @@ public interface UpdateService<T, ID> {
      * @param bean           更新的bean实体
      * @param updateNotNull  是否仅更新不为null的字段
      * @param optimisticLock 是否使用乐观锁
-     * @param wrapper        条件包装器
+     * @param cond           Lambda条件
+     * @return
+     */
+    int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, ConditionHandle<T> cond);
+
+    /**
+     * 根据条件更新
+     *
+     * @param bean           更新的bean实体
+     * @param updateNotNull  是否仅更新不为null的字段
+     * @param optimisticLock 是否使用乐观锁
+     * @param wrapper        Lambda条件
+     * @param filterColumns  过滤不需更新的字段
      * @return
      */
     int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper, Column... filterColumns);
@@ -159,10 +181,35 @@ public interface UpdateService<T, ID> {
      * @param bean           更新的bean实体
      * @param updateNotNull  是否仅更新不为null的字段
      * @param optimisticLock 是否使用乐观锁
+     * @param cond           Lambda条件
+     * @param filterColumns  过滤不需更新的字段
+     * @return
+     */
+    int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, ConditionHandle<T> cond, Column... filterColumns);
+
+    /**
+     * 根据条件更新
+     *
+     * @param bean           更新的bean实体
+     * @param updateNotNull  是否仅更新不为null的字段
+     * @param optimisticLock 是否使用乐观锁
      * @param wrapper        条件包装器
+     * @param filterColumns  过滤不需更新的字段
      * @return
      */
     <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, Wrapper wrapper, ColumnFun<T, R>... filterColumns);
+
+    /**
+     * 根据条件更新
+     *
+     * @param bean           更新的bean实体
+     * @param updateNotNull  是否仅更新不为null的字段
+     * @param optimisticLock 是否使用乐观锁
+     * @param cond           Lambda条件
+     * @param filterColumns  过滤不需更新的字段
+     * @return
+     */
+    <R> int updateBy(T bean, boolean updateNotNull, boolean optimisticLock, ConditionHandle<T> cond, ColumnFun<T, R>... filterColumns);
 
     /**
      * 根据条件更新

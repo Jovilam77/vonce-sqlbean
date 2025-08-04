@@ -1,9 +1,10 @@
 package cn.vonce.sql.dialect;
 
+import cn.vonce.sql.annotation.SqlJSON;
 import cn.vonce.sql.bean.Alter;
 import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.bean.Table;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.AlterType;
 import cn.vonce.sql.enumerate.JavaMapDerbyType;
@@ -35,7 +36,11 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
                 }
             }
         }
-        throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类不支持此字段类型：" + clazz.getSimpleName());
+        SqlJSON sqlJSON = field.getAnnotation(SqlJSON.class);
+        if (sqlJSON != null) {
+            return JavaMapDerbyType.VARCHAR;
+        }
+        throw new SqlBeanException(field.getDeclaringClass().getName() + "，实体类不支持此字段类型：" + clazz.getSimpleName());
     }
 
     @Override
@@ -46,13 +51,13 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
     /**
      * 获取表数据列表的SQL
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param schema
      * @param tableName
      * @return
      */
     @Override
-    public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getTableListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT tb.TABLENAME AS \"name\", sc.SCHEMANAME AS \"schema\" ");
         sql.append("FROM SYS.SYSTABLES tb ");
@@ -73,12 +78,12 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
     /**
      * 获取列数据列表的SQL
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      * @param tableName
      * @return
      */
     @Override
-    public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getColumnListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT cl.COLUMNNUMBER AS cid, cl.COLUMNNAME AS name, cl.COLUMNDATATYPE AS type, cl.COLUMNDEFAULT AS dflt_value, ");
         //由于Derby的缺陷无法查询是否为主键和外键，所以默认第一个字段为主键，其余字段都不是外键
@@ -211,24 +216,24 @@ public class DerbyDialect implements SqlDialect<JavaMapDerbyType> {
     }
 
     @Override
-    public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT SCHEMANAME as \"name\" FROM SYS.SYSSCHEMAS ");
         if (StringUtil.isNotEmpty(schemaName)) {
             sql.append("WHERE SCHEMANAME = ");
-            sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanMeta, schemaName) + "'");
         }
         return sql.toString();
     }
 
     @Override
-    public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
-        return "CREATE SCHEMA AUTHORIZATION " + this.getSchemaName(sqlBeanDB, schemaName);
+    public String getCreateSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
+        return "CREATE SCHEMA AUTHORIZATION " + this.getSchemaName(sqlBeanMeta, schemaName);
     }
 
     @Override
-    public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
-        return "DROP SCHEMA " + this.getSchemaName(sqlBeanDB, schemaName) + " RESTRICT";
+    public String getDropSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
+        return "DROP SCHEMA " + this.getSchemaName(sqlBeanMeta, schemaName) + " RESTRICT";
     }
 
 }

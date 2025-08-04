@@ -1,9 +1,10 @@
 package cn.vonce.sql.dialect;
 
+import cn.vonce.sql.annotation.SqlJSON;
 import cn.vonce.sql.bean.Alter;
 import cn.vonce.sql.bean.ColumnInfo;
 import cn.vonce.sql.bean.Table;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.constant.SqlConstant;
 import cn.vonce.sql.enumerate.AlterType;
 import cn.vonce.sql.enumerate.DbType;
@@ -36,7 +37,11 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
                 }
             }
         }
-        throw new SqlBeanException(field.getDeclaringClass().getName() + "实体类不支持此字段类型：" + clazz.getSimpleName());
+        SqlJSON sqlJSON = field.getAnnotation(SqlJSON.class);
+        if (sqlJSON != null) {
+            return JavaMapSqlServerType.NVARCHAR;
+        }
+        throw new SqlBeanException(field.getDeclaringClass().getName() + "，实体类不支持此字段类型：" + clazz.getSimpleName());
     }
 
     @Override
@@ -45,7 +50,7 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
     }
 
     @Override
-    public String getTableListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getTableListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT t.name, p.value AS remarks ");
         sql.append("FROM sys.tables t ");
@@ -68,7 +73,7 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
     }
 
     @Override
-    public String getColumnListSql(SqlBeanDB sqlBeanDB, String schema, String tableName) {
+    public String getColumnListSql(SqlBeanMeta sqlBeanMeta, String schema, String tableName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT a.cid, a.name, a.type, (CASE a.notnull WHEN 0 THEN 1 ELSE 0 END) AS notnull, ");
         sql.append("(CASE LEFT(constraint_name, 2) WHEN 'PK' THEN 1 ELSE 0 END) AS pk, ");
@@ -223,7 +228,7 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
         }
         //是否自增
         if (columnInfo.getAutoIncr() != null && columnInfo.getAutoIncr()) {
-            if (alter.getSqlBeanDB().getDbType() == DbType.MySQL || alter.getSqlBeanDB().getDbType() == DbType.MariaDB) {
+            if (alter.getSqlBeanMeta().getDbType() == DbType.MySQL || alter.getSqlBeanMeta().getDbType() == DbType.MariaDB) {
                 modifySql.append(SqlConstant.SPACES);
                 modifySql.append(SqlConstant.AUTO_INCREMENT);
             }
@@ -252,34 +257,34 @@ public class SqlServerDialect implements SqlDialect<JavaMapSqlServerType> {
     }
 
     @Override
-    public String getSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT name FROM sys.schemas ");
         if (StringUtil.isNotEmpty(schemaName)) {
             sql.append("WHERE name = ");
-            sql.append("'" + this.getSchemaName(sqlBeanDB, schemaName) + "'");
+            sql.append("'" + this.getSchemaName(sqlBeanMeta, schemaName) + "'");
         }
         return sql.toString();
     }
 
     @Override
-    public String getCreateSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getCreateSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("IF NOT EXISTS (SELECT name FROM sys.schemas WHERE name = N'");
-        sql.append(this.getSchemaName(sqlBeanDB, schemaName));
+        sql.append(this.getSchemaName(sqlBeanMeta, schemaName));
         sql.append("') BEGIN EXEC ('CREATE SCHEMA [");
-        sql.append(this.getSchemaName(sqlBeanDB, schemaName));
+        sql.append(this.getSchemaName(sqlBeanMeta, schemaName));
         sql.append("]'); END");
         return sql.toString();
     }
 
     @Override
-    public String getDropSchemaSql(SqlBeanDB sqlBeanDB, String schemaName) {
+    public String getDropSchemaSql(SqlBeanMeta sqlBeanMeta, String schemaName) {
         StringBuffer sql = new StringBuffer();
         sql.append("IF EXISTS (SELECT name FROM sys.schemas WHERE name = N'");
-        sql.append(this.getSchemaName(sqlBeanDB, schemaName));
+        sql.append(this.getSchemaName(sqlBeanMeta, schemaName));
         sql.append("') BEGIN EXEC ('DROP SCHEMA [");
-        sql.append(this.getSchemaName(sqlBeanDB, schemaName));
+        sql.append(this.getSchemaName(sqlBeanMeta, schemaName));
         sql.append("]'); END");
         return sql.toString();
     }

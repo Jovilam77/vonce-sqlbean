@@ -1,5 +1,9 @@
 package cn.vonce.sql.spring.datasource;
 
+import cn.vonce.sql.java.datasource.ConnectionContextHolder;
+import cn.vonce.sql.java.datasource.ConnectionProxy;
+import cn.vonce.sql.java.datasource.DataSourceContextHolder;
+import cn.vonce.sql.java.datasource.TransactionalContextHolder;
 import cn.vonce.sql.uitls.StringUtil;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 

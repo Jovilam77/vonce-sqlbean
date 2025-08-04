@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>vonce-sqlbean-solon</name>
+    <description>This is a tool that uses java object-oriented idea to write and generate SQL statements. On this basis,
+        it also implements lightweight plug-in support similar to JPA for mybatis and spring JDBC. A large number of
+        common SQL execution methods are built in plug-ins to improve development efficiency, reduce a large number of
+        SQL statement writing, and make developers focus on business code writing.
+    </description>
+    <url>www.vonce.cn</url>
+    <licenses>
+        <license>
+            <name>The MIT License</name>
+            <url>http://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>jovilam</name>
+            <email>imjovi@qq.com</email>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:git@github.com:Jovilam77/vonce-sqlbean.git</connection>
+        <developerConnection>scm:git:git@github.com:Jovilam77/vonce-sqlbean.git</developerConnection>
+        <url>git@github.com:Jovilam77/vonce-sqlbean.git</url>
+    </scm>
+
+    <!-- 版本信息 -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <vonce.sqlbean.version>1.7.0-beta12</vonce.sqlbean.version>
+        <solon.version>2.6.0</solon.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <!--生产源码文件插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--生产javadoc插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <aggregate>true</aggregate>
+                    <charset>UTF-8</charset>
+                    <docencoding>UTF-8</docencoding>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--gpg加密插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.8.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <groupId>cn.vonce</groupId>
+    <artifactId>vonce-sqlbean-solon</artifactId>
+    <version>1.7.0-beta12</version>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <!-- sqlbean java -->
+        <dependency>
+            <groupId>cn.vonce</groupId>
+            <artifactId>vonce-sqlbean-java</artifactId>
+            <version>${vonce.sqlbean.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon</artifactId>
+            <version>${solon.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>mybatis-solon-plugin</artifactId>
+            <version>${solon.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

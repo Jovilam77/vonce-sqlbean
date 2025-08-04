@@ -2,7 +2,7 @@ package cn.vonce.sql.test;
 
 import cn.vonce.sql.bean.*;
 import cn.vonce.sql.config.SqlBeanConfig;
-import cn.vonce.sql.config.SqlBeanDB;
+import cn.vonce.sql.config.SqlBeanMeta;
 import cn.vonce.sql.define.SqlFun;
 import cn.vonce.sql.enumerate.*;
 import cn.vonce.sql.helper.Cond;
@@ -25,43 +25,43 @@ import java.util.List;
 public class SqlHelperTest {
 
     public static void main(String[] args) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        SqlBeanDB sqlBeanDB = new SqlBeanDB();
+        SqlBeanMeta sqlBeanMeta = new SqlBeanMeta();
         SqlBeanConfig sqlBeanConfig = new SqlBeanConfig();
         sqlBeanConfig.setToUpperCase(false);
-        sqlBeanDB.setDbType(DbType.MySQL);
-        sqlBeanDB.setSqlBeanConfig(sqlBeanConfig);
+        sqlBeanMeta.setDbType(DbType.MySQL);
+        sqlBeanMeta.setSqlBeanConfig(sqlBeanConfig);
 
         long startTime = System.currentTimeMillis();
 
         // select1
-        select1(sqlBeanDB);
+        select1(sqlBeanMeta);
 
         // select2
-        select2(sqlBeanDB);
+        select2(sqlBeanMeta);
 
         // select3
-        select3(sqlBeanDB);
+        select3(sqlBeanMeta);
 //
 //        // select4
-//        select4(sqlBeanDB);
+//        select4(sqlBeanMeta);
 //
 //        // select5
-//        select5(sqlBeanDB);
+//        select5(sqlBeanMeta);
 //
 //        // insert1
-//        insert1(sqlBeanDB);
+//        insert1(sqlBeanMeta);
 //
 //        // insert2
-//        insert2(sqlBeanDB);
+//        insert2(sqlBeanMeta);
 //
 //        // update
-//        update(sqlBeanDB);
+//        update(sqlBeanMeta);
 //
 //        // update2
-//        update2(sqlBeanDB);
+//        update2(sqlBeanMeta);
 //
 //        // delete
-//        delete(sqlBeanDB);
+//        delete(sqlBeanMeta);
 
         float excTime = (float) (System.currentTimeMillis() - startTime) / 1000;
         System.out.println("耗时：" + excTime + "秒");
@@ -70,18 +70,20 @@ public class SqlHelperTest {
     /**
      * 查询1
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      */
-    private static void select1(SqlBeanDB sqlBeanDB) {
+    private static void select1(SqlBeanMeta sqlBeanMeta) {
         Select select = new Select();
-        select.setSqlBeanDB(sqlBeanDB);
+        select.setSqlBeanMeta(sqlBeanMeta);
         select.setBeanClass(Essay.class);
         select.column(Essay::getClass);
         select.column(User::getHeadPortrait, "头像");
         select.column(User::getNickname, "昵称");
         select.setTable(Essay.class);
         select.innerJoin(User.class).on(User::getId, Essay::getUserId);
-        select.where().eq(Essay::getClass, "1111");
+        select.where().eq(Essay::getUserId, "1111").or(condition -> condition.eq(User::getNickname, "vicky").and(condition1 -> {
+            condition1.eq(User::getHeadPortrait, "2222").or().eq(User::getHeadPortrait, "3333");
+        }));
         //value 直接输入字符串 会当作字符串处理，sql中会带''，如果希望不被做处理则使用Original
         select.where().eq(SqlFun.date_format(Essay::getCreationTime, "%Y-%m-%d"), SqlFun.date_format(SqlFun.now(), "%Y-%m-%d"));
         select.orderByDesc(Essay::getId);
@@ -92,11 +94,11 @@ public class SqlHelperTest {
     /**
      * 查询2
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      */
-    private static void select2(SqlBeanDB sqlBeanDB) {
+    private static void select2(SqlBeanMeta sqlBeanMeta) {
         Select select2 = new Select();
-        select2.setSqlBeanDB(sqlBeanDB);
+        select2.setSqlBeanMeta(sqlBeanMeta);
         select2.setBeanClass(Essay.class);
         select2.column(Essay::getId, "序号")
                 .column(Essay::getContent, "文章内容")
@@ -115,16 +117,16 @@ public class SqlHelperTest {
     /**
      * 查询3
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      */
-    private static void select3(SqlBeanDB sqlBeanDB) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    private static void select3(SqlBeanMeta sqlBeanMeta) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         Select select3 = new Select();
-        select3.setSqlBeanDB(sqlBeanDB);
+        select3.setSqlBeanMeta(sqlBeanMeta);
         select3.setBeanClass(Essay.class);
         select3.column(SqlFun.count(Essay::getId), "count")
                 .column(Essay::getCategoryId);
         select3.setTable(Essay.class);
-        SqlBeanUtil.setJoin(select3,EssayUnion.class);
+        SqlBeanUtil.setJoin(select3, EssayUnion.class);
         select3.groupBy(Essay::getCategoryId);
         select3.having().eq("count", 5);
         System.out.println("---select3---");
@@ -134,11 +136,11 @@ public class SqlHelperTest {
     /**
      * 查询4
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      */
-    private static void select4(SqlBeanDB sqlBeanDB) {
+    private static void select4(SqlBeanMeta sqlBeanMeta) {
         Select select4 = new Select();
-        select4.setSqlBeanDB(sqlBeanDB);
+        select4.setSqlBeanMeta(sqlBeanMeta);
         select4.setBeanClass(Essay.class);
         select4.column(User::getClass);
         select4.setTable(User.class);
@@ -153,11 +155,11 @@ public class SqlHelperTest {
     /**
      * 查询5
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      */
-    private static void select5(SqlBeanDB sqlBeanDB) {
+    private static void select5(SqlBeanMeta sqlBeanMeta) {
         Select select5 = new Select();
-        select5.setSqlBeanDB(sqlBeanDB);
+        select5.setSqlBeanMeta(sqlBeanMeta);
         select5.setBeanClass(Essay.class);
         select5.column(User::getClass);
         select5.setTable(User.class);
@@ -169,12 +171,12 @@ public class SqlHelperTest {
     /**
      * 插入1
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      */
-    private static void insert1(SqlBeanDB sqlBeanDB) {
+    private static void insert1(SqlBeanMeta sqlBeanMeta) {
         Insert insert = new Insert();
         insert.setBeanClass(User.class);
-        insert.setSqlBeanDB(sqlBeanDB);
+        insert.setSqlBeanMeta(sqlBeanMeta);
         User user = new User();
         user.setId("10000");
         user.setUsername("10000");
@@ -189,11 +191,11 @@ public class SqlHelperTest {
     /**
      * 插入2
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      */
-    private static void insert2(SqlBeanDB sqlBeanDB) {
+    private static void insert2(SqlBeanMeta sqlBeanMeta) {
         Insert insert = new Insert();
-        insert.setSqlBeanDB(sqlBeanDB);
+        insert.setSqlBeanMeta(sqlBeanMeta);
         insert.setBeanClass(User.class);
         List<User> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -213,11 +215,11 @@ public class SqlHelperTest {
     /**
      * 插入3
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      */
-    private static void insert3(SqlBeanDB sqlBeanDB) {
+    private static void insert3(SqlBeanMeta sqlBeanMeta) {
         Insert<User> insert = new Insert<>();
-        insert.setSqlBeanDB(sqlBeanDB);
+        insert.setSqlBeanMeta(sqlBeanMeta);
         insert.setBeanClass(User.class);
         insert.column(User::getId, User::getGender, User::getNickname).values(1, 2, "Jovi").values(2, 1, "Vicky");
         System.out.println("---insert3---");
@@ -227,16 +229,16 @@ public class SqlHelperTest {
     /**
      * 更新1
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      */
-    private static void update(SqlBeanDB sqlBeanDB) {
+    private static void update(SqlBeanMeta sqlBeanMeta) {
         User user = new User();
         user.setHeadPortrait("logo.png");
         user.setUsername("123");
         user.setGender(1);
         Update<User> update = new Update();
         update.setTable(User.class);
-        update.setSqlBeanDB(sqlBeanDB);
+        update.setSqlBeanMeta(sqlBeanMeta);
         update.filterFields("username").bean(user).notNull(true);
         update.where().gt(User::getId, 0).and().lt(User::getId, 10);
         System.out.println("---update---");
@@ -248,12 +250,12 @@ public class SqlHelperTest {
     /**
      * 更新2
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      */
-    private static void update2(SqlBeanDB sqlBeanDB) {
+    private static void update2(SqlBeanMeta sqlBeanMeta) {
         Update<User> update = new Update();
         update.setTable(User.class);
-        update.setSqlBeanDB(sqlBeanDB);
+        update.setSqlBeanMeta(sqlBeanMeta);
         update.set(User::getId, 1).
                 set(User::getNickname, "jovi").
                 setAdd(User::getIntegral, User::getIntegral, new RawValue(User::getIntegral)).
@@ -266,12 +268,12 @@ public class SqlHelperTest {
     /**
      * 删除
      *
-     * @param sqlBeanDB
+     * @param sqlBeanMeta
      */
-    private static void delete(SqlBeanDB sqlBeanDB) {
+    private static void delete(SqlBeanMeta sqlBeanMeta) {
         Delete delete = new Delete();
         delete.setTable(User.class);
-        delete.setSqlBeanDB(sqlBeanDB);
+        delete.setSqlBeanMeta(sqlBeanMeta);
         delete.where().gt(User::getId, 1).and().eq(User::getNickname, "jovi");
         System.out.println("---delete---");
         System.out.println(SqlHelper.buildDeleteSql(delete));

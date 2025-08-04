@@ -51,7 +51,8 @@ public enum JdbcType {
     NBLOB(0, 0),
     ARRAY(0, 0),
     IMAGE(0, 0),
-    BYTEA(0, 0);
+    BYTEA(0, 0),
+    JSON(0,0);
 
 
     JdbcType(int length, int scale) {

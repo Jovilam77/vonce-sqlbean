@@ -1,8 +1,7 @@
 package cn.vonce.sql.bean;
 
-
+import cn.vonce.sql.define.ConditionHandle;
 import cn.vonce.sql.enumerate.SqlLogic;
-
 import java.io.Serializable;
 
 /**
@@ -33,6 +32,19 @@ public class Logic<Action> implements Serializable {
     }
 
     /**
+     * 并且
+     *
+     * @param
+     * @return
+     */
+    public Logic<Action> and(ConditionHandle<Action> cond) {
+        Condition<Action> result = new Condition<>();
+        cond.handle(result);
+        condition.getDataList().add(new ConditionData(SqlLogic.AND, result.getDataList()));
+        return this;
+    }
+
+    /**
      * 或者
      *
      * @param
@@ -41,6 +53,19 @@ public class Logic<Action> implements Serializable {
     public Condition<Action> or() {
         condition.setSqlLogic(SqlLogic.OR);
         return condition;
+    }
+
+    /**
+     * 或者
+     *
+     * @param
+     * @return
+     */
+    public Logic<Action> or(ConditionHandle<Action> cond) {
+        Condition<Action> result = new Condition<>();
+        cond.handle(result);
+        condition.getDataList().add(new ConditionData(SqlLogic.OR, result.getDataList()));
+        return this;
     }
 
     /**

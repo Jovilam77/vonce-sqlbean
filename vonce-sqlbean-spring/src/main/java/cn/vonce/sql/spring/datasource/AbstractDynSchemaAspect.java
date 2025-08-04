@@ -1,7 +1,7 @@
 package cn.vonce.sql.spring.datasource;
 
+import cn.vonce.sql.java.annotation.DbDynSchema;
 import cn.vonce.sql.provider.DynSchemaContextHolder;
-import cn.vonce.sql.spring.annotation.DbDynSchema;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Before;

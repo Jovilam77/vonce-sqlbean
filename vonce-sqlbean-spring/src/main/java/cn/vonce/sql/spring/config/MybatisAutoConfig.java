@@ -1,17 +1,18 @@
 package cn.vonce.sql.spring.config;
 
-import cn.vonce.sql.spring.mapper.MybatisSqlBeanMapperInterceptor;
+import cn.vonce.sql.config.SqlBeanConfig;
+import cn.vonce.sql.config.SqlBeanMeta;
+import cn.vonce.sql.java.mapper.MybatisSqlBeanMapperInterceptor;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
-
+import java.sql.Connection;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Mybatis自动配置
@@ -23,7 +24,7 @@ import java.util.List;
  */
 public class MybatisAutoConfig {
 
-    private Logger logger = LoggerFactory.getLogger(MybatisAutoConfig.class);
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
      * Spring mvc模式使用，Spring boot为空
@@ -33,6 +34,10 @@ public class MybatisAutoConfig {
 
     @Autowired
     private BeanFactory beanFactory;
+
+    @Autowired(required = false)
+    private SqlBeanConfig sqlBeanConfig;
+
 
     @Bean
     @Conditional(ConditionalOnUseMybatis.class)
@@ -45,7 +50,7 @@ public class MybatisAutoConfig {
             try {
                 sqlSessionFactory = beanFactory.getBean(SqlSessionFactory.class);
             } catch (Exception e) {
-                logger.info("MybatisAutoConfig：{}", e.getMessage());
+                logger.warning(String.format("interceptor：%s", e.getMessage()));
             }
         }
         if (sqlSessionFactory != null) {
@@ -57,6 +62,25 @@ public class MybatisAutoConfig {
             }
         }
         return mybatisMapperInterceptor;
+    }
+
+    @Bean(name = "sqlBeanConfigForMybatis")
+    @Conditional(ConditionalOnUseMybatis.class)
+    public SqlBeanMeta sqlBeanMeta() throws Exception {
+        SqlSessionFactory sqlSessionFactory = null;
+        if (sqlSessionFactoryBean != null) {
+            sqlSessionFactory = sqlSessionFactoryBean.getObject();
+        } else {
+            try {
+                sqlSessionFactory = beanFactory.getBean(SqlSessionFactory.class);
+            } catch (Exception e) {
+                logger.warning(String.format("sqlBeanMeta：%s", e.getMessage()));
+            }
+        }
+        Connection connection = sqlSessionFactory.getConfiguration().getEnvironment().getDataSource().getConnection();
+        SqlBeanMeta sqlBeanMeta = SqlBeanMeta.build(sqlBeanConfig, connection.getMetaData());
+        connection.close();
+        return sqlBeanMeta;
     }
 
 }

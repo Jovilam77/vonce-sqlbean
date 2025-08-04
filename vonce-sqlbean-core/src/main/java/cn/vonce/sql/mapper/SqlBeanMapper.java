@@ -1,9 +1,13 @@
 package cn.vonce.sql.mapper;
 
 
+import cn.vonce.sql.annotation.SqlJSON;
+import cn.vonce.sql.json.JSONConvert;
 import cn.vonce.sql.uitls.DateUtil;
+import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
+import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -75,111 +79,122 @@ public class SqlBeanMapper extends BaseMapper<ResultSet> {
     }
 
     @Override
-    public Object getValue(String fieldType, String fieldName, ResultSetDelegate<ResultSet> resultSetDelegate) {
+    public Object getValue(Field field, String columnName, ResultSetDelegate<ResultSet> resultSetDelegate) {
         ResultSet resultSet = resultSetDelegate.getDelegate();
         Object value = null;
         try {
-            switch (fieldType) {
+            SqlJSON sqlJSON = field.getAnnotation(SqlJSON.class);
+            if (sqlJSON != null && sqlJSON.convert() != JSONConvert.class) {
+                if (sqlJSON != null && sqlJSON.convert() != JSONConvert.class) {
+                    String json = resultSet.getString(columnName);
+                    return SqlBeanUtil.convertJSON(sqlJSON.convert().newInstance(), json, field);
+                }
+            }
+            switch (field.getType().getName()) {
                 case "byte":
-                    value = resultSet.getByte(fieldName);
+                    value = resultSet.getByte(columnName);
                     break;
                 case "java.lang.Byte":
-                    value = resultSet.getObject(fieldName);
+                    value = resultSet.getObject(columnName);
                     if (value != null) {
-                        value = resultSet.getByte(fieldName);
+                        value = resultSet.getByte(columnName);
                     }
                     break;
                 case "short":
-                    value = resultSet.getShort(fieldName);
+                    value = resultSet.getShort(columnName);
                     break;
                 case "java.lang.Short":
-                    value = resultSet.getObject(fieldName);
+                    value = resultSet.getObject(columnName);
                     if (value != null) {
-                        value = resultSet.getShort(fieldName);
+                        value = resultSet.getShort(columnName);
                     }
                     break;
                 case "int":
-                    value = resultSet.getInt(fieldName);
+                    value = resultSet.getInt(columnName);
                     break;
                 case "java.lang.Integer":
-                    value = resultSet.getObject(fieldName);
+                    value = resultSet.getObject(columnName);
                     if (value != null) {
-                        value = resultSet.getInt(fieldName);
+                        value = resultSet.getInt(columnName);
                     }
                     break;
                 case "float":
-                    value = resultSet.getFloat(fieldName);
+                    value = resultSet.getFloat(columnName);
                     break;
                 case "java.lang.Float":
-                    value = resultSet.getObject(fieldName);
+                    value = resultSet.getObject(columnName);
                     if (value != null) {
-                        value = resultSet.getFloat(fieldName);
+                        value = resultSet.getFloat(columnName);
                     }
                     break;
                 case "double":
-                    value = resultSet.getDouble(fieldName);
+                    value = resultSet.getDouble(columnName);
                     break;
                 case "java.lang.Double":
-                    value = resultSet.getObject(fieldName);
+                    value = resultSet.getObject(columnName);
                     if (value != null) {
-                        value = resultSet.getDouble(fieldName);
+                        value = resultSet.getDouble(columnName);
                     }
                     break;
                 case "long":
-                    value = resultSet.getLong(fieldName);
+                    value = resultSet.getLong(columnName);
                     break;
                 case "java.lang.Long":
-                    value = resultSet.getObject(fieldName);
+                    value = resultSet.getObject(columnName);
                     if (value != null) {
-                        value = resultSet.getLong(fieldName);
+                        value = resultSet.getLong(columnName);
                     }
                     break;
                 case "boolean":
-                    value = resultSet.getBoolean(fieldName);
+                    value = resultSet.getBoolean(columnName);
                     break;
                 case "java.lang.Boolean":
-                    value = resultSet.getObject(fieldName);
+                    value = resultSet.getObject(columnName);
                     if (value != null) {
-                        value = resultSet.getBoolean(fieldName);
+                        value = resultSet.getBoolean(columnName);
                     }
                     break;
                 case "char":
                 case "java.lang.Character":
-                    value = resultSet.getString(fieldName);
+                    value = resultSet.getString(columnName);
                     if (StringUtil.isNotEmpty(value)) {
                         value = value.toString().charAt(0);
                     }
                     break;
                 case "java.lang.String":
-                    value = resultSet.getString(fieldName);
+                    value = resultSet.getString(columnName);
                     break;
                 case "java.sql.Date":
-                    value = resultSet.getDate(fieldName);
+                    value = resultSet.getDate(columnName);
                     break;
                 case "java.sql.Time":
-                    value = resultSet.getTime(fieldName);
+                    value = resultSet.getTime(columnName);
                     break;
                 case "java.util.Date":
                 case "java.sql.Timestamp":
-                    value = resultSet.getTimestamp(fieldName);
+                    value = resultSet.getTimestamp(columnName);
                     break;
                 case "java.time.LocalDate":
-                    value = DateUtil.dateToLocalDate(resultSet.getTimestamp(fieldName));
+                    value = DateUtil.dateToLocalDate(resultSet.getTimestamp(columnName));
                     break;
                 case "java.time.LocalTime":
-                    value = DateUtil.dateToLocalTime(resultSet.getTimestamp(fieldName));
+                    value = DateUtil.dateToLocalTime(resultSet.getTimestamp(columnName));
                     break;
                 case "java.time.LocalDateTime":
-                    value = DateUtil.dateToLocalDateTime(resultSet.getTimestamp(fieldName));
+                    value = DateUtil.dateToLocalDateTime(resultSet.getTimestamp(columnName));
                     break;
                 case "java.math.BigDecimal":
-                    value = resultSet.getBigDecimal(fieldName);
+                    value = resultSet.getBigDecimal(columnName);
                     break;
                 default:
-                    value = resultSet.getObject(fieldName);
+                    value = resultSet.getObject(columnName);
                     break;
             }
         } catch (SQLException e) {
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
         return value;
     }

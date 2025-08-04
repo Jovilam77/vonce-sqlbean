@@ -1,6 +1,7 @@
 package cn.vonce.sql.service;
 
 import cn.vonce.sql.bean.Delete;
+import cn.vonce.sql.define.ConditionHandle;
 import cn.vonce.sql.helper.Wrapper;
 
 /**
@@ -12,7 +13,7 @@ import cn.vonce.sql.helper.Wrapper;
  * @email imjovi@qq.com
  * @date 2019年6月27日下午3:57:33
  */
-public interface DeleteService<ID> {
+public interface DeleteService<T, ID> {
 
     /**
      * 根据id条件删除
@@ -38,6 +39,14 @@ public interface DeleteService<ID> {
      * @return
      */
     int deleteBy(Wrapper where);
+
+    /**
+     * 根据条件删除
+     *
+     * @param cond Lambda条件
+     * @return
+     */
+    int deleteBy(ConditionHandle<T> cond);
 
     /**
      * 删除(where条件为空会抛异常，因为删除全部非常危险)
@@ -80,5 +89,13 @@ public interface DeleteService<ID> {
      * @return
      */
     int logicallyDeleteBy(Wrapper where);
+
+    /**
+     * 根据条件逻辑删除
+     *
+     * @param cond Lambda条件
+     * @return
+     */
+    int logicallyDeleteBy(ConditionHandle<T> cond);
 
 }

@@ -1,9 +1,6 @@
 package cn.vonce.sql.model;
 
-import cn.vonce.sql.annotation.SqlColumn;
-import cn.vonce.sql.annotation.SqlDefaultValue;
-import cn.vonce.sql.annotation.SqlId;
-import cn.vonce.sql.annotation.SqlTable;
+import cn.vonce.sql.annotation.*;
 import cn.vonce.sql.enumerate.FillWith;
 
 import java.util.Date;
@@ -41,6 +38,9 @@ public class Essay {
      */
     @SqlColumn(value = "creationTime" )
     private Date creationTime;
+
+    @SqlColumn
+    private User user;
 
     public String getId() {
         return id;
@@ -80,6 +80,14 @@ public class Essay {
 
     public void setCreationTime(Date creationTime) {
         this.creationTime = creationTime;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override

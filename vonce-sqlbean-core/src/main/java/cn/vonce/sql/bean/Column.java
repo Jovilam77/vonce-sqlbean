@@ -24,22 +24,27 @@ public class Column implements Serializable {
     }
 
     public Column(String tableAlias, String name, String alias) {
-        this(false, tableAlias, name, alias, true);
+        this(false, tableAlias, name, alias, "", true);
     }
 
     public Column(String tableAlias, String name, String alias, boolean nameEscape) {
-        this(false, tableAlias, name, alias, nameEscape);
+        this(false, tableAlias, name, alias, "", nameEscape);
     }
 
     public Column(boolean immutable, String tableAlias, String name, String alias) {
-        this(immutable, tableAlias, name, alias, true);
+        this(immutable, tableAlias, name, alias, "", true);
     }
 
-    public Column(boolean immutable, String tableAlias, String name, String alias, boolean nameEscape) {
+    public Column(boolean immutable, String tableAlias, String name, String alias, String remarks) {
+        this(immutable, tableAlias, name, alias, remarks, true);
+    }
+
+    public Column(boolean immutable, String tableAlias, String name, String alias, String remarks, boolean nameEscape) {
         this.immutable = immutable;
         this.tableAlias = tableAlias;
         this.name = name;
         this.alias = alias;
+        this.remarks = remarks;
         this.nameEscape = nameEscape;
     }
 
@@ -47,6 +52,7 @@ public class Column implements Serializable {
     private String tableAlias;
     private String name;
     private String alias;
+    private String remarks;
     private boolean nameEscape;
 
     public String getTableAlias() {
@@ -87,6 +93,17 @@ public class Column implements Serializable {
             return;
         }
         this.alias = alias;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        if (immutable) {
+            return;
+        }
+        this.remarks = remarks;
     }
 
     public boolean isImmutable() {
