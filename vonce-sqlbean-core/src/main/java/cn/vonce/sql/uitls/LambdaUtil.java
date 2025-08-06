@@ -27,7 +27,7 @@ public class LambdaUtil {
      */
     public static <T, R> Column getColumn(ColumnFun<T, R> column) {
         if (SqlBeanUtil.isAndroidEnv()){
-            throw new SqlBeanException("android环境下暂时不支持Lambda表达式获取列字段对象");
+            throw new SqlBeanException("Android环境不支持Lambda表达式指定列字段(XXXClass::getXXX)");
         }
         SerializedLambda lambda = null;
         try {
