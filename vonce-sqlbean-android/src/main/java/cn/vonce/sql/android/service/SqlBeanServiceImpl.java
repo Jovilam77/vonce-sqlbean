@@ -520,7 +520,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
     public int countBy(Wrapper where) {
         Select select = new Select();
         select.where(where);
-        return sqliteTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanMeta(), null, clazz, select), new SqlBeanMapper<>(clazz, Integer.class));
+        return sqliteTemplate.queryForObject(SqlBeanProvider.countSql(getSqlBeanMeta(), clazz, null, select), new SqlBeanMapper<>(clazz, Integer.class));
     }
 
     @Override
