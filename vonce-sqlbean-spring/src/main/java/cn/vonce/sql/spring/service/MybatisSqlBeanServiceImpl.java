@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 /**
- * 通用的业务实现
+ * Spring环境的Mybatis实现
  *
  * @param <T>
  * @author Jovi
@@ -61,7 +61,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl<T> 
 
     @Override
     public SqlBeanMeta getSqlBeanMeta() {
-        return super.setSqlBeanMeta(sqlBeanMeta);
+        return sqlBeanMeta;
     }
 
     @Override

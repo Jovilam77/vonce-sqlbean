@@ -2,7 +2,7 @@
 
 #### 介绍
 
-###### SqlBean是一款通过Java语法生成SQL语句的ORM插件，其理念是弱化在开发阶段对数据库的操作，无需先建表再开发，可直接编写实体类和业务代码，项目启动后自动创建表和维护表结构。内置大量常用方法，支持灵活的条件查询，无DAO层，在项目中几乎不需要编写SQL语句，帮助你快速进行业务功能开发，除了支持Mybatis也同时支持Spring Jdbc。
+###### SqlBean 是一款革命性的 ORM（对象关系映射）插件，通过 Java 语法生成 SQL 语句，从根本上改变了开发者在 Java 应用程序中与数据库交互的方式。与传统 ORM 框架要求您首先设计数据库架构然后创建相应实体类不同，SqlBean 采用了代码优先的方式，让您可以直接专注于编写业务逻辑和实体类，数据库表则由系统自动创建和维护。
 
 ###### 🚀特点: 多数据源, 动态Schema, 读写分离, 自动建表, 自动维护表结构, 联表查询, 乐观锁, 分页
 
@@ -26,17 +26,17 @@
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
-		<version>1.7.0-beta12</version>
+		<version>1.7.0-beta13</version>
 	</dependency>
 ###### Solon项目
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-solon</artifactId>
-		<version>1.7.0-beta12</version>
+		<version>1.7.0-beta13</version>
 	</dependency>
 ###### Android项目（[详细使用](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")）
-	implementation 'cn.vonce:vonce-sqlbean-android:1.7.0-beta12'
-    annotationProcessor 'cn.vonce:vonce-sqlbean-android:1.7.0-beta12'
+	implementation 'cn.vonce:vonce-sqlbean-android:1.7.0-beta13'
+    annotationProcessor 'cn.vonce:vonce-sqlbean-android:1.7.0-beta13'
 ##### 2.标注实体类
 
 ```java

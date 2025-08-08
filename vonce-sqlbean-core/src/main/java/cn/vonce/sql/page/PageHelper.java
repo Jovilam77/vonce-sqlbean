@@ -258,13 +258,7 @@ public class PageHelper<T> implements Serializable {
         // 保存总数
         this.totalRecords = count;
         // 计算最多有几页
-        int countPage = totalRecords % pagesize == 0 ? totalRecords / pagesize : totalRecords / pagesize + 1;
-        // 返回总页数
-        totalPage = countPage;
-        // 如果提交的页数比总实际页数大，那就等于实际总页数
-        if (pagenum > totalPage) {
-            pagenum = totalPage;
-        }
+        this.totalPage = totalRecords % pagesize == 0 ? totalRecords / pagesize : totalRecords / pagesize + 1;
     }
 
     /**

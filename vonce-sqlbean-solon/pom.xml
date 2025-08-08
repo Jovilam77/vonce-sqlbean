@@ -32,7 +32,7 @@
     <!-- 版本信息 -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <vonce.sqlbean.version>1.7.0-beta12</vonce.sqlbean.version>
+        <vonce.sqlbean.version>1.7.0-beta13</vonce.sqlbean.version>
         <solon.version>2.6.0</solon.version>
     </properties>
 
@@ -112,7 +112,7 @@
 
     <groupId>cn.vonce</groupId>
     <artifactId>vonce-sqlbean-solon</artifactId>
-    <version>1.7.0-beta12</version>
+    <version>1.7.0-beta13</version>
     <packaging>jar</packaging>
 
     <dependencies>
