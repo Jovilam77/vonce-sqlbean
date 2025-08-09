@@ -1,8 +1,10 @@
 package cn.vonce.sql.spring.config;
 
 
+import cn.vonce.sql.spring.datasource.DataSourceAspect;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Import;
+
 import java.lang.annotation.*;
 
 /**
@@ -16,7 +18,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import({MybatisAutoConfig.class})
+@Import({MybatisAutoConfig.class, AutoCreateTableListener.class, DataSourceAspect.class})
 @MapperScan("cn.vonce.sql.java.dao")
 public @interface UseMybatis {
 
