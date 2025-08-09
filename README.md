@@ -6,7 +6,7 @@
 
 ###### 🚀特点: 多数据源, 动态Schema, 读写分离, 自动建表, 自动维护表结构, 联表查询, 乐观锁, 分页
 
-###### 💻Spring环境: JDK8+, Mybatis3.4.0+, (Spring MVC 4.1.2+, Spring Boot 1.x, Spring Boot 2.x)
+###### 💻Spring环境: JDK8+, Mybatis3.4.0+, (Spring MVC 4.1.2+, Spring Boot 1.x, 2.x, 3.x)
 
 ###### 💻Solon环境: JDK8+, Mybatis3.4.0+, Solon2.6+
 
