@@ -24,17 +24,17 @@
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
-		<version>1.7.0-beta13</version>
+		<version>1.7.0</version>
 	</dependency>
 ###### Solon项目
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-solon</artifactId>
-		<version>1.7.0-beta13</version>
+		<version>1.7.0</version>
 	</dependency>
-###### Android项目（[详细使用](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")）
-	implementation 'cn.vonce:vonce-sqlbean-android:1.7.0-beta13'
-    annotationProcessor 'cn.vonce:vonce-sqlbean-android:1.7.0-beta13'
+###### Android项目（[Android项目详细使用文档](doc/Android.md "Android项目详细使用文档")）
+	implementation 'cn.vonce:vonce-sqlbean-android:1.7.0'
+    annotationProcessor 'cn.vonce:vonce-sqlbean-android:1.7.0'
 ##### 2.标注实体类
 
 ```java
@@ -65,6 +65,7 @@ public class BaseEntity {
 
 }
 
+//编译项目（mvn compile）后会根据实体类生成字段常量，例如User类生成的常量类是User$，例如获取id字段是User$.id$
 @Data
 //autoAlter设置为true，实体类有变动时自动同步表结构
 @SqlTable(autoAlter = true, value = "t_user", remarks = "用户")
