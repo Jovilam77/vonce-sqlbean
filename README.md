@@ -10,7 +10,7 @@
 
 ###### 💻Solon环境: JDK8+, Solon2.6+, Mybatis3.4.0+
 
-###### 📱Android环境: JDK8+, Android 8.0
+###### 📱Android环境: JDK8+, Android 8.0+
 
 ###### 💿数据库: Mysql, MariaDB, Oracle, Sqlserver2008+, Postgresql, DB2, Derby, Sqlite, HSQL, H2
 
