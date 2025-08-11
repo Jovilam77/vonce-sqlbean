@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 /**
- * 通用的业务实现
+ * Spring环境的SpringJdbc实现
  *
  * @param <T>
  * @author Jovi
@@ -61,7 +61,7 @@ public class SpringJdbcSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl<
 
     @Override
     public SqlBeanMeta getSqlBeanMeta() {
-        return super.setSqlBeanMeta(sqlBeanMeta);
+        return sqlBeanMeta;
     }
 
     @Override

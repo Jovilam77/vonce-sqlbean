@@ -2,19 +2,17 @@
 
 #### 介绍
 
-###### SqlBean是一款通过Java语法生成SQL语句的ORM插件，其理念是弱化在开发阶段对数据库的操作，无需先建表再开发，可直接编写实体类和业务代码，项目启动后自动创建表和维护表结构。内置大量常用方法，支持灵活的条件查询，无DAO层，在项目中几乎不需要编写SQL语句，帮助你快速进行业务功能开发，除了支持Mybatis也同时支持Spring Jdbc。
+###### SqlBean 是一款革命性的 ORM（对象关系映射）插件，通过 Java 语法生成 SQL 语句，从根本上改变了开发者在 Java 应用程序中与数据库交互的方式。与传统 ORM 框架要求您首先设计数据库架构然后创建相应实体类不同，SqlBean 采用了代码优先的方式，让您可以直接专注于编写业务逻辑和实体类，数据库表则由系统自动创建和维护。
 
 ###### 🚀特点: 多数据源, 动态Schema, 读写分离, 自动建表, 自动维护表结构, 联表查询, 乐观锁, 分页
 
-###### 💻Spring环境: JDK8+, Mybatis3.2.4+, (Spring MVC 4.1.2+, Spring Boot 1.x, Spring Boot 2.x)
+###### 💻Spring环境: JDK8+, Mybatis3.4.0+, (Spring MVC 4.1.2+, Spring Boot 1.x, 2.x, 3.x)
 
-###### 💻Solon环境: JDK8+, Mybatis3.2.4+, Solon2.6+
+###### 💻Solon环境: JDK8+, Mybatis3.4.0+, Solon2.6+
 
 ###### 📱Android环境: JDK8+, Android 8.0
 
 ###### 💿数据库: Mysql, MariaDB, Oracle, Sqlserver2008+, Postgresql, DB2, Derby, Sqlite, HSQL, H2
-
-###### SqlBean For Android请移步这里👉 [gitee(推荐)](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")、 [github](https://github.com/Jovilam77/vonce-sqlbean-android "vonce-sqlbean-android")
 
 ###### SuperCode代码生成项目👉 [https://gitee.com/iJovi/supercode](https://gitee.com/iJovi/supercode "supercode")
 ###### SqlBean使用例子以及代码生成例子点击这里👉 [https://gitee.com/iJovi/sqlbean-example](https://gitee.com/iJovi/sqlbean-example "sqlbean-example")
@@ -26,17 +24,17 @@
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-spring</artifactId>
-		<version>1.7.0-beta12</version>
+		<version>1.7.0</version>
 	</dependency>
 ###### Solon项目
 	<dependency>
 		<groupId>cn.vonce</groupId>
 		<artifactId>vonce-sqlbean-solon</artifactId>
-		<version>1.7.0-beta12</version>
+		<version>1.7.0</version>
 	</dependency>
-###### Android项目（[详细使用](https://gitee.com/iJovi/vonce-sqlbean-android "vonce-sqlbean-android")）
-	implementation 'cn.vonce:vonce-sqlbean-android:1.7.0-beta12'
-    annotationProcessor 'cn.vonce:vonce-sqlbean-android:1.7.0-beta12'
+###### Android项目（[Android项目详细使用文档](doc/Android.md "Android项目详细使用文档")）
+	implementation 'cn.vonce:vonce-sqlbean-android:1.7.0'
+    annotationProcessor 'cn.vonce:vonce-sqlbean-android:1.7.0'
 ##### 2.标注实体类
 
 ```java
@@ -67,6 +65,7 @@ public class BaseEntity {
 
 }
 
+//编译项目（mvn compile）后会根据实体类生成字段常量，例如User类生成的常量类是User$，例如获取id字段是User$.id$
 @Data
 //autoAlter设置为true，实体类有变动时自动同步表结构
 @SqlTable(autoAlter = true, value = "t_user", remarks = "用户")

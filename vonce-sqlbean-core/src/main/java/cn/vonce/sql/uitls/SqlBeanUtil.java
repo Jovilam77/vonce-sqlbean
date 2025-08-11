@@ -1787,20 +1787,44 @@ public class SqlBeanUtil {
         if (StringUtil.isEmpty(json)) {
             return null;
         }
-        if (json.startsWith("[") && json.endsWith("]")) {
-            Type genericType = field.getGenericType();
-            if (genericType instanceof ParameterizedType) {
-                ParameterizedType pt = (ParameterizedType) genericType;
-                for (Type typeArg : pt.getActualTypeArguments()) {
-                    return convert.parseArray(json, (Class) typeArg);
+        if (json.trim().startsWith("[") && json.trim().endsWith("]")) {
+            if (field.getType().isArray()) {
+                return convertArray(convert.parseArray(json, field.getType().getComponentType()).toArray(), field.getType().getComponentType());
+            } else {
+                Type genericType = field.getGenericType();
+                if (genericType instanceof ParameterizedType) {
+                    ParameterizedType pt = (ParameterizedType) genericType;
+                    for (Type typeArg : pt.getActualTypeArguments()) {
+                        return convert.parseArray(json, (Class) typeArg);
+                    }
                 }
             }
             return convert.parse(json);
-        } else if (json.startsWith("{") && json.endsWith("}")) {
+        } else if (json.trim().startsWith("{") && json.trim().endsWith("}")) {
             return convert.parseObject(json, field.getType());
         }
         return null;
     }
+
+    /**
+     * 转换数组类型
+     *
+     * @param array
+     * @param targetType
+     * @return
+     */
+    public static Object convertArray(Object array, Class<?> targetType) {
+        if (!array.getClass().isArray()) return array;
+        int length = Array.getLength(array);
+        Object result = Array.newInstance(targetType, length);
+        for (int i = 0; i < length; i++) {
+            Object element = Array.get(array, i);
+            Array.set(result, i, element != null ?
+                    String.valueOf(element) : null);
+        }
+        return result;
+    }
+
 
     /**
      * 将条件转换为Wrapper

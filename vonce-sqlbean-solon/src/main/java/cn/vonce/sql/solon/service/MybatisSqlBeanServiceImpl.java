@@ -27,6 +27,7 @@ import org.noear.solon.data.annotation.Tran;
 import java.util.*;
 
 /**
+ * Solon环境的Mybatis实现
  * @author Jovi
  * @email imjovi@qq.com
  * @date 2024/8/9 15:03
@@ -53,7 +54,7 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl<T> 
 
     @Override
     public SqlBeanMeta getSqlBeanMeta() {
-        return super.setSqlBeanMeta(sqlBeanMeta);
+        return sqlBeanMeta;
     }
 
     @Override
@@ -273,25 +274,25 @@ public class MybatisSqlBeanServiceImpl<T, ID> extends BaseSqlBeanServiceImpl<T> 
         return mybatisSqlBeanDao.countBy(getSqlBeanMeta(), clazz, null);
     }
 
-    @DbSwitch(DbRole.MASTER)
+    @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> select() {
         return mybatisSqlBeanDao.selectAll(getSqlBeanMeta(), clazz, null);
     }
 
-    @DbSwitch(DbRole.MASTER)
+    @DbSwitch(DbRole.SLAVE)
     @Override
     public List<T> select(Paging paging) {
         return mybatisSqlBeanDao.selectAll(getSqlBeanMeta(), clazz, paging);
     }
 
-    @DbSwitch(DbRole.MASTER)
+    @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> select(Class<R> returnType) {
         return mybatisSqlBeanDao.selectAllO(getSqlBeanMeta(), clazz, returnType, null);
     }
 
-    @DbSwitch(DbRole.MASTER)
+    @DbSwitch(DbRole.SLAVE)
     @Override
     public <R> List<R> select(Class<R> returnType, Paging paging) {
         return mybatisSqlBeanDao.selectAllO(getSqlBeanMeta(), clazz, returnType, paging);

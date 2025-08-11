@@ -10,15 +10,11 @@ import cn.vonce.sql.enumerate.DbType;
 import cn.vonce.sql.enumerate.IdType;
 import cn.vonce.sql.enumerate.JdbcType;
 import cn.vonce.sql.helper.Wrapper;
-import cn.vonce.sql.java.datasource.ConnectionContextHolder;
-import cn.vonce.sql.java.datasource.ConnectionProxy;
-import cn.vonce.sql.java.datasource.DataSourceContextHolder;
 import cn.vonce.sql.uitls.ReflectUtil;
 import cn.vonce.sql.uitls.SqlBeanUtil;
 import cn.vonce.sql.uitls.StringUtil;
 
 import java.lang.reflect.Field;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,19 +30,6 @@ public abstract class BaseSqlBeanServiceImpl<T> {
 
 
     public abstract SqlBeanMeta getSqlBeanMeta();
-
-    protected SqlBeanMeta setSqlBeanMeta(SqlBeanMeta sqlBeanMeta) {
-        String currentDs = DataSourceContextHolder.getDataSource();
-        if (StringUtil.isNotBlank(currentDs)) {
-            ConnectionProxy connectionProxy = ConnectionContextHolder.getConnection(currentDs);
-            try {
-                return SqlBeanMeta.build(sqlBeanMeta.getSqlBeanConfig(), connectionProxy.getMetaData());
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return sqlBeanMeta;
-    }
 
     /**
      * 处理字段信息

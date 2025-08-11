@@ -2,7 +2,7 @@ package cn.vonce.sql.solon.config;
 
 import cn.vonce.sql.config.SqlBeanConfig;
 import cn.vonce.sql.config.SqlBeanMeta;
-import cn.vonce.sql.java.annotation.DbSource;
+import cn.vonce.sql.java.annotation.DbSwitch;
 import cn.vonce.sql.java.mapper.MybatisSqlBeanMapperInterceptor;
 import cn.vonce.sql.solon.annotation.EnableAutoConfigMultiDataSource;
 import cn.vonce.sql.solon.datasource.DataSourceInterceptor;
@@ -40,7 +40,7 @@ public class AutoConfigSolon implements Plugin {
             mybatisAdapter.getConfiguration().addInterceptor(new MybatisSqlBeanMapperInterceptor());
         }
         bw.context().beanMake(SolonAutoCreateTableListener.class);
-        bw.context().beanInterceptorAdd(DbSource.class, new DataSourceInterceptor());
+        bw.context().beanInterceptorAdd(DbSwitch.class, new DataSourceInterceptor());
         try {
             Connection connection = mybatisAdapter.getConfiguration().getEnvironment().getDataSource().getConnection();
             SqlBeanConfig sqlBeanConfig = bw.context().getBean(SqlBeanConfig.class);
