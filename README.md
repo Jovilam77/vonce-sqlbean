@@ -41,26 +41,39 @@
 @Data
 public class BaseEntity {
 
+    /**
+     * 唯一id（注：这个Java注释会当作表的字段注释自动同步）
+     */
     @SqlId(type = IdType.SNOWFLAKE_ID_16)
-    @SqlColumn(notNull = true, remarks = "唯一id")//字段不能为null,表字段注释
+    @SqlColumn(notNull = true)
     private Long id;
 
-    @SqlColumn(remarks = "创建者")//表字段注释
+    /**
+     * 创建者（注：这个Java注释会当作表的字段注释自动同步）
+     */
     private Long creator;
 
+    /**
+     * 创建时间（注：这个Java注释会当作表的字段注释自动同步）
+     */
     @SqlDefaultValue(with = FillWith.INSERT)
-    @SqlColumn(remarks = "创建时间")//表字段注释
     private Date createTime;
 
-    @SqlColumn(remarks = "更新者")//表字段注释
+    /**
+     * 更新者（注：这个Java注释会当作表的字段注释自动同步）
+     */
     private Long updater;
 
+    /**
+     * 更新时间（注：这个Java注释会当作表的字段注释自动同步）
+     */
     @SqlDefaultValue(with = FillWith.UPDATE)
-    @SqlColumn(remarks = "更新时间")//表字段注释
     private Date updateTime;
 
+    /**
+     * 是否删除（注：这个Java注释会当作表的字段注释自动同步）
+     */
     @SqlLogically
-    @SqlColumn(remarks = "是否删除(0正常 1删除)")//表字段注释
     private Boolean deleted;
 
 }
@@ -71,32 +84,55 @@ public class BaseEntity {
 @SqlTable(autoAlter = true, value = "t_user", remarks = "用户")
 public class User extends BaseEntity {
 
-    @SqlColumn(notNull = true, remarks = "用户名")//字段不能为null,表字段注释
+    /**
+     * 用户名（注：这个Java注释会当作表的字段注释自动同步）
+     */
+    @SqlColumn(notNull = true)
     private String userName;
 
-    @SqlColumn(remarks = "姓名")//表字段注释
+    /**
+     * 昵称（注：这个Java注释会当作表的字段注释自动同步）
+     */
     private String nickName;
 
-    @SqlColumn(notNull = true, remarks = "手机号码")//表字段注释
+    /**
+     * 手机号码（注：这个Java注释会当作表的字段注释自动同步）
+     */
     private String mobilePhone;
 
-    @SqlColumn(notNull = true, remarks = "密码")//表字段注释
+    /**
+     * 密码（注：这个Java注释会当作表的字段注释自动同步）
+     */
+    @SqlColumn(notNull = true)
     private String password;
 
-    @SqlColumn(notNull = true, remarks = "性别")//表字段注释
+    /**
+     * 性别（注：这个Java注释会当作表的字段注释自动同步）
+     */
+    @SqlColumn(notNull = true)
     private Integer gender;
 
-    @SqlColumn(remarks = "年龄")//表字段注释
+    /**
+     * 年龄（注：这个Java注释会当作表的字段注释自动同步）
+     */
     private Integer age;
 
-    @SqlColumn(remarks = "电子邮箱")//表字段注释
+    /**
+     * 电子邮箱（注：这个Java注释会当作表的字段注释自动同步）
+     */
     private String email;
 
-    @SqlColumn(remarks = "头像", oldName = "head_portrait")//表字段注释,修改表字段名称需要在oldName指定旧的名称
+    /**
+     * 头像（注：这个Java注释会当作表的字段注释自动同步）
+     */
+    @SqlColumn(oldName = "head_portrait")//修改表字段名称需要在oldName指定旧的名称
     private String avatar;
 
+    /**
+     * 状态（注：这个Java注释会当作表的字段注释自动同步）
+     */
     @SqlDefaultValue(with = FillWith.INSERT)
-    @SqlColumn(notNull = true, remarks = "状态(0正常 1停用)")//字段不能为null,表字段注释
+    @SqlColumn(notNull = true)
     private UserStatus status;
 
 }
