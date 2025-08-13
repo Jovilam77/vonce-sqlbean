@@ -121,7 +121,7 @@ public class SQLiteHelper {
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
-                Log.e("sqlbean", e.getMessage(), e);
+                Log.e("flexsql", e.getMessage(), e);
             }
         }).start();
     }

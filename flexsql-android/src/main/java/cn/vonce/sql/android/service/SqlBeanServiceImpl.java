@@ -284,7 +284,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.queryForObject(SqlBeanProvider.selectByIdSql(getSqlBeanMeta(), clazz, null, id), new SqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -297,7 +297,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.queryForObject(SqlBeanProvider.selectByIdSql(getSqlBeanMeta(), clazz, returnType, id), new SqlBeanMapper<R>(clazz, returnType));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -310,7 +310,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanMeta(), clazz, null, ids), new SqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -323,7 +323,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectByIdsSql(getSqlBeanMeta(), clazz, returnType, ids), new SqlBeanMapper<R>(clazz, returnType));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -334,7 +334,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.queryForObject(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, null, select), new SqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -345,7 +345,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.queryForObject(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, returnType, select), new SqlBeanMapper<R>(clazz, returnType));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -355,7 +355,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.queryForObject(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, null, select), new SqlBeanMapper<Map<String, Object>>(clazz, Map.class));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -365,7 +365,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.queryForObject(SqlBeanProvider.selectBySql(getSqlBeanMeta(), clazz, null, null, where, args), new SqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -375,7 +375,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.queryForObject(SqlBeanProvider.selectBySql(getSqlBeanMeta(), clazz, returnType, null, where, args), new SqlBeanMapper<R>(clazz, returnType));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -399,7 +399,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.queryForObject(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, returnType, select), new SqlBeanMapper<R>(clazz, clazz));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -414,7 +414,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanMeta(), clazz, returnType, null, where, args), new SqlBeanMapper<R>(clazz, returnType));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -426,7 +426,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, returnType, select), new SqlBeanMapper<R>(clazz, clazz));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -441,7 +441,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanMeta(), clazz, returnType, paging, where, args), new SqlBeanMapper<R>(clazz, returnType));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -455,7 +455,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, returnType, select), new SqlBeanMapper<R>(clazz, clazz));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -470,7 +470,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanMeta(), clazz, null, null, where, args), new SqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -492,7 +492,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectBySql(getSqlBeanMeta(), clazz, null, paging, where, args), new SqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -538,7 +538,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanMeta(), clazz, null, null), new SqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -548,7 +548,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanMeta(), clazz, null, paging), new SqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -558,7 +558,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanMeta(), clazz, returnType, null), new SqlBeanMapper<R>(clazz, returnType));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -568,7 +568,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectAllSql(getSqlBeanMeta(), clazz, returnType, paging), new SqlBeanMapper<R>(clazz, returnType));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -578,7 +578,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, null, select), new SqlBeanMapper<Map<String, Object>>(clazz, Map.class));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
 
@@ -589,7 +589,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, returnType, select), new SqlBeanMapper<R>(clazz, returnType));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }
@@ -599,7 +599,7 @@ public class SqlBeanServiceImpl<T, ID> implements SqlBeanService<T, ID>, DbManag
         try {
             return sqliteTemplate.query(SqlBeanProvider.selectSql(getSqlBeanMeta(), clazz, null, select), new SqlBeanMapper<T>(clazz, clazz));
         } catch (Exception e) {
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
             return null;
         }
     }

@@ -73,13 +73,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         String sql = SqlHelper.buildCreateSql(create);
                         db.execSQL("DROP TABLE IF EXISTS " + SqlBeanUtil.getTableName(create.getTable(), create));
                         db.execSQL(sql);
-                        Log.d("sqlbean", sql);
+                        Log.d("flexsql", sql);
                     }
                 }
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            Log.e("sqlbean", e.getMessage(), e);
+            Log.e("flexsql", e.getMessage(), e);
         }
     }
 

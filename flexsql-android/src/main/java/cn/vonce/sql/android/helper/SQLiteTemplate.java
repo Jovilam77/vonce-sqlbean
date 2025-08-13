@@ -32,7 +32,7 @@ public class SQLiteTemplate {
     public <T> List<T> query(String sql, RowMapper<T> rowMapper) {
         List<T> list = new ArrayList<>();
         ResultSetDelegate<Cursor> resultSetDelegate = new ResultSetDelegate<>(db.rawQuery(sql, null));
-        Log.d("sqlbean", "query: " + sql);
+        Log.d("flexsql", "query: " + sql);
         for (int i = 0; i < resultSetDelegate.getDelegate().getCount(); i++) {
             list.add(rowMapper.mapRow(resultSetDelegate, i));
         }
@@ -50,7 +50,7 @@ public class SQLiteTemplate {
      */
     public <T> T queryForObject(String sql, RowMapper<T> rowMapper) {
         Cursor cursor = db.rawQuery(sql, null);
-        Log.d("sqlbean", "queryForObject: " + sql);
+        Log.d("flexsql", "queryForObject: " + sql);
         T t = rowMapper.mapRow(new ResultSetDelegate<>(cursor), 0);
         cursor.close();
         return t;
@@ -63,7 +63,7 @@ public class SQLiteTemplate {
      * @return
      */
     public int insert(final String sql) {
-        Log.d("sqlbean", "updateSQL: " + sql);
+        Log.d("flexsql", "updateSQL: " + sql);
         return (int) db.compileStatement(sql).executeInsert();
     }
 
@@ -74,7 +74,7 @@ public class SQLiteTemplate {
      * @return
      */
     public int update(final String sql) {
-        Log.d("sqlbean", "updateSQL: " + sql);
+        Log.d("flexsql", "updateSQL: " + sql);
         return db.compileStatement(sql).executeUpdateDelete();
     }
 
@@ -84,7 +84,7 @@ public class SQLiteTemplate {
      * @param sql
      */
     public void execSQL(final String sql) {
-        Log.d("sqlbean", "execSQL: " + sql);
+        Log.d("flexsql", "execSQL: " + sql);
         db.execSQL(sql);
     }
 

@@ -110,7 +110,7 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
 
     @Override
     public String getDataSourcePrefix() {
-        return "spring.datasource.sqlbean";
+        return "spring.datasource.flexsql";
     }
 
     private BeanDefinition transactionalDefinition() {

@@ -3,11 +3,11 @@
 ###### 1. 数据源相关属性yml格式（注解自动配置必须准守，手动配置可自定义）
 ```
 #使用注解配置必须遵守spring.datasource.type否则找不到或不配将默认使用druid，如未导包会报错
-#使用注解配置必须遵守spring.datasource.sqlbean前缀
+#使用注解配置必须遵守spring.datasource.flexsql前缀
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    sqlbean:
+    flexsql:
       sqlite:
         driverClassName: org.sqlite.JDBC
         url: jdbc:sqlite:config.db
@@ -82,20 +82,20 @@ public class Application {
 public class DataSourceConfiguration {
 
     @Bean(name = "sqliteDataSource")
-    @ConfigurationProperties(prefix = "spring.datasource.sqlbean.sqlite")
+    @ConfigurationProperties(prefix = "spring.datasource.flexsql.sqlite")
     public DataSource getDateSourceSqlite() {
         return DruidDataSourceBuilder.create().build();
     }
 
 
     @Bean(name = "mysqlReadDataSource")
-    @ConfigurationProperties(prefix = "spring.datasource.sqlbean.mysqlread")
+    @ConfigurationProperties(prefix = "spring.datasource.flexsql.mysqlread")
     public DataSource getDateSourceMysqlRead() {
         return DruidDataSourceBuilder.create().build();
     }
 
     @Bean(name = "mysqlWriteDataSource")
-    @ConfigurationProperties(prefix = "spring.datasource.sqlbean.mysqlwrite")
+    @ConfigurationProperties(prefix = "spring.datasource.flexsql.mysqlwrite")
     public DataSource getDateSourceMysqlWrite() {
         return DruidDataSourceBuilder.create().build();
     }

@@ -42,7 +42,7 @@ public class AutoConfigMultiDataSource extends BaseAutoConfigMultiDataSource imp
 
     @Override
     public String getDataSourcePrefix() {
-        return "solon.datasource.sqlbean";
+        return "solon.datasource.flexsql";
     }
 
     @Override
