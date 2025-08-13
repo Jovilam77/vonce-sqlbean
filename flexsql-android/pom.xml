@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
 
-    <name>vonce-sqlbean-android</name>
+    <name>flexsql-android</name>
     <description>This is a tool that uses Java object-oriented thinking to write and generate Sql statements, and on this basis, it implements lightweight plug-in support for Android. A large number of commonly used Sql execution methods are built into the plug-in, the purpose is to improve development efficiency, reduce a large number of Sql statement writing, and let developers focus more on writing business code.
     </description>
     <url>www.vonce.cn</url>
@@ -22,14 +22,14 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:git@github.com:Jovilam77/vonce-sqlbean-android.git</connection>
-        <developerConnection>scm:git:git@github.com:Jovilam77/vonce-sqlbean-android.git</developerConnection>
-        <url>git@github.com:Jovilam77/vonce-sqlbean-android.git</url>
+        <connection>scm:git:git@github.com:Jovilam77/FlexSQL.git</connection>
+        <developerConnection>scm:git:git@github.com:Jovilam77/FlexSQL.git</developerConnection>
+        <url>git@github.com:Jovilam77/FlexSQL.git</url>
     </scm>
     <!-- 版本信息 -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <vonce.sqlbean.version>1.7.0</vonce.sqlbean.version>
+        <flexsql.version>1.7.0</flexsql.version>
         <android.version>26</android.version>
     </properties>
 
@@ -135,16 +135,16 @@
     </build>
 
     <groupId>cn.vonce</groupId>
-    <artifactId>vonce-sqlbean-android</artifactId>
+    <artifactId>flexsql-android</artifactId>
     <version>1.7.0</version>
     <packaging>jar</packaging>
 
     <dependencies>
-        <!-- sqlbean core -->
+        <!-- FlexSQL core -->
         <dependency>
             <groupId>cn.vonce</groupId>
-            <artifactId>vonce-sqlbean-core</artifactId>
-            <version>${vonce.sqlbean.version}</version>
+            <artifactId>flexsql-core</artifactId>
+            <version>${flexsql.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.esotericsoftware</groupId>

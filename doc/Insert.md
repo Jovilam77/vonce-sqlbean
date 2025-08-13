@@ -1,4 +1,4 @@
-#### 更多实例Sqlbean使用实例以及代码生成点击这里👉 [https://gitee.com/iJovi/sqlbean-example](https://gitee.com/iJovi/sqlbean-example "sqlbean-example")
+#### 更多实例FlexSQL使用实例以及代码生成点击这里👉 [https://gitee.com/iJovi/flexsql-example](https://gitee.com/iJovi/flexsql-example "FlexSQL-Example")
 #### 一. Insert对象使用示例（通常情况下不使用该方式，查看下方文档使用更简便方式）
 ######1.使用实体类方式插入
 ```java

@@ -1,8 +1,8 @@
-## SqlBean
+## FlexSQL（原名：SqlBean）
 
 #### 介绍
 
-###### SqlBean 是一款革命性的 ORM（对象关系映射）插件，通过 Java 语法生成 SQL 语句，从根本上改变了开发者在 Java 应用程序中与数据库交互的方式。与传统 ORM 框架要求您首先设计数据库架构然后创建相应实体类不同，SqlBean 采用了代码优先的方式，让您可以直接专注于编写业务逻辑和实体类，数据库表则由系统自动创建和维护。
+###### FlexSQL 是一款革命性的 ORM（对象关系映射）插件，通过 Java 语法生成 SQL 语句，从根本上改变了开发者在 Java 应用程序中与数据库交互的方式。与传统 ORM 框架要求您首先设计数据库架构然后创建相应实体类不同，FlexSQL 采用了代码优先的方式，让您可以直接专注于编写业务逻辑和实体类，数据库表则由系统自动创建和维护。
 
 ###### 🚀特点: 多数据源, 动态Schema, 读写分离, 自动建表, 自动维护表结构, 联表查询, 乐观锁, 分页
 
@@ -14,8 +14,8 @@
 
 ###### 💿数据库: Mysql, MariaDB, Oracle, Sqlserver2008+, Postgresql, DB2, Derby, Sqlite, HSQL, H2
 
-###### SuperCode代码生成项目👉 [https://gitee.com/iJovi/supercode](https://gitee.com/iJovi/supercode "supercode")
-###### SqlBean使用例子以及代码生成例子点击这里👉 [https://gitee.com/iJovi/sqlbean-example](https://gitee.com/iJovi/sqlbean-example "sqlbean-example")
+###### SuperCode代码生成项目👉 [https://gitee.com/iJovi/supercode](https://gitee.com/iJovi/supercode "SuperCode")
+###### FlexSQL使用例子以及代码生成例子点击这里👉 [https://gitee.com/iJovi/FlexSQL-example](https://gitee.com/iJovi/flexsql-example "FlexSQL-Example")
 
 ### 快速开始
 
@@ -23,18 +23,18 @@
 ###### Spring项目
 	<dependency>
 		<groupId>cn.vonce</groupId>
-		<artifactId>vonce-sqlbean-spring</artifactId>
+		<artifactId>flexsql-spring</artifactId>
 		<version>1.7.0</version>
 	</dependency>
 ###### Solon项目
 	<dependency>
 		<groupId>cn.vonce</groupId>
-		<artifactId>vonce-sqlbean-solon</artifactId>
+		<artifactId>flexsql-solon</artifactId>
 		<version>1.7.0</version>
 	</dependency>
 ###### Android项目（[Android项目详细使用文档](doc/Android.md "Android项目详细使用文档")）
-	implementation 'cn.vonce:vonce-sqlbean-android:1.7.0'
-    annotationProcessor 'cn.vonce:vonce-sqlbean-android:1.7.0'
+	implementation 'cn.vonce:flexsql-android:1.7.0'
+    annotationProcessor 'cn.vonce:flexsql-android:1.7.0'
 ##### 2.标注实体类
 
 ```java
@@ -138,21 +138,21 @@ public class User extends BaseEntity {
 }
 ```
 
-##### 3.无需Dao层，Service层接口只需继承SqlBeanService<实体类, id类型>
+##### 3.无需Dao层，Service层接口只需继承FlexSQLService<实体类, id类型>
 
 ```java
-public interface UserService extends SqlBeanService<User, Long> {
+public interface UserService extends FlexSQLService<User, Long> {
     //这里可以写自己封装的方法
 
 }
 ```
 
-##### 4.Service实现类只需继承MybatisSqlBeanServiceImpl<实体类, id类型>和实现你的Service接口
+##### 4.Service实现类只需继承MybatisFlexSQLServiceImpl<实体类, id类型>和实现你的Service接口
 
 ```java
-//使用Spring Jdbc的话将继承的父类改成SpringJdbcSqlBeanServiceImpl即可
+//使用Spring Jdbc的话将继承的父类改成SpringJdbcFlexSQLServiceImpl即可
 @Service
-public class UserServiceImpl extends MybatisSqlBeanServiceImpl<User, Long> implements UserService {
+public class UserServiceImpl extends MybatisFlexSQLServiceImpl<User, Long> implements UserService {
 
 }
 ```
@@ -284,7 +284,7 @@ public class UserController {
 
 ###### [7️⃣. Service接口和实现类](doc/Interface.md "Service接口和实现类")
 
-###### [8️⃣. SqlBean和SqlHelper](doc/SqlHelper.md "SqlBean和SqlHelper")
+###### [8️⃣. FlexSQL和SqlHelper](doc/SqlHelper.md "FlexSQL和SqlHelper")
 
 ###### [9️⃣. Where条件和Sql函数](doc/Where.md "Where条件和Sql函数")
 

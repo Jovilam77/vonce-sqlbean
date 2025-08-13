@@ -4,21 +4,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>cn.vonce</groupId>
-    <artifactId>vonce-sqlbean</artifactId>
+    <artifactId>FlexSQL</artifactId>
     <packaging>pom</packaging>
     <version>1.7.0</version>
     <modules>
-        <module>vonce-sqlbean-android</module>
-        <module>vonce-sqlbean-core</module>
-        <module>vonce-sqlbean-java</module>
-        <module>vonce-sqlbean-solon</module>
-        <module>vonce-sqlbean-spring</module>
+        <module>flexsql-android</module>
+        <module>flexsql-core</module>
+        <module>flexsql-java</module>
+        <module>flexsql-solon</module>
+        <module>flexsql-spring</module>
     </modules>
 
     <!-- 版本信息 -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <vonce.sqlbean.version>1.7.0</vonce.sqlbean.version>
+        <flexsql.version>1.7.0</flexsql.version>
         <com.esotericsoftware.version>1.11.9</com.esotericsoftware.version>
         <servlet-api.version>4.0.1</servlet-api.version>
         <spring.version>4.1.2.RELEASE</spring.version>

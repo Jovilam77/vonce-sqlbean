@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>vonce-sqlbean-core</name>
-    <description>This is the core project of Sqlbean.
+    <name>flexsql-core</name>
+    <description>This is the core project of FlexSQL.
     </description>
     <url>www.vonce.cn</url>
     <licenses>
@@ -21,9 +21,9 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:git@github.com:Jovilam77/vonce-sqlbean.git</connection>
-        <developerConnection>scm:git:git@github.com:Jovilam77/vonce-sqlbean.git</developerConnection>
-        <url>git@github.com:Jovilam77/vonce-sqlbean.git</url>
+        <connection>scm:git:git@github.com:Jovilam77/FlexSQL.git</connection>
+        <developerConnection>scm:git:git@github.com:Jovilam77/FlexSQL.git</developerConnection>
+        <url>git@github.com:Jovilam77/FlexSQL.git</url>
     </scm>
 
     <!-- 版本信息 -->
@@ -107,7 +107,7 @@
     </build>
 
     <groupId>cn.vonce</groupId>
-    <artifactId>vonce-sqlbean-core</artifactId>
+    <artifactId>flexsql-core</artifactId>
     <version>1.7.0</version>
     <packaging>jar</packaging>
 

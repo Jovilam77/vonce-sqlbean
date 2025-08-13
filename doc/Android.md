@@ -1,4 +1,4 @@
-## Sqlbean For Android
+## FlexSQL For Android
 
 ###### 1.引入Gradle依赖
 
