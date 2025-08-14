@@ -348,4 +348,46 @@ public class Update<T> extends CommonCondition<Update<T>> implements Serializabl
         return this;
     }
 
+    /**
+     * 设置table
+     *
+     * @param name
+     */
+    public Update<T> table(String name) {
+        super.setTable(name, name);
+        return this;
+    }
+
+    /**
+     * 设置table
+     *
+     * @param name
+     * @param aliasName
+     */
+    public Update<T> table(String name, String aliasName) {
+        super.setTable(name, aliasName);
+        return this;
+    }
+
+    /**
+     * 设置table
+     *
+     * @param name
+     * @param aliasName
+     */
+    public Update<T> table(String schema, String name, String aliasName) {
+        super.setTable(schema, name, aliasName);
+        return this;
+    }
+
+    /**
+     * 设置table sql 内容
+     *
+     * @param clazz 表对应的实体类
+     */
+    public Update<T> table(Class<?> clazz) {
+        super.setTable(clazz);
+        return this;
+    }
+
 }

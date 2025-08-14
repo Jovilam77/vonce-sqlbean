@@ -40,4 +40,46 @@ public class Delete extends CommonCondition<Delete> implements Serializable {
         this.logicallyDelete = logicallyDelete;
     }
 
+    /**
+     * 设置table
+     *
+     * @param name
+     */
+    public Delete table(String name) {
+        super.setTable(name, name);
+        return this;
+    }
+
+    /**
+     * 设置table
+     *
+     * @param name
+     * @param aliasName
+     */
+    public Delete table(String name, String aliasName) {
+        super.setTable(name, aliasName);
+        return this;
+    }
+
+    /**
+     * 设置table
+     *
+     * @param name
+     * @param aliasName
+     */
+    public Delete table(String schema, String name, String aliasName) {
+        super.setTable(schema, name, aliasName);
+        return this;
+    }
+
+    /**
+     * 设置table sql 内容
+     *
+     * @param clazz 表对应的实体类
+     */
+    public Delete table(Class<?> clazz) {
+        super.setTable(clazz);
+        return this;
+    }
+
 }
